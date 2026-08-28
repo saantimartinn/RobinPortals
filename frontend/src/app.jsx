@@ -33,7 +33,7 @@ function PortalRobin() {
     setState({ loading: false, user: null });
   }
   if (state.loading) return <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Cargando portal" /></div>;
-  if (!state.user) return <SubscriberAuthScreen onLogin={handleLogin} onSignup={handleSignup} />;
+  if (!state.user) return <SubscriberAuthScreen onLogin={handleLogin} onSignup={handleSignup} onBack={() => window.location.assign("https://santipruebas.netlify.app/portal/")} />;
   if (isSubscriberAdmin(state.user)) return <SubscriberAdmin user={state.user} onLogout={handleLogout} />;
   if (isSubscriberUser(state.user)) return <SubscriberPortal user={state.user} onLogout={handleLogout} onUserRefresh={refreshUser} />;
   return <div role="alert">Esta cuenta no pertenece a The Robin Plan. <button onClick={handleLogout}>Cerrar sesión</button></div>;

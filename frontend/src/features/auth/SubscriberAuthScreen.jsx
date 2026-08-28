@@ -60,6 +60,11 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
     <AuthShell>
       <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
         <div className="p-6 space-y-4">
+          {onBack && (
+            <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
+              <ChevronLeft className="h-4 w-4" /> Cambiar de portal
+            </button>
+          )}
           <div>
             <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "'Georgia', serif" }}>
               {tab === "login" ? "Bienvenido de vuelta" : "Crea tu cuenta"}
@@ -139,13 +144,6 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
             </div>
           )}
 
-          {onBack && (
-            <div className="pt-1 text-center">
-              <button type="button" onClick={onBack} className="text-xs text-slate-400 hover:text-slate-600 inline-flex items-center gap-1">
-                <ChevronLeft className="h-3.5 w-3.5" /> Volver
-              </button>
-            </div>
-          )}
         </div>
       </div>
       {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
