@@ -9,3 +9,4 @@ Recursos gráficos importados por React.
 - [logo-r-azul.png](../../../../../frontend/src/assets/logo-r-azul.png): Módulo frontend: logo-r-azul.png.
 - [logo-r-blanco.png](../../../../../frontend/src/assets/logo-r-blanco.png): Módulo frontend: logo-r-blanco.png.
 - [logo-robin-azul.png](../../../../../frontend/src/assets/logo-robin-azul.png): Módulo frontend: logo-robin-azul.png.
+- [robin-wordmark.png](../../../../../frontend/src/assets/robin-wordmark.png): Módulo frontend: robin-wordmark.png.

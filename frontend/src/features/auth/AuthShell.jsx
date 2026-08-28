@@ -2,40 +2,41 @@ import { NAVY, NAVY_DARK } from "../../shared/theme.js";
 import React from "react";
 import logoRBlanco from "../../assets/logo-r-blanco.png";
 import logoRobinAzul from "../../assets/logo-robin-azul.png";
+import "./auth-shell.css";
 
 function AuthShell({ children }) {
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: "'system-ui', sans-serif" }}>
-      <div className="hidden lg:flex flex-col justify-between w-[420px] flex-shrink-0 p-10 relative overflow-hidden"
+    <div className="subscription-auth-shell">
+      <aside className="subscription-auth-brand"
         style={{ background: `linear-gradient(160deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #2a4a8e 100%)` }}>
-        <div className="absolute inset-0 opacity-5">
+        <div className="subscription-auth-rings">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="absolute rounded-full border border-white"
               style={{ width: (i + 1) * 180, height: (i + 1) * 180, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           ))}
         </div>
-        <div className="relative">
-          <img src={logoRBlanco} alt="Robin" className="h-16 w-auto" />
+        <div className="subscription-auth-logo">
+          <img src={logoRBlanco} alt="Robin" />
         </div>
-        <div className="relative">
-          <div className="text-4xl font-bold text-white mb-4" style={{ fontFamily: "'Georgia', serif", lineHeight: 1.2 }}>
+        <div className="subscription-auth-message">
+          <div className="subscription-auth-title">
             Tu futuro<br />empieza aquí.
           </div>
-          <div className="text-white/60 text-sm leading-relaxed">
-            The Robin Plan te acompaña en tu vida internacional: comunidad, bienestar y desarrollo profesional.
+          <div className="subscription-auth-copy">
+            Servicios, comunidad y apoyo para construir tu vida internacional con más confianza.
           </div>
         </div>
-        <div className="relative text-white/30 text-xs">© Project Robin · The Robin Plan</div>
-      </div>
+        <div className="subscription-auth-footer">© Project Robin · The Robin Plan</div>
+      </aside>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden flex justify-center mb-8">
-            <img src={logoRobinAzul} alt="Project Robin" className="h-12 w-auto" />
+      <main className="subscription-auth-main">
+        <div className="subscription-auth-form">
+          <div className="subscription-auth-mobile-logo">
+            <img src={logoRobinAzul} alt="Project Robin" />
           </div>
           {children}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

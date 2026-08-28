@@ -1,7 +1,7 @@
-import { AlertCircle, CheckCircle2, ChevronLeft, Loader2, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle2, ChevronLeft, Loader2 } from "lucide-react";
 import { AuthShell } from "./AuthShell.jsx";
 import { Btn, Field, SelectField } from "../../shared/ui.jsx";
-import { NAVY, NAVY_DARK } from "../../shared/theme.js";
+import { NAVY } from "../../shared/theme.js";
 import { ROBIN_CITIES } from "../../shared/constants.js";
 import React, { useState } from "react";
 import { TermsModal } from "../../shared/TermsModal.jsx";
@@ -60,14 +60,12 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
     <AuthShell>
       <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
         <div className="p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl grid place-items-center text-white flex-shrink-0"
-              style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
-              <Sparkles className="h-5 w-5" />
+          <div>
+            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "'Georgia', serif" }}>
+              {tab === "login" ? "Bienvenido de vuelta" : "Crea tu cuenta"}
             </div>
-            <div>
-              <div className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>The Robin Plan</div>
-              <div className="text-xs text-slate-500">Tu suscripción de acompañamiento internacional</div>
+            <div className="text-sm text-slate-500">
+              {tab === "login" ? "Accede a The Robin Plan" : "Empieza a disfrutar de tu espacio Robin"}
             </div>
           </div>
 

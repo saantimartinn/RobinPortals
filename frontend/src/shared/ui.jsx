@@ -48,19 +48,19 @@ const Btn = ({ children, onClick, variant = "primary", className = "", disabled,
 export { Btn };
 
 const Card = ({ children, className = "" }) => (
-  <div className={`rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden ${className}`}>
+  <div className={`ui-card rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden ${className}`}>
     {children}
   </div>
 );
 
 export { Card };
 
-const CardContent = ({ children, className = "" }) => <div className={`px-6 py-5 ${className}`}>{children}</div>;
+const CardContent = ({ children, className = "" }) => <div className={`ui-card-content px-6 py-5 ${className}`}>{children}</div>;
 
 export { CardContent };
 
 const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
-  <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-4 justify-between">
+  <div className="ui-card-header px-6 py-4 border-b border-slate-100 flex items-center gap-4 justify-between">
     <div className="flex items-center gap-3 min-w-0">
       {Icon && (
         <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0"
@@ -69,7 +69,7 @@ const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
         </div>
       )}
       <div className="min-w-0">
-        <div className="text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "'Georgia', serif" }}>{title}</div>
+        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "'Georgia', serif" }}>{title}</div>
         {subtitle && <div className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</div>}
       </div>
     </div>

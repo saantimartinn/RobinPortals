@@ -8,3 +8,4 @@ Inicio de sesión y alta.
 
 - [AuthShell.jsx](../../../../../../frontend/src/features/auth/AuthShell.jsx): Módulo frontend: AuthShell.
 - [SubscriberAuthScreen.jsx](../../../../../../frontend/src/features/auth/SubscriberAuthScreen.jsx): Módulo frontend: SubscriberAuthScreen.
+- [auth-shell.css](../../../../../../frontend/src/features/auth/auth-shell.css): Módulo frontend: auth-shell.css.

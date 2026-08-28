@@ -53,10 +53,12 @@ Generado con `npm run docs:generate`.
 | [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | Módulo frontend: SubscriberPortal |
 | [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | Módulo frontend: SubscriberShell |
+| [frontend/src/application/subscription-portal.css](../frontend/src/application/subscription-portal.css) | Módulo frontend: subscription-portal.css |
 | [frontend/src/application/SubscriptionPlanPicker.jsx](../frontend/src/application/SubscriptionPlanPicker.jsx) | Módulo frontend: SubscriptionPlanPicker |
 | [frontend/src/assets/logo-r-azul.png](../frontend/src/assets/logo-r-azul.png) | Módulo frontend: logo-r-azul.png |
 | [frontend/src/assets/logo-r-blanco.png](../frontend/src/assets/logo-r-blanco.png) | Módulo frontend: logo-r-blanco.png |
 | [frontend/src/assets/logo-robin-azul.png](../frontend/src/assets/logo-robin-azul.png) | Módulo frontend: logo-robin-azul.png |
+| [frontend/src/assets/robin-wordmark.png](../frontend/src/assets/robin-wordmark.png) | Módulo frontend: robin-wordmark.png |
 | [frontend/src/features/admin/ADMIN_EVENT_KINDS.js](../frontend/src/features/admin/ADMIN_EVENT_KINDS.js) | Módulo frontend: ADMIN_EVENT_KINDS |
 | [frontend/src/features/admin/AdminChallengeManager.jsx](../frontend/src/features/admin/AdminChallengeManager.jsx) | Módulo frontend: AdminChallengeManager |
 | [frontend/src/features/admin/AdminDiscountManager.jsx](../frontend/src/features/admin/AdminDiscountManager.jsx) | Módulo frontend: AdminDiscountManager |
@@ -70,6 +72,7 @@ Generado con `npm run docs:generate`.
 | [frontend/src/features/admin/SUB_REQ_STATUS.js](../frontend/src/features/admin/SUB_REQ_STATUS.js) | Módulo frontend: SUB_REQ_STATUS |
 | [frontend/src/features/admin/SubscriberAdmin.jsx](../frontend/src/features/admin/SubscriberAdmin.jsx) | Módulo frontend: SubscriberAdmin |
 | [frontend/src/features/admin/toLocalInput.js](../frontend/src/features/admin/toLocalInput.js) | Módulo frontend: toLocalInput |
+| [frontend/src/features/auth/auth-shell.css](../frontend/src/features/auth/auth-shell.css) | Módulo frontend: auth-shell.css |
 | [frontend/src/features/auth/AuthShell.jsx](../frontend/src/features/auth/AuthShell.jsx) | Módulo frontend: AuthShell |
 | [frontend/src/features/auth/SubscriberAuthScreen.jsx](../frontend/src/features/auth/SubscriberAuthScreen.jsx) | Módulo frontend: SubscriberAuthScreen |
 | [frontend/src/features/career/CvAiPage.jsx](../frontend/src/features/career/CvAiPage.jsx) | Módulo frontend: CvAiPage |
