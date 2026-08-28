@@ -7,3 +7,7 @@ Recursos públicos copiados al build.
 ## Carpetas
 
 - [recursos](recursos/README.md): Recursos descargables del producto conservados del original.
+
+## Archivos
+
+- [favicon.png](../../../../frontend/public/favicon.png): Recurso público.
