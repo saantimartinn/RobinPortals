@@ -58,6 +58,7 @@ Generado con `npm run docs:generate`.
 | [frontend/src/assets/logo-r-azul.png](../frontend/src/assets/logo-r-azul.png) | Módulo frontend: logo-r-azul.png |
 | [frontend/src/assets/logo-r-blanco.png](../frontend/src/assets/logo-r-blanco.png) | Módulo frontend: logo-r-blanco.png |
 | [frontend/src/assets/logo-robin-azul.png](../frontend/src/assets/logo-robin-azul.png) | Módulo frontend: logo-robin-azul.png |
+| [frontend/src/assets/robin-logo-transparent.png](../frontend/src/assets/robin-logo-transparent.png) | Módulo frontend: robin-logo-transparent.png |
 | [frontend/src/assets/robin-wordmark.png](../frontend/src/assets/robin-wordmark.png) | Módulo frontend: robin-wordmark.png |
 | [frontend/src/features/admin/ADMIN_EVENT_KINDS.js](../frontend/src/features/admin/ADMIN_EVENT_KINDS.js) | Módulo frontend: ADMIN_EVENT_KINDS |
 | [frontend/src/features/admin/AdminChallengeManager.jsx](../frontend/src/features/admin/AdminChallengeManager.jsx) | Módulo frontend: AdminChallengeManager |

@@ -3,9 +3,8 @@
 .subscription-auth-rings { position: absolute; inset: 0; opacity: .06; }
 .subscription-auth-rings > div { position: absolute; border-radius: 999px; border: 1px solid white; }
 .subscription-auth-wordmark, .subscription-auth-message, .subscription-auth-footer { position: relative; z-index: 1; }
-.subscription-auth-wordmark, .subscription-auth-mobile-logo { display: flex; align-items: center; gap: 12px; }
-.subscription-auth-wordmark > span, .subscription-auth-mobile-logo > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #f4be4f; color: #29395f; }
-.subscription-auth-wordmark strong, .subscription-auth-mobile-logo strong { color: #fffdf2; font-size: 18px; letter-spacing: .22em; font-weight: 750; }
+.subscription-auth-wordmark, .subscription-auth-mobile-logo { display: flex; align-items: center; }
+.subscription-auth-wordmark img { width: 112px; height: 94px; object-fit: contain; }
 .subscription-auth-title { color: white; font: 700 clamp(38px, 4vw, 52px)/1.08 Georgia, serif; letter-spacing: -.035em; margin-bottom: 24px; }
 .subscription-auth-copy { max-width: 320px; color: rgba(255,255,255,.66); font-size: 13px; line-height: 1.75; }
 .subscription-auth-footer { color: rgba(255,255,255,.34); font-size: 11px; }
@@ -14,7 +13,7 @@
 .subscription-auth-form > .bg-white { border-radius: 24px; border-color: #e4e7eb; box-shadow: 0 24px 70px rgba(31,48,83,.10); }
 .subscription-auth-form > .bg-white > div { padding: 30px; }
 .subscription-auth-mobile-logo { display: none; justify-content: center; margin-bottom: 28px; }
-.subscription-auth-mobile-logo strong { color: #29395f; }
+.subscription-auth-mobile-logo img { width: 96px; height: 80px; object-fit: contain; border-radius: 16px; padding: 9px; background: #29395f; }
 @media (max-width: 900px) {
   .subscription-auth-brand { display: none; }
   .subscription-auth-main { padding: 28px 18px; }

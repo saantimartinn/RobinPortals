@@ -1,6 +1,6 @@
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";
-import { Bird } from "lucide-react";
 import React from "react";
+import robinLogoTransparent from "../../assets/robin-logo-transparent.png";
 import "./auth-shell.css";
 
 function AuthShell({ children }) {
@@ -15,8 +15,7 @@ function AuthShell({ children }) {
           ))}
         </div>
         <div className="subscription-auth-wordmark" aria-label="Robin">
-          <span><Bird size={19} strokeWidth={1.8} /></span>
-          <strong>ROBIN</strong>
+          <img src={robinLogoTransparent} alt="Robin" />
         </div>
         <div className="subscription-auth-message">
           <div className="subscription-auth-title">
@@ -32,7 +31,7 @@ function AuthShell({ children }) {
       <main className="subscription-auth-main">
         <div className="subscription-auth-form">
           <div className="subscription-auth-mobile-logo">
-            <span><Bird size={18} strokeWidth={1.8} /></span><strong>ROBIN</strong>
+            <img src={robinLogoTransparent} alt="Robin" />
           </div>
           {children}
         </div>

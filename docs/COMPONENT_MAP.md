@@ -22,7 +22,7 @@ Generado desde imports del código.
 | [frontend/src/features/admin/SUB_REQ_STATUS.js](../frontend/src/features/admin/SUB_REQ_STATUS.js) | — |
 | [frontend/src/features/admin/SubscriberAdmin.jsx](../frontend/src/features/admin/SubscriberAdmin.jsx) | `./AdminChallengeManager.jsx`, `./AdminDiscountManager.jsx`, `./AdminEventManager.jsx`, `./AdminMentorManager.jsx`, `./AdminPanelOverview.jsx`, `./AdminPartnerManager.jsx`, `./AdminSubNotifications.jsx`, `./AdminUsers.jsx`, `../../api/index.js`, `../../assets/robin-wordmark.png`, `../../application/subscription-portal.css` |
 | [frontend/src/features/admin/toLocalInput.js](../frontend/src/features/admin/toLocalInput.js) | — |
-| [frontend/src/features/auth/AuthShell.jsx](../frontend/src/features/auth/AuthShell.jsx) | `../../shared/theme.js`, `./auth-shell.css` |
+| [frontend/src/features/auth/AuthShell.jsx](../frontend/src/features/auth/AuthShell.jsx) | `../../shared/theme.js`, `../../assets/robin-logo-transparent.png`, `./auth-shell.css` |
 | [frontend/src/features/auth/SubscriberAuthScreen.jsx](../frontend/src/features/auth/SubscriberAuthScreen.jsx) | `./AuthShell.jsx`, `../../shared/ui.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `../../shared/TermsModal.jsx`, `../../api/index.js` |
 | [frontend/src/features/career/CvAiPage.jsx](../frontend/src/features/career/CvAiPage.jsx) | `../../shared/ui.jsx`, `./CvChoice.jsx`, `../../shared/theme.js`, `../services/SubIntro.jsx`, `./cvBuildHtml.jsx`, `./downloadCvDoc.jsx`, `../../api/index.js` |
 | [frontend/src/features/career/cvBuildHtml.jsx](../frontend/src/features/career/cvBuildHtml.jsx) | `./cvEsc.js` |
