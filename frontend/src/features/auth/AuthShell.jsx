@@ -1,7 +1,6 @@
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";
+import { Bird } from "lucide-react";
 import React from "react";
-import logoRBlanco from "../../assets/logo-r-blanco.png";
-import logoRobinAzul from "../../assets/logo-robin-azul.png";
 import "./auth-shell.css";
 
 function AuthShell({ children }) {
@@ -15,8 +14,9 @@ function AuthShell({ children }) {
               style={{ width: (i + 1) * 180, height: (i + 1) * 180, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
           ))}
         </div>
-        <div className="subscription-auth-logo">
-          <img src={logoRBlanco} alt="Robin" />
+        <div className="subscription-auth-wordmark" aria-label="Robin">
+          <span><Bird size={19} strokeWidth={1.8} /></span>
+          <strong>ROBIN</strong>
         </div>
         <div className="subscription-auth-message">
           <div className="subscription-auth-title">
@@ -32,7 +32,7 @@ function AuthShell({ children }) {
       <main className="subscription-auth-main">
         <div className="subscription-auth-form">
           <div className="subscription-auth-mobile-logo">
-            <img src={logoRobinAzul} alt="Project Robin" />
+            <span><Bird size={18} strokeWidth={1.8} /></span><strong>ROBIN</strong>
           </div>
           {children}
         </div>
