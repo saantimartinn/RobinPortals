@@ -45,6 +45,8 @@ Generado con `npm run docs:generate`.
 | [frontend/index.html](../frontend/index.html) | Configuración, herramienta o prueba |
 | [frontend/package.json](../frontend/package.json) | Configuración, herramienta o prueba |
 | [frontend/postcss.config.js](../frontend/postcss.config.js) | Configuración, herramienta o prueba |
+| [frontend/public/favicon-192.png](../frontend/public/favicon-192.png) | Recurso público |
+| [frontend/public/favicon-32.png](../frontend/public/favicon-32.png) | Recurso público |
 | [frontend/public/favicon.png](../frontend/public/favicon.png) | Recurso público |
 | [frontend/public/recursos/adaptacion-cultural-holanda.pdf](../frontend/public/recursos/adaptacion-cultural-holanda.pdf) | Recurso público |
 | [frontend/public/recursos/research-vs-applied-sciences.png](../frontend/public/recursos/research-vs-applied-sciences.png) | Recurso público |
