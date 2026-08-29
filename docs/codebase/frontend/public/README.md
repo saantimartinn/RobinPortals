@@ -10,6 +10,6 @@ Recursos públicos copiados al build.
 
 ## Archivos
 
+- [favicon-150.png](../../../../frontend/public/favicon-150.png): Recurso público.
 - [favicon-192.png](../../../../frontend/public/favicon-192.png): Recurso público.
-- [favicon-32.png](../../../../frontend/public/favicon-32.png): Recurso público.
 - [favicon.png](../../../../frontend/public/favicon.png): Recurso público.
