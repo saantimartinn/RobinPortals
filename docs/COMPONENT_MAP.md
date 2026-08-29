@@ -63,7 +63,7 @@ Generado desde imports del código.
 | [frontend/src/features/services/ComingSoon.jsx](../frontend/src/features/services/ComingSoon.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `./SubIntro.jsx` |
 | [frontend/src/features/services/ResidenciasPage.jsx](../frontend/src/features/services/ResidenciasPage.jsx) | `../../shared/ui.jsx`, `./ComingSoon.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `./SubIntro.jsx` |
 | [frontend/src/features/services/ServiceRequestCard.jsx](../frontend/src/features/services/ServiceRequestCard.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `../../api/index.js` |
-| [frontend/src/features/services/SubIntro.jsx](../frontend/src/features/services/SubIntro.jsx) | `../../shared/theme.js`, `../../assets/logo-r-blanco.png` |
+| [frontend/src/features/services/SubIntro.jsx](../frontend/src/features/services/SubIntro.jsx) | `../../shared/theme.js`, `../../assets/robin-plan-header-logo.png` |
 | [frontend/src/features/services/SubNavCard.jsx](../frontend/src/features/services/SubNavCard.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js` |
 | [frontend/src/features/services/SubPersonal.jsx](../frontend/src/features/services/SubPersonal.jsx) | `../../shared/ui.jsx`, `./ComingSoon.jsx`, `./ResidenciasPage.jsx`, `../../shared/constants.js`, `./ServiceRequestCard.jsx`, `./SubIntro.jsx`, `./SubNavCard.jsx`, `../../shared/utils.js` |
 | [frontend/src/features/subscription/SubHome.jsx](../frontend/src/features/subscription/SubHome.jsx) | `../../shared/ui.jsx`, `../../shared/constants.js`, `../community/EVENT_TAB_TYPES.js`, `../../shared/theme.js`, `../levels/RobinProgressBar.jsx`, `../community/cityVisible.js`, `../../shared/utils.js` |
