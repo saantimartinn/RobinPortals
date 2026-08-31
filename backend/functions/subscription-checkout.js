@@ -84,8 +84,8 @@ exports.handler = async (event) => {
       customer: u.stripe_customer_id || undefined,
       customer_email: u.stripe_customer_id ? undefined : (u.email || undefined),
       client_reference_id: String(u.id),
-      success_url: `${base}/portal/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${base}/portal/?sub=cancel`,
+      success_url: `${base}/therobinplan/?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${base}/therobinplan/?sub=cancel`,
       metadata: { kind: 'subscription', user_id: String(u.id), plan: planKey, nombre },
       subscription_data: { metadata: { user_id: String(u.id), plan: planKey } },
     });

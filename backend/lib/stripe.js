@@ -23,6 +23,8 @@ function getStripe() {
 
 // URL base del despliegue (para success_url / cancel_url).
 function getBaseUrl(event) {
+  const forwardedHost = event && event.headers && (event.headers['x-forwarded-host'] || event.headers['X-Forwarded-Host']);
+  if (forwardedHost) return `https://${forwardedHost}`;
   const envUrl = process.env.PUBLIC_BASE_URL || process.env.URL || process.env.DEPLOY_PRIME_URL || process.env.DEPLOY_URL;
   if (envUrl) return String(envUrl).replace(/\/$/, '');
   const h = (event && event.headers) || {};

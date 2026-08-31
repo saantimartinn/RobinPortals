@@ -6,7 +6,12 @@ async function request(method, url, body, isForm) {
   } else if (isForm) {
     opts.body = body;
   }
-  const resp = await fetch(url, opts);
+  const publicUrl = typeof window !== "undefined"
+    && /(^|\.)project-robin\.com$/i.test(window.location.hostname)
+    && url.startsWith("/api/")
+      ? "/therobinplan" + url
+      : url;
+  const resp = await fetch(publicUrl, opts);
   let data = null;
   try { data = await resp.json(); } catch (_) {}
   if (!resp.ok) {

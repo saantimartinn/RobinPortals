@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
 
-const COOKIE_NAME = 'robin_session';
+const COOKIE_NAME = 'robin_subscription_session';
 const COOKIE_MAX_AGE_S = 60 * 60 * 24 * 7; // 7 dias
 
 function getJwtSecret() {

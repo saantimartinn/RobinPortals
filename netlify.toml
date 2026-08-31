@@ -21,8 +21,14 @@
 # ---------- Entrada: la raíz abre el portal ----------
 [[redirects]]
   from = "/"
-  to = "/portal/"
+  to = "/therobinplan/"
   status = 302
+  force = true
+
+[[redirects]]
+  from = "/portal/*"
+  to = "/therobinplan/:splat"
+  status = 301
   force = true
 
 # ---------- Autenticación (compartida por rol; aquí solo suscriptores) ----------
@@ -133,8 +139,8 @@
 
 # ---------- Fallback del SPA ----------
 [[redirects]]
-  from = "/portal/*"
-  to = "/portal/index.html"
+  from = "/therobinplan/*"
+  to = "/therobinplan/index.html"
   status = 200
 
 # ---------- Headers de seguridad ----------
@@ -146,7 +152,7 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 [[headers]]
-  for = "/portal/assets/*"
+  for = "/therobinplan/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
