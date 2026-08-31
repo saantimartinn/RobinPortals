@@ -1,12 +1,12 @@
 .subscription-auth-shell { min-height: 100vh; display: flex; font-family: Inter, "Segoe UI", sans-serif; color: #29395f; background: #f4f5f7; }
-.subscription-auth-brand { width: min(44vw, 540px); flex: 0 0 min(44vw, 540px); min-height: 100vh; padding: 48px 52px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+.subscription-auth-brand { width: min(39vw, 480px); flex: 0 0 min(39vw, 480px); min-height: 100vh; padding: 44px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
 .subscription-auth-rings { position: absolute; inset: 0; opacity: .06; }
 .subscription-auth-rings > div { position: absolute; border-radius: 999px; border: 1px solid white; }
 .subscription-auth-wordmark, .subscription-auth-message, .subscription-auth-footer { position: relative; z-index: 1; }
 .subscription-auth-wordmark, .subscription-auth-mobile-logo { display: flex; align-items: center; }
 .subscription-auth-wordmark img { width: 112px; height: 94px; object-fit: contain; }
-.subscription-auth-title { color: white; font: 700 clamp(38px, 4vw, 52px)/1.08 Georgia, serif; letter-spacing: -.035em; margin-bottom: 24px; }
-.subscription-auth-copy { max-width: 320px; color: rgba(255,255,255,.66); font-size: 13px; line-height: 1.75; }
+.subscription-auth-title { color: white; font: 700 clamp(36px, 3.6vw, 46px)/1.1 Georgia, serif; letter-spacing: -.03em; margin-bottom: 20px; }
+.subscription-auth-copy { max-width: 300px; color: rgba(255,255,255,.66); font-size: 13px; line-height: 1.7; }
 .subscription-auth-footer { color: rgba(255,255,255,.34); font-size: 11px; }
 .subscription-auth-main { min-width: 0; flex: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 48px 34px; background: radial-gradient(circle at 75% 15%,#fff 0,transparent 34%),#f4f5f7; }
 .subscription-auth-form { width: min(100%, 448px); }
