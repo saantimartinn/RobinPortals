@@ -5,13 +5,13 @@
  *
  * Variables:
  *   RESEND_API_KEY     → API key de Resend
- *   RESEND_FROM        → "Project Robin <no-reply@projectrobin.com>"
+ *   RESEND_FROM        → "Project Robin <no-reply@project-robin.com>"
  */
 const { getSupabase } = require('./supabase');
 
 async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, reply_to, replyTo }) {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM || 'Project Robin <no-reply@projectrobin.com>';
+  const from = process.env.RESEND_FROM || 'Project Robin <no-reply@project-robin.com>';
   if (!to) return { sent: false, reason: 'missing_to' };
 
   if (!key) {
