@@ -17,6 +17,7 @@ const USER_FIELDS    = ['ciudad', 'nombre', 'apellidos', 'subscription_status', 
 const REQUEST_FIELDS = ['status', 'title', 'details', 'category'];
 const DISCOUNT_FIELDS = ['code', 'percent_off', 'active', 'max_redemptions', 'note', 'duration_months'];
 const CHALLENGE_FIELDS = ['title', 'description', 'advance_days', 'files', 'questions', 'active', 'sort_order'];
+const FAQ_FIELDS = ['question', 'answer', 'category', 'published', 'sort_order', 'updated_at'];
 const SUBMISSION_FIELDS = ['status', 'note'];
 
 function normDuration(data) {
@@ -32,8 +33,8 @@ function pick(obj, fields) {
   return out;
 }
 
-const TABLES = { event: 'community_events', partner: 'partners', user: 'subscribers', request: 'service_requests', discount_code: 'discount_codes', notification: 'notifications', challenge: 'challenges', submission: 'challenge_submissions' };
-const FIELDS = { event: EVENT_FIELDS, partner: PARTNER_FIELDS, user: USER_FIELDS, request: REQUEST_FIELDS, discount_code: DISCOUNT_FIELDS, notification: ['title', 'content'], challenge: CHALLENGE_FIELDS, submission: SUBMISSION_FIELDS };
+const TABLES = { event: 'community_events', partner: 'partners', user: 'subscribers', request: 'service_requests', discount_code: 'discount_codes', notification: 'notifications', challenge: 'challenges', submission: 'challenge_submissions', faq: 'subscription_faqs' };
+const FIELDS = { event: EVENT_FIELDS, partner: PARTNER_FIELDS, user: USER_FIELDS, request: REQUEST_FIELDS, discount_code: DISCOUNT_FIELDS, notification: ['title', 'content'], challenge: CHALLENGE_FIELDS, submission: SUBMISSION_FIELDS, faq: FAQ_FIELDS };
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -127,6 +128,16 @@ exports.handler = async (event) => {
     }
 
     const data = pick(payload, fields);
+    if (entity === 'faq') {
+      data.question = String(data.question || '').trim();
+      data.answer = String(data.answer || '').trim();
+      data.category = String(data.category || 'General').trim().slice(0, 80) || 'General';
+      data.published = data.published !== false;
+      data.sort_order = Number.isFinite(Number(data.sort_order)) ? Number(data.sort_order) : 0;
+      data.updated_at = new Date().toISOString();
+      if (!data.question || data.question.length > 300) return json({ error: 'invalid_question' }, { statusCode: 400 });
+      if (!data.answer || data.answer.length > 5000) return json({ error: 'invalid_answer' }, { statusCode: 400 });
+    }
 
     if (action === 'create') {
       if (entity === 'event' && !data.title) return json({ error: 'missing_title' }, { statusCode: 400 });

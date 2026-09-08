@@ -20,6 +20,15 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
+    const params = event.queryStringParameters || {};
+    if (event.httpMethod === 'GET' && params.resource === 'faqs') {
+      let query = sb.from('subscription_faqs').select('id, question, answer, category, published, sort_order, created_at, updated_at')
+        .order('sort_order', { ascending: true }).order('created_at', { ascending: true });
+      if (session.role !== 'subscriber_admin') query = query.eq('published', true);
+      const { data, error } = await query;
+      if (error) throw error;
+      return json({ faqs: data || [] });
+    }
 
     if (event.httpMethod === 'POST') {
       if (!verifyOrigin(event)) return json({ error: 'bad_origin' }, { statusCode: 403 });

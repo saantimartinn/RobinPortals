@@ -123,5 +123,5 @@ export async function notificationAck(notificationId, action) {
   return api.post("/api/notifications/ack", { notification_id: notificationId, action });
 }
 
-export async function faqsList() { return api.get("/api/faqs"); }
-export async function adminFaqMutate(action, payload) { return api.post("/api/faqs", { action, payload }); }
+export async function faqsList() { return api.get("/api/challenges?resource=faqs"); }
+export async function adminFaqMutate(action, payload) { return subAdminMutate("faq", action, payload); }
