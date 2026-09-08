@@ -16,6 +16,7 @@ import { SubProfile } from "../features/profile/SubProfile.jsx";
 import { SubSettings } from "../features/profile/SubSettings.jsx";
 import { SubSocial } from "../features/community/SubSocial.jsx";
 import { SubSupport } from "../features/subscription/SubSupport.jsx";
+import { SubFaqs } from "../features/subscription/SubFaqs.jsx";
 import { communityEventsList, messagesConversations, partnersList, serviceRequestsList } from "../api/index.js";
 import { getRobinLevel, robinLevelDef } from "../shared/utils.js";
 import robinWordmark from "../assets/robin-wordmark.png";
@@ -86,6 +87,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
     { key: "social", label: "Social", icon: MessagesSquare },
     { key: "pagos", label: "Pagos", icon: CreditCard },
     { key: "soporte", label: "Soporte", icon: HelpCircle },
+    { key: "faqs", label: "FAQs", icon: HelpCircle },
     { key: "ajustes", label: "Ajustes", icon: Settings },
   ];
 
@@ -154,6 +156,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
             {active === "soporte" && (
               <SubSupport requests={requests} onRefresh={refreshRequests} />
             )}
+            {active === "faqs" && <SubFaqs />}
             {active === "perfil" && (
               <SubProfile user={user} onUserRefresh={onUserRefresh} setActive={setActive} />
             )}

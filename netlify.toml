@@ -110,6 +110,10 @@
   from = "/api/service-requests"
   to = "/.netlify/functions/service-requests"
   status = 200
+[[redirects]]
+  from = "/api/faqs"
+  to = "/.netlify/functions/faqs"
+  status = 200
 
 # ---------- Panel admin de suscriptores (role subscriber_admin) ----------
 [[redirects]]

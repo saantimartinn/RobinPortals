@@ -1,7 +1,6 @@
 import { Badge, Btn, Card, CardContent, CardHeader, Field, TextareaField } from "../../shared/ui.jsx";
-import { Clock, HelpCircle, LifeBuoy, Loader2, Mail, Send } from "lucide-react";
+import { Clock, LifeBuoy, Loader2, Mail, Send } from "lucide-react";
 import React, { useState } from "react";
-import { SUBSCRIBER_FAQ } from "../../shared/constants.js";
 import { formatDate } from "../../shared/utils.js";
 import { serviceRequestCreate } from "../../api/index.js";
 
@@ -51,18 +50,6 @@ function SubSupport({ requests, onRefresh }) {
               <Badge tone={r.status === "done" ? "green" : r.status === "in_progress" ? "blue" : "amber"}>
                 {r.status === "done" ? "Resuelta" : r.status === "in_progress" ? "En curso" : "Abierta"}
               </Badge>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader title="Preguntas frecuentes" icon={HelpCircle} />
-        <CardContent className="space-y-3">
-          {SUBSCRIBER_FAQ.map((f, i) => (
-            <div key={i}>
-              <div className="text-sm font-semibold text-slate-800">{f.q}</div>
-              <div className="text-sm text-slate-500 mt-0.5">{f.a}</div>
             </div>
           ))}
         </CardContent>

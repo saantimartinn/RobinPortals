@@ -112,15 +112,6 @@ const STUDENTJOB_CITY_SLUG = {
 
 export { STUDENTJOB_CITY_SLUG };
 
-const SUBSCRIBER_FAQ = [
-  { q: "¿Qué incluye mi suscripción?", a: "Todos los servicios marcados como incluidos en la pestaña Servicios: trámites, vivienda, empleo, bienestar y comunidad. Los add-ons se marcan explícitamente como pago extra." },
-  { q: "¿Puedo cambiar de plan o cancelar?", a: "Sí, desde Suscripción, botón Gestionar en Stripe puedes cambiar de plan, pausar o cancelar cuando quieras. Los cambios se aplican al siguiente ciclo de facturación." },
-  { q: "¿Cómo reservo una llamada con mi mentor?", a: "Desde Servicios, pulsa Solicitar en Llamada con mentor. Nuestro equipo te contactará para agendar la sesión." },
-  { q: "¿Dónde veo mis facturas?", a: "En Pagos, botón Gestionar pagos y facturas, accedes al portal seguro de Stripe con tu historial completo." },
-];
-
-export { SUBSCRIBER_FAQ };
-
 const SUBSCRIBER_SERVICES = [
   { key: "bureaucratic_support", title: "Trámites burocráticos", desc: "Te acompañamos con NIE/BSN, empadronamiento, citas y papeleo administrativo.", icon: FileText, category: "Instalación", section: "personal" },
   { key: "arrival_support", title: "Soporte a la llegada", desc: "Checklist y acompañamiento durante tus primeros días en destino.", icon: Plane, category: "Instalación", section: "personal" },

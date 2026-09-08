@@ -6,7 +6,8 @@ import { AdminPanelOverview } from "./AdminPanelOverview.jsx";
 import { AdminPartnerManager } from "./AdminPartnerManager.jsx";
 import { AdminSubNotifications } from "./AdminSubNotifications.jsx";
 import { AdminUsers } from "./AdminUsers.jsx";
-import { Bell, Briefcase, Building2, CalendarCheck, GraduationCap, Handshake, LayoutDashboard, Loader2, LogOut, Percent, Plane, RefreshCw, Sparkles, Tag, Users } from "lucide-react";
+import { AdminFaqManager } from "./AdminFaqManager.jsx";
+import { Bell, Briefcase, Building2, CalendarCheck, GraduationCap, Handshake, HelpCircle, LayoutDashboard, Loader2, LogOut, Percent, Plane, RefreshCw, Sparkles, Tag, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { subAdminData } from "../../api/index.js";
 import robinWordmark from "../../assets/robin-wordmark.png";
@@ -42,6 +43,7 @@ function SubscriberAdmin({ user, onLogout }) {
     { key: "codigos", label: "Códigos", icon: Percent },
     { key: "notificaciones", label: "Notificaciones", icon: Bell },
     { key: "retos", label: "Retos", icon: Sparkles },
+    { key: "faqs", label: "FAQs", icon: HelpCircle },
   ];
 
   return (
@@ -95,6 +97,7 @@ function SubscriberAdmin({ user, onLogout }) {
               {section === "codigos" && <AdminDiscountManager codes={data.discount_codes} onChanged={load} />}
               {section === "notificaciones" && <AdminSubNotifications notifications={data.notifications} users={data.users} onChanged={load} />}
               {section === "retos" && <AdminChallengeManager challenges={data.challenges} submissions={data.submissions} onChanged={load} />}
+              {section === "faqs" && <AdminFaqManager />}
             </>
           )}
           <footer className="student-footer"><span>PROJECT ROBIN</span><span>Panel de administración</span></footer>

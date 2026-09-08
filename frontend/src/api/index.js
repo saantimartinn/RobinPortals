@@ -122,3 +122,6 @@ export async function notificationAck(notificationId, action) {
   // action: 'seen' | 'accept'
   return api.post("/api/notifications/ack", { notification_id: notificationId, action });
 }
+
+export async function faqsList() { return api.get("/api/faqs"); }
+export async function adminFaqMutate(action, payload) { return api.post("/api/faqs", { action, payload }); }
