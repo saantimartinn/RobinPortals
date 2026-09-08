@@ -114,6 +114,7 @@
   from = "/api/faqs"
   to = "/.netlify/functions/faqs"
   status = 200
+  force = true
 
 # ---------- Panel admin de suscriptores (role subscriber_admin) ----------
 [[redirects]]
