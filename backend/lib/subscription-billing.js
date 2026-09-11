@@ -132,6 +132,8 @@ async function createHoldedInvoice(portal, contactId, invoice) {
 async function processStripeInvoice(sb, stripeInvoice) {
   const stripeId = stripeInvoice.id;
   if (!stripeId) return { ok: false, reason: 'invoice_id_missing' };
+  const amountPaid = Number(stripeInvoice.amount_paid || 0);
+  if (amountPaid <= 0) return { ok: false, skipped: true, reason: 'zero_amount_invoice' };
   const subscriptionId = typeof stripeInvoice.subscription === 'string' ? stripeInvoice.subscription : stripeInvoice.subscription && stripeInvoice.subscription.id;
   const customerId = typeof stripeInvoice.customer === 'string' ? stripeInvoice.customer : stripeInvoice.customer && stripeInvoice.customer.id;
   const metadataUserId = stripeInvoice.subscription_details && stripeInvoice.subscription_details.metadata && stripeInvoice.subscription_details.metadata.user_id;
@@ -140,7 +142,7 @@ async function processStripeInvoice(sb, stripeInvoice) {
   const { data: subscribers, error: subscriberError } = await query.limit(2);
   if (subscriberError) throw subscriberError;
   const subscriber = subscribers && subscribers[0];
-  const row = { subscriber_id: subscriber ? subscriber.id : null, stripe_invoice_id: stripeId, stripe_customer_id: customerId || null, stripe_subscription_id: subscriptionId || null, amount: Number(stripeInvoice.amount_paid || stripeInvoice.total || 0) / 100, currency: stripeInvoice.currency || 'eur', paid_at: stripeInvoice.status_transitions && stripeInvoice.status_transitions.paid_at ? new Date(stripeInvoice.status_transitions.paid_at * 1000).toISOString() : new Date().toISOString(), status: stripeInvoice.status || 'paid', updated_at: new Date().toISOString() };
+  const row = { subscriber_id: subscriber ? subscriber.id : null, stripe_invoice_id: stripeId, stripe_customer_id: customerId || null, stripe_subscription_id: subscriptionId || null, amount: amountPaid / 100, currency: stripeInvoice.currency || 'eur', paid_at: stripeInvoice.status_transitions && stripeInvoice.status_transitions.paid_at ? new Date(stripeInvoice.status_transitions.paid_at * 1000).toISOString() : new Date().toISOString(), status: stripeInvoice.status || 'paid', updated_at: new Date().toISOString() };
   const { data: saved, error: upsertError } = await sb.from('subscription_invoices').upsert(row, { onConflict: 'stripe_invoice_id', ignoreDuplicates: false }).select('*').single();
   if (upsertError) throw upsertError;
   if (saved.holded_invoice_id) return { ok: true, already: true, invoice_id: saved.holded_invoice_id };

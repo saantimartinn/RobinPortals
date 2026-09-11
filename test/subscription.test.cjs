@@ -34,3 +34,7 @@ test('billing matcher supports the subscriber, parent and fiscal identity layers
   assert.equal(billing.scoreCandidate({profile_extra:{billing_tax_id:'22222222J'}},portal).score,100);
   assert.equal(billing.scoreCandidate({nombre:'Parent',apellidos:'Robin'},portal).score,45);
 });
+test('zero amount Stripe invoices are never sent to Holded',async()=>{
+  const result=await billing.processStripeInvoice({from(){throw new Error('database must not be accessed');}},{id:'in_free',amount_paid:0});
+  assert.deepEqual(result,{ok:false,skipped:true,reason:'zero_amount_invoice'});
+});
