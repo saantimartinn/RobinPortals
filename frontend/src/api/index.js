@@ -114,6 +114,10 @@ export async function subAdminMutate(entity, action, payload) {
   return api.post("/api/sub-admin/mutate", { entity, action, payload });
 }
 
+export async function partnerLogoUpload(dataUrl, partnerId) {
+  return api.post("/api/sub-admin/partner-logo", { data_url: dataUrl, partner_id: partnerId || null });
+}
+
 export async function notificationsPending() {
   return api.get("/api/notifications");
 }

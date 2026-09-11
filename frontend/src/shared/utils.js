@@ -73,6 +73,36 @@ function resizeImageFile(file, max = 256) {
 
 export { resizeImageFile };
 
+function prepareLogoFile(file, maxWidth = 900, maxHeight = 500) {
+  return new Promise((resolve, reject) => {
+    if (!file || !["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      reject(new Error("invalid_logo_type")); return;
+    }
+    if (file.size > 5 * 1024 * 1024) { reject(new Error("logo_too_large")); return; }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read_error"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("img_error"));
+      img.onload = () => {
+        const scale = Math.min(1, maxWidth / img.width, maxHeight / img.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+export { prepareLogoFile };
+
 function robinDaysActive(user) {
   const bonus = Number(user && user.bonus_days) || 0;
   const ref = user && (user.created_at || user.subscription_started_at);

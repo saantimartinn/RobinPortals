@@ -13,10 +13,12 @@ Entradas HTTP de Netlify. Conservan los contratos /api existentes.
 - [community-events-list.js](../../../../backend/functions/community-events-list.js): Handler HTTP: community-events-list.
 - [community-rsvp.js](../../../../backend/functions/community-rsvp.js): Handler HTTP: community-rsvp.
 - [discount-validate.js](../../../../backend/functions/discount-validate.js): Handler HTTP: discount-validate.
+- [faqs.js](../../../../backend/functions/faqs.js): Handler HTTP: faqs.
 - [me.js](../../../../backend/functions/me.js): Handler HTTP: me.
 - [messages.js](../../../../backend/functions/messages.js): Handler HTTP: messages.
 - [notifications-ack.js](../../../../backend/functions/notifications-ack.js): Handler HTTP: notifications-ack.
 - [notifications-list.js](../../../../backend/functions/notifications-list.js): Handler HTTP: notifications-list.
+- [partner-logo-upload.js](../../../../backend/functions/partner-logo-upload.js): Handler HTTP: partner-logo-upload.
 - [partners-list.js](../../../../backend/functions/partners-list.js): Handler HTTP: partners-list.
 - [service-requests.js](../../../../backend/functions/service-requests.js): Handler HTTP: service-requests.
 - [social.js](../../../../backend/functions/social.js): Handler HTTP: social.

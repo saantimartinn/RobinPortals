@@ -1,16 +1,31 @@
 import { Badge, Btn, Card, CardContent, CardHeader, Field, SelectField, TextareaField } from "../../shared/ui.jsx";
-import { CheckCircle2, Handshake, Loader2, Pencil, Plus, Trash2, XCircle } from "lucide-react";
+import { CheckCircle2, Handshake, ImageIcon, Loader2, Pencil, Plus, Trash2, UploadCloud, XCircle } from "lucide-react";
 import { PARTNER_CATEGORY_LABELS, ROBIN_CITIES } from "../../shared/constants.js";
 import React, { useState } from "react";
-import { subAdminMutate } from "../../api/index.js";
+import { partnerLogoUpload, subAdminMutate } from "../../api/index.js";
+import { prepareLogoFile } from "../../shared/utils.js";
 
 function AdminPartnerManager({ partners, onChanged }) {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [err, setErr] = useState("");
   const cats = Object.keys(PARTNER_CATEGORY_LABELS);
 
-  function blank() { return { name: "", category: "other", city: "", description: "", benefits: "", discount: "", contact_url: "", eligibility: "", active: true }; }
+  function blank() { return { name: "", category: "other", city: "", description: "", benefits: "", discount: "", contact_url: "", eligibility: "", logo_url: "", active: true }; }
+  async function onLogo(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingLogo(true); setErr("");
+    try {
+      const dataUrl = await prepareLogoFile(file);
+      const result = await partnerLogoUpload(dataUrl, editing && editing.id);
+      setEditing((p) => ({ ...p, logo_url: result.logo_url }));
+    } catch (error) {
+      setErr(error.message === "logo_too_large" ? "El logo original no puede superar 5 MB." : error.message === "invalid_logo_type" ? "Usa un archivo PNG, JPG o WebP." : (error.message || "No se pudo subir el logo."));
+    } finally { setUploadingLogo(false); }
+  }
   async function save() {
     if (!editing.name.trim()) { setErr("El nombre es obligatorio."); return; }
     setSaving(true); setErr("");
@@ -18,7 +33,7 @@ function AdminPartnerManager({ partners, onChanged }) {
       await subAdminMutate("partner", editing.id ? "update" : "create", {
         id: editing.id, name: editing.name.trim(), category: editing.category || "other", city: editing.city || null,
         description: editing.description || null, benefits: editing.benefits || null, discount: editing.discount || null,
-        contact_url: editing.contact_url || null, eligibility: editing.eligibility || null, active: editing.active !== false,
+        contact_url: editing.contact_url || null, eligibility: editing.eligibility || null, logo_url: editing.logo_url || null, active: editing.active !== false,
       });
       setEditing(null); await onChanged();
     } catch (e) { setErr(e.message || "No se pudo guardar."); }
@@ -37,6 +52,21 @@ function AdminPartnerManager({ partners, onChanged }) {
           <CardHeader title={editing.id ? "Editar partner" : "Nuevo partner"} icon={Pencil}
             right={<Btn size="sm" variant="ghost" onClick={() => setEditing(null)}><XCircle className="h-3.5 w-3.5" /> Cerrar</Btn>} />
           <CardContent className="space-y-3">
+            <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center">
+              <div className="flex h-24 w-40 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-3">
+                {editing.logo_url ? <img src={editing.logo_url} alt={`Logo de ${editing.name || "partner"}`} className="h-full w-full object-contain" /> : <ImageIcon className="h-7 w-7 text-slate-300" />}
+              </div>
+              <div className="space-y-2">
+                <div><div className="text-sm font-semibold text-slate-800">Logotipo</div><div className="text-xs text-slate-500">PNG, JPG o WebP. Se conserva la proporción y se optimiza antes de subir.</div></div>
+                <div className="flex flex-wrap gap-2">
+                  <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
+                    {uploadingLogo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />} {editing.logo_url ? "Cambiar logo" : "Subir logo"}
+                    <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onLogo} disabled={uploadingLogo} />
+                  </label>
+                  {editing.logo_url && <Btn size="sm" variant="ghost" onClick={() => setEditing((p) => ({ ...p, logo_url: "" }))}>Quitar</Btn>}
+                </div>
+              </div>
+            </div>
             <div className="grid sm:grid-cols-2 gap-3">
               <Field label="Nombre" value={editing.name} onChange={(v) => setEditing((p) => ({ ...p, name: v }))} />
               <SelectField label="Categoría" allowEmpty={false} value={editing.category} onChange={(v) => setEditing((p) => ({ ...p, category: v }))}
@@ -66,6 +96,9 @@ function AdminPartnerManager({ partners, onChanged }) {
         {partners.map((p) => (
           <Card key={p.id}>
             <CardContent className="space-y-2">
+              <div className="flex h-20 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50 p-3">
+                {p.logo_url ? <img src={p.logo_url} alt={`Logo de ${p.name}`} className="h-full w-full object-contain" /> : <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-200 font-semibold text-slate-500">{p.name.charAt(0).toUpperCase()}</div>}
+              </div>
               <div className="flex items-start justify-between gap-2">
                 <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{p.name}</div>
                 {p.active === false && <Badge tone="slate">Oculto</Badge>}

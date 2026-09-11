@@ -125,6 +125,10 @@
   from = "/api/sub-admin/mutate"
   to = "/.netlify/functions/sub-admin-mutate"
   status = 200
+[[redirects]]
+  from = "/api/sub-admin/partner-logo"
+  to = "/.netlify/functions/partner-logo-upload"
+  status = 200
 
 # ---------- Notificaciones ----------
 [[redirects]]

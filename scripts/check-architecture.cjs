@@ -18,7 +18,10 @@ for (const file of walk('backend').filter(f => f.endsWith('.js'))) {
     try { require.resolve(m[1], { paths: [path.resolve(path.dirname(file))] }); } catch { errors.push(`${file}: unresolved ${m[1]}`); }
     if (file.includes('functions') && m[1].startsWith('./')) errors.push(`${file}: handler imports another handler`);
   }
-  if (/\.from\(['"](?:users|payments|careers|documents)['"]\)/.test(source)) errors.push(`${file}: application-portal table`);
+  // La única frontera autorizada con el portal es el adaptador servidor de
+  // facturación. Usa credenciales independientes y nunca expone datos al browser.
+  const isBillingBridge = file.endsWith(path.join('backend', 'lib', 'subscription-billing.js'));
+  if (!isBillingBridge && /\.from\(['"](?:users|payments|careers|documents)['"]\)/.test(source)) errors.push(`${file}: application-portal table`);
 }
 const files = walk('frontend/src').filter(f => /\.jsx?$/.test(f));
 const graph = new Map();

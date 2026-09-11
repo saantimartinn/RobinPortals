@@ -6,6 +6,7 @@ Recursos públicos copiados al build.
 
 ## Carpetas
 
+- [partner-logos](partner-logos/README.md): Ver detalle.
 - [recursos](recursos/README.md): Recursos descargables del producto conservados del original.
 
 ## Archivos

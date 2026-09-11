@@ -10,6 +10,7 @@ Administración de suscriptores, contenidos, descuentos y notificaciones.
 - [AdminChallengeManager.jsx](../../../../../../frontend/src/features/admin/AdminChallengeManager.jsx): Módulo frontend: AdminChallengeManager.
 - [AdminDiscountManager.jsx](../../../../../../frontend/src/features/admin/AdminDiscountManager.jsx): Módulo frontend: AdminDiscountManager.
 - [AdminEventManager.jsx](../../../../../../frontend/src/features/admin/AdminEventManager.jsx): Módulo frontend: AdminEventManager.
+- [AdminFaqManager.jsx](../../../../../../frontend/src/features/admin/AdminFaqManager.jsx): Módulo frontend: AdminFaqManager.
 - [AdminMentorManager.jsx](../../../../../../frontend/src/features/admin/AdminMentorManager.jsx): Módulo frontend: AdminMentorManager.
 - [AdminPanelOverview.jsx](../../../../../../frontend/src/features/admin/AdminPanelOverview.jsx): Módulo frontend: AdminPanelOverview.
 - [AdminPartnerManager.jsx](../../../../../../frontend/src/features/admin/AdminPartnerManager.jsx): Módulo frontend: AdminPartnerManager.

@@ -16,10 +16,12 @@ Generado con `npm run docs:generate`.
 | [backend/functions/community-events-list.js](../backend/functions/community-events-list.js) | Handler HTTP: community-events-list |
 | [backend/functions/community-rsvp.js](../backend/functions/community-rsvp.js) | Handler HTTP: community-rsvp |
 | [backend/functions/discount-validate.js](../backend/functions/discount-validate.js) | Handler HTTP: discount-validate |
+| [backend/functions/faqs.js](../backend/functions/faqs.js) | Handler HTTP: faqs |
 | [backend/functions/me.js](../backend/functions/me.js) | Handler HTTP: me |
 | [backend/functions/messages.js](../backend/functions/messages.js) | Handler HTTP: messages |
 | [backend/functions/notifications-ack.js](../backend/functions/notifications-ack.js) | Handler HTTP: notifications-ack |
 | [backend/functions/notifications-list.js](../backend/functions/notifications-list.js) | Handler HTTP: notifications-list |
+| [backend/functions/partner-logo-upload.js](../backend/functions/partner-logo-upload.js) | Handler HTTP: partner-logo-upload |
 | [backend/functions/partners-list.js](../backend/functions/partners-list.js) | Handler HTTP: partners-list |
 | [backend/functions/service-requests.js](../backend/functions/service-requests.js) | Handler HTTP: service-requests |
 | [backend/functions/social.js](../backend/functions/social.js) | Handler HTTP: social |
@@ -40,6 +42,7 @@ Generado con `npm run docs:generate`.
 | [backend/lib/principal.js](../backend/lib/principal.js) | Servicio servidor: principal |
 | [backend/lib/social.js](../backend/lib/social.js) | Servicio servidor: social |
 | [backend/lib/stripe.js](../backend/lib/stripe.js) | Servicio servidor: stripe |
+| [backend/lib/subscription-billing.js](../backend/lib/subscription-billing.js) | Servicio servidor: subscription-billing |
 | [backend/lib/subscription.js](../backend/lib/subscription.js) | Servicio servidor: subscription |
 | [backend/lib/supabase.js](../backend/lib/supabase.js) | Servicio servidor: supabase |
 | [frontend/index.html](../frontend/index.html) | Configuración, herramienta o prueba |
@@ -48,6 +51,8 @@ Generado con `npm run docs:generate`.
 | [frontend/public/favicon-150.png](../frontend/public/favicon-150.png) | Recurso público |
 | [frontend/public/favicon-192.png](../frontend/public/favicon-192.png) | Recurso público |
 | [frontend/public/favicon.png](../frontend/public/favicon.png) | Recurso público |
+| [frontend/public/partner-logos/link-maas.jpg](../frontend/public/partner-logos/link-maas.jpg) | Configuración, herramienta o prueba |
+| [frontend/public/partner-logos/the-circo.png](../frontend/public/partner-logos/the-circo.png) | Recurso público |
 | [frontend/public/recursos/adaptacion-cultural-holanda.pdf](../frontend/public/recursos/adaptacion-cultural-holanda.pdf) | Recurso público |
 | [frontend/public/recursos/research-vs-applied-sciences.png](../frontend/public/recursos/research-vs-applied-sciences.png) | Recurso público |
 | [frontend/public/recursos/trabajar-y-estudiar-nl.pdf](../frontend/public/recursos/trabajar-y-estudiar-nl.pdf) | Recurso público |
@@ -68,6 +73,7 @@ Generado con `npm run docs:generate`.
 | [frontend/src/features/admin/AdminChallengeManager.jsx](../frontend/src/features/admin/AdminChallengeManager.jsx) | Módulo frontend: AdminChallengeManager |
 | [frontend/src/features/admin/AdminDiscountManager.jsx](../frontend/src/features/admin/AdminDiscountManager.jsx) | Módulo frontend: AdminDiscountManager |
 | [frontend/src/features/admin/AdminEventManager.jsx](../frontend/src/features/admin/AdminEventManager.jsx) | Módulo frontend: AdminEventManager |
+| [frontend/src/features/admin/AdminFaqManager.jsx](../frontend/src/features/admin/AdminFaqManager.jsx) | Módulo frontend: AdminFaqManager |
 | [frontend/src/features/admin/AdminMentorManager.jsx](../frontend/src/features/admin/AdminMentorManager.jsx) | Módulo frontend: AdminMentorManager |
 | [frontend/src/features/admin/AdminPanelOverview.jsx](../frontend/src/features/admin/AdminPanelOverview.jsx) | Módulo frontend: AdminPanelOverview |
 | [frontend/src/features/admin/AdminPartnerManager.jsx](../frontend/src/features/admin/AdminPartnerManager.jsx) | Módulo frontend: AdminPartnerManager |
@@ -122,6 +128,7 @@ Generado con `npm run docs:generate`.
 | [frontend/src/features/services/SubIntro.jsx](../frontend/src/features/services/SubIntro.jsx) | Módulo frontend: SubIntro |
 | [frontend/src/features/services/SubNavCard.jsx](../frontend/src/features/services/SubNavCard.jsx) | Módulo frontend: SubNavCard |
 | [frontend/src/features/services/SubPersonal.jsx](../frontend/src/features/services/SubPersonal.jsx) | Módulo frontend: SubPersonal |
+| [frontend/src/features/subscription/SubFaqs.jsx](../frontend/src/features/subscription/SubFaqs.jsx) | Módulo frontend: SubFaqs |
 | [frontend/src/features/subscription/SubHome.jsx](../frontend/src/features/subscription/SubHome.jsx) | Módulo frontend: SubHome |
 | [frontend/src/features/subscription/SubPayments.jsx](../frontend/src/features/subscription/SubPayments.jsx) | Módulo frontend: SubPayments |
 | [frontend/src/features/subscription/SubSubscription.jsx](../frontend/src/features/subscription/SubSubscription.jsx) | Módulo frontend: SubSubscription |
@@ -144,6 +151,9 @@ Generado con `npm run docs:generate`.
 | [scripts/create-admin.cjs](../scripts/create-admin.cjs) | Configuración, herramienta o prueba |
 | [scripts/generate-docs.cjs](../scripts/generate-docs.cjs) | Configuración, herramienta o prueba |
 | [supabase/migrations/001_robin_plan_schema.sql](../supabase/migrations/001_robin_plan_schema.sql) | Esquema de base de datos |
+| [supabase/migrations/002_subscription_faqs.sql](../supabase/migrations/002_subscription_faqs.sql) | Esquema de base de datos |
+| [supabase/migrations/003_partner_logos.sql](../supabase/migrations/003_partner_logos.sql) | Esquema de base de datos |
+| [supabase/migrations/004_subscription_billing.sql](../supabase/migrations/004_subscription_billing.sql) | Esquema de base de datos |
 | [supabase/seeds/demo.sql](../supabase/seeds/demo.sql) | Datos demo opcionales |
 | [test/auth.test.cjs](../test/auth.test.cjs) | Configuración, herramienta o prueba |
 | [test/frontend.test.cjs](../test/frontend.test.cjs) | Configuración, herramienta o prueba |

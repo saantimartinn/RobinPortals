@@ -2,6 +2,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const stripe=require('../backend/lib/stripe');
 const subscriptions=require('../backend/lib/subscription');
+const billing=require('../backend/lib/subscription-billing');
 test('checkout refuses portal payments and unpaid subscription sessions',async()=>{
   const db={from(){throw new Error('must not access database');}};
   assert.equal((await stripe.fulfillCheckout(db,{metadata:{kind:'onboarding'}})).reason,'unsupported_checkout');
@@ -25,4 +26,11 @@ test('plan prices and statuses retain subscription behavior',()=>{
   assert.equal(subscriptions.mapStripeStatus('unpaid'),'past_due');
   assert.equal(subscriptions.mapStripeStatus('incomplete_expired'),'canceled');
   assert.equal(stripe.toCents(49.99),4999);
+});
+test('billing matcher supports the subscriber, parent and fiscal identity layers',()=>{
+  const portal={email:'student@example.test',nombre:'Student',apellidos:'Robin',dni_numero:'11111111H',contract_data:{cliente:{nombre:'Parent Robin',dni:'22222222J',email:'parent@example.test'}}};
+  assert.equal(billing.scoreCandidate({email:'student@example.test'},portal).score,100);
+  assert.equal(billing.scoreCandidate({email:'parent@example.test'},portal).score,100);
+  assert.equal(billing.scoreCandidate({profile_extra:{billing_tax_id:'22222222J'}},portal).score,100);
+  assert.equal(billing.scoreCandidate({nombre:'Parent',apellidos:'Robin'},portal).score,45);
 });

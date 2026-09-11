@@ -14,5 +14,6 @@ Servicios y utilidades del servidor compartidos por handlers.
 - [principal.js](../../../../backend/lib/principal.js): Servicio servidor: principal.
 - [social.js](../../../../backend/lib/social.js): Servicio servidor: social.
 - [stripe.js](../../../../backend/lib/stripe.js): Servicio servidor: stripe.
+- [subscription-billing.js](../../../../backend/lib/subscription-billing.js): Servicio servidor: subscription-billing.
 - [subscription.js](../../../../backend/lib/subscription.js): Servicio servidor: subscription.
 - [supabase.js](../../../../backend/lib/supabase.js): Servicio servidor: supabase.

@@ -78,6 +78,26 @@ exports.handler = async (event) => {
       }
     }
 
+    if (evt.type === 'invoice.paid') {
+      const billing = require('../lib/subscription-billing');
+      let result;
+      try {
+        result = await billing.processStripeInvoice(sb, evt.data.object);
+      } catch (billingError) {
+        // La facturación es secundaria: nunca invalida ni bloquea un cobro de Stripe.
+        result = { ok: false, reason: billingError && billingError.message || 'billing_error' };
+        console.error('subscription billing error:', result.reason);
+      }
+      try {
+        await sb.from('webhook_log').insert({
+          source: 'holded',
+          payload: { type: evt.type, stripe_invoice_id: evt.data.object.id },
+          result: result && result.ok ? 'ok' : 'skipped',
+          message: result && (result.reason || result.match_method) || 'subscription invoice processed',
+        });
+      } catch (_) {}
+    }
+
     return { statusCode: 200, body: JSON.stringify({ received: true }) };
   } catch (e) {
     // Stripe debe reintentar los fallos transitorios de persistencia.

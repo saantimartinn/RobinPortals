@@ -61,3 +61,13 @@ test('Stripe webhook rejects invalid signatures and retries persistence failures
     assert.equal((await failing({httpMethod:'POST',headers:{},body:'{}'})).statusCode,500);
   } finally { if(original===undefined)delete process.env.STRIPE_WEBHOOK_SECRET;else process.env.STRIPE_WEBHOOK_SECRET=original; }
 });
+
+test('partner logo parser accepts real image signatures and rejects disguised content',()=>{
+  const { parseImageDataUrl, safeSegment }=require('../backend/functions/partner-logo-upload')._test;
+  const png=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),Buffer.from('fixture')]);
+  const parsed=parseImageDataUrl(`data:image/png;base64,${png.toString('base64')}`);
+  assert.equal(parsed.contentType,'image/png');
+  assert.equal(parsed.extension,'png');
+  assert.equal(parseImageDataUrl(`data:image/png;base64,${Buffer.from('not an image').toString('base64')}`),null);
+  assert.equal(safeSegment('../partner id!'),'partnerid');
+});

@@ -42,6 +42,13 @@ const PARTNER_CATEGORY_LABELS = {
   health_insurance: "Seguro médico",
   gym: "Gimnasios",
   bike: "Bicicletas",
+  professional_development: "Desarrollo profesional",
+  academies: "Academias",
+  nightlife: "Fiesta",
+  social_events: "Eventos sociales",
+  cultural_events: "Eventos culturales",
+  legal_support: "Apoyo legal",
+  jobs: "Trabajo",
   other: "Otros",
 };
 

@@ -17,13 +17,15 @@ Generado desde Netlify y los handlers. Los controles por rol y ownership están 
 | `/api/subscription/discount` | [discount-validate](../backend/functions/discount-validate.js) | POST | Público |
 | `/api/social` | [social](../backend/functions/social.js) | POST, GET | Sesión suscriptor/admin |
 | `/api/messages` | [messages](../backend/functions/messages.js) | POST, GET | Sesión suscriptor/admin |
-| `/api/challenges` | [challenges](../backend/functions/challenges.js) | POST, GET | Sesión suscriptor/admin |
+| `/api/challenges` | [challenges](../backend/functions/challenges.js) | GET, POST | Sesión suscriptor/admin |
 | `/api/partners` | [partners-list](../backend/functions/partners-list.js) | GET | Sesión suscriptor/admin |
 | `/api/community/events` | [community-events-list](../backend/functions/community-events-list.js) | GET | Sesión suscriptor/admin |
 | `/api/community/rsvp` | [community-rsvp](../backend/functions/community-rsvp.js) | POST | Sesión suscriptor/admin |
 | `/api/service-requests` | [service-requests](../backend/functions/service-requests.js) | GET, POST | Sesión suscriptor/admin |
+| `/api/faqs` | [faqs](../backend/functions/faqs.js) | GET, POST | Sesión suscriptor/admin |
 | `/api/sub-admin/data` | [sub-admin-data](../backend/functions/sub-admin-data.js) | GET | Sesión suscriptor/admin |
 | `/api/sub-admin/mutate` | [sub-admin-mutate](../backend/functions/sub-admin-mutate.js) | POST | Sesión suscriptor/admin |
+| `/api/sub-admin/partner-logo` | [partner-logo-upload](../backend/functions/partner-logo-upload.js) | POST | Sesión suscriptor/admin |
 | `/api/notifications/ack` | [notifications-ack](../backend/functions/notifications-ack.js) | POST | Sesión suscriptor/admin |
 | `/api/notifications` | [notifications-list](../backend/functions/notifications-list.js) | GET | Sesión suscriptor/admin |
 | `/api/stripe/webhook` | [stripe-webhook](../backend/functions/stripe-webhook.js) | POST | Firma Stripe |

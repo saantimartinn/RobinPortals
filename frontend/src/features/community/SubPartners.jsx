@@ -1,5 +1,5 @@
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
-import { CalendarCheck, ExternalLink, Handshake, MapPin, Percent } from "lucide-react";
+import { CalendarCheck, ExternalLink, Handshake, ImageIcon, MapPin, Percent } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";
 import { PARTNER_CATEGORY_LABELS } from "../../shared/constants.js";
 import React, { useState } from "react";
@@ -33,6 +33,9 @@ function SubPartners({ partners, loading }) {
         {filtered.map((p) => (
           <Card key={p.id}>
             <CardContent className="space-y-2.5">
+              <div className="flex h-28 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                {p.logo_url ? <img src={p.logo_url} alt={`Logo de ${p.name}`} loading="lazy" className="h-full w-full object-contain" /> : <ImageIcon className="h-8 w-8 text-slate-300" aria-hidden="true" />}
+              </div>
               <div className="flex items-start justify-between gap-2">
                 <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{p.name}</div>
                 <Badge tone="slate">{PARTNER_CATEGORY_LABELS[p.category] || p.category}</Badge>

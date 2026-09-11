@@ -9,6 +9,9 @@ ni en variables `VITE_*`. En Netlify, configurar secretos para Functions/runtime
 | JWT_SECRET | Secreto aleatorio exclusivo de este portal para sesiones |
 | STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET | Checkout y firma de webhook |
 | STRIPE_PRICE_MONTHLY, STRIPE_PRICE_ANNUAL | Opcionales; Price IDs recurrentes en Stripe |
+| PORTAL_SUPABASE_URL, PORTAL_SUPABASE_SERVICE_ROLE_KEY | Lectura servidor del portal principal para vincular al pagador |
+| HOLDED_API_PAT | Token servidor para crear facturas de suscripción en Holded |
+| HOLDED_ACCOUNT_SUBSCRIPTIONS, HOLDED_ACCOUNT_GENERAL | Cuenta contable de suscripciones y fallback |
 | PUBLIC_BASE_URL | URL canónica de retorno de Stripe |
 | ALLOWED_ORIGINS | Orígenes adicionales separados por comas |
 | ANTHROPIC_API_KEY, ANTHROPIC_MODEL | CV con IA; modelo opcional |
@@ -18,4 +21,6 @@ ni en variables `VITE_*`. En Netlify, configurar secretos para Functions/runtime
 
 Sin Stripe, los endpoints correspondientes devuelven indisponibilidad. Sin Resend,
 se registra `not_sent` y no existe cola de reenvío. Sin Anthropic, el CV IA no funciona.
-No hacen falta variables de Google, Holded, Zoom ni buckets de DNI.
+No hacen falta variables de Google, Zoom ni buckets de DNI. Holded y la conexión
+servidor al portal sólo son necesarias para emitir facturas; si faltan, el cobro y
+la activación siguen funcionando y la factura queda marcada como no generada.

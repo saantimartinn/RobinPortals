@@ -22,6 +22,7 @@ test('frontend entry points and domain views render with local fixtures', async 
     ['features/admin/SubscriberAdmin.jsx', 'SubscriberAdmin', { user: { ...user, role: 'subscriber_admin' }, onLogout: noop }, 'Usuarios'],
     ['features/subscription/SubHome.jsx', 'SubHome', { user, events: [], partners: [], requests: [], setActive: noop }, 'Plan Mensual'],
     ['features/community/SubCommunity.jsx', 'SubCommunity', { user, events: [], partners: [], loading: false, onRefresh: noop }, 'Community'],
+    ['features/community/SubPartners.jsx', 'SubPartners', { partners: [{ id: 'p1', name: 'Partner demo', category: 'other', logo_url: 'https://assets.example.test/logo.png' }], loading: false }, 'Logo de Partner demo'],
     ['features/profile/SubProfile.jsx', 'SubProfile', { user, onUserRefresh: noop, setActive: noop }, 'perfil'],
   ];
   try {
@@ -32,5 +33,12 @@ test('frontend entry points and domain views render with local fixtures', async 
         assert.match(html, new RegExp(expected, 'i'));
       });
     }
+    await t.test('partner category catalogue is available to admins and subscribers', async () => {
+      const module = await server.ssrLoadModule('/src/features/community/SubPartners.jsx');
+      const html = renderToString(React.createElement(module.SubPartners, { partners: [], loading: false }));
+      for (const label of ['Desarrollo profesional','Academias','Fiesta','Eventos sociales','Eventos culturales','Apoyo legal','Trabajo']) {
+        assert.match(html, new RegExp(label, 'i'));
+      }
+    });
   } finally { await server.close(); }
 });
