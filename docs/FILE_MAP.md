@@ -10,8 +10,10 @@ Generado con `npm run docs:generate`.
 | [.gitignore](../.gitignore) | Configuración, herramienta o prueba |
 | [.nvmrc](../.nvmrc) | Configuración, herramienta o prueba |
 | [backend/functions/auth-change-password.js](../backend/functions/auth-change-password.js) | Handler HTTP: auth-change-password |
+| [backend/functions/auth-forgot-password.js](../backend/functions/auth-forgot-password.js) | Handler HTTP: auth-forgot-password |
 | [backend/functions/auth-login.js](../backend/functions/auth-login.js) | Handler HTTP: auth-login |
 | [backend/functions/auth-logout.js](../backend/functions/auth-logout.js) | Handler HTTP: auth-logout |
+| [backend/functions/auth-reset-password.js](../backend/functions/auth-reset-password.js) | Handler HTTP: auth-reset-password |
 | [backend/functions/challenges.js](../backend/functions/challenges.js) | Handler HTTP: challenges |
 | [backend/functions/community-events-list.js](../backend/functions/community-events-list.js) | Handler HTTP: community-events-list |
 | [backend/functions/community-rsvp.js](../backend/functions/community-rsvp.js) | Handler HTTP: community-rsvp |
@@ -159,4 +161,5 @@ Generado con `npm run docs:generate`.
 | [test/frontend.test.cjs](../test/frontend.test.cjs) | Configuración, herramienta o prueba |
 | [test/handlers.test.cjs](../test/handlers.test.cjs) | Configuración, herramienta o prueba |
 | [test/http.test.cjs](../test/http.test.cjs) | Configuración, herramienta o prueba |
+| [test/password-reset.test.cjs](../test/password-reset.test.cjs) | Configuración, herramienta o prueba |
 | [test/subscription.test.cjs](../test/subscription.test.cjs) | Configuración, herramienta o prueba |

@@ -6,6 +6,7 @@
  */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
 
 const COOKIE_NAME = 'robin_subscription_session';
@@ -22,6 +23,39 @@ function hashPassword(plain) {
 }
 function verifyPassword(plain, hash) {
   return bcrypt.compareSync(plain, hash);
+}
+
+function passwordResetVersion(passwordHash) {
+  return crypto.createHash('sha256').update(String(passwordHash || '')).digest('base64url');
+}
+
+function signPasswordResetToken(user) {
+  return jwt.sign(
+    {
+      uid: user.id,
+      purpose: 'password_reset',
+      password_version: passwordResetVersion(user.password_hash),
+    },
+    getJwtSecret(),
+    { expiresIn: '30m' }
+  );
+}
+
+function verifyPasswordResetToken(token) {
+  try {
+    const payload = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
+    if (!payload.uid || payload.purpose !== 'password_reset' || !payload.password_version) return null;
+    return payload;
+  } catch (_) {
+    return null;
+  }
+}
+
+function isCurrentPasswordResetToken(payload, passwordHash) {
+  if (!payload || !payload.password_version) return false;
+  const actual = Buffer.from(passwordResetVersion(passwordHash));
+  const expected = Buffer.from(String(payload.password_version));
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
 
 function signSession(user) {
@@ -59,6 +93,9 @@ module.exports = {
   COOKIE_NAME,
   hashPassword,
   verifyPassword,
+  signPasswordResetToken,
+  verifyPasswordResetToken,
+  isCurrentPasswordResetToken,
   signSession,
   buildSessionCookie,
   readSessionFromEvent,
