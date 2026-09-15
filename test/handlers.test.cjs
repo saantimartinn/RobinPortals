@@ -48,6 +48,21 @@ test('login refuses application admin even when a row exists',async()=>{
   assert.equal(response.statusCode,401);
 });
 
+test('password recovery uses the existing public password endpoint without a session',async()=>{
+  const calls=[];
+  const handler=loadHandler('auth-change-password',{
+    '../lib/password-reset':{
+      requestPasswordReset:async(_event,email)=>{calls.push(['request',email]);return {ok:true};},
+      applyPasswordReset:async(token,password)=>{calls.push(['reset',token,password]);return {ok:true};},
+    },
+  });
+  const request=await handler({httpMethod:'POST',headers:{},body:'{"action":"request_reset","email":"client@example.test"}'});
+  const reset=await handler({httpMethod:'POST',headers:{},body:'{"action":"reset","token":"signed","password":"new-password"}'});
+  assert.equal(request.statusCode,200);
+  assert.equal(reset.statusCode,200);
+  assert.deepEqual(calls,[['request','client@example.test'],['reset','signed','new-password']]);
+});
+
 test('Stripe webhook rejects invalid signatures and retries persistence failures',async()=>{
   const original=process.env.STRIPE_WEBHOOK_SECRET;
   process.env.STRIPE_WEBHOOK_SECRET='test-only';

@@ -37,11 +37,11 @@ export async function login(username, password) {
 }
 
 export async function requestPasswordReset(email) {
-  return api.post("/api/auth/forgot-password", { email });
+  return api.post("/api/auth/change-password", { action: "request_reset", email });
 }
 
 export async function resetPassword(token, password) {
-  return api.post("/api/auth/reset-password", { token, password });
+  return api.post("/api/auth/change-password", { action: "reset", token, password });
 }
 
 export async function logout() {

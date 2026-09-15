@@ -7,8 +7,6 @@ Generado desde Netlify y los handlers. Los controles por rol y ownership están 
 | `/api/auth/login` | [auth-login](../backend/functions/auth-login.js) | POST | Público |
 | `/api/auth/logout` | [auth-logout](../backend/functions/auth-logout.js) | POST | Público |
 | `/api/auth/change-password` | [auth-change-password](../backend/functions/auth-change-password.js) | POST | Sesión suscriptor/admin |
-| `/api/auth/forgot-password` | [auth-forgot-password](../backend/functions/auth-forgot-password.js) | POST | Público |
-| `/api/auth/reset-password` | [auth-reset-password](../backend/functions/auth-reset-password.js) | POST | Público |
 | `/api/me` | [me](../backend/functions/me.js) | GET | Sesión suscriptor/admin |
 | `/api/subscriber/signup` | [subscriber-signup](../backend/functions/subscriber-signup.js) | POST | Público |
 | `/api/subscriber/cv-ai` | [subscriber-cv-ai](../backend/functions/subscriber-cv-ai.js) | POST | Sesión suscriptor/admin |

@@ -5,8 +5,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { createRequire } = require('node:module');
 
-function loadHandler(name, mocks) {
-  const filename = path.resolve(`backend/functions/${name}.js`);
+function loadModule(relativePath, mocks) {
+  const filename = path.resolve(relativePath);
   const realRequire = createRequire(filename);
   const exports = {};
   const module = { exports };
@@ -37,15 +37,14 @@ test('password reset token expires and becomes invalid after changing the passwo
 
 test('forgot password does not reveal whether an account exists', async () => {
   let emailCalls = 0;
-  const { handler } = loadHandler('auth-forgot-password', {
-    '../lib/supabase': { getSupabase: () => ({
+  const service = loadModule('backend/lib/password-reset.js', {
+    './supabase': { getSupabase: () => ({
       from: () => ({ select: () => ({ eq: () => ({ limit: async () => ({ data: [], error: null }) }) }) }),
     }) },
-    '../lib/email': { sendEmail: async () => { emailCalls += 1; } },
+    './email': { sendEmail: async () => { emailCalls += 1; } },
   });
-  const response = await handler({ httpMethod: 'POST', headers: {}, body: '{"email":"unknown@example.test"}' });
-  assert.equal(response.statusCode, 200);
-  assert.equal(JSON.parse(response.body).ok, true);
+  const response = await service.requestPasswordReset({ headers: {} }, 'unknown@example.test');
+  assert.equal(response.ok, true);
   assert.equal(emailCalls, 0);
 });
 
@@ -53,9 +52,9 @@ test('reset link always returns to The Robin Plan and contains the signed token'
   const previous = process.env.PUBLIC_BASE_URL;
   process.env.PUBLIC_BASE_URL = 'https://project-robin.com/therobinplan/';
   try {
-    const { _test } = loadHandler('auth-forgot-password', {});
+    const service = loadModule('backend/lib/password-reset.js', {});
     assert.equal(
-      _test.resetUrl({ headers: {} }, 'signed.token'),
+      service.resetUrl({ headers: {} }, 'signed.token'),
       'https://project-robin.com/therobinplan/?reset_token=signed.token'
     );
   } finally {
@@ -82,14 +81,11 @@ test('a valid reset request replaces the hash without exposing the password', as
         },
       }),
     };
-    const { handler } = loadHandler('auth-reset-password', {
-      '../lib/supabase': { getSupabase: () => database },
+    const service = loadModule('backend/lib/password-reset.js', {
+      './supabase': { getSupabase: () => database },
     });
-    const response = await handler({
-      httpMethod: 'POST', headers: {},
-      body: JSON.stringify({ token, password: 'a-new-secure-password' }),
-    });
-    assert.equal(response.statusCode, 200);
+    const response = await service.applyPasswordReset(token, 'a-new-secure-password');
+    assert.equal(response.ok, true);
     assert.equal(auth.verifyPassword('a-new-secure-password', savedHash), true);
     assert.equal(savedHash.includes('a-new-secure-password'), false);
   } finally {

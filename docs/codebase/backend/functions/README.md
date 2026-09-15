@@ -7,10 +7,8 @@ Entradas HTTP de Netlify. Conservan los contratos /api existentes.
 ## Archivos
 
 - [auth-change-password.js](../../../../backend/functions/auth-change-password.js): Handler HTTP: auth-change-password.
-- [auth-forgot-password.js](../../../../backend/functions/auth-forgot-password.js): Handler HTTP: auth-forgot-password.
 - [auth-login.js](../../../../backend/functions/auth-login.js): Handler HTTP: auth-login.
 - [auth-logout.js](../../../../backend/functions/auth-logout.js): Handler HTTP: auth-logout.
-- [auth-reset-password.js](../../../../backend/functions/auth-reset-password.js): Handler HTTP: auth-reset-password.
 - [challenges.js](../../../../backend/functions/challenges.js): Handler HTTP: challenges.
 - [community-events-list.js](../../../../backend/functions/community-events-list.js): Handler HTTP: community-events-list.
 - [community-rsvp.js](../../../../backend/functions/community-rsvp.js): Handler HTTP: community-rsvp.

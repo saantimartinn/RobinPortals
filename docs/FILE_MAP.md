@@ -10,10 +10,8 @@ Generado con `npm run docs:generate`.
 | [.gitignore](../.gitignore) | Configuración, herramienta o prueba |
 | [.nvmrc](../.nvmrc) | Configuración, herramienta o prueba |
 | [backend/functions/auth-change-password.js](../backend/functions/auth-change-password.js) | Handler HTTP: auth-change-password |
-| [backend/functions/auth-forgot-password.js](../backend/functions/auth-forgot-password.js) | Handler HTTP: auth-forgot-password |
 | [backend/functions/auth-login.js](../backend/functions/auth-login.js) | Handler HTTP: auth-login |
 | [backend/functions/auth-logout.js](../backend/functions/auth-logout.js) | Handler HTTP: auth-logout |
-| [backend/functions/auth-reset-password.js](../backend/functions/auth-reset-password.js) | Handler HTTP: auth-reset-password |
 | [backend/functions/challenges.js](../backend/functions/challenges.js) | Handler HTTP: challenges |
 | [backend/functions/community-events-list.js](../backend/functions/community-events-list.js) | Handler HTTP: community-events-list |
 | [backend/functions/community-rsvp.js](../backend/functions/community-rsvp.js) | Handler HTTP: community-rsvp |
@@ -41,6 +39,7 @@ Generado con `npm run docs:generate`.
 | [backend/lib/discounts.js](../backend/lib/discounts.js) | Servicio servidor: discounts |
 | [backend/lib/email.js](../backend/lib/email.js) | Servicio servidor: email |
 | [backend/lib/http.js](../backend/lib/http.js) | Servicio servidor: http |
+| [backend/lib/password-reset.js](../backend/lib/password-reset.js) | Servicio servidor: password-reset |
 | [backend/lib/principal.js](../backend/lib/principal.js) | Servicio servidor: principal |
 | [backend/lib/social.js](../backend/lib/social.js) | Servicio servidor: social |
 | [backend/lib/stripe.js](../backend/lib/stripe.js) | Servicio servidor: stripe |
