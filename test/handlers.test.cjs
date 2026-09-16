@@ -86,3 +86,31 @@ test('partner logo parser accepts real image signatures and rejects disguised co
   assert.equal(parseImageDataUrl(`data:image/png;base64,${Buffer.from('not an image').toString('base64')}`),null);
   assert.equal(safeSegment('../partner id!'),'partnerid');
 });
+
+test('partner creation accepts no logo and can upload one through the established admin mutation route',async()=>{
+  const inserted=[];
+  const uploads=[];
+  const sb={
+    from(table){
+      assert.equal(table,'partners');
+      return {insert(data){inserted.push(data);return {select(){return {single:async()=>({data:{id:'p1',...data},error:null})};}};}};
+    },
+  };
+  const handler=loadHandler('sub-admin-mutate',{
+    '../lib/supabase':{getSupabase:()=>sb},
+    '../lib/auth':{readSessionFromEvent:()=>({role:'subscriber_admin'})},
+    '../lib/partner-logo':{
+      parseImageDataUrl:value=>value==='data:image/png;base64,fixture'?{extension:'png'}:null,
+      uploadPartnerLogo:async(_sb,image,partnerId)=>{uploads.push({image,partnerId});return {logoUrl:'https://assets.example.test/partner.png'};},
+    },
+  });
+  const withoutLogo=await handler({httpMethod:'POST',headers:{},body:JSON.stringify({entity:'partner',action:'create',payload:{name:'Sin logo',category:'other',logo_url:null}})});
+  assert.equal(withoutLogo.statusCode,200);
+  assert.equal(inserted[0].logo_url,null);
+  assert.equal(uploads.length,0);
+
+  const withLogo=await handler({httpMethod:'POST',headers:{},body:JSON.stringify({entity:'partner',action:'create',payload:{name:'Con logo',category:'other',logo_data_url:'data:image/png;base64,fixture'}})});
+  assert.equal(withLogo.statusCode,200);
+  assert.equal(inserted[1].logo_url,'https://assets.example.test/partner.png');
+  assert.equal(uploads.length,1);
+});

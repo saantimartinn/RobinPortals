@@ -9,6 +9,7 @@
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
+const { parseImageDataUrl, uploadPartnerLogo } = require('../lib/partner-logo');
 
 // Campos permitidos por entidad (whitelist)
 const EVENT_FIELDS   = ['title', 'type', 'description', 'location', 'city', 'starts_at', 'ends_at', 'capacity', 'expires_at', 'meta', 'image_url', 'active', 'sort_order'];
@@ -128,6 +129,12 @@ exports.handler = async (event) => {
     }
 
     const data = pick(payload, fields);
+    if (entity === 'partner' && payload.logo_data_url) {
+      const image = parseImageDataUrl(payload.logo_data_url);
+      if (!image) return json({ error: 'invalid_logo', detail: 'Usa PNG, JPG o WebP de hasta 2 MB.' }, { statusCode: 400 });
+      const { logoUrl } = await uploadPartnerLogo(sb, image, payload.id);
+      data.logo_url = logoUrl;
+    }
     if (entity === 'faq') {
       data.question = String(data.question || '').trim();
       data.answer = String(data.answer || '').trim();

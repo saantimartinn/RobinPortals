@@ -2,13 +2,13 @@ import { Badge, Btn, Card, CardContent, CardHeader, Field, SelectField, Textarea
 import { CheckCircle2, Handshake, ImageIcon, Loader2, Pencil, Plus, Trash2, UploadCloud, XCircle } from "lucide-react";
 import { PARTNER_CATEGORY_LABELS, ROBIN_CITIES } from "../../shared/constants.js";
 import React, { useState } from "react";
-import { partnerLogoUpload, subAdminMutate } from "../../api/index.js";
+import { subAdminMutate } from "../../api/index.js";
 import { prepareLogoFile } from "../../shared/utils.js";
 
 function AdminPartnerManager({ partners, onChanged }) {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [preparingLogo, setPreparingLogo] = useState(false);
   const [err, setErr] = useState("");
   const cats = Object.keys(PARTNER_CATEGORY_LABELS);
 
@@ -17,14 +17,13 @@ function AdminPartnerManager({ partners, onChanged }) {
     const file = e.target.files && e.target.files[0];
     e.target.value = "";
     if (!file) return;
-    setUploadingLogo(true); setErr("");
+    setPreparingLogo(true); setErr("");
     try {
       const dataUrl = await prepareLogoFile(file);
-      const result = await partnerLogoUpload(dataUrl, editing && editing.id);
-      setEditing((p) => ({ ...p, logo_url: result.logo_url }));
+      setEditing((p) => ({ ...p, logo_data_url: dataUrl }));
     } catch (error) {
       setErr(error.message === "logo_too_large" ? "El logo original no puede superar 5 MB." : error.message === "invalid_logo_type" ? "Usa un archivo PNG, JPG o WebP." : (error.message || "No se pudo subir el logo."));
-    } finally { setUploadingLogo(false); }
+    } finally { setPreparingLogo(false); }
   }
   async function save() {
     if (!editing.name.trim()) { setErr("El nombre es obligatorio."); return; }
@@ -33,7 +32,8 @@ function AdminPartnerManager({ partners, onChanged }) {
       await subAdminMutate("partner", editing.id ? "update" : "create", {
         id: editing.id, name: editing.name.trim(), category: editing.category || "other", city: editing.city || null,
         description: editing.description || null, benefits: editing.benefits || null, discount: editing.discount || null,
-        contact_url: editing.contact_url || null, eligibility: editing.eligibility || null, logo_url: editing.logo_url || null, active: editing.active !== false,
+        contact_url: editing.contact_url || null, eligibility: editing.eligibility || null, logo_url: editing.logo_url || null,
+        logo_data_url: editing.logo_data_url || null, active: editing.active !== false,
       });
       setEditing(null); await onChanged();
     } catch (e) { setErr(e.message || "No se pudo guardar."); }
@@ -54,17 +54,18 @@ function AdminPartnerManager({ partners, onChanged }) {
           <CardContent className="space-y-3">
             <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center">
               <div className="flex h-24 w-40 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-3">
-                {editing.logo_url ? <img src={editing.logo_url} alt={`Logo de ${editing.name || "partner"}`} className="h-full w-full object-contain" /> : <ImageIcon className="h-7 w-7 text-slate-300" />}
+                {(editing.logo_data_url || editing.logo_url) ? <img src={editing.logo_data_url || editing.logo_url} alt={`Logo de ${editing.name || "partner"}`} className="h-full w-full object-contain" /> : <ImageIcon className="h-7 w-7 text-slate-300" />}
               </div>
               <div className="space-y-2">
                 <div><div className="text-sm font-semibold text-slate-800">Logotipo</div><div className="text-xs text-slate-500">PNG, JPG o WebP. Se conserva la proporción y se optimiza antes de subir.</div></div>
                 <div className="flex flex-wrap gap-2">
                   <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
-                    {uploadingLogo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />} {editing.logo_url ? "Cambiar logo" : "Subir logo"}
-                    <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onLogo} disabled={uploadingLogo} />
+                    {preparingLogo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />} {(editing.logo_data_url || editing.logo_url) ? "Cambiar logo" : "Subir logo"}
+                    <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onLogo} disabled={preparingLogo} />
                   </label>
-                  {editing.logo_url && <Btn size="sm" variant="ghost" onClick={() => setEditing((p) => ({ ...p, logo_url: "" }))}>Quitar</Btn>}
+                  {(editing.logo_data_url || editing.logo_url) && <Btn size="sm" variant="ghost" onClick={() => setEditing((p) => ({ ...p, logo_url: "", logo_data_url: "" }))}>Quitar</Btn>}
                 </div>
+                {editing.logo_data_url && <div className="text-xs text-slate-500">El logo se subirá al guardar el partner.</div>}
               </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-3">

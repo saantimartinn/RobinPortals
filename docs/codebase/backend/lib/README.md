@@ -11,6 +11,7 @@ Servicios y utilidades del servidor compartidos por handlers.
 - [discounts.js](../../../../backend/lib/discounts.js): Servicio servidor: discounts.
 - [email.js](../../../../backend/lib/email.js): Servicio servidor: email.
 - [http.js](../../../../backend/lib/http.js): Servicio servidor: http.
+- [partner-logo.js](../../../../backend/lib/partner-logo.js): Servicio servidor: partner-logo.
 - [password-reset.js](../../../../backend/lib/password-reset.js): Servicio servidor: password-reset.
 - [principal.js](../../../../backend/lib/principal.js): Servicio servidor: principal.
 - [social.js](../../../../backend/lib/social.js): Servicio servidor: social.

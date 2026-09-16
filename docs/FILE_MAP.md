@@ -39,6 +39,7 @@ Generado con `npm run docs:generate`.
 | [backend/lib/discounts.js](../backend/lib/discounts.js) | Servicio servidor: discounts |
 | [backend/lib/email.js](../backend/lib/email.js) | Servicio servidor: email |
 | [backend/lib/http.js](../backend/lib/http.js) | Servicio servidor: http |
+| [backend/lib/partner-logo.js](../backend/lib/partner-logo.js) | Servicio servidor: partner-logo |
 | [backend/lib/password-reset.js](../backend/lib/password-reset.js) | Servicio servidor: password-reset |
 | [backend/lib/principal.js](../backend/lib/principal.js) | Servicio servidor: principal |
 | [backend/lib/social.js](../backend/lib/social.js) | Servicio servidor: social |
