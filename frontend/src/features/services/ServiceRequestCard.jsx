@@ -1,3 +1,4 @@
+// Services feature UI for service request card; the application shell selects this view.
 import { Badge, Btn, TextareaField } from "../../shared/ui.jsx";
 import { Loader2, Send } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

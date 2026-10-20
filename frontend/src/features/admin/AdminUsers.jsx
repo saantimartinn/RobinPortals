@@ -1,3 +1,4 @@
+// Admin feature UI for admin users; the application shell selects this view.
 import { AdminUserDetail } from "./AdminUserDetail.jsx";
 import { Badge, Btn, Card, CardContent, CardHeader, Field, SelectField } from "../../shared/ui.jsx";
 import { ChevronRight, Users } from "lucide-react";

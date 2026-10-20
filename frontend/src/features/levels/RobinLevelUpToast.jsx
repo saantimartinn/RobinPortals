@@ -1,3 +1,4 @@
+// Levels feature UI for robin level up toast; the application shell selects this view.
 import { Btn } from "../../shared/ui.jsx";
 import React from "react";
 import { robinLevelDef } from "../../shared/utils.js";

@@ -16,7 +16,6 @@ Documentación mantenida y mapas generados.
 - [API_INVENTORY.md](../../API_INVENTORY.md): Documentación.
 - [ARCHITECTURE.md](../../ARCHITECTURE.md): Documentación.
 - [AUTHORIZATION.md](../../AUTHORIZATION.md): Documentación.
-- [BACKEND_ARCHITECTURE.md](../../BACKEND_ARCHITECTURE.md): Documentación.
 - [BROWSER_SECURITY.md](../../BROWSER_SECURITY.md): Documentación.
 - [CLEANUP.md](../../CLEANUP.md): Documentación.
 - [CLOUDFLARE_ROUTING.md](../../CLOUDFLARE_ROUTING.md): Documentación.
@@ -27,7 +26,6 @@ Documentación mantenida y mapas generados.
 - [ERROR_HANDLING.md](../../ERROR_HANDLING.md): Documentación.
 - [FILE_INDEX.generated.md](../../FILE_INDEX.generated.md): Documentación.
 - [FILE_MAP.md](../../FILE_MAP.md): Documentación.
-- [FRONTEND_ARCHITECTURE.md](../../FRONTEND_ARCHITECTURE.md): Documentación.
 - [FRONTEND_DEVELOPMENT.md](../../FRONTEND_DEVELOPMENT.md): Documentación.
 - [IDENTITY_MODEL.md](../../IDENTITY_MODEL.md): Documentación.
 - [INTEGRATIONS.md](../../INTEGRATIONS.md): Documentación.

@@ -1,3 +1,4 @@
+// Levels feature UI for robin benefits page; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { CheckCircle2, ChevronLeft, Lock, Sparkles, Star } from "lucide-react";
 import { GOLD, NAVY, NAVY_DARK } from "../../shared/theme.js";

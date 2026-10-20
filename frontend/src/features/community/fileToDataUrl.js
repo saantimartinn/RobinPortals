@@ -1,3 +1,4 @@
+// Community feature UI for file to data url; the application shell selects this view.
 
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {

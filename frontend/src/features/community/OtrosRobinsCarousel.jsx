@@ -1,3 +1,4 @@
+// Community feature UI for otros robins carousel; the application shell selects this view.
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { DEMO_ROBINS } from "./DEMO_ROBINS.js";
 import { GOLD } from "../../shared/theme.js";

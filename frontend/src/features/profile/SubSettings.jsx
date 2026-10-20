@@ -1,3 +1,4 @@
+// Profile feature UI for sub settings; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { LogOut } from "lucide-react";
 import React from "react";

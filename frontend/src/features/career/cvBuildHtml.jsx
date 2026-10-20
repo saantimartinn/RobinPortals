@@ -1,3 +1,4 @@
+// Career feature UI for cv build html; the application shell selects this view.
 import React from "react";
 import { cvEsc } from "./cvEsc.js";
 

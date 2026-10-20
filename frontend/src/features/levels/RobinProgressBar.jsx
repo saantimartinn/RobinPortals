@@ -1,3 +1,4 @@
+// Levels feature UI for robin progress bar; the application shell selects this view.
 import { GOLD } from "../../shared/theme.js";
 import React from "react";
 

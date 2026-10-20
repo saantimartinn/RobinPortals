@@ -1,3 +1,4 @@
+// Career feature UI for cv choice; the application shell selects this view.
 import { NAVY } from "../../shared/theme.js";
 import React from "react";
 

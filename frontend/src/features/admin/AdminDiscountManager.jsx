@@ -1,3 +1,4 @@
+// Admin feature UI for admin discount manager; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader, Field } from "../../shared/ui.jsx";
 import { CheckCircle2, Loader2, Pencil, Percent, Plus, Trash2 } from "lucide-react";
 import React, { useState } from "react";

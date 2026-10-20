@@ -1,3 +1,4 @@
+/* Admin feature UI for robin plan developer database; the application shell selects this view. */
 .robin-plan-dev-db{overflow:hidden;border:1px solid #dce5ee;border-radius:16px;background:#fff}
 .robin-plan-dev-db>header,.robin-plan-dev-db>footer{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px}
 .robin-plan-dev-db h2{margin:0;color:#203c66;font-size:19px;font-weight:800}

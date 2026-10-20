@@ -1,3 +1,4 @@
+// Subscription feature UI for sub support; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader, Field, TextareaField } from "../../shared/ui.jsx";
 import { Clock, LifeBuoy, Loader2, Mail, Send } from "lucide-react";
 import React, { useState } from "react";

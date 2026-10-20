@@ -1,3 +1,4 @@
+// Auth feature UI for use subscriber auth; the application shell selects this view.
 import { useEffect, useState } from "react";
 import { discountValidate, requestPasswordReset, resetPassword } from "../../api/index.js";
 

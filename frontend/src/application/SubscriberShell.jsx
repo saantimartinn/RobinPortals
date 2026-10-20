@@ -1,3 +1,4 @@
+// Shell or navigation module for subscriber shell; local authentication state stays in the application layer.
 import { AnimatePresence, motion } from "framer-motion";
 import "./subscription-portal.css";
 import { Briefcase, CreditCard, HeartHandshake, HelpCircle, Home, MessagesSquare, Settings, Users } from "lucide-react";

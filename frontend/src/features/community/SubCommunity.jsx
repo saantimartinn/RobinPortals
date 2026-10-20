@@ -1,3 +1,4 @@
+// Community feature UI for sub community; the application shell selects this view.
 import { Building2, CalendarCheck, Handshake, Lock, Plane, Sparkles, Tag, Users } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { GOLD } from "../../shared/theme.js";

@@ -1,3 +1,4 @@
+// Server-side password reset helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { getSupabase } = require('./supabase');
 const { hashPassword, signPasswordResetToken, verifyPasswordResetToken, isCurrentPasswordResetToken } = require('./auth');
 const { sendEmail } = require('./email');

@@ -1,3 +1,4 @@
+// Shell or navigation module for cross portal nav; local authentication state stays in the application layer.
 import React from "react";
 import { LogOut } from "lucide-react";
 import robinWordmark from "../assets/robin-wordmark.png";

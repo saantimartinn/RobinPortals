@@ -1,3 +1,4 @@
+// Server-side discounts helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 async function lookupCode(sb, rawCode) {
   const code = String(rawCode || '').trim();
   if (!code) return null;

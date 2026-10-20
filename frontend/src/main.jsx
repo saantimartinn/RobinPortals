@@ -1,3 +1,4 @@
+// Browser entry point: mounts The Robin Plan app and global styles.
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app.jsx";

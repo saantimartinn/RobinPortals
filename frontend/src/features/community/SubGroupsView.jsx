@@ -1,3 +1,4 @@
+// Community feature UI for sub groups view; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { CityFilterBar } from "./CityFilterBar.jsx";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

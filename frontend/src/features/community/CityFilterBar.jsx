@@ -1,3 +1,4 @@
+// Community feature UI for city filter bar; the application shell selects this view.
 import { NAVY } from "../../shared/theme.js";
 import React from "react";
 

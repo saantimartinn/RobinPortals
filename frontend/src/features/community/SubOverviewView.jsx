@@ -1,3 +1,4 @@
+// Community feature UI for sub overview view; the application shell selects this view.
 import { Badge, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { COMMUNITY_TYPE_LABELS } from "../../shared/constants.js";
 import { CalendarCheck, Tag, Users } from "lucide-react";

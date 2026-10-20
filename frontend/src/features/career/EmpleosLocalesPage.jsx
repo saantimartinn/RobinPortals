@@ -1,3 +1,4 @@
+// Career feature UI for empleos locales page; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Briefcase, ExternalLink } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

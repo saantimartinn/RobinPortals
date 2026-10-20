@@ -1,3 +1,4 @@
+// Shared utils values or helpers used across this runtime.
 import { ROBIN_BENEFITS, ROBIN_LEVELS, ROBIN_LEVEL_ORDER, STUDENTJOB_CITY_SLUG } from "./constants.js";
 
 function formatDate(d) {

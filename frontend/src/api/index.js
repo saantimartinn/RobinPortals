@@ -1,3 +1,4 @@
+// Browser API client for index; keeps endpoint and fetch details out of the screens.
 async function request(method, url, body, isForm) {
   const opts = { method, credentials: "same-origin", headers: {} };
   if (body && !isForm) {

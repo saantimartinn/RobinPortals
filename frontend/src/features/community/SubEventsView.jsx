@@ -1,3 +1,4 @@
+// Community feature UI for sub events view; the application shell selects this view.
 import { Badge, Btn, Card, CardContent } from "../../shared/ui.jsx";
 import { COMMUNITY_TYPE_LABELS } from "../../shared/constants.js";
 import { Calendar, CheckCircle2, MapPin, Star, Users, XCircle } from "lucide-react";

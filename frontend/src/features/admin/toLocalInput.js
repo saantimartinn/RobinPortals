@@ -1,3 +1,4 @@
+// Admin feature UI for to local input; the application shell selects this view.
 
 function toLocalInput(v, dateOnly) {
   if (!v) return "";

@@ -1,3 +1,4 @@
+// Admin feature UI for admin event kinds; the application shell selects this view.
 import { Briefcase, Building2, CalendarCheck, Plane, Tag, Users } from "lucide-react";
 
 const ADMIN_EVENT_KINDS = {

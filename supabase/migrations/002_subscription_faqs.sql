@@ -1,3 +1,4 @@
+-- SQL change for 002 subscription faqs; apply it only to the Supabase project that owns this migration.
 begin;
 create table if not exists public.subscription_faqs (
   id uuid primary key default gen_random_uuid(),

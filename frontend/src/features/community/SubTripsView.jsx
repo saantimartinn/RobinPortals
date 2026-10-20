@@ -1,3 +1,4 @@
+// Community feature UI for sub trips view; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Calendar, CheckCircle2, Plane, Users } from "lucide-react";
 import { CityFilterBar } from "./CityFilterBar.jsx";

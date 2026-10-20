@@ -1,3 +1,4 @@
+// Career feature UI for mentorias page; the application shell selects this view.
 import { Calendar, CalendarCheck, ChevronRight, Compass } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { MentorProfileCard } from "./MentorProfileCard.jsx";

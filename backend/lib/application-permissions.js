@@ -1,3 +1,4 @@
+// Server-side application permissions helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { parse: parseCookies } = require('cookie');
 
 const APPLICATION_ME_URL = 'https://project-robin.com/portal/api/me';

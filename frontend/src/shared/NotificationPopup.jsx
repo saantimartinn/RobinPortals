@@ -1,3 +1,4 @@
+// Shared notification popup values or helpers used across this runtime.
 import { Bell, CheckCircle2, FileText, Loader2 } from "lucide-react";
 import { Btn } from "./ui.jsx";
 import { NAVY, NAVY_DARK } from "./theme.js";

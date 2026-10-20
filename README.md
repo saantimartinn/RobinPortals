@@ -44,7 +44,7 @@ empaqueta aparte. No subir compilados, dependencias, credenciales o exports de d
 - [USERGUIDE](USERGUIDE.md): índice de lectura por módulos, endpoints y repos conectados.
 - [Cloudflare y enrutamiento](docs/CLOUDFLARE_ROUTING.md): paths públicos, Worker y salto a Netlify.
 - [Mapa técnico mantenido](docs/FILE_MAP.md), [índice generado](docs/FILE_INDEX.generated.md) y [árbol navegable](docs/codebase/README.md).
-- [Arquitectura](docs/ARCHITECTURE.md), [frontend](docs/FRONTEND_ARCHITECTURE.md) y [backend](docs/BACKEND_ARCHITECTURE.md).
+- [Arquitectura](docs/ARCHITECTURE.md), [contratos API](docs/API_CONTRACTS.md) y [autorización](docs/AUTHORIZATION.md).
 - [Inventario API](docs/API_INVENTORY.md) y [contratos](docs/API_CONTRACTS.md).
 - [Base de datos](docs/DATABASE_CURRENT.md), [entorno](docs/ENVIRONMENT.md) y [autorización](docs/AUTHORIZATION.md).
 - [Despliegue y operación](docs/OPERATIONS.md), [pruebas](docs/TESTING.md) y [limpieza realizada](docs/CLEANUP.md).

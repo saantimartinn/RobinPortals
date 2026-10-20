@@ -1,3 +1,4 @@
+// Career feature UI for sub profesional; the application shell selects this view.
 import { Briefcase, FileText, Handshake, Users } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { ComingSoon } from "../services/ComingSoon.jsx";

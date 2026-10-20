@@ -17,6 +17,13 @@ Las funcionalidades se agrupan bajo `frontend/src/features/`; `shared/` contiene
 UI, tema y utilidades. Los handlers HTTP están en `backend/functions/` y extraen
 servicios comunes a `backend/lib/`.
 
+### Invariantes de composición
+
+- Ninguna Function debe invocar otra Function; los contratos compartidos se extraen a `backend/lib/` para que HTTP siga siendo responsabilidad del handler.
+- No forzar que todos los handlers sean controladores mínimos: una separación adicional debe eliminar duplicación o complejidad concreta. Billing, permisos, auth y proveedores son módulos compartidos cuando el dominio lo justifica.
+- El shell selecciona una vista según la sesión local. La UI no concede acceso: el backend aplica roles y ownership, y los niveles mostrados no sustituyen autorización.
+- Precios, pagos confirmados y estado de suscripción se verifican en el backend y Stripe; los assets y componentes compartidos no contienen secretos.
+
 El portal público vive bajo `/therobinplan/`, con rutas `/api/` en el origin Netlify
 que el Worker expone bajo `/therobinplan/api/`. `frontend/vite.config.js` usa base
 `/therobinplan/`, crea `dist/therobinplan/` y escribe un redirect adicional para

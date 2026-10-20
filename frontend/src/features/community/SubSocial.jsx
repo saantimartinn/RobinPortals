@@ -1,3 +1,4 @@
+// Community feature UI for sub social; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { CheckCircle2, Clock, Loader2, MessageCircle, Plus, Search, Trash2, Users, XCircle } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

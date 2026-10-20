@@ -1,3 +1,4 @@
+// Automated checks for http test; external services should remain outside this test boundary.
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const {parseJsonBody,verifyOrigin,json,methodNotAllowed}=require('../backend/lib/http');

@@ -1,3 +1,4 @@
+// Server-side subscription billing helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { createClient } = require('@supabase/supabase-js');
 
 const HOLDED_BASE = 'https://api.holded.com/api/v2';
@@ -85,6 +86,7 @@ async function findPortalMatch(subscriber) {
     && candidateValues(best.user).clientName.split(' ').length >= 2
     && candidateValues(best.user).clientName.length >= 8
     && (!ranked[1] || ranked[1].score < best.score);
+  // Nota: solo seguimos con una identidad fuerte y única; los empates se envían a revisión para no facturar a la persona equivocada.
   const safe = best.score >= 100 || (best.score >= 80 && (!ranked[1] || ranked[1].score < best.score)) || uniqueCompleteContractName;
   if (!safe || (ranked[1] && ranked[1].score === best.score)) {
     return { ok: false, reason: 'ambiguous', candidates: ranked.slice(0, 5).map((x) => ({ portal_user_id: x.user.id, score: x.score, reasons: x.reasons.map((r) => r.key) })) };
@@ -146,6 +148,7 @@ async function processStripeInvoice(sb, stripeInvoice) {
   const { data: saved, error: upsertError } = await sb.from('subscription_invoices').upsert(row, { onConflict: 'stripe_invoice_id', ignoreDuplicates: false }).select('*').single();
   if (upsertError) throw upsertError;
   if (saved.holded_invoice_id) return { ok: true, already: true, invoice_id: saved.holded_invoice_id };
+  // Nota: esta actualización condicional reclama la factura de forma atómica antes de crearla en Holded; los webhooks repetidos no deben duplicarla.
   const { data: claimed, error: claimError } = await sb.from('subscription_invoices')
     .update({ billing_status: 'processing', updated_at: new Date().toISOString() })
     .eq('id', saved.id).in('billing_status', ['pending', 'unmatched', 'failed']).select('id');

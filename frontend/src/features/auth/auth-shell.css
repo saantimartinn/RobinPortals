@@ -1,3 +1,4 @@
+/* Auth feature UI for auth shell; the application shell selects this view. */
 .subscription-auth-shell { min-height: 100vh; display: flex; font-family: Inter, "Segoe UI", sans-serif; color: #29395f; background: #f4f5f7; }
 .subscription-auth-brand { width: min(39vw, 480px); flex: 0 0 min(39vw, 480px); min-height: 100vh; padding: 44px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
 .subscription-auth-rings { position: absolute; inset: 0; opacity: .06; }

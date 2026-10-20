@@ -1,3 +1,4 @@
+// Community feature UI for sub challenges; the application shell selects this view.
 import { Card, CardContent } from "../../shared/ui.jsx";
 import { ChallengeCard } from "./ChallengeCard.jsx";
 import { GOLD } from "../../shared/theme.js";

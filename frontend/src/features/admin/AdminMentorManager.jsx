@@ -1,3 +1,4 @@
+// Admin feature UI for admin mentor manager; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader, Field, SelectField, TextareaField } from "../../shared/ui.jsx";
 import { CAMPUS_AREAS } from "../../shared/constants.js";
 import { CalendarCheck, CheckCircle2, GraduationCap, Loader2, Pencil, Plus, Trash2, UploadCloud } from "lucide-react";

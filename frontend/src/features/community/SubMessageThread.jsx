@@ -1,3 +1,4 @@
+// Community feature UI for sub message thread; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { ChevronLeft, Loader2, MessageCircle, Send } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

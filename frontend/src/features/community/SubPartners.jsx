@@ -1,3 +1,4 @@
+// Community feature UI for sub partners; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { CalendarCheck, ExternalLink, Handshake, ImageIcon, MapPin, Percent } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

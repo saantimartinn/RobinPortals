@@ -1,3 +1,4 @@
+// Shell or navigation module for subscriber portal; local authentication state stays in the application layer.
 import React from "react";
 import { SubscriberShell } from "./SubscriberShell.jsx";
 import { SubscriptionPlanPicker } from "./SubscriptionPlanPicker.jsx";

@@ -1,3 +1,4 @@
+// Services feature UI for coming soon; the application shell selects this view.
 import { Card, CardContent } from "../../shared/ui.jsx";
 import { CheckCircle2, Sparkles } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

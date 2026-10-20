@@ -1,3 +1,4 @@
+// Subscription feature UI for sub payments; the application shell selects this view.
 import { AlertCircle, Loader2, Receipt, Wallet } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader, Row } from "../../shared/ui.jsx";
 import React, { useState } from "react";

@@ -1,3 +1,4 @@
+// Admin feature UI for admin event manager; the application shell selects this view.
 import { ADMIN_EVENT_KINDS } from "./ADMIN_EVENT_KINDS.js";
 import { Badge, Btn, Card, CardContent, CardHeader, Field, SelectField, TextareaField } from "../../shared/ui.jsx";
 import { COMMUNITY_TYPE_LABELS, ROBIN_CITIES } from "../../shared/constants.js";

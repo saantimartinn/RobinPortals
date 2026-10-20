@@ -1,3 +1,4 @@
+// Career feature UI for mentor profile card; the application shell selects this view.
 import { Badge, Btn, Card, CardContent } from "../../shared/ui.jsx";
 import { ExternalLink } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

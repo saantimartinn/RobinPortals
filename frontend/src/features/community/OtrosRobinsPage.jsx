@@ -1,3 +1,4 @@
+// Community feature UI for otros robins page; the application shell selects this view.
 import { Card, CardContent } from "../../shared/ui.jsx";
 import { DEMO_ROBINS } from "./DEMO_ROBINS.js";
 import React from "react";

@@ -1,3 +1,4 @@
+// Resolves the local subscriber session and selects the subscriber or admin shell.
 import { CREAM } from "./shared/theme.js";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";

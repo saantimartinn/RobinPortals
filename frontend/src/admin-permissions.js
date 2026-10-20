@@ -1,3 +1,4 @@
+// Browser-side admin permissions helper used by The Robin Plan.
 const PRO_EMAILS = new Set(['noel@project-robin.com', 'maria@project-robin.com', 'manuel@project-robin.com', 'santimartin1203@gmail.com']);
 
 export function isDeveloperAdminEmail(email) {

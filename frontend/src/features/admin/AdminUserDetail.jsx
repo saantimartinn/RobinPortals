@@ -1,3 +1,4 @@
+// Admin feature UI for admin user detail; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader, Divider, Field, SelectField } from "../../shared/ui.jsx";
 import { CheckCircle2, Loader2, User, XCircle } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

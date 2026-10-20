@@ -1,3 +1,4 @@
+// Community feature UI for social avatar; the application shell selects this view.
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";
 import React from "react";
 

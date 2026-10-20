@@ -1,3 +1,4 @@
+// Admin feature UI for admin panel overview; the application shell selects this view.
 import { Badge, Card, CardContent, CardHeader, KpiCard } from "../../shared/ui.jsx";
 import { CalendarCheck, Clock, LifeBuoy, MapPin, Star, Users } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

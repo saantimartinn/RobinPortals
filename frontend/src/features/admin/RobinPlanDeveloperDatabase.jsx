@@ -1,3 +1,4 @@
+// Admin feature UI for robin plan developer database; the application shell selects this view.
 import React, { useCallback, useEffect, useState } from "react";
 import { subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate } from "../../api/index.js";
 import "./robin-plan-developer-database.css";

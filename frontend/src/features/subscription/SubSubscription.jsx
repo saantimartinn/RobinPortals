@@ -1,3 +1,4 @@
+// Subscription feature UI for sub subscription; the application shell selects this view.
 import { AlertCircle, CheckCircle2, Clock, ExternalLink, Loader2, Star } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader, Row } from "../../shared/ui.jsx";
 import { NAVY } from "../../shared/theme.js";

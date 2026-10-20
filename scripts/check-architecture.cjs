@@ -1,3 +1,4 @@
+// Maintenance utility for check architecture; it is run explicitly by developers or CI.
 const fs = require('node:fs');
 const path = require('node:path');
 const { parse } = require('@babel/parser');

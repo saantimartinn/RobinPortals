@@ -1,3 +1,4 @@
+// Server-side partner logo helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const crypto = require('node:crypto');
 
 const BUCKET = 'partner-logos';

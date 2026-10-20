@@ -1,3 +1,4 @@
+-- SQL change for 004 subscription billing; apply it only to the Supabase project that owns this migration.
 begin;
 
 alter table public.subscribers

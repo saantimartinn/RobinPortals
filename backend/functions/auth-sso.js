@@ -1,3 +1,4 @@
+// Netlify handler for /api/auth/sso; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../lib/supabase');
 const { signSession, buildSessionCookie } = require('../lib/auth');
 const { isSubscriberRole } = require('../lib/principal');
@@ -15,6 +16,7 @@ async function findSubscriber(sb, identity) {
   for (const [field, value] of lookups) {
     const { data, error } = await sb.from('subscribers').select('id, lead_id, username, email, role').eq(field, value).limit(2);
     if (error) throw error;
+    // Nota: no elegimos una cuenta si un identificador duplicado puede enlazar a otra persona.
     if (data?.length > 1) { ambiguous = true; continue; }
     if (data?.length === 1) {
       return isSubscriberRole(data[0].role) ? { user: data[0] } : {};

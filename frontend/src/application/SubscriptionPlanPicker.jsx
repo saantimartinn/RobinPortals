@@ -1,3 +1,4 @@
+// Shell or navigation module for subscription plan picker; local authentication state stays in the application layer.
 import { AlertCircle, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Badge, Btn } from "../shared/ui.jsx";
 import { CREAM, NAVY } from "../shared/theme.js";

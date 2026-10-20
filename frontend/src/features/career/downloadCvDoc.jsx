@@ -1,3 +1,4 @@
+// Career feature UI for download cv doc; the application shell selects this view.
 import React from "react";
 import { cvBuildHtml } from "./cvBuildHtml.jsx";
 

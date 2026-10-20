@@ -1,3 +1,4 @@
+// Admin feature UI for admin sub notifications; the application shell selects this view.
 import { Bell, Loader2, Search, Send, Trash2 } from "lucide-react";
 import { Btn, Card, CardContent, CardHeader, Field, TextareaField } from "../../shared/ui.jsx";
 import { NAVY } from "../../shared/theme.js";

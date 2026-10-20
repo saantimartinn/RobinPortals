@@ -1,3 +1,4 @@
+// Auth feature UI for auth shell; the application shell selects this view.
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";
 import React from "react";
 import robinLogoTransparent from "../../assets/robin-logo-transparent.png";

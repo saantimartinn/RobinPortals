@@ -1,3 +1,4 @@
+// Community feature UI for sub associations view; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Building2, ExternalLink } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

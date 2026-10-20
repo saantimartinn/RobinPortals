@@ -1,3 +1,4 @@
+// Services feature UI for sub personal; the application shell selects this view.
 import { Building2, HeartHandshake, Home, LifeBuoy, Plane } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { ComingSoon } from "./ComingSoon.jsx";

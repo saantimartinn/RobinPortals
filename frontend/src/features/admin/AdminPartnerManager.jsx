@@ -1,3 +1,4 @@
+// Admin feature UI for admin partner manager; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader, Field, SelectField, TextareaField } from "../../shared/ui.jsx";
 import { CheckCircle2, Handshake, ImageIcon, Loader2, Pencil, Plus, Trash2, UploadCloud, XCircle } from "lucide-react";
 import { PARTNER_CATEGORY_LABELS, ROBIN_CITIES } from "../../shared/constants.js";

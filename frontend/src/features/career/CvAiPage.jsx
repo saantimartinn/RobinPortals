@@ -1,3 +1,4 @@
+// Career feature UI for cv ai page; the application shell selects this view.
 import { Btn, Card, CardContent, Field, TextareaField } from "../../shared/ui.jsx";
 import { CheckCircle2, ChevronRight, Download, Loader2, Sparkles, UploadCloud } from "lucide-react";
 import { CvChoice } from "./CvChoice.jsx";

@@ -1,3 +1,4 @@
+// Community feature UI for sub offers view; the application shell selects this view.
 import { Badge, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { CityFilterBar } from "./CityFilterBar.jsx";
 import { Clock, MapPin, Tag } from "lucide-react";

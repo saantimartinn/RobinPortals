@@ -1,3 +1,4 @@
+// Admin feature UI for sub req status; the application shell selects this view.
 
 const SUB_REQ_STATUS = [
   { value: "open", label: "Abierta" },

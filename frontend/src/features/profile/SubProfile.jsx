@@ -1,3 +1,4 @@
+// Profile feature UI for sub profile; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader, Field, SelectField, TextareaField } from "../../shared/ui.jsx";
 import { CheckCircle2, Loader2, UploadCloud, User } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

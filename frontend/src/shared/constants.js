@@ -1,3 +1,4 @@
+// Shared constants values or helpers used across this runtime.
 import { Briefcase, Dumbbell, FileText, Handshake, HeartHandshake, Home, PartyPopper, Plane, Users } from "lucide-react";
 
 const CAMPUS_AREAS = [

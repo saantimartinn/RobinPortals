@@ -1,3 +1,4 @@
+// Services feature UI for sub intro; the application shell selects this view.
 import { ChevronLeft } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";
 import React from "react";

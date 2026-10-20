@@ -1,3 +1,4 @@
+// Services feature UI for residencias page; the application shell selects this view.
 import { Badge } from "../../shared/ui.jsx";
 import { Building2, ChevronRight, MapPin } from "lucide-react";
 import { ComingSoon } from "./ComingSoon.jsx";

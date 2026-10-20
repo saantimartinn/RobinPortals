@@ -1,3 +1,4 @@
+// Auth feature UI for subscriber auth screen; the application shell selects this view.
 import { AlertCircle, CheckCircle2, ChevronLeft, KeyRound, Loader2, Mail } from "lucide-react";
 import { AuthShell } from "./AuthShell.jsx";
 import { Btn, Field, SelectField } from "../../shared/ui.jsx";

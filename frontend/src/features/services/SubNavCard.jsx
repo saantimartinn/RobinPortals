@@ -1,3 +1,4 @@
+// Services feature UI for sub nav card; the application shell selects this view.
 import { Badge } from "../../shared/ui.jsx";
 import { ChevronRight, ExternalLink, Lock } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

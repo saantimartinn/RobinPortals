@@ -1,3 +1,4 @@
+// Levels feature UI for robin locked notice; the application shell selects this view.
 import { Card, CardContent } from "../../shared/ui.jsx";
 import { Lock } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";

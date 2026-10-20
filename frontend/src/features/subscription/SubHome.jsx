@@ -1,3 +1,4 @@
+// Subscription feature UI for sub home; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Briefcase, CalendarCheck, ChevronRight, HeartHandshake, Tag, Users } from "lucide-react";
 import { COMMUNITY_TYPE_LABELS, SUB_STATUS_LABELS } from "../../shared/constants.js";

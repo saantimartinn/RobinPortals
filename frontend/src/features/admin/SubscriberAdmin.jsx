@@ -1,3 +1,4 @@
+// Admin feature UI for subscriber admin; the application shell selects this view.
 import { AdminChallengeManager } from "./AdminChallengeManager.jsx";
 import { AdminDiscountManager } from "./AdminDiscountManager.jsx";
 import { AdminEventManager } from "./AdminEventManager.jsx";

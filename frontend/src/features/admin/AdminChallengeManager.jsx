@@ -1,3 +1,4 @@
+// Admin feature UI for admin challenge manager; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader, Field, TextareaField } from "../../shared/ui.jsx";
 import { CheckCircle2, Clock, Download, Loader2, Pencil, Plus, Sparkles, Trash2, UploadCloud, XCircle } from "lucide-react";
 import { NAVY } from "../../shared/theme.js";

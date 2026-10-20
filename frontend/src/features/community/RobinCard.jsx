@@ -1,3 +1,4 @@
+// Community feature UI for robin card; the application shell selects this view.
 import { NAVY_DARK } from "../../shared/theme.js";
 import React from "react";
 

@@ -1,3 +1,4 @@
+// Community feature UI for demo robins; the application shell selects this view.
 
 const DEMO_ROBINS = [
   { name: "Lucía G.", city: "Ámsterdam", color: "#1B2F6E" },

@@ -1,3 +1,4 @@
+// Admin feature UI for admin faq manager; the application shell selects this view.
 import React, { useEffect, useState } from "react";
 import { HelpCircle, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { adminFaqMutate, faqsList } from "../../api/index.js";

@@ -1,3 +1,4 @@
+// Community feature UI for city visible; the application shell selects this view.
 
 function cityVisible(item, ciudad, showAll) {
   if (showAll) return true;

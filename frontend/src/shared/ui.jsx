@@ -1,3 +1,4 @@
+// Shared ui values or helpers used across this runtime.
 import { GOLD, NAVY, NAVY_DARK } from "./theme.js";
 import React from "react";
 

@@ -1,3 +1,4 @@
+// Subscription feature UI for sub faqs; the application shell selects this view.
 import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Loader2, Search } from "lucide-react";
 import { faqsList } from "../../api/index.js";

@@ -1,3 +1,4 @@
+// Shared theme values or helpers used across this runtime.
 
 
 const CREAM = "#FAF8F0";
