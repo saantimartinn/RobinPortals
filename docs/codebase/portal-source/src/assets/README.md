@@ -8,6 +8,12 @@ Logotipos importados y procesados por Vite.
 
 **Entra aquí:** Cuando sustituyas identidad visual utilizada desde componentes.
 
+## Subcarpetas
+
+| Carpeta | Qué contiene | Entra aquí cuando |
+|---|---|---|
+| [`team-popups/`](team-popups/README.md) | Contenido mantenido de `portal-source/src/assets/team-popups/`. | Cuando necesites trabajar en esta parte concreta del repositorio. |
+
 ## Archivos
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |

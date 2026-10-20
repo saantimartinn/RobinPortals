@@ -1,6 +1,6 @@
 # File map
 
-Inventario generado de 286 archivos mantenidos por el repositorio. Los lockfiles se
+Inventario generado de 298 archivos mantenidos por el repositorio. Los lockfiles se
 excluyen porque describen resoluciones de dependencias, no módulos de arquitectura. Las
 dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 
@@ -36,6 +36,7 @@ dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 | `docs/codebase/portal-source/src/application/payments/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
 | `docs/codebase/portal-source/src/application/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
 | `docs/codebase/portal-source/src/assets/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
+| `docs/codebase/portal-source/src/assets/team-popups/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
 | `docs/codebase/portal-source/src/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
 | `docs/codebase/portal-source/src/shared/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
 | `docs/codebase/README.md` | Documentación mantenida: README | — | — | — | — | ACTIVE |
@@ -212,6 +213,17 @@ dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 | `portal-source/src/assets/robin-logo-transparent.png` | Composición o utilidad frontend: robin logo transparent | — | portal-source/src/app.jsx | — | — | ACTIVE |
 | `portal-source/src/assets/robin-skate.png` | Composición o utilidad frontend: robin skate | — | portal-source/src/application/AdminPortal.jsx<br>portal-source/src/application/ApplicationPortals.jsx | — | — | ACTIVE |
 | `portal-source/src/assets/robin-wordmark.png` | Composición o utilidad frontend: robin wordmark | — | portal-source/src/application/CrossPortalNav.jsx | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-01.jpg` | Composición o utilidad frontend: team 01 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-02.jpg` | Composición o utilidad frontend: team 02 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-03.jpg` | Composición o utilidad frontend: team 03 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-04.jpg` | Composición o utilidad frontend: team 04 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-05.jpg` | Composición o utilidad frontend: team 05 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-06.jpg` | Composición o utilidad frontend: team 06 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-07.jpg` | Composición o utilidad frontend: team 07 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-08.jpg` | Composición o utilidad frontend: team 08 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-09.jpg` | Composición o utilidad frontend: team 09 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-10.jpg` | Composición o utilidad frontend: team 10 | — | — | — | — | ACTIVE |
+| `portal-source/src/assets/team-popups/team-11.jpg` | Composición o utilidad frontend: team 11 | — | — | — | — | ACTIVE |
 | `portal-source/src/browser-utils.js` | Composición o utilidad frontend: browser utils | — | portal-source/src/application/ApplicationPortals.jsx<br>portal-source/src/application/onboarding/OnboardingFlow.jsx | — | — | ACTIVE |
 | `portal-source/src/client-utils.js` | Composición o utilidad frontend: client utils | — | portal-source/src/app.jsx<br>portal-source/src/application/onboarding/OnboardingFlow.jsx<br>portal-source/src/shared/PortalWidgets.jsx | — | — | ACTIVE |
 | `portal-source/src/index.css` | Composición o utilidad frontend: index | — | — | — | — | ACTIVE |

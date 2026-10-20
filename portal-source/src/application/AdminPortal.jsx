@@ -6,6 +6,17 @@ import robinKeys from "../assets/robin-keys.webp";
 import robinGraduate from "../assets/robin-graduate.jpg";
 import robinSkate from "../assets/robin-skate.png";
 import robinBike from "../assets/robin-bike.jpg";
+import teamPopup01 from "../assets/team-popups/team-01.jpg";
+import teamPopup02 from "../assets/team-popups/team-02.jpg";
+import teamPopup03 from "../assets/team-popups/team-03.jpg";
+import teamPopup04 from "../assets/team-popups/team-04.jpg";
+import teamPopup05 from "../assets/team-popups/team-05.jpg";
+import teamPopup06 from "../assets/team-popups/team-06.jpg";
+import teamPopup07 from "../assets/team-popups/team-07.jpg";
+import teamPopup08 from "../assets/team-popups/team-08.jpg";
+import teamPopup09 from "../assets/team-popups/team-09.jpg";
+import teamPopup10 from "../assets/team-popups/team-10.jpg";
+import teamPopup11 from "../assets/team-popups/team-11.jpg";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User, MessageCircle, Calendar, FileText, LayoutDashboard,
@@ -45,6 +56,14 @@ import {
 
 const { APPLICATION_TOTALS, FISCAL: ROBIN_FISCAL, isLatamClient } = financialConfig;
 const { academicSystemLabel, academicLevelLabel } = academicSystemsConfig;
+const TEAM_POPUP_IMAGES = [teamPopup01, teamPopup02, teamPopup03, teamPopup04, teamPopup05, teamPopup06, teamPopup07, teamPopup08, teamPopup09, teamPopup10, teamPopup11];
+
+function isTeamPopupUser(user) {
+  const identities = [user?.email, user?.username, user?.nombre, user?.name, user?.display_name]
+    .filter(Boolean)
+    .map((value) => String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
+  return identities.some((value) => /(^|[^a-z])(noel|maria|candela|manuel)([^a-z]|$)/.test(value));
+}
 
 import { AdminChatIA, LivedAbroadCard } from "./ApplicationPortals.jsx";
 
@@ -741,6 +760,8 @@ function AdminChatAssistant({ user, activeClientId, clients, mascot }) {
 // =====================
 export function AdminPortal({ user }) {
   const adminId = (user.email || user.username || "").toLowerCase();
+  const [teamPopupOpen, setTeamPopupOpen] = useState(() => isTeamPopupUser(user));
+  const [teamPopupImage] = useState(() => TEAM_POPUP_IMAGES[Math.floor(Math.random() * TEAM_POPUP_IMAGES.length)]);
   const [data, setData] = useState({ clients: [] });
   const [{ active, selectedClientId }, dispatchNavigation] = useReducer(adminNavigation, INITIAL_ADMIN_NAVIGATION);
   const [mascot] = useState(() => [robinKeys, robinGraduate, robinSkate, robinBike][Math.floor(Math.random() * 4)]);
@@ -805,6 +826,15 @@ export function AdminPortal({ user }) {
   const [assignError, setAssignError] = useState("");
   const [assignBusyId, setAssignBusyId] = useState(null);
 
+  useEffect(() => {
+    if (!teamPopupOpen) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setTeamPopupOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [teamPopupOpen]);
+
   async function reloadAssigned() {
     try {
       const res = await adminListClients();
@@ -850,8 +880,9 @@ export function AdminPortal({ user }) {
   }, [data.clients, debouncedQ]);
 
   return (
-    <AdminWorkspace active={active} client={selectedClient} clients={data.clients || []}
-      loading={loadingClients} error={loadError} onNavigate={navigate} onSwitchClient={switchClient}>
+    <>
+      <AdminWorkspace active={active} client={selectedClient} clients={data.clients || []}
+        loading={loadingClients} error={loadError} onNavigate={navigate} onSwitchClient={switchClient}>
 
           <main key={active + (selectedClient?.id || "list")}
             className="admin-content space-y-5 min-w-0" id="admin-content" tabIndex={-1}>
@@ -924,7 +955,32 @@ export function AdminPortal({ user }) {
           onClose={() => setAssignOpen(false)}
         />
       )}
-    </AdminWorkspace>
+      </AdminWorkspace>
+      {teamPopupOpen && (
+        <div
+          className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/70 p-4 backdrop-blur-sm"
+          onClick={() => setTeamPopupOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Imagen sorpresa del equipo Robin"
+            className="relative w-full max-w-[min(92vw,640px)] overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Cerrar imagen"
+              onClick={() => setTeamPopupOpen(false)}
+              className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-white/95 text-2xl leading-none text-slate-700 shadow-md transition hover:bg-white"
+            >
+              ×
+            </button>
+            <img src={teamPopupImage} alt="Imagen sorpresa" className="block max-h-[84vh] w-full bg-slate-100 object-contain" />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
