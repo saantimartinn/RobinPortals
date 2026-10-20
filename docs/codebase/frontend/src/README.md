@@ -14,6 +14,7 @@ Aplicación, funcionalidades y componentes del navegador.
 
 ## Archivos
 
+- [admin-permissions.js](../../../../frontend/src/admin-permissions.js): Módulo frontend: admin-permissions.
 - [app.jsx](../../../../frontend/src/app.jsx): Módulo frontend: app.
 - [index.css](../../../../frontend/src/index.css): Módulo frontend: index.css.
 - [main.jsx](../../../../frontend/src/main.jsx): Módulo frontend: main.

@@ -23,9 +23,21 @@ function purpose(file) {
   if(/\.(png|pdf)$/.test(file))return 'Recurso público';
   return 'Configuración, herramienta o prueba';
 }
+function functionSymbols(file) {
+  if(!/\.(?:js|jsx|cjs|mjs)$/.test(file)) return '—';
+  const source=fs.readFileSync(file,'utf8'), names=new Set();
+  for(const match of source.matchAll(/\b(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/g)) names.add(match[1]);
+  for(const match of source.matchAll(/\bexport\s+(?:const|let|var|class|type|interface)\s+([A-Za-z_$][\w$]*)/g)) names.add(match[1]);
+  for(const match of source.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function\s*\*?\s*|(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>)/g)) names.add(match[1]);
+  for(const match of source.matchAll(/(?:module\.)?exports\.([A-Za-z_$][\w$]*)\s*=/g)) names.add(match[1]);
+  const exportedObject=/module\.exports\s*=\s*\{([\s\S]*?)\n\s*\}/.exec(source)?.[1]||'';
+  for(const match of exportedObject.matchAll(/^\s*([A-Za-z_$][\w$]*)\s*(?:[:,(])/gm)) names.add(match[1]);
+  if(file.startsWith('backend/functions/')&&/exports\.handler\s*=|module\.exports\s*=\s*\{[^}]*handler/.test(source)) names.add('handler');
+  return [...names].sort().join(', ')||'—';
+}
 function link(from,to){return path.posix.relative(path.posix.dirname(from),to)||'.';}
-const fm='docs/FILE_MAP.md';
-generated.set(fm,'# Mapa de archivos\n\nGenerado con `npm run docs:generate`.\n\n| Archivo | Responsabilidad |\n|---|---|\n'+files.filter(f=>!f.startsWith('docs/')).map(f=>`| [${f}](${link(fm,f)}) | ${purpose(f)} |`).join('\n')+'\n');
+const fm='docs/FILE_INDEX.generated.md';
+generated.set(fm,'# Índice generado de archivos\n\nGenerado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/FILE_MAP.md`. Las funciones/exportaciones listadas se detectan estáticamente por nombre; revisa el archivo fuente para argumentos, efectos y semántica.\n\n| Archivo | Responsabilidad | Funciones/exportaciones detectadas |\n|---|---|---|\n'+files.filter(f=>!f.startsWith('docs/')).map(f=>`| [${f}](${link(fm,f)}) | ${purpose(f)} | ${functionSymbols(f)} |`).join('\n')+'\n');
 const cm='docs/COMPONENT_MAP.md';
 generated.set(cm,'# Mapa del frontend\n\nGenerado desde imports del código.\n\n| Módulo | Dependencias locales |\n|---|---|\n'+files.filter(f=>f.startsWith('frontend/src/')&&/\.jsx?$/.test(f)).map(f=>{
   const ast=parse(fs.readFileSync(f,'utf8'),{sourceType:'module',plugins:['jsx']});

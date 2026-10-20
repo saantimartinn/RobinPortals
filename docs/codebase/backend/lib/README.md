@@ -7,6 +7,7 @@ Servicios y utilidades del servidor compartidos por handlers.
 ## Archivos
 
 - [anthropic-chat.js](../../../../backend/lib/anthropic-chat.js): Servicio servidor: anthropic-chat.
+- [application-permissions.js](../../../../backend/lib/application-permissions.js): Servicio servidor: application-permissions.
 - [auth.js](../../../../backend/lib/auth.js): Servicio servidor: auth.
 - [discounts.js](../../../../backend/lib/discounts.js): Servicio servidor: discounts.
 - [email.js](../../../../backend/lib/email.js): Servicio servidor: email.

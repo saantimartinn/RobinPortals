@@ -19,6 +19,8 @@ Mapa de responsabilidades y enlaces al código.
 - [.gitignore](../../.gitignore): Configuración, herramienta o prueba.
 - [.nvmrc](../../.nvmrc): Configuración, herramienta o prueba.
 - [README.md](../../README.md): Documentación.
+- [READMELONG.md](../../READMELONG.md): Documentación.
+- [USERGUIDE.md](../../USERGUIDE.md): Documentación.
 - [netlify.toml](../../netlify.toml): Configuración, herramienta o prueba.
 - [package-lock.json](../../package-lock.json): Configuración, herramienta o prueba.
 - [package.json](../../package.json): Configuración, herramienta o prueba.

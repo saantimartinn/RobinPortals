@@ -25,6 +25,7 @@ Entradas HTTP de Netlify. Conservan los contratos /api existentes.
 - [social.js](../../../../backend/functions/social.js): Handler HTTP: social.
 - [stripe-webhook.js](../../../../backend/functions/stripe-webhook.js): Handler HTTP: stripe-webhook.
 - [sub-admin-data.js](../../../../backend/functions/sub-admin-data.js): Handler HTTP: sub-admin-data.
+- [sub-admin-database.js](../../../../backend/functions/sub-admin-database.js): Handler HTTP: sub-admin-database.
 - [sub-admin-mutate.js](../../../../backend/functions/sub-admin-mutate.js): Handler HTTP: sub-admin-mutate.
 - [subscriber-cv-ai.js](../../../../backend/functions/subscriber-cv-ai.js): Handler HTTP: subscriber-cv-ai.
 - [subscriber-profile-update.js](../../../../backend/functions/subscriber-profile-update.js): Handler HTTP: subscriber-profile-update.

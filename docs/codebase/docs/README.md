@@ -4,6 +4,10 @@ Documentación mantenida y mapas generados.
 
 [Subir](../README.md) · [Código](../..)
 
+## Carpetas
+
+- [userguide](userguide/README.md): Ver detalle.
+
 ## Archivos
 
 - [ABUSE_PROTECTION.md](../../ABUSE_PROTECTION.md): Documentación.
@@ -15,11 +19,13 @@ Documentación mantenida y mapas generados.
 - [BACKEND_ARCHITECTURE.md](../../BACKEND_ARCHITECTURE.md): Documentación.
 - [BROWSER_SECURITY.md](../../BROWSER_SECURITY.md): Documentación.
 - [CLEANUP.md](../../CLEANUP.md): Documentación.
+- [CLOUDFLARE_ROUTING.md](../../CLOUDFLARE_ROUTING.md): Documentación.
 - [COMPONENT_MAP.md](../../COMPONENT_MAP.md): Documentación.
 - [CONFIGURATION_MODEL.md](../../CONFIGURATION_MODEL.md): Documentación.
 - [DATABASE_CURRENT.md](../../DATABASE_CURRENT.md): Documentación.
 - [ENVIRONMENT.md](../../ENVIRONMENT.md): Documentación.
 - [ERROR_HANDLING.md](../../ERROR_HANDLING.md): Documentación.
+- [FILE_INDEX.generated.md](../../FILE_INDEX.generated.md): Documentación.
 - [FILE_MAP.md](../../FILE_MAP.md): Documentación.
 - [FRONTEND_ARCHITECTURE.md](../../FRONTEND_ARCHITECTURE.md): Documentación.
 - [FRONTEND_DEVELOPMENT.md](../../FRONTEND_DEVELOPMENT.md): Documentación.
