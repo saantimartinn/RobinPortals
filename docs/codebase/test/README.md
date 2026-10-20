@@ -14,6 +14,7 @@ Regresiones unitarias y de límites arquitectónicos ejecutadas por Node.js.
 |---|---|---|---|
 | [`academic-systems.test.cjs`](../../../test/academic-systems.test.cjs) | Pruebas automatizadas de academic systems.test. | `../shared/academic-systems.cjs` | Al fijar o actualizar el comportamiento cubierto. |
 | [`account-access-email.test.js`](../../../test/account-access-email.test.js) | Pruebas automatizadas de account access email.test. | `../lib/account-access-email` | Al fijar o actualizar el comportamiento cubierto. |
+| [`admin-dashboard-utils.test.cjs`](../../../test/admin-dashboard-utils.test.cjs) | Pruebas automatizadas de admin dashboard utils.test. | — | Al fijar o actualizar el comportamiento cubierto. |
 | [`admin-navigation.test.mjs`](../../../test/admin-navigation.test.mjs) | Pruebas automatizadas de admin navigation.test. | `../portal-source/src/application/admin-navigation.js` | Al fijar o actualizar el comportamiento cubierto. |
 | [`admins.test.js`](../../../test/admins.test.js) | Pruebas automatizadas de admins.test. | `../lib/admins` | Al fijar o actualizar el comportamiento cubierto. |
 | [`auth-session.test.js`](../../../test/auth-session.test.js) | Pruebas automatizadas de auth session.test. | `../lib/auth` | Al fijar o actualizar el comportamiento cubierto. |

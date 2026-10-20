@@ -14,7 +14,7 @@ Punto de entrada para entender el repositorio completo antes de bajar a una capa
 4. Consulta `shared/` para reglas idénticas en frontend y backend.
 5. Usa `test/` y `scripts/` para saber qué contrato protege CI.
 
-Este árbol cubre 274 archivos mantenidos en 27 carpetas. Los propios READMEs generados se excluyen para evitar una referencia recursiva.
+Este árbol cubre 318 archivos mantenidos en 29 carpetas. Los propios READMEs generados se excluyen para evitar una referencia recursiva.
 
 ## Subcarpetas
 
@@ -38,6 +38,8 @@ Este árbol cubre 274 archivos mantenidos en 27 carpetas. Los propios READMEs ge
 | [`.env.example`](../../.env.example) | Inventario de variables de entorno permitidas, siempre sin valores reales. | — | Cuando cambie la responsabilidad indicada. |
 | [`.gitignore`](../../.gitignore) | Evita versionar dependencias, builds, secretos y artefactos locales. | — | Cuando cambie la responsabilidad indicada. |
 | [`README.md`](../../README.md) | Portada del proyecto con arranque local y enlaces de documentación. | — | Cuando cambie la responsabilidad indicada. |
+| [`READMELONG.md`](../../READMELONG.md) | Archivo mantenido del repositorio: READMELONG.md. | — | Cuando cambie la responsabilidad indicada. |
+| [`USERGUIDE.md`](../../USERGUIDE.md) | Archivo mantenido del repositorio: USERGUIDE.md. | — | Cuando cambie la responsabilidad indicada. |
 | [`lint.config.cjs`](../../lint.config.cjs) | Patrones y carpetas usados por el lint de seguridad local. | — | Cuando cambie la responsabilidad indicada. |
 | [`netlify.toml`](../../netlify.toml) | Fuente de verdad de build, redirects, headers, Edge Functions y schedules de Netlify. | — | Al cambiar despliegue, rutas, cabeceras o schedules. |
 | [`package-lock.json`](../../package-lock.json) | Resolución reproducible de dependencias raíz; se regenera con npm. | — | Solo como resultado de un cambio intencional de dependencias. |

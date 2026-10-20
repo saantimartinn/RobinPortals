@@ -12,6 +12,7 @@ Composición React, sesión, cliente API, estilos y utilidades del navegador.
 
 | Carpeta | Qué contiene | Entra aquí cuando |
 |---|---|---|
+| [`api/`](api/README.md) | Contenido mantenido de `portal-source/src/api/`. | Cuando necesites trabajar en esta parte concreta del repositorio. |
 | [`application/`](application/README.md) | Pantallas principales de alumnos y administración, organizadas por dominio. | Cuando cambies una sección funcional del portal autenticado. |
 | [`assets/`](assets/README.md) | Logotipos importados y procesados por Vite. | Cuando sustituyas identidad visual utilizada desde componentes. |
 | [`shared/`](shared/README.md) | Componentes reutilizados por varias superficies autenticadas. | Cuando un cambio visual o de interacción afecte a más de un portal. |
@@ -20,8 +21,9 @@ Composición React, sesión, cliente API, estilos y utilidades del navegador.
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
-| [`api.js`](../../../../portal-source/src/api.js) | Cliente único de las rutas `/api/*` consumidas por el navegador. | `./preview-api.js` | Al cambiar esa parte de la experiencia React. |
-| [`app.jsx`](../../../../portal-source/src/app.jsx) | Raíz de autenticación y selección entre portal de alumno y administración. | `./assets/robin-logo-transparent.png`<br>`./session.js`<br>`./theme.js`<br>`./ui.jsx`<br>`./client-utils.js`<br>`./application/AdminPortal.jsx` | Al cambiar esa parte de la experiencia React. |
+| [`admin-permissions.js`](../../../../portal-source/src/admin-permissions.js) | Módulo frontend de admin permissions. | — | Al cambiar esa parte de la experiencia React. |
+| [`api.js`](../../../../portal-source/src/api.js) | Cliente único de las rutas `/api/*` consumidas por el navegador. | `./api/core.js`<br>`./api/auth-onboarding.js`<br>`./api/profile.js`<br>`./api/admin-clients.js`<br>`./api/onboarding.js`<br>`./api/payments.js` | Al cambiar esa parte de la experiencia React. |
+| [`app.jsx`](../../../../portal-source/src/app.jsx) | Raíz de autenticación y selección entre portal de alumno y administración. | `./assets/robin-logo-transparent.png`<br>`./session.js`<br>`./admin-permissions.js`<br>`./theme.js`<br>`./ui.jsx`<br>`./client-utils.js` | Al cambiar esa parte de la experiencia React. |
 | [`application-steps.js`](../../../../portal-source/src/application-steps.js) | Definición de fases y pasos visibles del expediente. | — | Al cambiar esa parte de la experiencia React. |
 | [`browser-utils.js`](../../../../portal-source/src/browser-utils.js) | Utilidades que dependen de APIs disponibles solo en navegador. | — | Al cambiar esa parte de la experiencia React. |
 | [`client-utils.js`](../../../../portal-source/src/client-utils.js) | Formato, logging seguro e imágenes auxiliares del frontend. | — | Al cambiar esa parte de la experiencia React. |
