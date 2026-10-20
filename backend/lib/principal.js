@@ -6,4 +6,7 @@ function principalTable(role) {
   if (!isSubscriberRole(role)) throw new Error('unsupported_role');
   return 'subscribers';
 }
-module.exports = { isSubscriberRole, principalTable };
+function subscriberDisplayName(user) {
+  return `${user.nombre || ''} ${user.apellidos || ''}`.trim() || user.email || user.username || 'Robin';
+}
+module.exports = { isSubscriberRole, principalTable, subscriberDisplayName };

@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 const auth = require('../backend/lib/auth');
-const { principalTable } = require('../backend/lib/principal');
+const { principalTable, subscriberDisplayName } = require('../backend/lib/principal');
 process.env.JWT_SECRET = 'test-only-not-a-production-secret-123456789';
 const event = token => ({ headers: { cookie: `${auth.COOKIE_NAME}=${token}` } });
 test('subscriber sessions round trip; application roles are rejected', () => {
@@ -13,6 +13,12 @@ test('subscriber sessions round trip; application roles are rejected', () => {
   }
   assert.equal(auth.readSessionFromEvent(event(auth.signSession({ id:'user-1',role:'admin' }))), null);
   assert.throws(()=>principalTable('admin'), /unsupported_role/);
+});
+test('subscriber display names retain the existing name and fallback order', () => {
+  assert.equal(subscriberDisplayName({ nombre: 'Ana', apellidos: 'Robin', email: 'ana@example.test' }), 'Ana Robin');
+  assert.equal(subscriberDisplayName({ email: 'ana@example.test', username: 'ana' }), 'ana@example.test');
+  assert.equal(subscriberDisplayName({ username: 'ana' }), 'ana');
+  assert.equal(subscriberDisplayName({}), 'Robin');
 });
 test('tampered, expired and missing sessions fail closed', () => {
   assert.equal(auth.readSessionFromEvent(event('invalid')), null);

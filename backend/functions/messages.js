@@ -9,14 +9,12 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { getFriendIds, areFriends } = require('../lib/social');
-
-function isSub(role) { return role === 'subscriber' || role === 'subscriber_admin'; }
-function displayName(u) { return `${u.nombre || ''} ${u.apellidos || ''}`.trim() || u.email || u.username || 'Robin'; }
+const { isSubscriberRole, subscriberDisplayName } = require('../lib/principal');
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
-  if (!isSub(session.role)) return json({ error: 'forbidden' }, { statusCode: 403 });
+  if (!isSubscriberRole(session.role)) return json({ error: 'forbidden' }, { statusCode: 403 });
   const uid = session.uid;
 
   try {
@@ -85,7 +83,7 @@ exports.handler = async (event) => {
       const c = convByFriend[fid] || { last: null, unread: 0 };
       return {
         friend_id: fid,
-        name: displayName(u),
+        name: subscriberDisplayName(u),
         avatar_url: u.avatar_url || null,
         last_body: c.last ? c.last.body : null,
         last_at: c.last ? c.last.created_at : null,
