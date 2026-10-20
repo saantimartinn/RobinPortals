@@ -15,7 +15,7 @@ function trackedAndUntrackedFiles() {
   return [...new Set(output.split('\0').filter(Boolean))]
     .map((file) => file.replace(/\\/g, '/'))
     .filter((file) => fs.existsSync(path.join(root, file)))
-    .filter((file) => !excluded.has(file) && file !== 'docs/FILE_MAP.md')
+    .filter((file) => !excluded.has(file) && !['docs/FILE_MAP.md', 'docs/FILE_INDEX.generated.md'].includes(file))
     .sort((a, b) => a.localeCompare(b));
 }
 
@@ -69,6 +69,18 @@ function tables(source) {
   return matches(source, /\.from\(['"]([^'"]+)['"]\)/g).sort();
 }
 
+function functionsAndExports(source, file) {
+  const names = new Set();
+  for (const match of source.matchAll(/\b(?:export\s+(?:default\s+)?)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/g)) names.add(match[1]);
+  for (const match of source.matchAll(/\bexport\s+(?:const|let|var|class|type|interface)\s+([A-Za-z_$][\w$]*)/g)) names.add(match[1]);
+  for (const match of source.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function\s*\*?\s*|(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>)/g)) names.add(match[1]);
+  for (const match of source.matchAll(/(?:module\.)?exports\.([A-Za-z_$][\w$]*)\s*=/g)) names.add(match[1]);
+  const exportedObject = /module\.exports\s*=\s*\{([\s\S]*?)\n\s*\}/.exec(source)?.[1] || "";
+  for (const match of exportedObject.matchAll(/^\s*([A-Za-z_$][\w$]*)\s*(?:[:,(])/gm)) names.add(match[1]);
+  if (file.startsWith('netlify/functions/') && /exports\.handler\s*=|module\.exports\s*=\s*\{[^}]*handler/.test(source)) names.add('handler (Netlify entrypoint)');
+  return [...names].sort().join(', ');
+}
+
 function integrations(source, file) {
   if (file === 'scripts/generate-file-map.js') return [];
   const checks = [
@@ -119,6 +131,7 @@ const rows = files.map((file) => {
   return [
     `\`${file}\``,
     responsibility(file),
+    functionsAndExports(source, file),
     localDependencies(source),
     consumers.get(file).sort().slice(0, 8),
     tables(source),
@@ -134,8 +147,8 @@ const output = [
   'excluyen porque describen resoluciones de dependencias, no módulos de arquitectura. Las',
   'dependencias, tablas e integraciones son inferencias estáticas conservadoras.',
   '',
-  '| Archivo | Responsabilidad | Dependencias locales directas | Consumidores directos | Tablas directas | Integraciones detectadas | Estado |',
-  '|---|---|---|---|---|---|---|',
+  '| Archivo | Responsabilidad | Funciones/exportaciones detectadas | Dependencias locales directas | Consumidores directos | Tablas directas | Integraciones detectadas | Estado |',
+  '|---|---|---|---|---|---|---|---|',
   ...rows.map((row) => `| ${row.map(cell).join(' | ')} |`),
   '',
   '## Estados',
@@ -154,5 +167,5 @@ const output = [
   '',
 ].join('\n');
 
-fs.writeFileSync(path.join(root, 'docs', 'FILE_MAP.md'), output, 'utf8');
+fs.writeFileSync(path.join(root, 'docs', 'FILE_INDEX.generated.md'), output, 'utf8');
 console.log(`File map generated: ${files.length} maintained files.`);

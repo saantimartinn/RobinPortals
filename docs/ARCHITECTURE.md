@@ -46,6 +46,22 @@ del cliente de servidor se encuentra en cada Function. Véanse
 | Frontend | `portal-source/src/` | Portales React de alumnos y administración |
 | Evidencia y gates | `test/`, `scripts/`, documentación | Regresión, inventarios y controles estáticos |
 
+### Contenido por carpeta
+
+| Carpeta | Contenido |
+|---|---|
+| `portal-source/src/api/` | Módulos de cliente HTTP que preserva `src/api.js`. |
+| `portal-source/src/application/` | Shell de alumnos, admin, navegación cross-portal y recursos de cada flujo. |
+| `portal-source/src/application/onboarding/` | Formularios y componentes modulares del alta. |
+| `portal-source/src/application/admin/` | Dashboard, pagos, documentos, clientes, carreras, reservas, notificaciones y perfil administrativo. |
+| `portal-source/src/application/careers/`, `payments/`, `documents/` | Componentes de carrera, pagos/recibos y reglas de documentos. |
+| `portal-source/src/shared/`, `assets/`, `public/` | Widgets, imágenes importadas y recursos descargables. |
+| `netlify/functions/`, `netlify/edge-functions/` | HTTP/cron y rate-limit/abuse middleware. |
+| `lib/`, `shared/` | Adaptadores y lógica servidor; reglas que deben ejecutarse iguales en Node y navegador. |
+| `infrastructure/cloudflare/` | Worker de host público; no se empaqueta en Netlify. |
+| `supabase/`, `test/`, `scripts/`, `.github/` | Evolución de datos, pruebas, inventarios/gates y CI. |
+| `docs/` | Contratos mantenidos, guías por dominio y árboles generados. |
+
 ## Dominios
 
 - **Identidad**: cookie JWT firmada y una raíz persistente `users` para alumnos/admins.
@@ -56,7 +72,7 @@ del cliente de servidor se encuentra en cada Function. Véanse
 
 Los entrypoints conservan los detalles HTTP y delegan lógica reutilizable a `lib/`.
 [API_INVENTORY.md](API_INVENTORY.md) enumera todas las Functions y
-[FILE_MAP.md](FILE_MAP.md) localiza cada módulo.
+[FILE_MAP.md](FILE_MAP.md) explica a mano la relación entre módulos; el [índice generado](FILE_INDEX.generated.md) y el árbol localizan archivos por nombre.
 
 Las Functions tienen un límite CI uniforme de 220 líneas físicas.
 

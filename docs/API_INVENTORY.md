@@ -1,6 +1,6 @@
 # API inventory
 
-Generated from `netlify.toml` and static analysis of 65 Netlify Functions.
+Generated from `netlify.toml` and static analysis of 66 Netlify Functions.
 Scheduled/internal Functions without a redirect are listed with their direct function path. This is an
 engineering inventory, not a substitute for runtime or legal review.
 
@@ -14,8 +14,9 @@ engineering inventory, not a substitute for runtime or legal review.
 | admin-chat | GET/POST | /api/admin/chat | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, forbidden, missing_user_id, client_not_found, empty_message | ai_chat_messages, ai_chat_state, notification_recipients, notifications, users | none |
 | admin-client-assign | POST | /api/admin/clients/assign | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_user_id, forbidden, not_found | users, webhook_log | Google Sheets, Holded, Notion |
 | admin-clients-all | GET | /api/admin/clients/all | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden | users | none |
-| admin-clients-list | GET | /api/admin/clients | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden | users | none |
-| admin-dashboard | GET | /api/admin/dashboard | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden | admin_tasks, bookings, documents, payments, users | Google Calendar/Meet |
+| admin-clients-list | GET | /api/admin/clients | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden, portal_access_denied | users | none |
+| admin-dashboard | GET | /api/admin/dashboard | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden, portal_access_denied | admin_tasks, bookings, documents, payments, users | Google Calendar/Meet |
+| admin-developer-clients | GET/POST | /api/admin/developer-clients | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, developer_admin_required, invalid_update, user_not_found, unknown_column | users | none |
 | admin-documents-add | POST | /api/admin/documents/add | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_fields, forbidden, user_not_found | documents, users | none |
 | admin-documents-delete | POST | /api/admin/documents/delete | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, missing_id, forbidden | documents, users | none |
 | admin-documents-review | POST | /api/admin/documents/review | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, invalid_params, forbidden | documents, users | none |
