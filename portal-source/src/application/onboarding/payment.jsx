@@ -1,3 +1,4 @@
+// Onboarding step or helper for payment; OnboardingFlow owns the step sequence.
 import { useState, useEffect } from "react";
 import { ChevronRight, CreditCard, Loader2, AlertCircle } from "lucide-react";
 import { NAVY, NAVY_DARK } from "../../theme.js";

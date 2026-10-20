@@ -1,3 +1,4 @@
+// Admin workspace module for client avatar; AdminPortal composes these views.
 import { NAVY, NAVY_DARK } from "../../theme.js";
 
 export function ClientAvatar({ nombre, apellidos, size = "md" }) {

@@ -1,3 +1,4 @@
+// Portal view or navigation module for student profile; the application shell owns session state.
 import "./student-portal.css";
 import { useState, useEffect, useRef } from "react";
 import { UploadCloud, MapPin, Loader2 } from "lucide-react";

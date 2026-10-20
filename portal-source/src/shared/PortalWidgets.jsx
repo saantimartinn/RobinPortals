@@ -1,3 +1,4 @@
+// Shared portal widgets values or helpers used across this runtime.
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell, CheckCircle2, FileText, Loader2, PartyPopper } from "lucide-react";

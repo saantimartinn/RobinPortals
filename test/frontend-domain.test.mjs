@@ -1,3 +1,4 @@
+// Automated checks for frontend domain test; external services should remain outside this test boundary.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dniExtract } from '../portal-source/src/api.js';

@@ -1,3 +1,4 @@
+// Portal view or navigation module for career requirements timeline; the application shell owns session state.
 import React from "react";
 import { CalendarDays, FileText, Flag } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "../../ui.jsx";

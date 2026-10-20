@@ -1,3 +1,4 @@
+// Portal view or navigation module for application portals; the application shell owns session state.
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import "./student-portal.css";
 import { StudentAssistant } from "./PortalAssistant.jsx";

@@ -1,3 +1,4 @@
+// Portal view or navigation module for bookings portal; the application shell owns session state.
 import { useState, useEffect } from "react";
 import { Calendar, CheckCircle2, Loader2 } from "lucide-react";
 import { NAVY } from "../theme.js";

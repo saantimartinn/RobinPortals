@@ -1,3 +1,4 @@
+// Browser-side client utils helper used by the application.
 export function reportClientError(operation, error) {
   console.warn(JSON.stringify({
     level: 'warn',

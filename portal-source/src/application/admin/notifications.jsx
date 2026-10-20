@@ -1,3 +1,4 @@
+// Admin workspace module for notifications; AdminPortal composes these views.
 import { useMemo, useState, useEffect } from "react";
 import { FileText, CheckCircle2, Search, Loader2, AlertCircle, RefreshCw, ChevronDown, Clock, Send, Bell } from "lucide-react";
 import { NAVY } from "../../theme.js";

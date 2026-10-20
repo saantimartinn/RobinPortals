@@ -1,3 +1,4 @@
+// Maintenance utility for check pii logs; it is run explicitly by developers or CI.
 const fs = require('fs');
 const path = require('path');
 

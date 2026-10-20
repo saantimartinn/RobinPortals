@@ -1,3 +1,4 @@
+// Portal view or navigation module for document utils; the application shell owns session state.
 export const APP_PHASE_LABELS = [
   { key: 1, label: 'Presentación de carreras', desc: 'Te presentamos las opciones que mejor encajan contigo' },
   { key: 2, label: 'Elección de carreras', desc: 'Elegís juntos las universidades y programas a solicitar' },

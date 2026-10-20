@@ -1,3 +1,4 @@
+// Browser-side preview api helper used by the application.
 const PREVIEW_HOSTS = new Set(["localhost", "127.0.0.1"]);
 
 const previewClient = {

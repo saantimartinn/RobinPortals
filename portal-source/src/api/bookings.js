@@ -1,3 +1,4 @@
+// Browser API client for bookings; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
 // ----- BOOKINGS (reservas Google Meet) -----

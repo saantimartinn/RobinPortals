@@ -1,3 +1,4 @@
+// Browser-side theme helper used by the application.
 export const NAVY = "#1B2F6E";
 export const NAVY_DARK = "#0e1c45";
 export const GOLD = "#F5A623";

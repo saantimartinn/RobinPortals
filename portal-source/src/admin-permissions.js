@@ -1,3 +1,4 @@
+// Browser-side admin permissions helper used by the application.
 const PRO_EMAILS = new Set([
   "noel@project-robin.com",
   "maria@project-robin.com",

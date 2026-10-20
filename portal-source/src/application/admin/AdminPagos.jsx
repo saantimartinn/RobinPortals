@@ -1,3 +1,4 @@
+// Admin workspace module for admin pagos; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { FileText, Shield, CheckCircle2, Plus, Trash2, BookOpen, CreditCard, Loader2, Pencil } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";

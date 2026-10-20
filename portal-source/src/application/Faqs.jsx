@@ -1,3 +1,4 @@
+// Portal view or navigation module for faqs; the application shell owns session state.
 import React, { useEffect, useMemo, useState } from "react";
 import { HelpCircle, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { faqsList, adminFaqMutate } from "../api.js";

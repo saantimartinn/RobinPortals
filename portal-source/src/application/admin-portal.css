@@ -1,3 +1,4 @@
+/* Application UI for admin portal; shared navigation and session state are owned by the surrounding shell. */
 .admin-workspace { --admin-navy: #29395f; --admin-gold: #f4be4f; min-height: 100vh; background: #f7f8fa; color: #253452; font-family: Inter, 'Segoe UI', sans-serif; }
 .admin-workspace * { box-sizing: border-box; }
 .admin-workspace button, .admin-workspace input, .admin-workspace select, .admin-workspace textarea { font: inherit; }

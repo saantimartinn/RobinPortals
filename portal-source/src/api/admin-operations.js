@@ -1,3 +1,4 @@
+// Browser API client for admin operations; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
 // ----- FASE APLICACIÓN -----

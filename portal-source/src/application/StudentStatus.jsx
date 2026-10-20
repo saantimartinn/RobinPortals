@@ -1,3 +1,4 @@
+// Portal view or navigation module for student status; the application shell owns session state.
 import { motion } from "framer-motion";
 import { Calendar, FileText, CheckCircle2, GraduationCap, Compass, ArrowUpRight } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";

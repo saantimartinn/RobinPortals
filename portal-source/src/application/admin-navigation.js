@@ -1,3 +1,4 @@
+// Portal view or navigation module for admin navigation; the application shell owns session state.
 export const ADMIN_CLIENT_SECTIONS = ["estado", "perfil", "carreras", "documentos", "pagos", "chat", "reservas", "academico"];
 const GLOBAL_SECTIONS = ["inicio", "clientes", "notificaciones", "faqs", "base-datos"];
 export const INITIAL_ADMIN_NAVIGATION = { active: "inicio", selectedClientId: null };

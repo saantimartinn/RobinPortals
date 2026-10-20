@@ -1,3 +1,4 @@
+// Automated checks for password policy test; external services should remain outside this test boundary.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { PASSWORD_MAX_BYTES, PASSWORD_MIN_LENGTH, passwordByteLength, passwordPolicy } = require('../shared/password-policy.cjs');

@@ -1,3 +1,4 @@
+-- SQL change for 202610060002 add academic profile; apply it only to the Supabase project that owns this migration.
 alter table public.users
   add column if not exists academic_system text,
   add column if not exists academic_subjects jsonb not null default '[]'::jsonb;

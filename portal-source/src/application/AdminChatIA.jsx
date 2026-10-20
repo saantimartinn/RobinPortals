@@ -1,3 +1,4 @@
+// Portal view or navigation module for admin chat ia; the application shell owns session state.
 import "./student-portal.css";
 import { useState, useEffect, useRef } from "react";
 import { Loader2, Sparkles, RefreshCw, PauseCircle, Send } from "lucide-react";

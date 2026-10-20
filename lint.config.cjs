@@ -1,3 +1,4 @@
+// Shared lint config module.
 module.exports = {
   roots: ['lib', 'netlify/functions', 'netlify/edge-functions', 'shared', 'scripts', 'test', 'portal-source/src'],
   extensions: ['.js', '.cjs', '.mjs', '.jsx'],

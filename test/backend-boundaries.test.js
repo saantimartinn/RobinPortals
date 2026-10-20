@@ -1,3 +1,4 @@
+// Automated checks for backend boundaries test; external services should remain outside this test boundary.
 const assert = require('node:assert/strict');
 const test = require('node:test');
 

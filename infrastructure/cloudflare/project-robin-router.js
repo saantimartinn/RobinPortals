@@ -1,3 +1,4 @@
+// Cloudflare Worker entry point for the public Robin host; route order and path rewrites are part of the external contract.
 const PORTAL_ORIGIN = "https://santipruebas.netlify.app";
 const PLAN_ORIGIN = "https://suscriptions-santi.netlify.app";
 const ADMIN_ORIGIN = "https://robin-admin-platform.netlify.app";
@@ -9,6 +10,7 @@ function upstreamFor(url) {
   if (url.pathname.startsWith("/admin/")) {
     return new URL(url.pathname.slice("/admin".length) + url.search, ADMIN_ORIGIN);
   }
+  // Nota: las rutas API van antes que los prefijos de interfaz; cada portal necesita una reescritura distinta para que las cookies sigan siendo same-origin.
   if (url.pathname.startsWith("/api/admin/") || url.pathname === "/api/admin") {
     return new URL(url.pathname + url.search, ADMIN_ORIGIN);
   }
@@ -68,6 +70,7 @@ export default {
     if (!contentType.includes("text/html") && !contentType.includes("text/css") && !contentType.includes("javascript")) return response;
 
     const body = await response.text();
+    // Nota: el HTML de Admin se compiló pensando en la raíz de Netlify; al publicarlo bajo /admin hay que mover también sus referencias a assets.
     const rewritten = body
       .replaceAll("/assets/", "/admin/assets/")
       .replace(/(\/admin\/assets\/[^"' )]+)(?=["')])/g, "$1?v=admin-20261008");

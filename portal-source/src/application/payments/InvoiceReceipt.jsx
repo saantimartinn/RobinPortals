@@ -1,3 +1,4 @@
+// Portal view or navigation module for invoice receipt; the application shell owns session state.
 import React from "react";
 import financialConfig from "../../../../shared/financial-config.cjs";
 import { Btn } from "../../ui.jsx";

@@ -1,3 +1,4 @@
+// Browser API client for profile; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;

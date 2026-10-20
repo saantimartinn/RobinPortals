@@ -1,3 +1,4 @@
+// Portal view or navigation module for client sections; the application shell owns session state.
 import React, { useEffect, useState } from "react";
 import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, Shield, UploadCloud } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";

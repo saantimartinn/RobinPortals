@@ -1,3 +1,4 @@
+// Admin workspace module for admin carreras new; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { CheckCircle2, Plus, Trash2, BookOpen, Loader2, Pencil } from "lucide-react";
 import { CREAM, NAVY } from "../../theme.js";

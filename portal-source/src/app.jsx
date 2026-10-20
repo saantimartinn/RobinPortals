@@ -1,3 +1,4 @@
+// Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useState } from "react";
 import { AlertCircle, ArrowLeft, ChevronRight, GraduationCap, Loader2, Sparkles } from "lucide-react";
 import robinLogoTransparent from "./assets/robin-logo-transparent.png";

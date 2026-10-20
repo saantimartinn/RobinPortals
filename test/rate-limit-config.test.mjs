@@ -1,3 +1,4 @@
+// Automated checks for rate limit config test; external services should remain outside this test boundary.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import identityHandler, { config as identity } from '../netlify/edge-functions/rate-limit-identity.mjs';

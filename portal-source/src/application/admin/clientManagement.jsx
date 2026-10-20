@@ -1,3 +1,4 @@
+// Admin workspace module for client management; AdminPortal composes these views.
 import { useMemo, useState } from "react";
 import { Search, Users, Plus, ChevronRight, Loader2 } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../ui.jsx";

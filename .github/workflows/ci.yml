@@ -1,3 +1,4 @@
+# Build or deployment configuration for ci.
 name: CI
 
 on:

@@ -76,6 +76,16 @@ Los entrypoints conservan los detalles HTTP y delegan lógica reutilizable a `li
 
 Las Functions tienen un límite CI uniforme de 220 líneas físicas.
 
+### Invariantes de frontend y backend
+
+- La raíz React coordina sesión, onboarding y shell activo. Las vistas comparten widgets; un widget reutilizable no debe importar un portal completo ni crear ciclos.
+- Cada flujo conserva el estado y las llamadas API en el módulo que lo posee; no añadir un store global o una capa de routing adicional sin una necesidad que el estado actual demuestre.
+- La UI no es una barrera de permisos. La API del mismo origen y el backend deciden identidad y autorización; el navegador no recibe secretos ni SDKs de proveedor.
+- Functions poseen HTTP, método, origen, auth y respuesta. Los servicios no deben leer eventos de Netlify: reciben identificadores y datos autenticados explícitos.
+- Los archivos binarios académicos se transfieren directamente a Storage con URL firmada temporal; el backend valida ownership, destino, MIME y tamaño y conserva metadata.
+- Mantener un despliegue mientras no exista una necesidad operativa medida para dividirlo. Los adaptadores que pueden reintentarse deben conservar idempotencia.
+- Las extracciones deben regenerar mapas, resolver bindings/imports/ciclos y pasar el build; deben demostrar una mejora real y no crear abstracciones sin consumidores o duplicación que eliminen.
+
 ## Datos y archivos
 
 Las tablas de aplicación residen en `public`; los buckets privados vigentes son
@@ -94,9 +104,8 @@ frontend. Netlify ejecuta su build desde el commit, copia `portal-source/dist` a
 `deploy/portal` y despliega Functions/Edge Functions junto al estático. `deploy/` y
 `node_modules/` son artefactos regenerables y no se versionan.
 
-Decisiones más detalladas: [FRONTEND_ARCHITECTURE.md](FRONTEND_ARCHITECTURE.md),
-[BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md),
-[IDENTITY_MODEL.md](IDENTITY_MODEL.md) y [OPERATIONS.md](OPERATIONS.md).
+Los límites de identidad y permisos se desarrollan en [IDENTITY_MODEL.md](IDENTITY_MODEL.md),
+y el despliegue en [OPERATIONS.md](OPERATIONS.md).
 
 Para bajar desde estas capas hasta cada carpeta y archivo concreto, usa el
 [árbol navegable del repositorio](codebase/README.md).

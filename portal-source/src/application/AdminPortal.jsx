@@ -1,3 +1,4 @@
+// Portal view or navigation module for admin portal; the application shell owns session state.
 import React, { useMemo, useState, useEffect, useRef, useReducer } from "react";
 import { AdminWorkspace } from "./AdminWorkspace.jsx";
 import { AdminFaqManager } from "./Faqs.jsx";

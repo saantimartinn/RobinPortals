@@ -1,3 +1,4 @@
+// Admin workspace module for admin documentos new; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { FileText, UploadCloud, Download, Eye, Plus, Trash2, Loader2 } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader, Field } from "../../ui.jsx";
