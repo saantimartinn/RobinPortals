@@ -10,6 +10,7 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { parseImageDataUrl, uploadPartnerLogo } = require('../lib/partner-logo');
+const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 
 // Campos permitidos por entidad (whitelist)
 const EVENT_FIELDS   = ['title', 'type', 'description', 'location', 'city', 'starts_at', 'ends_at', 'capacity', 'expires_at', 'meta', 'image_url', 'active', 'sort_order'];
@@ -43,6 +44,9 @@ exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   if (session.role !== 'subscriber_admin') return json({ error: 'forbidden' }, { statusCode: 403 });
+  try {
+    if (!canUseRobinPlan(await readApplicationIdentity(event))) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
+  } catch (error) { return serverError(error, 'sub-admin.permissions'); }
 
   const body = parseJsonBody(event);
   if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });

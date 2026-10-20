@@ -10,6 +10,7 @@
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
+const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -18,6 +19,7 @@ exports.handler = async (event) => {
   if (session.role !== 'subscriber_admin') return json({ error: 'forbidden' }, { statusCode: 403 });
 
   try {
+    if (!canUseRobinPlan(await readApplicationIdentity(event))) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
     const sb = getSupabase();
 
     const [uRes, eRes, pRes, rRes, rsvpRes, dcRes] = await Promise.all([

@@ -8,7 +8,8 @@ const { renderToString } = require('react-dom/server');
 
 test('frontend entry points and domain views render with local fixtures', async t => {
   const frontendRequire = createRequire(path.resolve('frontend/package.json'));
-  const { createServer } = await import(pathToFileURL(frontendRequire.resolve('vite')).href);
+  const vite = await import(pathToFileURL(frontendRequire.resolve('vite')).href);
+  const createServer = vite.createServer || vite.default?.createServer;
   const server = await createServer({
     root: path.resolve('frontend'),
     server: { middlewareMode: true, watch: null },

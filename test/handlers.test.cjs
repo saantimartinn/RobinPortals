@@ -99,6 +99,7 @@ test('partner creation accepts no logo and can upload one through the establishe
   const handler=loadHandler('sub-admin-mutate',{
     '../lib/supabase':{getSupabase:()=>sb},
     '../lib/auth':{readSessionFromEvent:()=>({role:'subscriber_admin'})},
+    '../lib/application-permissions':{readApplicationIdentity:async()=>({is_application_admin:true,is_pro_admin:true}),canUseRobinPlan:()=>true},
     '../lib/partner-logo':{
       parseImageDataUrl:value=>value==='data:image/png;base64,fixture'?{extension:'png'}:null,
       uploadPartnerLogo:async(_sb,image,partnerId)=>{uploads.push({image,partnerId});return {logoUrl:'https://assets.example.test/partner.png'};},

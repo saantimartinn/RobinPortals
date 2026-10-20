@@ -1,24 +1,8 @@
-const { parse: parseCookies } = require('cookie');
 const { getSupabase } = require('../lib/supabase');
 const { signSession, buildSessionCookie } = require('../lib/auth');
 const { isSubscriberRole } = require('../lib/principal');
 const { json, methodNotAllowed, serverError, verifyOrigin } = require('../lib/http');
-
-const APPLICATION_ME_URL = 'https://project-robin.com/portal/api/me';
-
-async function readApplicationIdentity(event) {
-  const headers = event.headers || {};
-  const cookieHeader = headers.cookie || headers.Cookie || '';
-  const token = parseCookies(cookieHeader).robin_portal_session;
-  if (!token) return null;
-  const response = await fetch(APPLICATION_ME_URL, {
-    headers: { Cookie: `robin_portal_session=${token}` },
-    cache: 'no-store',
-  });
-  if (!response.ok) return null;
-  const user = await response.json().catch(() => null);
-  return user && typeof user.email === 'string' ? user : null;
-}
+const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 
 async function findSubscriber(sb, identity) {
   const email = String(identity.email || '').trim();
@@ -48,6 +32,7 @@ exports.handler = async (event) => {
     const { user, ambiguous } = await findSubscriber(getSupabase(), identity);
     if (ambiguous) return json({ error: 'ambiguous_identity' }, { statusCode: 409 });
     if (!user) return json({ error: 'subscription_account_required' }, { statusCode: 403 });
+    if (user.role === 'subscriber_admin' && !canUseRobinPlan(identity)) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
     const cookie = buildSessionCookie(signSession(user));
     return json({ ok: true }, { cookies: [cookie] });
   } catch (error) {
