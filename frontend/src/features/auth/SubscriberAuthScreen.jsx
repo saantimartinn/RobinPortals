@@ -3,106 +3,18 @@ import { AuthShell } from "./AuthShell.jsx";
 import { Btn, Field, SelectField } from "../../shared/ui.jsx";
 import { NAVY } from "../../shared/theme.js";
 import { ROBIN_CITIES } from "../../shared/constants.js";
-import React, { useEffect, useState } from "react";
 import { TermsModal } from "../../shared/TermsModal.jsx";
-import { discountValidate, requestPasswordReset, resetPassword } from "../../api/index.js";
+import { useSubscriberAuth } from "./useSubscriberAuth.js";
 
 function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
-  const [resetToken, setResetToken] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return new URLSearchParams(window.location.search).get("reset_token") || "";
-  });
-  const [tab, setTab] = useState(() => resetToken ? "reset" : "login"); // login | signup | forgot | reset
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [ciudad, setCiudad] = useState("");
-  const [discountCode, setDiscountCode] = useState("");
-  const [discountInfo, setDiscountInfo] = useState(null); // { valid, percent_off }
-  const [checkingCode, setCheckingCode] = useState(false);
-  const [tcAccepted, setTcAccepted] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  function removeResetTokenFromAddress() {
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("reset_token");
-      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-    }
-  }
-
-  useEffect(() => {
-    if (resetToken) removeResetTokenFromAddress();
-  }, []);
-
-  function clearResetLink() {
-    setResetToken("");
-    removeResetTokenFromAddress();
-  }
-
-  async function submitLogin() {
-    if (!email || !password) return;
-    setLoading(true); setError("");
-    try { await onLogin(email, password); }
-    catch (e) {
-      if (e.status === 401) setError("Usuario o contraseña incorrectos.");
-      else setError(e.message || "No hemos podido iniciar sesión.");
-    } finally { setLoading(false); }
-  }
-
-  async function submitForgotPassword() {
-    if (!email) { setError("Introduce tu correo electrónico."); return; }
-    setLoading(true); setError("");
-    try {
-      await requestPasswordReset(email);
-      setTab("forgot-sent");
-    } catch (e) {
-      setError(e.message || "No hemos podido enviar el enlace. Inténtalo de nuevo.");
-    } finally { setLoading(false); }
-  }
-
-  async function submitResetPassword() {
-    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
-    if (password !== confirm) { setError("Las contraseñas no coinciden."); return; }
-    setLoading(true); setError("");
-    try {
-      await resetPassword(resetToken, password);
-      clearResetLink();
-      setPassword(""); setConfirm("");
-      setTab("reset-done");
-    } catch (e) {
-      if (e.data && e.data.error === "invalid_or_expired_token") setError("Este enlace ha caducado o ya se ha utilizado. Solicita uno nuevo.");
-      else if (e.data && e.data.error === "weak_password") setError("La contraseña debe tener entre 8 y 72 caracteres.");
-      else setError(e.message || "No hemos podido cambiar la contraseña.");
-    } finally { setLoading(false); }
-  }
-
-  async function checkDiscount() {
-    const code = discountCode.trim();
-    if (!code) { setDiscountInfo(null); return; }
-    setCheckingCode(true);
-    try {
-      const r = await discountValidate(code);
-      setDiscountInfo(r && r.valid ? { valid: true, percent_off: r.percent_off } : { valid: false });
-    } catch (_) { setDiscountInfo({ valid: false }); }
-    finally { setCheckingCode(false); }
-  }
-
-  async function submitSignup() {
-    if (!name || !email || !password) return;
-    if (password !== confirm) { setError("Las contraseñas no coinciden."); return; }
-    if (password.length < 6) { setError("La contraseña debe tener al menos 6 caracteres."); return; }
-    if (!tcAccepted) { setError("Debes aceptar los Términos y Condiciones para crear la cuenta."); return; }
-    setLoading(true); setError("");
-    try { await onSignup(name, email, password, ciudad, discountCode.trim() || undefined, tcAccepted); }
-    catch (e) {
-      if (e.data && e.data.error === "email_in_use") setError("Ya existe una cuenta con ese correo.");
-      else setError(e.message || "No hemos podido crear la cuenta.");
-    } finally { setLoading(false); }
-  }
+  const {
+    tab, setTab, email, setEmail, password, setPassword, name, setName,
+    confirm, setConfirm, ciudad, setCiudad, discountCode, setDiscountCode,
+    discountInfo, setDiscountInfo, checkingCode, tcAccepted, setTcAccepted,
+    showTerms, setShowTerms, error, setError, loading, submitLogin,
+    submitForgotPassword, submitResetPassword, checkDiscount, submitSignup,
+    clearResetLink,
+  } = useSubscriberAuth({ onLogin, onSignup });
 
   return (
     <AuthShell>

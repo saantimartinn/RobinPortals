@@ -10,6 +10,14 @@ const errors = [];
 const globals = new Set(('undefined NaN Infinity console window document navigator localStorage sessionStorage fetch URL URLSearchParams FormData File FileReader Blob Image Uint8Array ArrayBuffer atob btoa setTimeout clearTimeout setInterval clearInterval requestAnimationFrame cancelAnimationFrame Date Intl Math JSON Object Array String Number Boolean Promise Error TypeError Set Map RegExp parseInt parseFloat isNaN alert confirm encodeURIComponent decodeURIComponent').split(' '));
 const config = fs.readFileSync('netlify.toml', 'utf8');
 const routes = new Map([...config.matchAll(/from = "(\/api\/[^"\n]+)"\s+to = "\/\.netlify\/functions\/([^"\n]+)"/g)].map(m => [m[1], m[2]]));
+// The Vite build writes this redirect into the published root dist directory.
+const viteConfigPath = 'frontend/vite.config.js';
+if (fs.existsSync(viteConfigPath)) {
+  const viteConfig = fs.readFileSync(viteConfigPath, 'utf8');
+  for (const match of viteConfig.matchAll(/(\/api\/[^\s"'`]+)\s+\/\.netlify\/functions\/([a-z0-9-]+)/g)) {
+    routes.set(match[1], match[2]);
+  }
+}
 for (const [route, handler] of routes) if (!fs.existsSync(`backend/functions/${handler}.js`)) errors.push(`Missing handler: ${route}`);
 for (const file of walk('backend').filter(f => f.endsWith('.js'))) {
   const source = fs.readFileSync(file, 'utf8');

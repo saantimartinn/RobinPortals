@@ -7,14 +7,12 @@
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
-
-function isSub(role) { return role === 'subscriber' || role === 'subscriber_admin'; }
-function displayName(u) { return `${u.nombre || ''} ${u.apellidos || ''}`.trim() || u.email || u.username || 'Robin'; }
+const { isSubscriberRole, subscriberDisplayName } = require('../lib/principal');
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
-  if (!isSub(session.role)) return json({ error: 'forbidden' }, { statusCode: 403 });
+  if (!isSubscriberRole(session.role)) return json({ error: 'forbidden' }, { statusCode: 403 });
   const uid = session.uid;
 
   try {
@@ -88,7 +86,7 @@ exports.handler = async (event) => {
 
     const friends = [], incoming = [], outgoing = [], directory = [];
     (subs || []).forEach((u) => {
-      const card = { id: u.id, name: displayName(u), ciudad: u.ciudad || null, avatar_url: u.avatar_url || null };
+      const card = { id: u.id, name: subscriberDisplayName(u), ciudad: u.ciudad || null, avatar_url: u.avatar_url || null };
       const r = relByOther[u.id];
       let status = 'none';
       if (r) {

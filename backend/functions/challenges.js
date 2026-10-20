@@ -7,15 +7,14 @@
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
-
-function isSub(role) { return role === 'subscriber' || role === 'subscriber_admin'; }
+const { isSubscriberRole } = require('../lib/principal');
 const MAX_FILES = 8;
 const MAX_FILE_CHARS = 3_000_000; // ~2.2MB por archivo (base64)
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
-  if (!isSub(session.role)) return json({ error: 'forbidden' }, { statusCode: 403 });
+  if (!isSubscriberRole(session.role)) return json({ error: 'forbidden' }, { statusCode: 403 });
   const uid = session.uid;
 
   try {
