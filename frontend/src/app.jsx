@@ -39,7 +39,7 @@ function PortalRobin() {
   }
   if (state.loading) return <><CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} /><div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Cargando portal" /></div></>;
   if (!state.user) return <><CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} /><SubscriberAuthScreen onLogin={handleLogin} onSignup={handleSignup} onBack={() => window.location.assign("/login")} /></>;
-  if (isSubscriberAdmin(state.user)) return <><CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} onRefresh={() => window.dispatchEvent(new Event("robin:refresh-subscriptions-admin"))} /><SubscriberAdmin /></>;
+  if (isSubscriberAdmin(state.user)) return <><CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} /><SubscriberAdmin /></>;
   if (isSubscriberUser(state.user)) return <><CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} /><SubscriberPortal user={state.user} onLogout={handleLogout} onUserRefresh={refreshUser} /></>;
   return <><CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} /><div role="alert">Esta cuenta no pertenece a The Robin Plan. <button onClick={handleLogout}>Cerrar sesión</button></div></>;
 }
