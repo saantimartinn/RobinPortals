@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LayoutDashboard, Users, Bell, Shield, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap } from "lucide-react";
+import { LayoutDashboard, Users, Bell, Shield, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap, Database } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";
 import "./admin-portal.css";
 
@@ -21,7 +21,8 @@ const GLOBAL_TABS = [
 ];
 const fullName = c => `${c.nombre || ""} ${c.apellidos || ""}`.trim() || c.email || c.username || "Alumno";
 
-export function AdminWorkspace({ active, client, clients, loading, error, onNavigate, onSwitchClient, children }) {
+export function AdminWorkspace({ active, client, clients, loading, error, onNavigate, onSwitchClient, isDeveloper = false, children }) {
+  const globalTabs = isDeveloper ? [...GLOBAL_TABS, { key: "base-datos", label: "Base de datos", icon: Database }] : GLOBAL_TABS;
   const [pickerOpen, setPickerOpen] = useState(false);
   const switchRef = useRef(null);
   const tabRef = useRef(null);
@@ -29,7 +30,7 @@ export function AdminWorkspace({ active, client, clients, loading, error, onNavi
     window.scrollTo({ top: 0, behavior: "instant" });
     tabRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [active, client?.id]);
-  const page = GLOBAL_TABS.find(t => t.key === active);
+  const page = globalTabs.find(t => t.key === active);
   const clientPage = CLIENT_TABS.some(t => t.key === active);
   return <div className="admin-workspace">
     <a className="admin-skip" href="#admin-content">Saltar al contenido</a>
@@ -38,7 +39,7 @@ export function AdminWorkspace({ active, client, clients, loading, error, onNavi
         <div className="admin-team"><span className="admin-team-icon"><Shield size={21} /></span><div><strong>Equipo Robin</strong><span>Administración</span></div></div>
         <p className="admin-eyebrow admin-nav-caption">VISTA GENERAL</p>
         <nav className="admin-global-nav" aria-label="Administración">
-          {GLOBAL_TABS.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key || (key === "clientes" && clientPage) ? "page" : undefined}><Icon size={19} /><span>{label}</span>{key === "clientes" && !loading && !error && <small>{clients.length}</small>}</button>)}
+          {globalTabs.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key || (key === "clientes" && clientPage) ? "page" : undefined}><Icon size={19} /><span>{key === "clientes" && isDeveloper ? "Todos los clientes" : label}</span>{key === "clientes" && !loading && !error && <small>{clients.length}</small>}</button>)}
         </nav>
         <div className="admin-sidebar-note"><Compass size={23} /><h3>Cada camino cuenta.</h3><p>Abre un expediente para gestionar el progreso, los documentos y las conversaciones de ese alumno.</p></div>
       </aside>
