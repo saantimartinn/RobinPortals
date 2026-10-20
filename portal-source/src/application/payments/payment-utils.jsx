@@ -1,3 +1,4 @@
+// Portal view or navigation module for payment utils; the application shell owns session state.
 import React from 'react';
 import { Badge } from '../../ui.jsx';
 

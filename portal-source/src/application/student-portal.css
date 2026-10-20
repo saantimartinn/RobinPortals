@@ -1,3 +1,4 @@
+/* Application UI for student portal; shared navigation and session state are owned by the surrounding shell. */
 .student-portal {
   --student-navy: #29395f;
   --student-gold: #f4be4f;

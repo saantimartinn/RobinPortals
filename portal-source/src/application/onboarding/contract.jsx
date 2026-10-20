@@ -1,3 +1,4 @@
+// Onboarding step or helper for contract; OnboardingFlow owns the step sequence.
 import React, { useState, useEffect, useRef } from "react";
 import { FileText, CheckCircle2, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";

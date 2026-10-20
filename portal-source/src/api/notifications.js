@@ -1,3 +1,4 @@
+// Browser API client for notifications; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
 // ----- Notificaciones -----

@@ -1,3 +1,4 @@
+// Admin workspace module for progress; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { LayoutDashboard, CheckCircle2 } from "lucide-react";
 import { CREAM, GOLD, NAVY, NAVY_DARK } from "../../theme.js";

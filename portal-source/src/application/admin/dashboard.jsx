@@ -1,3 +1,4 @@
+// Admin workspace module for dashboard; AdminPortal composes these views.
 import { useMemo, useState, useEffect } from "react";
 import { MessageCircle, Calendar, LayoutDashboard, Shield, CheckCircle2, Users, Plus, CreditCard, Loader2, AlertCircle } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";

@@ -1,3 +1,4 @@
+// Admin workspace module for academic; AdminPortal composes these views.
 import { GraduationCap } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "../../ui.jsx";
 import academicSystemsConfig from "../../../../shared/academic-systems.cjs";

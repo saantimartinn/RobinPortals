@@ -1,3 +1,4 @@
+// Admin workspace module for dashboard utils; AdminPortal composes these views.
 export function dashboardPhaseMetrics(clients = []) {
   const phaseCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
   const sums = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };

@@ -1,3 +1,4 @@
+// Portal view or navigation module for portal assistant; the application shell owns session state.
 import { useState, useEffect, useRef } from "react";
 import { Shield, Loader2, Sparkles, Send, X, ArrowUpRight, ArrowRight } from "lucide-react";
 import { NAVY } from "../theme.js";

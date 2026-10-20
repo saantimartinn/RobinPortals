@@ -1,3 +1,4 @@
+// Browser-side session helper used by the application.
 import applicationRoles from "../../shared/application-roles.cjs";
 
 const { hasApplicationAdminRole } = applicationRoles;

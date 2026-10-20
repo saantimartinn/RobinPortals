@@ -1,3 +1,4 @@
+// Portal view or navigation module for developer clients table; the application shell owns session state.
 import React, { useCallback, useEffect, useState } from "react";
 import { adminDeveloperClients, adminDeveloperClientUpdate } from "../api.js";
 import "./developer-clients-table.css";

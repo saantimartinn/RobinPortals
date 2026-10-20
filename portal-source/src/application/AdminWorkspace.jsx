@@ -1,3 +1,4 @@
+// Portal view or navigation module for admin workspace; the application shell owns session state.
 import React, { useEffect, useRef, useState } from "react";
 import { LayoutDashboard, Users, Bell, Shield, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap, Database } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";

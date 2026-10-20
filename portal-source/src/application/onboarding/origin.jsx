@@ -1,3 +1,4 @@
+// Onboarding step or helper for origin; OnboardingFlow owns the step sequence.
 import { useState } from "react";
 import { FileText, CheckCircle2, ChevronRight, MapPin, Loader2, AlertCircle, ChevronLeft, GraduationCap } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";

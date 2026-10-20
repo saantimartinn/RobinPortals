@@ -1,3 +1,4 @@
+// Maintenance utility for check frontend bindings; it is run explicitly by developers or CI.
 const fs = require('fs');
 const path = require('path');
 

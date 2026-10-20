@@ -1,3 +1,4 @@
+// Portal view or navigation module for cross portal nav; the application shell owns session state.
 import React from "react";
 import { LogOut, RefreshCw } from "lucide-react";
 import robinWordmark from "../assets/robin-wordmark.png";

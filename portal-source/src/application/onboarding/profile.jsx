@@ -1,3 +1,4 @@
+// Onboarding step or helper for profile; OnboardingFlow owns the step sequence.
 import { useMemo, useState } from "react";
 import { CheckCircle2, Plus, Trash2, ChevronRight, Loader2, Mail, AlertCircle, ChevronLeft } from "lucide-react";
 import { initQuestionnaireAnswers, QuestionField, qOptLabel, qFmtSlider } from "./questionnaire-fields.jsx";

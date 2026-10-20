@@ -1,3 +1,4 @@
+/* Application UI for developer clients table; shared navigation and session state are owned by the surrounding shell. */
 .robin-developer-table{max-width:100%;overflow:hidden;border:1px solid #dce5ee;border-radius:16px;background:#fff}
 .robin-developer-table header,.robin-developer-table footer{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 22px}
 .robin-developer-table h2{margin:0;color:#203c66;font-size:20px;font-weight:800}

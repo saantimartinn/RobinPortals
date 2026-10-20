@@ -1,3 +1,4 @@
+// Onboarding step or helper for dni; OnboardingFlow owns the step sequence.
 import { useState } from "react";
 import { Shield, UploadCloud, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { NAVY } from "../../theme.js";

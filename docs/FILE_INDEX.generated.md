@@ -1,6 +1,6 @@
 # File map
 
-Inventario generado de 343 archivos mantenidos por el repositorio. Los lockfiles se
+Inventario generado de 341 archivos mantenidos por el repositorio. Los lockfiles se
 excluyen porque describen resoluciones de dependencias, no módulos de arquitectura. Las
 dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 
@@ -15,7 +15,6 @@ dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 | `docs/API_INVENTORY.md` | Documentación mantenida: API INVENTORY | — | — | — | — | — | GENERATED |
 | `docs/ARCHITECTURE.md` | Documentación mantenida: ARCHITECTURE | — | — | — | — | — | ACTIVE |
 | `docs/AUTHORIZATION.md` | Documentación mantenida: AUTHORIZATION | — | — | — | — | — | ACTIVE |
-| `docs/BACKEND_ARCHITECTURE.md` | Documentación mantenida: BACKEND ARCHITECTURE | — | — | — | — | — | ACTIVE |
 | `docs/BOOKING_CONFIGURATION.md` | Documentación mantenida: BOOKING CONFIGURATION | — | — | — | — | — | ACTIVE |
 | `docs/BROWSER_SECURITY.md` | Documentación mantenida: BROWSER SECURITY | — | — | — | — | — | ACTIVE |
 | `docs/CLOUDFLARE_ROUTING.md` | Documentación mantenida: CLOUDFLARE ROUTING | — | — | — | — | — | ACTIVE |
@@ -53,7 +52,6 @@ dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 | `docs/DATABASE_CURRENT.md` | Documentación mantenida: DATABASE CURRENT | — | — | — | — | — | ACTIVE |
 | `docs/ENVIRONMENT.md` | Documentación mantenida: ENVIRONMENT | — | — | — | — | — | ACTIVE |
 | `docs/ERROR_HANDLING.md` | Documentación mantenida: ERROR HANDLING | — | — | — | — | — | ACTIVE |
-| `docs/FRONTEND_ARCHITECTURE.md` | Documentación mantenida: FRONTEND ARCHITECTURE | — | — | — | — | — | ACTIVE |
 | `docs/FRONTEND_DEVELOPMENT.md` | Documentación mantenida: FRONTEND DEVELOPMENT | — | — | — | — | — | ACTIVE |
 | `docs/IDENTITY_MODEL.md` | Documentación mantenida: IDENTITY MODEL | — | — | — | — | — | ACTIVE |
 | `docs/INTEGRATIONS.md` | Documentación mantenida: INTEGRATIONS | — | — | — | — | — | ACTIVE |

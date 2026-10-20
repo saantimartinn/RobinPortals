@@ -1,3 +1,4 @@
+// Admin workspace module for profile; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { User, FileText, CheckCircle2, BookOpen, Loader2, AlertCircle, Sparkles, RefreshCw, ExternalLink, GraduationCap, ChevronDown, PartyPopper, XCircle } from "lucide-react";
 import { NAVY } from "../../theme.js";

@@ -1,3 +1,4 @@
+// Automated checks for revolut test; external services should remain outside this test boundary.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

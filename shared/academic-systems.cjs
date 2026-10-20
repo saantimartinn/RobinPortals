@@ -1,3 +1,4 @@
+// Shared academic systems values or helpers used across this runtime.
 const ACADEMIC_SYSTEMS = [
   {
     value: 'bachillerato_espanol',

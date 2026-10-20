@@ -1,3 +1,4 @@
+// Browser API client for documents; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
 import { cancelDirectUpload, uploadFileDirect } from "./uploads.js";

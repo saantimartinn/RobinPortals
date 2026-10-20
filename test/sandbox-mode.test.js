@@ -1,3 +1,4 @@
+// Automated checks for sandbox mode test; external services should remain outside this test boundary.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { isIsolatedSandbox } = require('../lib/sandbox-mode');

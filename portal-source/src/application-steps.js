@@ -1,3 +1,4 @@
+// Browser-side application steps helper used by the application.
 export const APP_STEPS = [
   { key: 1, label: "Presentación de carreras", desc: "Te presentamos las opciones que mejor encajan contigo" },
   { key: 2, label: "Elección de carreras", desc: "Elegís juntos las universidades y programas a solicitar" },

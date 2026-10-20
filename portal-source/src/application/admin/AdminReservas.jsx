@@ -1,3 +1,4 @@
+// Admin workspace module for admin reservas; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 import { NAVY } from "../../theme.js";

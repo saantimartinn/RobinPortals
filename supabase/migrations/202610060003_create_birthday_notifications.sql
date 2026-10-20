@@ -1,3 +1,4 @@
+-- SQL change for 202610060003 create birthday notifications; apply it only to the Supabase project that owns this migration.
 alter table public.notifications
   add column if not exists event_kind text not null default 'general',
   add column if not exists dedupe_key text;

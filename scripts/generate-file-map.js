@@ -1,3 +1,4 @@
+// Maintenance utility for generate file map; it is run explicitly by developers or CI.
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');

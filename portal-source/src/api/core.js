@@ -1,3 +1,4 @@
+// Browser API client for core; keeps endpoint and fetch details out of the screens.
 import { getLocalPreviewResponse } from "../preview-api.js";
 
 async function request(method, url, body) {

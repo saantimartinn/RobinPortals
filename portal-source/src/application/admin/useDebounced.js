@@ -1,3 +1,4 @@
+// Admin workspace module for use debounced; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 
 export function useDebounced(value, delay = 250) {

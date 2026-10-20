@@ -1,3 +1,4 @@
+// Onboarding step or helper for onboarding shared; OnboardingFlow owns the step sequence.
 import { FileText, CheckCircle2, CreditCard, Mail } from "lucide-react";
 import logoRBlanco from "../../assets/logo-r-blanco.png";
 import { NAVY, NAVY_DARK } from "../../theme.js";

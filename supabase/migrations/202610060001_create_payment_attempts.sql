@@ -1,3 +1,4 @@
+-- SQL change for 202610060001 create payment attempts; apply it only to the Supabase project that owns this migration.
 create table if not exists public.payment_attempts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.users(id) on delete cascade,

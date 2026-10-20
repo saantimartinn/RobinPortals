@@ -1,3 +1,4 @@
+// Maintenance utility for lint; it is run explicitly by developers or CI.
 const fs = require('fs');
 const path = require('path');
 const config = require('../lint.config.cjs');

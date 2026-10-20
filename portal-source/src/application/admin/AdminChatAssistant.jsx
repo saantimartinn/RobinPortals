@@ -1,3 +1,4 @@
+// Admin workspace module for admin chat assistant; AdminPortal composes these views.
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, ChevronRight, Loader2, UploadCloud } from "lucide-react";
 import { Btn } from "../../ui.jsx";

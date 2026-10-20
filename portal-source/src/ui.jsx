@@ -1,3 +1,4 @@
+// Browser-side ui helper used by the application.
 import { GOLD, NAVY, NAVY_DARK } from "./theme.js";
 
 export const Card = ({ children, className = "" }) => (

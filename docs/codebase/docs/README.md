@@ -24,7 +24,6 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`API_INVENTORY.md`](../../API_INVENTORY.md) | Documenta: API inventory. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`ARCHITECTURE.md`](../../ARCHITECTURE.md) | Documenta: Arquitectura actual. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`AUTHORIZATION.md`](../../AUTHORIZATION.md) | Documenta: Autenticación y autorización. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
-| [`BACKEND_ARCHITECTURE.md`](../../BACKEND_ARCHITECTURE.md) | Documenta: Backend architecture. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`BOOKING_CONFIGURATION.md`](../../BOOKING_CONFIGURATION.md) | Documenta: Booking availability. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`BROWSER_SECURITY.md`](../../BROWSER_SECURITY.md) | Documenta: Browser security. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`CLOUDFLARE_ROUTING.md`](../../CLOUDFLARE_ROUTING.md) | Documenta: Cloudflare y enrutamiento de Project Robin. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
@@ -35,7 +34,6 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`ERROR_HANDLING.md`](../../ERROR_HANDLING.md) | Documenta: Error-handling policy. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`FILE_INDEX.generated.md`](../../FILE_INDEX.generated.md) | Documenta: File map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`FILE_MAP.md`](../../FILE_MAP.md) | Documenta: Mapa técnico de Robin Platform cliente. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
-| [`FRONTEND_ARCHITECTURE.md`](../../FRONTEND_ARCHITECTURE.md) | Documenta: Frontend architecture. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`FRONTEND_DEVELOPMENT.md`](../../FRONTEND_DEVELOPMENT.md) | Documenta: Portal Robin. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`IDENTITY_MODEL.md`](../../IDENTITY_MODEL.md) | Documenta: Modelo de identidad. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`INTEGRATIONS.md`](../../INTEGRATIONS.md) | Documenta: Integraciones externas. | — | Al actualizar la decisión, contrato o procedimiento descrito. |

@@ -1,3 +1,4 @@
+// Onboarding step or helper for questionnaire fields; OnboardingFlow owns the step sequence.
 import { CheckCircle2 } from "lucide-react";
 import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL } from "../../questionnaire-data.js";
 import { GOLD, NAVY } from "../../theme.js";

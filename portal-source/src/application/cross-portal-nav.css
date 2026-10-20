@@ -1,3 +1,4 @@
+/* Application UI for cross portal nav; shared navigation and session state are owned by the surrounding shell. */
 .robin-cross-nav{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:16rem minmax(0,1fr) auto;align-items:stretch;height:84px;min-height:84px;padding:0 2rem 0 0;background:#fff;border-bottom:1px solid #e0e6ed;color:#263b6a;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
 .robin-cross-brand{display:flex;align-items:center;gap:.7rem;width:16rem;height:100%;padding:0 1.25rem;color:#193260;text-decoration:none}
 .robin-cross-brand img{display:block;flex:0 0 auto;width:84px;height:43px;object-fit:contain}

@@ -1,3 +1,4 @@
+// Automated checks for admin navigation test; external services should remain outside this test boundary.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ADMIN_CLIENT_SECTIONS, INITIAL_ADMIN_NAVIGATION, adminNavigation } from '../portal-source/src/application/admin-navigation.js';
