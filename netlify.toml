@@ -237,6 +237,10 @@
   to = "/.netlify/functions/admin-clients-all"
   status = 200
 [[redirects]]
+  from = "/api/admin/developer-clients"
+  to = "/.netlify/functions/admin-developer-clients"
+  status = 200
+[[redirects]]
   from = "/api/admin/clients/assign"
   to = "/.netlify/functions/admin-client-assign"
   status = 200

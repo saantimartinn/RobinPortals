@@ -3,6 +3,7 @@ import { AlertCircle, ArrowLeft, ChevronRight, GraduationCap, Loader2, Sparkles 
 import robinLogoTransparent from "./assets/robin-logo-transparent.png";
 
 import { isAdminUser } from "./session.js";
+import { canAdminSee, firstAllowedAdminUrl } from "./admin-permissions.js";
 import { CREAM, NAVY, NAVY_DARK } from "./theme.js";
 import { Btn, Field } from "./ui.jsx";
 import { reportClientError } from "./client-utils.js";
@@ -66,6 +67,17 @@ export default function PortalRobin() {
   }, []);
 
   useEffect(() => {
+    let active = true;
+    const refreshPermissions = () => {
+      if (document.visibilityState !== "visible") return;
+      void apiMe().then((user) => { if (active) setAuthenticatedUser(user); }).catch(() => undefined);
+    };
+    window.addEventListener("focus", refreshPermissions);
+    document.addEventListener("visibilitychange", refreshPermissions);
+    return () => { active = false; window.removeEventListener("focus", refreshPermissions); document.removeEventListener("visibilitychange", refreshPermissions); };
+  }, []);
+
+  useEffect(() => {
     let params;
     try { params = new URLSearchParams(window.location.search); } catch (_error) { return; }
     const attemptId = params.get("payment_attempt");
@@ -124,7 +136,12 @@ export default function PortalRobin() {
 
   if (!authState.user && isSelectorRoute && !selectedPortal) return <PortalSelector onSelectPortal={() => window.location.assign("/portal/")} />;
   if (!authState.user) return <LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} />;
-  if (isAdminUser(authState.user)) return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><AdminPortal user={authState.user} /></>;
+  if (isAdminUser(authState.user)) return <>
+    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} />
+    {canAdminSee(authState.user, "platform.student_portal")
+      ? <AdminPortal user={authState.user} />
+      : <main className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]" role="alert"><h1 className="text-2xl font-bold">Portal no disponible</h1><p>Tu perfil no tiene acceso al Portal del Alumno.</p><a className="underline" href={firstAllowedAdminUrl(authState.user)}>Ir a una sección disponible</a></main>}
+  </>;
 
   const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
   if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingOrigin {...onboardingProps} /></>;

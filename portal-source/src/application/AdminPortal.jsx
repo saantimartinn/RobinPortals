@@ -1,22 +1,12 @@
 import React, { useMemo, useState, useEffect, useRef, useReducer } from "react";
 import { AdminWorkspace } from "./AdminWorkspace.jsx";
 import { AdminFaqManager } from "./Faqs.jsx";
+import { DeveloperClientsTable } from "./DeveloperClientsTable.jsx";
 import { adminNavigation, INITIAL_ADMIN_NAVIGATION } from "./admin-navigation.js";
 import robinKeys from "../assets/robin-keys.webp";
 import robinGraduate from "../assets/robin-graduate.jpg";
 import robinSkate from "../assets/robin-skate.png";
 import robinBike from "../assets/robin-bike.jpg";
-import teamPopup01 from "../assets/team-popups/team-01.jpg";
-import teamPopup02 from "../assets/team-popups/team-02.jpg";
-import teamPopup03 from "../assets/team-popups/team-03.jpg";
-import teamPopup04 from "../assets/team-popups/team-04.jpg";
-import teamPopup05 from "../assets/team-popups/team-05.jpg";
-import teamPopup06 from "../assets/team-popups/team-06.jpg";
-import teamPopup07 from "../assets/team-popups/team-07.jpg";
-import teamPopup08 from "../assets/team-popups/team-08.jpg";
-import teamPopup09 from "../assets/team-popups/team-09.jpg";
-import teamPopup10 from "../assets/team-popups/team-10.jpg";
-import teamPopup11 from "../assets/team-popups/team-11.jpg";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User, MessageCircle, Calendar, FileText, LayoutDashboard,
@@ -56,15 +46,6 @@ import {
 
 const { APPLICATION_TOTALS, FISCAL: ROBIN_FISCAL, isLatamClient } = financialConfig;
 const { academicSystemLabel, academicLevelLabel } = academicSystemsConfig;
-const TEAM_POPUP_IMAGES = [teamPopup01, teamPopup02, teamPopup03, teamPopup04, teamPopup05, teamPopup06, teamPopup07, teamPopup08, teamPopup09, teamPopup10, teamPopup11];
-
-function isTeamPopupUser(user) {
-  const identities = [user?.email, user?.username, user?.nombre, user?.name, user?.display_name]
-    .filter(Boolean)
-    .map((value) => String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
-  return identities.some((value) => /(^|[^a-z])(noel|maria|candela|manuel)([^a-z]|$)/.test(value));
-}
-
 import { AdminChatIA, LivedAbroadCard } from "./ApplicationPortals.jsx";
 
 function useDebounced(value, delay = 250) {
@@ -760,8 +741,7 @@ function AdminChatAssistant({ user, activeClientId, clients, mascot }) {
 // =====================
 export function AdminPortal({ user }) {
   const adminId = (user.email || user.username || "").toLowerCase();
-  const [teamPopupOpen, setTeamPopupOpen] = useState(() => isTeamPopupUser(user));
-  const [teamPopupImageIndex, setTeamPopupImageIndex] = useState(() => Math.floor(Math.random() * TEAM_POPUP_IMAGES.length));
+  const isDeveloper = adminId === "santimartin1203@gmail.com";
   const [data, setData] = useState({ clients: [] });
   const [{ active, selectedClientId }, dispatchNavigation] = useReducer(adminNavigation, INITIAL_ADMIN_NAVIGATION);
   const [mascot] = useState(() => [robinKeys, robinGraduate, robinSkate, robinBike][Math.floor(Math.random() * 4)]);
@@ -819,28 +799,12 @@ export function AdminPortal({ user }) {
     dispatchNavigation({ type: "switch", clientId: client.id });
   }
 
-  function generateNewTeamPopupImage() {
-    setTeamPopupImageIndex((currentIndex) => {
-      const next = Math.floor(Math.random() * (TEAM_POPUP_IMAGES.length - 1));
-      return next >= currentIndex ? next + 1 : next;
-    });
-  }
-
   // ----- Asignación manual -----
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignList, setAssignList] = useState([]);
   const [assignLoading, setAssignLoading] = useState(false);
   const [assignError, setAssignError] = useState("");
   const [assignBusyId, setAssignBusyId] = useState(null);
-
-  useEffect(() => {
-    if (!teamPopupOpen) return undefined;
-    const closeOnEscape = (event) => {
-      if (event.key === "Escape") setTeamPopupOpen(false);
-    };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [teamPopupOpen]);
 
   async function reloadAssigned() {
     try {
@@ -888,7 +852,7 @@ export function AdminPortal({ user }) {
 
   return (
     <>
-      <AdminWorkspace active={active} client={selectedClient} clients={data.clients || []}
+      <AdminWorkspace active={active} client={selectedClient} clients={data.clients || []} isDeveloper={isDeveloper}
         loading={loadingClients} error={loadError} onNavigate={navigate} onSwitchClient={switchClient}>
 
           <main key={active + (selectedClient?.id || "list")}
@@ -944,6 +908,7 @@ export function AdminPortal({ user }) {
               <AdminNotificaciones adminId={adminId} clients={data.clients || []} />
             )}
             {active === "faqs" && <AdminFaqManager />}
+            {active === "base-datos" && isDeveloper && <DeveloperClientsTable />}
 
             <div className="text-center text-xs text-slate-400 py-2">
               Project Robin · Panel de administración
@@ -963,39 +928,6 @@ export function AdminPortal({ user }) {
         />
       )}
       </AdminWorkspace>
-      {teamPopupOpen && (
-        <div
-          className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/70 p-4 backdrop-blur-sm"
-          onClick={() => setTeamPopupOpen(false)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Imagen sorpresa del equipo Robin"
-            className="relative w-full max-w-[min(92vw,640px)] overflow-hidden rounded-2xl bg-white shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              aria-label="Cerrar imagen"
-              onClick={() => setTeamPopupOpen(false)}
-              className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-white/95 text-2xl leading-none text-slate-700 shadow-md transition hover:bg-white"
-            >
-              ×
-            </button>
-            <img src={TEAM_POPUP_IMAGES[teamPopupImageIndex]} alt="Imagen sorpresa" className="block max-h-[76vh] w-full bg-slate-100 object-contain" />
-            <div className="flex justify-end border-t border-slate-100 p-3">
-              <button
-                type="button"
-                onClick={generateNewTeamPopupImage}
-                className="rounded-xl bg-[#254879] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1b3559] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#254879]"
-              >
-                Generar nueva
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

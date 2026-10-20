@@ -1,0 +1,21 @@
+.robin-developer-table{max-width:100%;overflow:hidden;border:1px solid #dce5ee;border-radius:16px;background:#fff}
+.robin-developer-table header,.robin-developer-table footer{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 22px}
+.robin-developer-table h2{margin:0;color:#203c66;font-size:20px;font-weight:800}
+.robin-developer-table header p{margin:4px 0 0;color:#718099;font-size:13px}
+.robin-developer-table button{cursor:pointer}
+.robin-developer-table header>button,.robin-developer-table footer button,.robin-developer-backdrop button{border:1px solid #ccdbea;border-radius:10px;background:#eef6ff;color:#254879;padding:9px 14px;font-size:13px;font-weight:750}
+.robin-developer-table button:disabled{opacity:.5;cursor:default}
+.robin-developer-scroll{max-height:70vh;overflow:auto;border-block:1px solid #e1e9f2}
+.robin-developer-table table{border-collapse:collapse;background:#fff;white-space:nowrap}
+.robin-developer-table th{position:sticky;top:0;z-index:1;background:#edf5fd;color:#244775;text-align:left;font-size:12px}
+.robin-developer-table td,.robin-developer-table th{min-width:145px;max-width:260px;border:1px solid #e3ebf2;padding:8px}
+.robin-developer-table td button,.robin-developer-table td span{display:block;width:100%;overflow:hidden;border:0;background:transparent;color:#2b405c;text-align:left;text-overflow:ellipsis;font-size:12px}
+.robin-developer-table td button:hover{background:#eaf3fd}
+.robin-developer-table footer span{color:#61738b;font-size:13px}
+.robin-developer-error{margin:12px 22px;color:#af3446;font-size:13px}
+.robin-developer-empty{padding:18px 22px;color:#78869a}
+.robin-developer-backdrop{position:fixed;inset:0;z-index:150;display:grid;place-items:center;background:#0c1d38aa;padding:20px}
+.robin-developer-backdrop section{width:min(560px,95vw);border-radius:16px;background:white;padding:24px;box-shadow:0 20px 60px #071b3a33}
+.robin-developer-backdrop h2{margin:0;color:#203c66;font-size:20px}.robin-developer-backdrop p,.robin-developer-backdrop small{color:#687b94;font-size:13px}
+.robin-developer-backdrop textarea{display:block;width:100%;margin:15px 0 8px;border:1px solid #cbd9e8;border-radius:9px;padding:12px;font:13px ui-monospace,monospace}
+.robin-developer-backdrop section>div{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}

@@ -1,5 +1,5 @@
 export const ADMIN_CLIENT_SECTIONS = ["estado", "perfil", "carreras", "documentos", "pagos", "chat", "reservas", "academico"];
-const GLOBAL_SECTIONS = ["inicio", "clientes", "notificaciones", "faqs"];
+const GLOBAL_SECTIONS = ["inicio", "clientes", "notificaciones", "faqs", "base-datos"];
 export const INITIAL_ADMIN_NAVIGATION = { active: "inicio", selectedClientId: null };
 
 // A single transition changes both the visible section and its client context.

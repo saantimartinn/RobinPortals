@@ -5,6 +5,13 @@ const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { applicationPlanForUser, contractPricingVersion } = require('../../shared/financial-config.cjs');
 const { signedUrl } = require('../../lib/storage');
 
+const PRO_ADMIN_EMAILS = new Set([
+  'noel@project-robin.com',
+  'maria@project-robin.com',
+  'manuel@project-robin.com',
+  'santimartin1203@gmail.com',
+]);
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
   const session = readSessionFromEvent(event);
@@ -24,6 +31,8 @@ exports.handler = async (event) => {
       email: u.email,
       role: u.role,
       is_application_admin: isApplicationAdmin(u),
+      is_pro_admin: isApplicationAdmin(u) && PRO_ADMIN_EMAILS.has(String(u.email || '').trim().toLowerCase()),
+      visible_tabs: Array.isArray(u.visible_tabs) ? u.visible_tabs : [],
       requires_onboarding: !!u.requires_onboarding,
       dni_completed: !!u.dni_completed,
       profile_completed: !!u.profile_completed,
