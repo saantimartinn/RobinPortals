@@ -114,19 +114,16 @@ export default function PortalRobin() {
 
   if (authState.loading) {
     return (
-      <>
-        <CrossPortalNav current="application" />
-        <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}>
-          <div className="flex items-center gap-3 text-slate-500 text-sm">
-            <Loader2 className="h-4 w-4 animate-spin" /> Cargando portal…
-          </div>
+      <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}>
+        <div className="flex items-center gap-3 text-slate-500 text-sm">
+          <Loader2 className="h-4 w-4 animate-spin" /> Cargando portal…
         </div>
-      </>
+      </div>
     );
   }
 
-  if (!authState.user && isSelectorRoute && !selectedPortal) return <><CrossPortalNav current="application" /><PortalSelector onSelectPortal={() => window.location.assign("/portal/")} /></>;
-  if (!authState.user) return <><CrossPortalNav current="application" /><LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} /></>;
+  if (!authState.user && isSelectorRoute && !selectedPortal) return <PortalSelector onSelectPortal={() => window.location.assign("/portal/")} />;
+  if (!authState.user) return <LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} />;
   if (isAdminUser(authState.user)) return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><AdminPortal user={authState.user} /></>;
 
   const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
