@@ -141,6 +141,7 @@ export default function PortalRobin() {
       <PortalShell
         user={user}
         clientName={clientName}
+        onLogout={handleLogout}
         active={active}
         setActive={setActive}
         onUserRefresh={refreshUser}

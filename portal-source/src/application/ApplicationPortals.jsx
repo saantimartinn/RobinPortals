@@ -3,7 +3,7 @@ import "./student-portal.css";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User, MessageCircle, Calendar, FileText, LayoutDashboard,
-  Shield, CheckCircle2, UploadCloud, Search,
+  LogOut, Shield, CheckCircle2, UploadCloud, Search,
   Users, Download, Eye, Plus, Trash2, ChevronRight,
   BookOpen, MapPin, CreditCard, Loader2, Mail, AlertCircle,
   ChevronLeft, Sparkles, RefreshCw, ExternalLink, GraduationCap, ChevronDown,
@@ -13,6 +13,7 @@ import {
   Compass, MessagesSquare, Pencil, Bell, Lock, X, ArrowUpRight, ArrowRight,
 } from "lucide-react";
 import robinKeys from "../assets/robin-keys.webp";
+import robinWordmark from "../assets/robin-wordmark.png";
 import robinGraduate from "../assets/robin-graduate.jpg";
 import robinSkate from "../assets/robin-skate.png";
 import robinBike from "../assets/robin-bike.jpg";
@@ -42,7 +43,7 @@ import {
 
 const { APPLICATION_TOTALS, FISCAL: ROBIN_FISCAL } = financialConfig;
 
-export function PortalShell({ user, clientName, active, setActive, onUserRefresh }) {
+export function PortalShell({ user, clientName, onLogout, active, setActive, onUserRefresh }) {
   const [profilePhoto, setProfilePhoto] = useState(user.avatar_url || null);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
@@ -105,6 +106,16 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
     <div className="student-portal">
       <NotificationPopup />
       <a className="student-skip" href="#student-content">Saltar al contenido</a>
+      <header className="student-header">
+        <button className="student-brand" onClick={() => setActive("estado")} aria-label="Robin, ir a Mi camino">
+          <img src={robinWordmark} alt="ROBIN" />
+          <span>Tu camino a Holanda</span>
+        </button>
+        <div className="student-header-account">
+          <span className="student-header-name">Hola, {user.nombre || "Robin"}</span>
+          <button className="student-signout" onClick={onLogout}><LogOut size={16} /><span>Salir</span></button>
+        </div>
+      </header>
       <div className="student-layout">
         <nav className="student-sidebar" aria-label="Navegación del alumno">
           <div className="student-identity">
