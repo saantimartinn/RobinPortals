@@ -76,6 +76,16 @@ function buildSessionCookie(token, { clear = false } = {}) {
   });
 }
 
+function clearApplicationSessionCookie() {
+  return serializeCookie('robin_portal_session', '', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  });
+}
+
 function readSessionFromEvent(event) {
   const header = (event.headers && (event.headers.cookie || event.headers.Cookie)) || '';
   const cookies = parseCookies(header || '');
@@ -98,5 +108,6 @@ module.exports = {
   isCurrentPasswordResetToken,
   signSession,
   buildSessionCookie,
+  clearApplicationSessionCookie,
   readSessionFromEvent,
 };

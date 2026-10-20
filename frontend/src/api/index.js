@@ -52,6 +52,10 @@ export async function me() {
   return api.get("/api/me");
 }
 
+export async function exchangeApplicationSession() {
+  return api.post("/api/auth/sso");
+}
+
 export async function subscriberSignup(name, email, password, ciudad, discountCode, tcAccepted) {
   return api.post("/api/subscriber/signup", { name, email, password, ciudad, discount_code: discountCode, tc_accepted: !!tcAccepted });
 }

@@ -12,6 +12,7 @@ Generado con `npm run docs:generate`.
 | [backend/functions/auth-change-password.js](../backend/functions/auth-change-password.js) | Handler HTTP: auth-change-password |
 | [backend/functions/auth-login.js](../backend/functions/auth-login.js) | Handler HTTP: auth-login |
 | [backend/functions/auth-logout.js](../backend/functions/auth-logout.js) | Handler HTTP: auth-logout |
+| [backend/functions/auth-sso.js](../backend/functions/auth-sso.js) | Handler HTTP: auth-sso |
 | [backend/functions/challenges.js](../backend/functions/challenges.js) | Handler HTTP: challenges |
 | [backend/functions/community-events-list.js](../backend/functions/community-events-list.js) | Handler HTTP: community-events-list |
 | [backend/functions/community-rsvp.js](../backend/functions/community-rsvp.js) | Handler HTTP: community-rsvp |
@@ -61,6 +62,8 @@ Generado con `npm run docs:generate`.
 | [frontend/public/recursos/tranquilidad-para-los-padres.pdf](../frontend/public/recursos/tranquilidad-para-los-padres.pdf) | Recurso público |
 | [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index |
 | [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app |
+| [frontend/src/application/cross-portal-nav.css](../frontend/src/application/cross-portal-nav.css) | Módulo frontend: cross-portal-nav.css |
+| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | Módulo frontend: SubscriberPortal |
 | [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | Módulo frontend: SubscriberShell |
 | [frontend/src/application/subscription-portal.css](../frontend/src/application/subscription-portal.css) | Módulo frontend: subscription-portal.css |

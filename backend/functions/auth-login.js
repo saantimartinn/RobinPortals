@@ -1,5 +1,5 @@
 const { getSupabase } = require('../lib/supabase');
-const { verifyPassword, signSession, buildSessionCookie } = require('../lib/auth');
+const { verifyPassword, signSession, buildSessionCookie, clearApplicationSessionCookie } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 
 exports.handler = async (event) => {
@@ -30,6 +30,8 @@ exports.handler = async (event) => {
 
     const token = signSession(user);
     const cookie = buildSessionCookie(token);
+    const cookies = [cookie];
+    if (typeof clearApplicationSessionCookie === 'function') cookies.push(clearApplicationSessionCookie());
 
 
     return json(
@@ -37,7 +39,7 @@ exports.handler = async (event) => {
         ok: true,
         user: { id: user.id, username: user.username, role: user.role },
       },
-      { cookies: [cookie] }
+      { cookies }
     );
   } catch (e) {
     console.error('login error', e);

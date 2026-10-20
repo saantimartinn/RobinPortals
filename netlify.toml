@@ -37,6 +37,10 @@
   to = "/.netlify/functions/auth-login"
   status = 200
 [[redirects]]
+  from = "/api/auth/sso"
+  to = "/.netlify/functions/auth-sso"
+  status = 200
+[[redirects]]
   from = "/api/auth/logout"
   to = "/.netlify/functions/auth-logout"
   status = 200
