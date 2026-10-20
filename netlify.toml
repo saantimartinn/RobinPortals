@@ -133,6 +133,7 @@
   from = "/api/sub-admin/database"
   to = "/.netlify/functions/sub-admin-database"
   status = 200
+  force = true
 [[redirects]]
   from = "/api/sub-admin/partner-logo"
   to = "/.netlify/functions/partner-logo-upload"
