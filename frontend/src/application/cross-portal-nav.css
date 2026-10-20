@@ -1,16 +1,18 @@
-.robin-cross-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:clamp(28px,4vw,70px);height:80px;min-height:80px;padding:0 20px;background:#fff;border-bottom:1px solid #e0e6ed;color:#263b6a;font-family:Inter,system-ui,sans-serif}
-.robin-cross-brand{display:flex;align-items:center;gap:16px;flex:0 0 190px;color:#193260;text-decoration:none}
-.robin-cross-brand img{display:block;width:80px;height:58px;object-fit:contain}
-.robin-cross-brand span{border-left:1px solid #dce1e9;padding-left:16px;font-size:10px;font-weight:800;line-height:1.25;letter-spacing:.16em}
-.robin-cross-nav nav{display:flex;align-items:stretch;align-self:stretch;gap:clamp(16px,2.2vw,36px);overflow-x:auto;scrollbar-width:none;flex:1}
+.robin-cross-nav{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:16rem minmax(0,1fr) auto;align-items:stretch;height:84px;min-height:84px;padding:0 2rem 0 0;background:#fff;border-bottom:1px solid #e0e6ed;color:#263b6a;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+.robin-cross-brand{display:flex;align-items:center;gap:.7rem;width:16rem;height:100%;padding:0 1.25rem;color:#193260;text-decoration:none}
+.robin-cross-brand img{display:block;flex:0 0 auto;width:84px;height:43px;object-fit:contain}
+.robin-cross-brand span{border-left:1px solid #dfe4e9;padding-left:.7rem;color:#66758a;font-size:.52rem;font-weight:750;line-height:1.25;letter-spacing:.14em}
+.robin-cross-nav nav{display:flex;align-items:stretch;align-self:stretch;min-width:0;overflow-x:auto;scrollbar-width:none;padding-left:2rem}
 .robin-cross-nav nav::-webkit-scrollbar{display:none}
-.robin-cross-nav nav a{position:relative;display:flex;align-items:center;flex:0 0 auto;padding:4px 0;color:#66748d;text-decoration:none;font-size:14px;font-weight:700;white-space:nowrap}
-.robin-cross-nav nav a:hover,.robin-cross-nav nav a.is-active{color:#1d3769}
-.robin-cross-nav nav a.is-active:after{position:absolute;right:-14px;bottom:0;left:-14px;height:3px;background:#e5a333;content:""}
-.robin-cross-admin{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#254576;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
-.robin-cross-actions{display:flex;align-items:center;gap:12px;flex:0 0 auto}
-.robin-cross-account{max-width:190px;overflow:hidden;color:#254576;font-size:13px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
-.robin-cross-icon-button{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid #dce4ef;border-radius:10px;background:#fff;color:#526782;cursor:pointer}
-.robin-cross-icon-button:hover{background:#f4f7fb;color:#1d3769}
-@media(max-width:900px){.robin-cross-nav{gap:14px;padding:0 16px}.robin-cross-brand{flex-basis:160px}.robin-cross-nav nav{gap:18px}}
-@media(max-width:640px){.robin-cross-nav{height:66px;min-height:66px;gap:10px;padding:0 10px}.robin-cross-brand{flex-basis:auto;gap:7px}.robin-cross-brand img{width:62px;height:42px}.robin-cross-brand span{padding-left:7px;font-size:8px}.robin-cross-nav nav{gap:14px}.robin-cross-nav nav a{font-size:11px}.robin-cross-admin{font-size:0}.robin-cross-admin span{font-size:16px}.robin-cross-actions{gap:7px}.robin-cross-account{max-width:76px;font-size:10px}.robin-cross-icon-button{width:32px;height:32px;flex-basis:32px}}
+.robin-cross-nav nav a{position:relative;display:flex;align-items:center;flex:0 0 auto;padding:0 .68rem;border-bottom:3px solid transparent;color:#67768a;text-decoration:none;font-size:.68rem;font-weight:700;white-space:nowrap}
+.robin-cross-nav nav a:hover{color:#1f416f;background:#f8fafc}
+.robin-cross-nav nav a.is-active{border-bottom-color:#d69b3b;color:#1f416f}
+.robin-cross-admin{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#254576;text-decoration:none;font-size:.66rem;font-weight:800;white-space:nowrap}
+.robin-cross-actions{display:flex;align-items:center;gap:.55rem;flex:0 0 auto}
+.robin-cross-account{max-width:190px;overflow:hidden;padding:0 .45rem;color:#1f416f;font-size:.66rem;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
+.robin-cross-icon-button{position:relative;display:grid;place-items:center;flex:0 0 2.2rem;width:2.2rem;height:2.2rem;border:1px solid #e0e6ed;border-radius:.58rem;background:#fff;color:#53647a;cursor:pointer}
+.robin-cross-icon-button svg{width:1rem;height:1rem}
+.robin-cross-icon-button:hover{background:#f8fafc;color:#1f416f}
+@media(max-width:1320px){.robin-cross-brand{width:14rem}.robin-cross-nav{grid-template-columns:14rem minmax(0,1fr) auto}.robin-cross-brand img{width:76px}.robin-cross-nav nav{padding-left:1.5rem}.robin-cross-nav nav a{padding:0 .55rem}}
+@media(max-width:1000px){.robin-cross-brand{width:11rem;padding:0 1rem}.robin-cross-nav{grid-template-columns:11rem minmax(0,1fr) auto;padding-right:1rem}.robin-cross-brand img{width:64px;height:40px}.robin-cross-brand span{font-size:.48rem}.robin-cross-nav nav{padding-left:.75rem}.robin-cross-nav nav a{font-size:.63rem;padding:0 .45rem}.robin-cross-account{max-width:120px}}
+@media(max-width:760px){.robin-cross-nav{height:66px;min-height:66px;grid-template-columns:auto minmax(0,1fr) auto;padding:0 .65rem}.robin-cross-brand{width:auto;gap:.5rem;padding:0}.robin-cross-brand img{width:56px;height:38px}.robin-cross-brand span{display:none}.robin-cross-nav nav{padding-left:.5rem}.robin-cross-nav nav a{font-size:.61rem;padding:0 .45rem}.robin-cross-account{display:none}.robin-cross-actions{gap:.4rem}.robin-cross-icon-button{width:2rem;height:2rem;flex-basis:2rem}}
