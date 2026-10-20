@@ -5,7 +5,7 @@ import { SubscriptionPlanPicker } from "./SubscriptionPlanPicker.jsx";
 function SubscriberPortal({ user, onLogout, onUserRefresh }) {
   const hasPlan = user.subscription_status && user.subscription_status !== "none";
   if (!hasPlan) {
-    return <SubscriptionPlanPicker user={user} onLogout={onLogout} onSubscribed={onUserRefresh} />;
+    return <SubscriptionPlanPicker user={user} onSubscribed={onUserRefresh} />;
   }
   return <SubscriberShell user={user} onLogout={onLogout} onUserRefresh={onUserRefresh} />;
 }

@@ -7,13 +7,12 @@ import { AdminPartnerManager } from "./AdminPartnerManager.jsx";
 import { AdminSubNotifications } from "./AdminSubNotifications.jsx";
 import { AdminUsers } from "./AdminUsers.jsx";
 import { AdminFaqManager } from "./AdminFaqManager.jsx";
-import { Bell, Briefcase, Building2, CalendarCheck, GraduationCap, Handshake, HelpCircle, LayoutDashboard, Loader2, LogOut, Percent, Plane, RefreshCw, Sparkles, Tag, Users } from "lucide-react";
+import { Bell, Briefcase, Building2, CalendarCheck, GraduationCap, Handshake, HelpCircle, LayoutDashboard, Loader2, Percent, Plane, Sparkles, Tag, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { subAdminData } from "../../api/index.js";
-import robinWordmark from "../../assets/robin-wordmark.png";
 import "../../application/subscription-portal.css";
 
-function SubscriberAdmin({ user, onLogout }) {
+function SubscriberAdmin() {
   const [section, setSection] = useState("panel");
   const [data, setData] = useState({ users: [], events: [], partners: [], requests: [], discount_codes: [], notifications: [], challenges: [], submissions: [] });
   const [loading, setLoading] = useState(true);
@@ -28,6 +27,11 @@ function SubscriberAdmin({ user, onLogout }) {
     finally { setLoading(false); }
   }
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const refreshAdminData = () => { load(); };
+    window.addEventListener("robin:refresh-subscriptions-admin", refreshAdminData);
+    return () => window.removeEventListener("robin:refresh-subscriptions-admin", refreshAdminData);
+  }, []);
 
   const nav = [
     { key: "panel", label: "Panel general", icon: LayoutDashboard },
@@ -49,17 +53,6 @@ function SubscriberAdmin({ user, onLogout }) {
   return (
     <div className="student-portal subscription-admin">
       <a className="student-skip" href="#subscription-admin-content">Saltar al contenido</a>
-      <header className="student-header">
-        <button className="student-brand" onClick={() => setSection("panel")} aria-label="Robin, ir al panel general">
-          <img src={robinWordmark} alt="ROBIN" /><span>Administración · The Robin Plan</span>
-        </button>
-        <div className="student-header-account">
-          <span className="student-header-name">{user.email || user.username}</span>
-          <button className="student-signout" onClick={load}><RefreshCw size={16} /><span>Recargar</span></button>
-          <button className="student-signout" onClick={onLogout}><LogOut size={16} /><span>Salir</span></button>
-        </div>
-      </header>
-
       <div className="student-layout">
         <nav className="student-sidebar" aria-label="Navegación de administración">
           <div className="student-identity">

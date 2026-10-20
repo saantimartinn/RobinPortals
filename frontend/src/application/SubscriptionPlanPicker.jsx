@@ -1,13 +1,12 @@
-import { AlertCircle, CheckCircle2, Loader2, LogOut, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Badge, Btn } from "../shared/ui.jsx";
 import { CREAM, NAVY } from "../shared/theme.js";
 import React, { useEffect, useState } from "react";
 import { SUBSCRIBER_SERVICES } from "../shared/constants.js";
 import { formatMoney } from "../shared/utils.js";
-import robinWordmark from "../assets/robin-wordmark.png";
 import { subscriptionCheckout, subscriptionPlans } from "../api/index.js";
 
-function SubscriptionPlanPicker({ user, onLogout, onSubscribed }) {
+function SubscriptionPlanPicker({ user, onSubscribed }) {
   const [plans, setPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [selected, setSelected] = useState("monthly");
@@ -39,17 +38,6 @@ function SubscriptionPlanPicker({ user, onLogout, onSubscribed }) {
 
   return (
     <div className="min-h-screen" style={{ background: CREAM }}>
-      <header className="sticky top-0 z-20 border-b border-slate-200/60 backdrop-blur-md bg-white/85">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <img src={robinWordmark} alt="ROBIN" className="h-7 w-[106px] object-contain flex-shrink-0" />
-            <div className="h-5 w-px bg-slate-200" />
-            <div className="text-sm font-semibold text-slate-900 truncate">The Robin Plan</div>
-          </div>
-          <Btn variant="secondary" onClick={onLogout} size="sm"><LogOut className="h-3.5 w-3.5" /> Salir</Btn>
-        </div>
-      </header>
-
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="text-center mb-8">
           <div className="text-2xl md:text-3xl font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>

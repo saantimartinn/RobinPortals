@@ -8,7 +8,8 @@
 .robin-cross-nav nav a:hover,.robin-cross-nav nav a.is-active{color:#1d3769}
 .robin-cross-nav nav a.is-active:after{position:absolute;right:-14px;bottom:0;left:-14px;height:3px;background:#e5a333;content:""}
 .robin-cross-admin{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#254576;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
-.robin-cross-account{flex:0 1 auto;overflow:hidden;color:#254576;font-size:13px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
-.robin-cross-logout{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid #dce4ef;border-radius:12px;background:#fff;color:#526782;font:700 22px/1 system-ui;cursor:pointer}
-.robin-cross-logout:hover{background:#f4f7fb;color:#1d3769}
-@media(max-width:760px){.robin-cross-nav{gap:12px;min-height:66px;padding:0 12px}.robin-cross-brand{gap:7px}.robin-cross-brand img{width:70px;height:42px}.robin-cross-brand span{padding-left:7px;font-size:8px}.robin-cross-nav nav{gap:18px}.robin-cross-nav nav a{font-size:12px}.robin-cross-admin{font-size:0}.robin-cross-admin span{font-size:16px}}
+.robin-cross-actions{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.robin-cross-account{max-width:190px;overflow:hidden;color:#254576;font-size:13px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
+.robin-cross-icon-button{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid #dce4ef;border-radius:12px;background:#fff;color:#526782;cursor:pointer}
+.robin-cross-icon-button:hover{background:#f4f7fb;color:#1d3769}
+@media(max-width:760px){.robin-cross-nav{gap:12px;min-height:66px;padding:0 12px}.robin-cross-brand{gap:7px}.robin-cross-brand img{width:70px;height:42px}.robin-cross-brand span{padding-left:7px;font-size:8px}.robin-cross-nav nav{gap:18px}.robin-cross-nav nav a{font-size:12px}.robin-cross-admin{font-size:0}.robin-cross-admin span{font-size:16px}.robin-cross-actions{gap:7px}.robin-cross-account{max-width:90px;font-size:11px}.robin-cross-icon-button{width:36px;height:36px;flex-basis:36px}}

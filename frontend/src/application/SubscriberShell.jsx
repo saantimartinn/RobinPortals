@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import "./subscription-portal.css";
-import { Briefcase, CreditCard, HeartHandshake, HelpCircle, Home, LogOut, MessagesSquare, Settings, Users } from "lucide-react";
+import { Briefcase, CreditCard, HeartHandshake, HelpCircle, Home, MessagesSquare, Settings, Users } from "lucide-react";
 import { NotificationPopup } from "../shared/NotificationPopup.jsx";
 import { ROBIN_LEVEL_ORDER } from "../shared/constants.js";
 import React, { useEffect, useState } from "react";
@@ -19,7 +19,6 @@ import { SubSupport } from "../features/subscription/SubSupport.jsx";
 import { SubFaqs } from "../features/subscription/SubFaqs.jsx";
 import { communityEventsList, messagesConversations, partnersList, serviceRequestsList } from "../api/index.js";
 import { getRobinLevel, robinLevelDef } from "../shared/utils.js";
-import robinWordmark from "../assets/robin-wordmark.png";
 
 function SubscriberShell({ user, onLogout, onUserRefresh }) {
   const initialTab = (() => {
@@ -95,17 +94,6 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
     <div className="student-portal">
       <NotificationPopup />
       <a className="student-skip" href="#subscription-content">Saltar al contenido</a>
-      <header className="student-header">
-        <button className="student-brand" onClick={() => setActive("home")} aria-label="Robin, ir al inicio">
-          <img src={robinWordmark} alt="ROBIN" />
-          <span>The Robin Plan</span>
-        </button>
-        <div className="student-header-account">
-          <span className="student-header-name">Hola, {user.nombre || "Robin"}</span>
-          <button className="student-signout" onClick={onLogout}><LogOut size={16} /><span>Salir</span></button>
-        </div>
-      </header>
-
       <div className="student-layout">
         <nav className="student-sidebar" aria-label="Navegación de The Robin Plan">
           <button type="button" className="student-identity w-full text-left" onClick={() => setActive("perfil")} title="Ver tu perfil">

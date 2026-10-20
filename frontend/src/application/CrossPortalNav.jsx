@@ -1,4 +1,5 @@
 import React from "react";
+import { LogOut, RefreshCw } from "lucide-react";
 import robinWordmark from "../assets/robin-wordmark.png";
 import "./cross-portal-nav.css";
 
@@ -10,7 +11,7 @@ const LINKS = [
   ["/admin/analiticas/ventas", "Otras métricas", "admin"],
 ];
 
-export function CrossPortalNav({ current = "subscriptions", user = null, onLogout }) {
+export function CrossPortalNav({ current = "subscriptions", user = null, onLogout, onRefresh }) {
   const accountName = [user?.nombre, user?.apellidos].filter(Boolean).join(" ") || user?.username || user?.email;
   return (
     <header className="robin-cross-nav">
@@ -24,10 +25,11 @@ export function CrossPortalNav({ current = "subscriptions", user = null, onLogou
           return <a key={href} href={href} className={isActive ? "is-active" : ""} aria-current={isActive ? "page" : undefined}>{label}</a>;
         })}
       </nav>
-      {accountName ? <>
+      {accountName ? <div className="robin-cross-actions">
         <span className="robin-cross-account">{accountName}</span>
-        <button className="robin-cross-logout" type="button" onClick={onLogout} aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
-      </> : <a className="robin-cross-admin" href="/admin" title="Abrir Robin Admin">Administración <span aria-hidden="true">↗</span></a>}
+        {onRefresh && <button className="robin-cross-icon-button" type="button" onClick={onRefresh} aria-label="Recargar" title="Recargar"><RefreshCw size={18} /></button>}
+        <button className="robin-cross-icon-button" type="button" onClick={onLogout} aria-label="Cerrar sesión" title="Cerrar sesión"><LogOut size={18} /></button>
+      </div> : <a className="robin-cross-admin" href="/admin" title="Abrir Robin Admin">Administración <span aria-hidden="true">↗</span></a>}
     </header>
   );
 }
