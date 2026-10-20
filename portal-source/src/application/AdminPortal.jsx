@@ -761,7 +761,7 @@ function AdminChatAssistant({ user, activeClientId, clients, mascot }) {
 export function AdminPortal({ user }) {
   const adminId = (user.email || user.username || "").toLowerCase();
   const [teamPopupOpen, setTeamPopupOpen] = useState(() => isTeamPopupUser(user));
-  const [teamPopupImage] = useState(() => TEAM_POPUP_IMAGES[Math.floor(Math.random() * TEAM_POPUP_IMAGES.length)]);
+  const [teamPopupImageIndex, setTeamPopupImageIndex] = useState(() => Math.floor(Math.random() * TEAM_POPUP_IMAGES.length));
   const [data, setData] = useState({ clients: [] });
   const [{ active, selectedClientId }, dispatchNavigation] = useReducer(adminNavigation, INITIAL_ADMIN_NAVIGATION);
   const [mascot] = useState(() => [robinKeys, robinGraduate, robinSkate, robinBike][Math.floor(Math.random() * 4)]);
@@ -817,6 +817,13 @@ export function AdminPortal({ user }) {
 
   function switchClient(client) {
     dispatchNavigation({ type: "switch", clientId: client.id });
+  }
+
+  function generateNewTeamPopupImage() {
+    setTeamPopupImageIndex((currentIndex) => {
+      const next = Math.floor(Math.random() * (TEAM_POPUP_IMAGES.length - 1));
+      return next >= currentIndex ? next + 1 : next;
+    });
   }
 
   // ----- Asignación manual -----
@@ -976,7 +983,16 @@ export function AdminPortal({ user }) {
             >
               ×
             </button>
-            <img src={teamPopupImage} alt="Imagen sorpresa" className="block max-h-[84vh] w-full bg-slate-100 object-contain" />
+            <img src={TEAM_POPUP_IMAGES[teamPopupImageIndex]} alt="Imagen sorpresa" className="block max-h-[76vh] w-full bg-slate-100 object-contain" />
+            <div className="flex justify-end border-t border-slate-100 p-3">
+              <button
+                type="button"
+                onClick={generateNewTeamPopupImage}
+                className="rounded-xl bg-[#254879] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1b3559] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#254879]"
+              >
+                Generar nueva
+              </button>
+            </div>
           </div>
         </div>
       )}
