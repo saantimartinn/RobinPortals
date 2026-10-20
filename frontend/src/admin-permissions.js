@@ -1,5 +1,9 @@
 const PRO_EMAILS = new Set(['noel@project-robin.com', 'maria@project-robin.com', 'manuel@project-robin.com', 'santimartin1203@gmail.com']);
 
+export function isDeveloperAdminEmail(email) {
+  return String(email || '').trim().toLowerCase() === 'santimartin1203@gmail.com';
+}
+
 export function canAdminSee(user, permission) {
   if (!user?.is_application_admin) return false;
   if (user.is_pro_admin === true || PRO_EMAILS.has(String(user.email || '').trim().toLowerCase())) return true;

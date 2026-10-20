@@ -122,6 +122,18 @@ export async function subAdminData() {
   return api.get("/api/sub-admin/data");
 }
 
+export async function subAdminDatabase(table, page = 1) {
+  return api.get(`/api/sub-admin/database?table=${encodeURIComponent(table)}&page=${page}`);
+}
+
+export async function subAdminDatabaseUpdate(table, id, column, value) {
+  return api.post("/api/sub-admin/database", { table, id, column, value });
+}
+
+export async function subAdminDatabaseExecuteSql(statement) {
+  return api.post("/api/sub-admin/database", { action: "sql", statement });
+}
+
 export async function subAdminMutate(entity, action, payload) {
   return api.post("/api/sub-admin/mutate", { entity, action, payload });
 }

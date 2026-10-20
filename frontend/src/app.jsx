@@ -63,7 +63,7 @@ function PortalRobin() {
   if (!state.user) return <SubscriberAuthScreen onLogin={handleLogin} onSignup={handleSignup} onBack={() => window.location.assign("/login")} />;
   if (isSubscriberAdmin(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={applicationIdentity} onLogout={handleLogout} />
-    {canAdminSee(applicationIdentity, 'platform.robin_plan') ? <SubscriberAdmin /> : <main role="alert" className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]"><h1 className="text-2xl font-bold">The Robin Plan no disponible</h1><p>Tu perfil no tiene acceso a este portal.</p><a className="underline" href={firstAllowedAdminUrl(applicationIdentity)}>Ir a una sección disponible</a></main>}
+    {canAdminSee(applicationIdentity, 'platform.robin_plan') ? <SubscriberAdmin applicationIdentity={applicationIdentity} /> : <main role="alert" className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]"><h1 className="text-2xl font-bold">The Robin Plan no disponible</h1><p>Tu perfil no tiene acceso a este portal.</p><a className="underline" href={firstAllowedAdminUrl(applicationIdentity)}>Ir a una sección disponible</a></main>}
   </>;
   if (isSubscriberUser(state.user)) return <SubscriberPortal user={state.user} onLogout={handleLogout} onUserRefresh={refreshUser} />;
   return <div role="alert">Esta cuenta no pertenece a The Robin Plan. <button onClick={handleLogout}>Cerrar sesión</button></div>;

@@ -7,12 +7,14 @@ import { AdminPartnerManager } from "./AdminPartnerManager.jsx";
 import { AdminSubNotifications } from "./AdminSubNotifications.jsx";
 import { AdminUsers } from "./AdminUsers.jsx";
 import { AdminFaqManager } from "./AdminFaqManager.jsx";
-import { Bell, Briefcase, Building2, CalendarCheck, GraduationCap, Handshake, HelpCircle, LayoutDashboard, Loader2, Percent, Plane, Sparkles, Tag, Users } from "lucide-react";
+import { Bell, Briefcase, Building2, CalendarCheck, Database, GraduationCap, Handshake, HelpCircle, LayoutDashboard, Loader2, Percent, Plane, Sparkles, Tag, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { subAdminData } from "../../api/index.js";
+import { isDeveloperAdminEmail } from "../../admin-permissions.js";
+import { RobinPlanDeveloperDatabase } from "./RobinPlanDeveloperDatabase.jsx";
 import "../../application/subscription-portal.css";
 
-function SubscriberAdmin() {
+function SubscriberAdmin({ applicationIdentity }) {
   const [section, setSection] = useState("panel");
   const [data, setData] = useState({ users: [], events: [], partners: [], requests: [], discount_codes: [], notifications: [], challenges: [], submissions: [] });
   const [loading, setLoading] = useState(true);
@@ -33,6 +35,7 @@ function SubscriberAdmin() {
     return () => window.removeEventListener("robin:refresh-subscriptions-admin", refreshAdminData);
   }, []);
 
+  const isDeveloper = isDeveloperAdminEmail(applicationIdentity?.email);
   const nav = [
     { key: "panel", label: "Panel general", icon: LayoutDashboard },
     { key: "usuarios", label: "Usuarios", icon: Users },
@@ -48,6 +51,7 @@ function SubscriberAdmin() {
     { key: "notificaciones", label: "Notificaciones", icon: Bell },
     { key: "retos", label: "Retos", icon: Sparkles },
     { key: "faqs", label: "FAQs", icon: HelpCircle },
+    ...(isDeveloper ? [{ key: "database", label: "Base de datos", icon: Database }] : []),
   ];
 
   return (
@@ -91,6 +95,7 @@ function SubscriberAdmin() {
               {section === "notificaciones" && <AdminSubNotifications notifications={data.notifications} users={data.users} onChanged={load} />}
               {section === "retos" && <AdminChallengeManager challenges={data.challenges} submissions={data.submissions} onChanged={load} />}
               {section === "faqs" && <AdminFaqManager />}
+              {section === "database" && isDeveloper && <RobinPlanDeveloperDatabase />}
             </>
           )}
           <footer className="student-footer"><span>PROJECT ROBIN</span><span>Panel de administración</span></footer>
