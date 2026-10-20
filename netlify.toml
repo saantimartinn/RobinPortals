@@ -130,7 +130,7 @@
   to = "/.netlify/functions/sub-admin-mutate"
   status = 200
 [[redirects]]
-  from = "/api/sub-admin/database"
+  from = "/api/sub-admin/db"
   to = "/.netlify/functions/sub-admin-database"
   status = 200
   force = true
