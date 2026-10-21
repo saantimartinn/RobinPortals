@@ -28,3 +28,14 @@ loading → sesión propia
 ## Símbolos de sesión
 
 Ver `frontend/src/api/index.js` (`exchangeApplicationSession`, `login`, `me`, `logout`), `frontend/src/shared/utils.js` (`isSubscriberAdmin`, `isSubscriberUser`), `backend/lib/principal.js` (`isSubscriberRole`, `subscriberDisplayName`) y `backend/functions/auth-*.js`. La lista completa de exports aparece en [FILE_MAP](../FILE_MAP.md).
+## Depurar la cadena de autenticación
+
+En una visita fresca, comprueba en orden `/api/me`, el eventual 401, `/api/auth/sso` y la segunda llamada `/api/me`. No interpretes cualquier fallo como invitado: la UI actualmente convierte el fallo final en estado sin usuario, así que inspecciona red y logs saneados para distinguir cuenta ausente de caída de backend.
+
+El SSO resuelve una identidad Platform y busca una cuenta local por identificadores permitidos. Si no existe cuenta local, es ambiguo o el rol no corresponde, la Function debe fallar sin emitir cookie. Una vez emitida, la cookie firma el principal local con los secretos de este despliegue. Los administradores además necesitan el scope esperado de aplicación.
+
+Al modificarlo, revisa `backend/functions/auth-sso.js`, `backend/lib/application-permissions.js`, `backend/lib/auth.js`, `backend/lib/principal.js`, `frontend/src/app.jsx` y el flujo del proveedor Platform. Comprueba entrada por login local, SSO, logout, usuario sin enlace y admin sin scope.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [Siguiente documento de lectura →](./02-subscriber-frontend.md) · [READMELONG](../../READMELONG.md)

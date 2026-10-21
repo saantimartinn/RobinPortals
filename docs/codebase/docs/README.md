@@ -17,16 +17,14 @@ Documentación mantenida y mapas generados.
 - [ARCHITECTURE.md](../../ARCHITECTURE.md): Documentación.
 - [AUTHORIZATION.md](../../AUTHORIZATION.md): Documentación.
 - [BROWSER_SECURITY.md](../../BROWSER_SECURITY.md): Documentación.
-- [CLEANUP.md](../../CLEANUP.md): Documentación.
 - [CLOUDFLARE_ROUTING.md](../../CLOUDFLARE_ROUTING.md): Documentación.
 - [COMPONENT_MAP.md](../../COMPONENT_MAP.md): Documentación.
-- [CONFIGURATION_MODEL.md](../../CONFIGURATION_MODEL.md): Documentación.
 - [DATABASE_CURRENT.md](../../DATABASE_CURRENT.md): Documentación.
+- [DATAFLOW.md](../../DATAFLOW.md): Documentación.
 - [ENVIRONMENT.md](../../ENVIRONMENT.md): Documentación.
 - [ERROR_HANDLING.md](../../ERROR_HANDLING.md): Documentación.
 - [FILE_INDEX.generated.md](../../FILE_INDEX.generated.md): Documentación.
 - [FILE_MAP.md](../../FILE_MAP.md): Documentación.
-- [FRONTEND_DEVELOPMENT.md](../../FRONTEND_DEVELOPMENT.md): Documentación.
 - [IDENTITY_MODEL.md](../../IDENTITY_MODEL.md): Documentación.
 - [INTEGRATIONS.md](../../INTEGRATIONS.md): Documentación.
 - [KNOWN_LIMITATIONS.md](../../KNOWN_LIMITATIONS.md): Documentación.

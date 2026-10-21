@@ -22,3 +22,14 @@
 ## Secuencia de cambio
 
 Para una acción de UI identifica el handler en [API_INVENTORY](../API_INVENTORY.md), inspecciona su scope/ownership, actualiza cliente `frontend/src/api/index.js` y después el componente. Mantén loading/error, cancelación/debounce y refresh de perfil local. Si el dato se modifica, rastrea tabla y migración según [DATABASE_CURRENT](../DATABASE_CURRENT.md).
+## Añadir una vista o acción
+
+Empieza por el shell de `SubscriberPortal` y determina qué feature posee el estado. Mantén la operación remota en el API client y deja a la vista la presentación/estado específico; así se conserva un punto común para cookies, URL y normalización de errores.
+
+Para una vista nueva confirma su montaje en la navegación del shell, la lectura inicial de datos, el estado vacío, la respuesta ante 401 y el refresh tras una mutación. Para formularios verifica validación de cliente como ayuda de UX, validación equivalente en backend, doble submit y mensajes cuando el proveedor falla.
+
+La URL puede ser `/api/*` en desarrollo/directo o `/therobinplan/api/*` en el dominio compartido. El API client detecta host común y prefija las rutas `/api/`; no añadas un prefijo duplicado. Consulta el capítulo [06](06-cloudflare-cross-repo.md) si se modifica ese comportamiento.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./01-app-session-and-sso.md) · [Siguiente documento de lectura →](./03-admin-and-community-features.md) · [READMELONG](../../READMELONG.md)

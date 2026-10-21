@@ -21,3 +21,16 @@ El root `frontend/src/app.jsx` presenta `SubscriberAdmin.jsx` solo tras validar 
 - `features/levels/`: beneficios y progreso.
 
 El contrato de IA y tratamiento de datos se describe en [AI_DATA_USE](../AI_DATA_USE.md); integraciones backend y variables en [INTEGRATIONS](../INTEGRATIONS.md) y [ENVIRONMENT](../ENVIRONMENT.md).
+
+
+## Ownership y permisos de featuresOwnership y permisos de features
+
+Admin de Subscriptions administra entidades locales del producto. Community trabaja sobre cuentas, relaciones, mensajes, eventos y retos. Que ambos usen el mismo principal local no elimina las comprobaciones por entidad, acción y ownership.
+
+Al añadir una mutación administrativa inspecciona `backend/lib/application-permissions.js` y el handler correspondiente; limita nombres de entidad/acción/campo y valida el ID afectado. La UI no es una frontera de autorización. Para mensajes/RSVP/social valida quién puede leer o actuar sobre el registro; para contenido compartido revisa qué usuarios reciben una notificación.
+
+Al tocar una feature que usa varios endpoints, deja claro qué datos son de perfil, suscripción o comunidad y qué API es responsable. Comprueba loading/error/empty en cada panel y que después de guardar se actualizan tanto el estado local como cualquier resumen derivado.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./02-subscriber-frontend.md) · [Siguiente documento de lectura →](./04-api-and-backend.md) · [READMELONG](../../READMELONG.md)

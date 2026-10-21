@@ -12,3 +12,4 @@ Mapa de responsabilidades y enlaces al código.
 - [04-api-and-backend.md](../../../userguide/04-api-and-backend.md): Documentación.
 - [05-data-security-and-operations.md](../../../userguide/05-data-security-and-operations.md): Documentación.
 - [06-cloudflare-cross-repo.md](../../../userguide/06-cloudflare-cross-repo.md): Documentación.
+- [07-source-file-reference.md](../../../userguide/07-source-file-reference.md): Documentación.

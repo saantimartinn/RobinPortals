@@ -9,7 +9,7 @@ npm run build:netlify
 - `check`: sintaxis, imports, bindings frontend, ciclos, rutas y límites backend.
 - `test`: sesiones/roles, cookies, bcrypt, JSON/Origin, handlers, fulfillment de Stripe
   y renderizado de pantallas React con fixtures locales sin proveedores.
-- `build`: compilación de producción de React/Vite en dist/portal.
+- `build`: compilación de producción de React/Vite en `dist/therobinplan/` (dentro del publish `dist/`).
 - `docs:check`: mapas generados actualizados.
 - `build:netlify`: build y empaquetado real de las 23 Functions, sin desplegar.
 

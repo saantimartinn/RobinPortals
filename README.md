@@ -47,7 +47,7 @@ empaqueta aparte. No subir compilados, dependencias, credenciales o exports de d
 - [Arquitectura](docs/ARCHITECTURE.md), [contratos API](docs/API_CONTRACTS.md) y [autorización](docs/AUTHORIZATION.md).
 - [Inventario API](docs/API_INVENTORY.md) y [contratos](docs/API_CONTRACTS.md).
 - [Base de datos](docs/DATABASE_CURRENT.md), [entorno](docs/ENVIRONMENT.md) y [autorización](docs/AUTHORIZATION.md).
-- [Despliegue y operación](docs/OPERATIONS.md), [pruebas](docs/TESTING.md) y [limpieza realizada](docs/CLEANUP.md).
+- [Despliegue y operación](docs/OPERATIONS.md) y [pruebas](docs/TESTING.md).
 - [Riesgos y trabajo pendiente](docs/KNOWN_LIMITATIONS.md).
 
 ## Repos relacionados

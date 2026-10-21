@@ -1,5 +1,9 @@
 # Robin Subscriptions — guía técnica extendida
 
+> **¿Primera vez en el código?** Empieza por la [USERGUIDE](USERGUIDE.md), que enlaza el recorrido por la sesión propia, el SSO de aplicación, el frontend, la API, billing, datos y routing.
+>
+> Para seguir una operación entre UI, API, backend y proveedores, consulta [DATAFLOW](docs/DATAFLOW.md); para datos personales, [PRIVACY_DATA_MAP](docs/PRIVACY_DATA_MAP.md).
+
 ## Rol y límites
 
 Este repositorio implementa The Robin Plan, una experiencia de suscripción independiente con frontend React/Vite, Netlify Functions y un proyecto Supabase propio. El portal se sirve públicamente bajo `/therobinplan/` en `project-robin.com`. Robin Platform es el proveedor de identidad de aplicación para el handshake SSO; Robin Admin es un producto hermano, no una dependencia de runtime de este proyecto.

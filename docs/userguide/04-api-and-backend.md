@@ -31,3 +31,16 @@ Familias de handlers:
 Debe ser visible qué métodos acepta, qué datos lee y modifica, su nivel auth, alcance por record/table, manejo de errores y efectos externos. Webhooks verifican firma/secreto antes de mutation; retries requieren idempotencia; `Cache-Control: no-store` aplica a API. No añadir secrets o body sensible al log.
 
 Leer fuente: [inventario API](../API_INVENTORY.md) → [contratos](../API_CONTRACTS.md) → handler → `backend/lib` → migration/table.
+
+
+## Implementar una ruta nuevaImplementar una ruta nueva
+
+Empieza por `netlify.toml`: verifica redirect exacto, orden y target `/.netlify/functions/<name>`. Luego crea el handler en `backend/functions/` y limita su responsabilidad a protocolo: método, origen, sesión, autorización, parsing/validación y status. Para lógica de negocio reutilizable crea o actualiza un módulo `backend/lib/`.
+
+Antes de aceptar una escritura responde: ¿quién es el principal?, ¿qué scope/rol se exige?, ¿qué recurso puede mutar?, ¿qué campos acepta el servidor?, ¿qué ocurre en reintento?, ¿qué respuesta necesita la UI? En un webhook agrega verificación de firma y clave de deduplicación antes de actualizar estado.
+
+El catálogo [API_INVENTORY](../API_INVENTORY.md) ayuda a encontrar el handler pero no describe todos los errores ni todas las ramas condicionales. Lee la Function, el módulo backend y las migraciones. Comprueba el API client para no introducir inconsistencia entre path, método y payload.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./03-admin-and-community-features.md) · [Siguiente documento de lectura →](./05-data-security-and-operations.md) · [READMELONG](../../READMELONG.md)
