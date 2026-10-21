@@ -18,7 +18,7 @@ export function Reservas() {
   const [avLoading, setAvLoading] = useState(true);
   const [advisorName, setAdvisorName] = useState("");
   const [calendarConnected, setCalendarConnected] = useState(true);
-  const [slotMin, setSlotMin] = useState(30);
+  const [slotMin, setSlotMin] = useState(60);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
 

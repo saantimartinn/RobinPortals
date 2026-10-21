@@ -2,12 +2,13 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import "./student-portal.css";
 import { StudentAssistant } from "./PortalAssistant.jsx";
+import { StudentPlanCalendar } from "./StudentPlanCalendar.jsx";
 import { Estado } from "./StudentStatus.jsx";
 import { Perfil } from "./StudentProfile.jsx";
 import { Reservas } from "./BookingsPortal.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  User, MessageCircle, Calendar, FileText, LayoutDashboard,
+  User, MessageCircle, Calendar, CalendarDays, FileText, LayoutDashboard,
   LogOut, Shield, CheckCircle2, UploadCloud, Search,
   Users, Download, Eye, Plus, Trash2, ChevronRight,
   BookOpen, MapPin, CreditCard, Loader2, Mail, AlertCircle,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 import robinKeys from "../assets/robin-keys.webp";
 import robinWordmark from "../assets/robin-wordmark.png";
+import robinHatching from "../assets/robin-hatching.svg";
 import robinGraduate from "../assets/robin-graduate.jpg";
 import robinSkate from "../assets/robin-skate.png";
 import robinBike from "../assets/robin-bike.jpg";
@@ -70,6 +72,7 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
   }, [active, user.id]);
   const navigation = [
     { key: "estado", label: "Mi camino", icon: LayoutDashboard },
+    { key: "plan", label: "Mi plan", icon: CalendarDays },
     { key: "carreras", label: "Mis carreras", icon: BookOpen },
     { key: "documentos", label: "Documentos", icon: FileText },
     { key: "reservas", label: "Mis llamadas", icon: Calendar },
@@ -113,8 +116,11 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
       <a className="student-skip" href="#student-content">Saltar al contenido</a>
       <header className="student-header">
         <button className="student-brand" onClick={() => setActive("estado")} aria-label="Robin, ir a Mi camino">
-          <img src={robinWordmark} alt="ROBIN" />
-          <span>Tu camino a Holanda</span>
+          <span className="student-brand-logos">
+            <img src={robinWordmark} alt="ROBIN" />
+            <img className="student-brand-hatch" src={robinHatching} alt="" aria-hidden="true" />
+          </span>
+          <span>Tu futuro empieza aquí</span>
         </button>
         <div className="student-header-account">
           <span className="student-header-name">Hola, {user.nombre || "Robin"}</span>
@@ -125,13 +131,13 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
         <nav className="student-sidebar" aria-label="Navegación del alumno">
           <div className="student-identity">
             <div className="student-avatar">{profilePhoto ? <img src={profilePhoto} alt="Tu foto de perfil" /> : (clientName || "R").charAt(0).toUpperCase()}</div>
-            <div><strong>{clientName}</strong><span>Estudiante Robin</span></div>
+            <div><strong>{clientName}</strong><span>Estudiante Robin Jr</span></div>
           </div>
           <p className="student-nav-caption">TU ESPACIO</p>
           <div className="student-nav-items">
             {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{label}</span>{active === key && <span className="student-nav-dot" />}</button>)}
           </div>
-          <div className="student-support"><span className="student-eyebrow">VAMOS CONTIGO</span><h3>Un equipo detrás de cada paso.</h3><p>Habla con tu asesor y prepara lo que viene.</p><button onClick={() => setActive("reservas")}>Reservar una llamada <ArrowUpRight size={16} /></button></div>
+          <div className="student-support"><span className="student-eyebrow">ROBIN JR</span><h3>Tu futuro empieza con una idea.</h3><p>Habla con tu asesor y descubre las opciones que encajan contigo.</p><button onClick={() => setActive("reservas")}>Hablar con mi asesor <ArrowUpRight size={16} /></button></div>
         </nav>
 
         <AnimatePresence mode="wait">
@@ -143,6 +149,7 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
             {active === "estado" && (
               <Estado step={user.application_phase || 1} onNavigate={setActive} docsPendingCount={summary.documents} bookingsCount={summary.bookings} />
             )}
+            {active === "plan" && <StudentPlanCalendar />}
             {active === "perfil" && (
               <Perfil user={user} clientName={clientName} profilePhoto={profilePhoto} onPhotoChange={changePhoto} photoBusy={photoBusy} photoError={photoError} intereses={intereses} onUserRefresh={onUserRefresh} />
             )}
@@ -160,7 +167,7 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
             )}
             {active === "faqs" && <FaqsPage />}
 
-            <footer className="student-footer"><span>PROJECT ROBIN</span><span>The world is your campus.</span></footer>
+            <footer className="student-footer"><span>ROBIN JR</span><span>The world is your campus.</span></footer>
           </motion.main>
         </AnimatePresence>
       </div>

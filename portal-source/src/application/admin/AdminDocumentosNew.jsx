@@ -1,9 +1,9 @@
 // Admin workspace module for admin documentos new; AdminPortal composes these views.
 import { useState, useEffect } from "react";
-import { FileText, UploadCloud, Download, Eye, Plus, Trash2, Loader2 } from "lucide-react";
+import { CalendarDays, FileText, UploadCloud, Download, Eye, Plus, Trash2, Loader2 } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader, Field } from "../../ui.jsx";
 import { statusLabel } from "../documents/document-utils.js";
-import { documentsGet, adminDocumentsList, adminDocumentsReview, adminDocumentsAdd, adminDocumentsDelete } from "../../api.js";
+import { documentsGet, adminDocumentsList, adminDocumentsReview, adminDocumentsAdd, adminDocumentsDelete, adminDocumentsSetDeadline } from "../../api.js";
 
 export function AdminDocumentosNew({ client }) {
   const [docs, setDocs] = useState([]);
@@ -12,14 +12,17 @@ export function AdminDocumentosNew({ client }) {
   const [busyId, setBusyId] = useState(null);
 
   const [newName, setNewName] = useState("");
+  const [newDeadline, setNewDeadline] = useState("");
   const [newRequired, setNewRequired] = useState(true);
   const [newTemplate, setNewTemplate] = useState(null);
+  const [deadlines, setDeadlines] = useState({});
 
   async function refresh() {
     setLoading(true); setError("");
     try {
       const res = await adminDocumentsList(client.id);
       setDocs(res.documents || []);
+      setDeadlines(Object.fromEntries((res.documents || []).map((doc) => [doc.id, doc.deadline || ""])));
     } catch (e) { setError(e.message || "Error."); }
     finally { setLoading(false); }
   }
@@ -32,14 +35,22 @@ export function AdminDocumentosNew({ client }) {
     finally { setBusyId(null); }
   }
   async function addCustom() {
-    if (!newName.trim()) return;
+    if (!newName.trim() || !newDeadline) return;
     setBusyId("new");
     try {
-      const payload = { user_id: client.id, name: newName.trim(), required: newRequired };
+      const payload = { user_id: client.id, name: newName.trim(), required: newRequired, deadline: newDeadline };
       await adminDocumentsAdd(payload, newTemplate);
-      setNewName(""); setNewRequired(true); setNewTemplate(null);
+      setNewName(""); setNewDeadline(""); setNewRequired(true); setNewTemplate(null);
       await refresh();
     } catch (e) { setError(e.message || "Error."); }
+    finally { setBusyId(null); }
+  }
+  async function saveDeadline(doc) {
+    const deadline = deadlines[doc.id];
+    if (!deadline) return;
+    setBusyId(`deadline-${doc.id}`); setError("");
+    try { await adminDocumentsSetDeadline(doc.id, deadline); await refresh(); }
+    catch (e) { setError(e.message || "No se pudo guardar la deadline."); }
     finally { setBusyId(null); }
   }
   async function delDoc(d) {
@@ -65,9 +76,12 @@ export function AdminDocumentosNew({ client }) {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Pedir documento al alumno" subtitle="Opcionalmente adjunta una plantilla" icon={UploadCloud} />
+        <CardHeader title="Pedir documento al alumno" subtitle="Asigna una fecha límite y, si hace falta, adjunta una plantilla" icon={UploadCloud} />
         <CardContent className="space-y-3">
-          <Field label="Nombre del documento" value={newName} onChange={setNewName} placeholder="Carta de motivación" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="Nombre del documento" value={newName} onChange={setNewName} placeholder="Carta de motivación" />
+            <Field label="Fecha límite" type="date" value={newDeadline} onChange={setNewDeadline} />
+          </div>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input type="checkbox" checked={newRequired} onChange={(e) => setNewRequired(e.target.checked)} /> Obligatorio
           </label>
@@ -78,8 +92,8 @@ export function AdminDocumentosNew({ client }) {
               <input type="file" className="hidden" onChange={(e) => setNewTemplate(e.target.files?.[0] || null)} />
             </div>
           </label>
-          <Btn size="sm" onClick={addCustom} disabled={busyId === "new" || !newName.trim()}>
-            <Plus className="h-3.5 w-3.5" /> Añadir solicitud
+          <Btn size="sm" onClick={addCustom} disabled={busyId === "new" || !newName.trim() || !newDeadline}>
+            <Plus className="h-3.5 w-3.5" /> Añadir solicitud con fecha
           </Btn>
         </CardContent>
       </Card>
@@ -105,6 +119,7 @@ export function AdminDocumentosNew({ client }) {
                         <div className="text-sm font-medium text-slate-900 truncate">{d.name}</div>
                         <div className="text-xs text-slate-400">
                           {d.required ? "Obligatorio" : "Opcional"}
+                          {d.deadline && ` · fecha límite ${new Date(`${d.deadline}T00:00:00`).toLocaleDateString("es-ES")}`}
                           {d.uploaded_at && ` · subido ${new Date(d.uploaded_at).toLocaleDateString("es-ES")} por ${d.uploaded_by === "admin" ? "ti" : "el alumno"}`}
                           {d.source === "career_template" && " · de carrera asignada"}
                           {d.source === "admin_custom" && " · custom"}
@@ -113,6 +128,14 @@ export function AdminDocumentosNew({ client }) {
                       <Badge tone={info.tone}>{info.label}</Badge>
                     </div>
                     <div className="flex flex-wrap gap-1 mt-2">
+                      <label className="flex items-center gap-2 text-xs text-slate-600 mr-2">
+                        <CalendarDays className="h-3.5 w-3.5 text-slate-400" />
+                        <input type="date" value={deadlines[d.id] || ""} onChange={(e) => setDeadlines((current) => ({ ...current, [d.id]: e.target.value }))}
+                          aria-label={`Fecha límite de ${d.name}`} className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs" />
+                      </label>
+                      <Btn size="sm" variant="secondary" onClick={() => saveDeadline(d)} disabled={!deadlines[d.id] || deadlines[d.id] === (d.deadline || "") || busyId === `deadline-${d.id}`}>
+                        {busyId === `deadline-${d.id}` ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CalendarDays className="h-3.5 w-3.5" />} Guardar fecha
+                      </Btn>
                       {d.has_template && (
                         <Btn variant="secondary" size="sm" onClick={() => viewTpl(d)}>
                           <Download className="h-3.5 w-3.5" /> Plantilla

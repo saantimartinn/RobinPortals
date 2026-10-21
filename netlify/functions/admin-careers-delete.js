@@ -1,5 +1,6 @@
 // Netlify handler for /api/admin/careers/delete; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
+const storage = require('../../lib/storage');
 const { readSessionFromEvent } = require('../../lib/auth');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
@@ -20,8 +21,10 @@ exports.handler = async (event) => {
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
 
+    const { data: template } = await sb.from('career_templates').select('image_path').eq('id', id).single();
     const { error } = await sb.from('career_templates').delete().eq('id', id);
     if (error) throw error;
+    if (template?.image_path) await storage.removeObject(sb, template.image_path);
     return json({ ok: true });
   } catch (e) {
     return serverError(e);

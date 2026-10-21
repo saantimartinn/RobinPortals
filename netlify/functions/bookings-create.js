@@ -1,7 +1,7 @@
 /**
  * POST /api/bookings/create
  * Auth: cliente (no admin).
- * Body: { start_at: ISO string, duration_min?: 30 }
+ * Body: { start_at: ISO string, duration_min?: 60 }
  *
  * Flujo (Google Meet):
  *  1) Carga user + asesor asignado (assigned_to).
@@ -61,14 +61,19 @@ exports.handler = async (event) => {
   }
   const body = parseJsonBody(event) || {};
   const startAt = isoDate(body.start_at);
+  const configuredDuration = bookingConfig().slotMin;
   const durationMin = body.duration_min == null
-    ? 30
+    ? configuredDuration
     : numberValue(body.duration_min, { min: 15, max: 240, integer: true });
   if (!startAt) {
     log.warn('rejected', { error_code: 'invalid_start_at' });
     return json({ error: 'invalid_start_at' }, { statusCode: 400 });
   }
   if (durationMin == null) {
+    log.warn('rejected', { error_code: 'invalid_duration' });
+    return json({ error: 'invalid_duration' }, { statusCode: 400 });
+  }
+  if (durationMin !== configuredDuration) {
     log.warn('rejected', { error_code: 'invalid_duration' });
     return json({ error: 'invalid_duration' }, { statusCode: 400 });
   }

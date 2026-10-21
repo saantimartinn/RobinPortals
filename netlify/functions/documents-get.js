@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
     const fields = [
       'id', 'user_id', 'name', 'required', 'status', 'uploaded_at', 'validated_at',
-      'rejection_reason', 'source', 'created_at', 'career_template_id', 'file_path',
+      'rejection_reason', 'source', 'created_at', 'file_path',
       'template_path', 'file_filename', 'file_mime', 'template_filename', 'template_mime',
       'uploaded_by', 'validated_by',
     ].join(', ');

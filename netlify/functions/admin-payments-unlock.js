@@ -30,10 +30,14 @@ exports.handler = async (event) => {
 
     const { data: u } = await sb
       .from('users')
-      .select('id, email, nombre, apellidos, tipo, origin, pais, num_carreras, has_eu_id, contract_signed, contract_data, pago_completed, pago_completed_at, pago_data')
+      .select('id, email, nombre, apellidos, tipo, origin, pais, num_carreras, has_eu_id, contract_signed, contract_data, pago_completed, pago_completed_at, pago_data, application_phase')
       .eq('id', user_id)
       .single();
     if (!u) return json({ error: 'user_not_found' }, { statusCode: 404 });
+    const requiredPhase = installment === 2 ? 6 : 9;
+    if (Number(u.application_phase || 1) < requiredPhase) {
+      return json({ error: 'payment_milestone_not_reached', required_phase: requiredPhase }, { statusCode: 409 });
+    }
 
     const rows = await ensurePayments(sb, u);
     const target = rows.find((r) => r.installment === installment);

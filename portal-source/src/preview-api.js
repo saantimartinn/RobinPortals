@@ -42,11 +42,6 @@ const previewCareer = {
   name: "International Business",
   university: "Universidad de Ámsterdam",
   city: "Ámsterdam",
-  required_docs: [
-    { id: "req-transcript", type: "document", name: "Certificado académico", required: true, deadline: "2026-10-15" },
-    { id: "req-motivation", type: "document", name: "Carta de motivación", required: true, deadline: "2026-11-01" },
-    { id: "req-application", type: "event", name: "Cierre de la solicitud", required: false, deadline: "2027-01-15" },
-  ],
 };
 
 const previewBookings = [
@@ -142,7 +137,7 @@ export async function getLocalPreviewResponse(method, url) {
   if (path === "/api/careers") return { active: true, data: { careers: [previewCareer] } };
   if (path === "/api/payments") return { active: true, data: { user: previewUser("client"), payments: [] } };
   if (path === "/api/bookings") return { active: true, data: { bookings: previewBookings } };
-  if (path === "/api/bookings/availability") return { active: true, data: { days: [], advisor: "Equipo Robin", calendar_connected: true, slot_min: 30 } };
+  if (path === "/api/bookings/availability") return { active: true, data: { days: [], advisor: "Equipo Robin", calendar_connected: true, slot_min: 60 } };
   if (path === "/api/faqs") {
     const { default: faqItems } = await import("../../shared/portal-faqs.json");
     return { active: true, data: { faqs: faqItems.map((faq, index) => ({ ...faq, id: `builtin-${index + 1}`, published: true, builtin: true })) } };

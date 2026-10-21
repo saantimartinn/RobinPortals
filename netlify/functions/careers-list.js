@@ -8,11 +8,18 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { uuid } = require('../../lib/validation');
+const storage = require('../../lib/storage');
+
+async function withImageUrls(sb, rows = []) {
+  return Promise.all(rows.map(async (row) => row.image_path
+    ? { ...row, image_url: await storage.signedUrl(sb, row.image_path, { expiresIn: 3600 }) }
+    : row));
+}
 
 async function listAdminCareerState(sb, userId = null) {
   const { data: rows, error } = await sb
     .from('career_templates')
-    .select('*')
+    .select('id, name, university, city, details, image_path, created_at')
     .order('created_at', { ascending: false });
   if (error) throw error;
 
@@ -26,7 +33,7 @@ async function listAdminCareerState(sb, userId = null) {
     assignedTemplateIds = (assignments || []).map((row) => row.career_template_id);
   }
 
-  return { templates: rows || [], assigned_template_ids: assignedTemplateIds };
+  return { templates: await withImageUrls(sb, rows || []), assigned_template_ids: assignedTemplateIds };
 }
 
 exports.handler = async (event) => {
@@ -52,14 +59,14 @@ exports.handler = async (event) => {
     // Cliente: sus carreras asignadas (con datos del template)
     const { data: cc, error } = await sb
       .from('client_careers')
-      .select('id, assigned_at, career_template_id, career_templates ( id, name, university, city, required_docs )')
+      .select('id, assigned_at, career_template_id, career_templates ( id, name, university, city, details, image_path )')
       .eq('user_id', u.id);
     if (error) throw error;
-    const careers = (cc || []).map((r) => ({
+    const careers = await withImageUrls(sb, (cc || []).map((r) => ({
       assignment_id: r.id,
       assigned_at: r.assigned_at,
       ...r.career_templates,
-    }));
+    })));
     return json({ careers });
   } catch (e) {
     console.error('careers-list error', e);
@@ -68,3 +75,4 @@ exports.handler = async (event) => {
 };
 
 exports.listAdminCareerState = listAdminCareerState;
+exports.withImageUrls = withImageUrls;

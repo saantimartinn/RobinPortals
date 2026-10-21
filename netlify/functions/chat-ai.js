@@ -24,9 +24,10 @@ const HISTORY_MAX = 24;      // nº máx. de mensajes previos que se pasan a la 
 const MAX_LEN = 4000;        // longitud máx. de un mensaje del alumno
 
 const PHASE_LABELS = {
-  1: 'Presentación de carreras', 2: 'Elección de carreras', 3: 'Upload de documentos',
-  4: 'Esperando resultados', 5: 'Selección del destino', 6: 'Buscando alojamiento',
-  7: 'Entrega de EBAU + pago de matrícula', 8: 'Trámites finales', 9: 'Llegada al destino',
+  1: 'Diagnóstico', 2: 'Tus resultados', 3: 'Mentoría 1 con exalumno',
+  4: 'Mentoría 2 con exalumno', 5: 'Mentoría 3 con exalumno',
+  6: 'Sesión grupal 1', 7: 'Sesión grupal 2', 8: 'Diagnóstico final con nuestra profe',
+  9: 'Wrap up',
 };
 
 function cutoffISO() {

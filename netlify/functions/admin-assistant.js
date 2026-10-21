@@ -13,11 +13,15 @@ const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = req
 const { chatCompletion } = require('../../lib/anthropic-chat');
 
 const PHASES = {
-  1: 'Presentación de carreras',
-  2: 'Decisión de carreras',
-  3: 'Upload de documentos',
-  4: 'Waiting decision',
-  5: 'Taking decision',
+  1: 'Diagnóstico',
+  2: 'Tus resultados',
+  3: 'Mentoría 1 con exalumno',
+  4: 'Mentoría 2 con exalumno',
+  5: 'Mentoría 3 con exalumno',
+  6: 'Sesión grupal 1',
+  7: 'Sesión grupal 2',
+  8: 'Diagnóstico final con nuestra profe',
+  9: 'Wrap up',
 };
 
 function daysAgo(d) {
@@ -159,8 +163,8 @@ ROL:
 - Respuestas concisas, en español, formato natural. Listas cortas si ayuda.
 - Si el admin pregunta por un alumno que NO está en su lista, dilo claramente y NO inventes.
 
-FASES (5 INMUTABLES):
-1 Presentación de carreras · 2 Decisión de carreras · 3 Upload de documentos · 4 Waiting decision · 5 Taking decision
+FASES DEL PROCESO (8):
+1 Diagnóstico · 2 Tus resultados · 3 Mentoría 1 con exalumno · 4 Mentoría 2 con exalumno · 5 Mentoría 3 con exalumno · 6 Sesión grupal 1 · 7 Sesión grupal 2 · 8 Diagnóstico final con nuestra profe
 
 CONTEXTO — tus ${summarized.length} clientes asignados (resumido):
 ${JSON.stringify(summarized, null, 2)}

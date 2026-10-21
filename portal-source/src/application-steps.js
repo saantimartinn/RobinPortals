@@ -1,12 +1,12 @@
 // Browser-side application steps helper used by the application.
 export const APP_STEPS = [
-  { key: 1, label: "Presentación de carreras", desc: "Te presentamos las opciones que mejor encajan contigo" },
-  { key: 2, label: "Elección de carreras", desc: "Elegís juntos las universidades y programas a solicitar" },
-  { key: 3, label: "Entrega de documentos", desc: "Reúnes y subes toda la documentación necesaria" },
-  { key: 4, label: "Esperando resultados", desc: "Las universidades estudian tu solicitud" },
-  { key: 5, label: "Selección del destino", desc: "Eliges entre las admisiones recibidas tu universidad" },
-  { key: 6, label: "Buscando alojamiento", desc: "Buscamos y aseguramos tu alojamiento en destino" },
-  { key: 7, label: "Entrega de EBAU + pago de matrícula", desc: "Envías tus notas de EBAU y formalizas la matrícula" },
-  { key: 8, label: "Trámites finales", desc: "Completamos los últimos trámites antes de tu salida" },
-  { key: 9, label: "Llegada al destino", desc: "¡Llegas a tu nuevo destino y comienza la aventura!" },
+  { key: 1, label: "Diagnóstico", desc: "Conocemos tu punto de partida y lo que te interesa." },
+  { key: 2, label: "Tus resultados", desc: "Revisamos contigo los resultados del diagnóstico." },
+  { key: 3, label: "Mentoría 1 con exalumno", desc: "Primera sesión para conocer su experiencia y resolver tus dudas." },
+  { key: 4, label: "Mentoría 2 con exalumno", desc: "Segunda sesión para seguir explorando tus opciones." },
+  { key: 5, label: "Mentoría 3 con exalumno", desc: "Tercera sesión para concretar lo que más encaja contigo." },
+  { key: 6, label: "Sesión grupal 1", desc: "Primera sesión para compartir preguntas e ideas con otros alumnos." },
+  { key: 7, label: "Sesión grupal 2", desc: "Segunda sesión grupal para continuar explorando tus opciones." },
+  { key: 8, label: "Diagnóstico final con nuestra profe", desc: "Revisáis tu recorrido y definís los siguientes pasos." },
+  { key: 9, label: "Wrap up", desc: "Cerramos el programa y repasamos los próximos pasos." },
 ];

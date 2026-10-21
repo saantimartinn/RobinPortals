@@ -8,6 +8,7 @@ const storage = require('../../lib/storage');
 const { readSessionFromEvent } = require('../../lib/auth');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
+const { normalizeDeadline } = require('../../lib/career-requirements');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -16,8 +17,14 @@ exports.handler = async (event) => {
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   const body = parseJsonBody(event);
   if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });
-  const { user_id, name, required = true, template_path, template_filename, template_mime, template_size } = body;
-  if (!user_id || !name) return json({ error: 'missing_fields' }, { statusCode: 400 });
+  if (body.action === 'set_deadline' && (!body.id || !normalizeDeadline(body.deadline))) {
+    return json({ error: 'invalid_deadline' }, { statusCode: 400 });
+  }
+  const { user_id, name, required = true, deadline, template_path, template_filename, template_mime, template_size } = body;
+  const normalizedDeadline = normalizeDeadline(deadline);
+  if (body.action !== 'set_deadline' && (!user_id || !name || !normalizedDeadline)) {
+    return json({ error: 'missing_fields' }, { statusCode: 400 });
+  }
 
   try {
     const sb = getSupabase();
@@ -25,6 +32,13 @@ exports.handler = async (event) => {
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (body.action === 'set_deadline') {
+      const { data: document } = await sb.from('documents').select('id').eq('id', body.id).single();
+      if (!document) return json({ error: 'document_not_found' }, { statusCode: 404 });
+      const { error } = await sb.from('documents').update({ deadline: normalizedDeadline }).eq('id', body.id);
+      if (error) throw error;
+      return json({ ok: true });
+    }
     const { data: target } = await sb.from('users').select('id').eq('id', user_id).single();
     if (!target) return json({ error: 'user_not_found' }, { statusCode: 404 });
 
@@ -52,7 +66,7 @@ exports.handler = async (event) => {
 
     const { data, error } = await sb.from('documents').insert({
       user_id: target.id, name: String(name).trim(), required: !!required,
-      status: 'required', source: 'admin_custom',
+      status: 'required', source: 'admin_custom', deadline: normalizedDeadline,
       template_path,
       template_filename: template_filename || null,
       template_mime: template_mime || null,

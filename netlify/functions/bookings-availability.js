@@ -8,8 +8,8 @@
  * Respuesta: { advisor, slot_min, days: [ { date, slots: [{ start, label }] } ] }
  *
  * Config (env opcional):
- *   BOOKING_AVAIL_TITLE (default "LLAMADAS CLIENTES")
- *   BOOKING_SLOT_MIN    (default 30) · BOOKING_MAX_DAYS (default 14)
+ *   BOOKING_AVAIL_TITLE (default "RobinJr")
+ *   BOOKING_SLOT_MIN    (default 60) · BOOKING_MAX_DAYS (default 14)
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
     const timeMin = new Date(Math.max(from.getTime(), now.getTime()));
     const timeMax = new Date(from.getTime() + days * 24 * 3600 * 1000);
 
-    // MODO INVERSO: la disponibilidad son ÚNICAMENTE los eventos "LLAMADAS CLIENTES"
+    // MODO INVERSO: la disponibilidad son ÚNICAMENTE los eventos "RobinJr"
     // que el asesor tenga en su calendario. Fuera de esas ventanas no hay huecos.
     // El resto de eventos (opacos) bloquean los slots que caigan dentro para no doblar reservas.
     let events = [];
@@ -87,7 +87,7 @@ exports.handler = async (event) => {
     }
 
     const AVAIL_TITLE = config.availabilityTitle.toLowerCase();
-    const isWindow = (ev) => String(ev.summary || '').toLowerCase().includes(AVAIL_TITLE);
+    const isWindow = (ev) => String(ev.summary || '').trim().toLowerCase() === AVAIL_TITLE;
 
     const windows = [];
     const busy = [];
@@ -134,7 +134,7 @@ exports.handler = async (event) => {
       advisor_email: advisorEmail,
       slot_min: config.slotMin,
       calendar_connected: calendarOk,
-      availability_mode: 'llamadas_clientes',
+      availability_mode: 'robin_jr',
       windows_count: windows.length,
       days: out,
     });

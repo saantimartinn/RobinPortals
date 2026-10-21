@@ -29,8 +29,8 @@ exports.handler = async (event) => {
       .from('documents')
       .select([
         'id', 'user_id', 'name', 'required', 'status', 'uploaded_at', 'validated_at',
-        'rejection_reason', 'source', 'created_at', 'career_template_id', 'file_path',
-        'template_path', 'file_filename', 'file_mime', 'template_filename', 'template_mime',
+        'rejection_reason', 'source', 'created_at', 'file_path',
+        'template_path', 'file_filename', 'file_mime', 'template_filename', 'template_mime', 'deadline',
         'uploaded_by', 'validated_by',
       ].join(', '))
       .eq('user_id', target_uid)

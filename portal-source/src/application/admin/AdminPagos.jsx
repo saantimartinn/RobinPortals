@@ -1,14 +1,11 @@
 // Admin workspace module for admin pagos; AdminPortal composes these views.
 import { useState, useEffect } from "react";
-import { FileText, Shield, CheckCircle2, Plus, Trash2, BookOpen, CreditCard, Loader2, Pencil } from "lucide-react";
-import { GOLD, NAVY } from "../../theme.js";
+import { FileText, Shield, CheckCircle2, Plus, Trash2, CreditCard, Loader2 } from "lucide-react";
+import { GOLD } from "../../theme.js";
 import { Btn, Card, CardContent, CardHeader, Field } from "../../ui.jsx";
 import { daysBetween, eur, PaymentStatusBadge, paymentTitle } from "../payments/payment-utils.jsx";
 import { Factura } from "../payments/InvoiceReceipt.jsx";
-import { adminPaymentsList, adminPaymentsUnlock, adminPaymentsSetAmount, adminPaymentsSetCarreras, adminPaymentsAdd, adminPaymentsDelete } from "../../api.js";
-import financialConfig from "../../../../shared/financial-config.cjs";
-
-const { APPLICATION_TOTALS, isLatamClient } = financialConfig;
+import { adminPaymentsList, adminPaymentsUnlock, adminPaymentsAdd, adminPaymentsDelete } from "../../api.js";
 
 export function AdminPagos({ client }) {
   const [data, setData] = useState({ user: client, payments: [] });
@@ -28,9 +25,6 @@ export function AdminPagos({ client }) {
   const [xDue, setXDue] = useState("");
   const [xBusy, setXBusy] = useState(false);
   const [xErr, setXErr] = useState("");
-  const [editId, setEditId] = useState(null);
-  const [editVal, setEditVal] = useState("");
-  const [editBusy, setEditBusy] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 60 * 1000);
@@ -59,15 +53,6 @@ export function AdminPagos({ client }) {
       setError(e.message || "No se pudo desbloquear.");
     } finally { setBusyId(null); }
   }
-  async function setCarreras(n) {
-    setBusyId("carreras"); setError("");
-    try {
-      await adminPaymentsSetCarreras(client.id, n);
-      await refresh();
-    } catch (e) {
-      setError(e.message || "No se pudo guardar.");
-    } finally { setBusyId(null); }
-  }
   async function addExtra() {
     const amt = Number(String(xAmount).replace(",", "."));
     if (xPreset === "custom" && !xConcept.trim()) { setXErr("Indica el concepto del pago."); return; }
@@ -91,53 +76,10 @@ export function AdminPagos({ client }) {
       setError(e.message || "No se pudo eliminar el pago.");
     } finally { setBusyId(null); }
   }
-  async function saveAmount(p) {
-    const amt = Number(String(editVal).replace(",", "."));
-    if (!isFinite(amt) || amt <= 0) { setError("Indica un importe válido."); return; }
-    setEditBusy(true); setError("");
-    try {
-      await adminPaymentsSetAmount(client.id, p.installment, amt);
-      setEditId(null); setEditVal("");
-      await refresh();
-    } catch (e) {
-      setError(e.message || "No se pudo guardar el importe.");
-    } finally { setEditBusy(false); }
-  }
-
-  const tipo = (data.user?.tipo || client.tipo || "general").toLowerCase();
-  const origin = (data.user?.origin || client.origin || "").toLowerCase();
-  const esOtros = origin === "otros";
-  const esLatam = isLatamClient(data.user || client);
-  const esInternacional = esOtros || esLatam;
-  const num = data.user?.num_carreras || client.num_carreras || 1;
-
   return (
     <div className="space-y-5">
-      {tipo === "general" && !esInternacional && (
-        <Card>
-          <CardHeader title="Paquete contratado" subtitle="Solo para Pack General · ajusta el número de carreras" icon={BookOpen} />
-          <CardContent>
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3].map((n) => {
-                const sel = num === n;
-            const prices = Object.fromEntries(Object.entries(APPLICATION_TOTALS.general).map(([key, value]) => [key, `${Number(value).toLocaleString("es-ES")} €`]));
-                return (
-                  <button key={n} onClick={() => setCarreras(n)}
-                    disabled={busyId === "carreras"}
-                    className="rounded-xl border px-3 py-3 text-sm text-left transition disabled:opacity-50"
-                    style={sel ? { background: NAVY, color: "white", borderColor: NAVY } : { background: "white", color: "#475569", borderColor: "#e2e8f0" }}>
-                    <div className="font-bold">{n} {n === 1 ? "carrera" : "carreras"}</div>
-                    <div className={`text-xs ${sel ? "text-white/70" : "text-slate-400"}`}>{prices[n]} · total</div>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <Card>
-        <CardHeader title="Cuotas del cliente" subtitle={esLatam ? `LATAM · ${Number(APPLICATION_TOTALS.international).toLocaleString("es-ES")} € · sin IVA` : esOtros ? `Internacional · ${Number(APPLICATION_TOTALS.international).toLocaleString("es-ES")} €` : `Tipo de paquete: ${tipo}${tipo === "general" ? ` · ${num} carrera(s)` : ""}`} icon={CreditCard} />
+        <CardHeader title="Cuotas del cliente" subtitle="Robin Jr · 500 € + 500 € + 499,99 € · total 1.499,99 €" icon={CreditCard} />
         <CardContent>
           {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2 mb-3">{error}</div>}
           {loading ? (
@@ -165,7 +107,9 @@ export function AdminPagos({ client }) {
                       <div className="text-xs text-slate-400">
                         {isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
                         {isUnlocked && p.unlocked_at && `Desbloqueado el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
-                        {isLocked && `Bloqueado`}
+                        {isLocked && p.installment === 2 && "Bloqueado hasta completar las 3 mentorías con exalumnos"}
+                        {isLocked && p.installment === 3 && "Bloqueado hasta la fase Wrap up"}
+                        {isLocked && p.installment > 3 && "Bloqueado"}
                       </div>
                       {isUnlocked && daysSinceUnlock !== null && (
                         <div className="mt-1">
@@ -178,33 +122,16 @@ export function AdminPagos({ client }) {
                         </div>
                       )}
                     </div>
-                    {editId === p.id ? (
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <input autoFocus value={editVal}
-                          onChange={(e) => setEditVal(e.target.value.replace(/[^\d.,]/g, ""))}
-                          className="w-24 rounded-lg border border-slate-200 px-2 py-1 text-sm text-right tabular-nums"
-                          placeholder="€" />
-                        <Btn size="sm" onClick={() => saveAmount(p)} disabled={editBusy}>
-                          {editBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Guardar"}
-                        </Btn>
-                        <Btn size="sm" variant="secondary" onClick={() => { setEditId(null); setEditVal(""); }} disabled={editBusy}>Cancelar</Btn>
-                      </div>
-                    ) : (
                     <>
                     <PaymentStatusBadge status={p.status} />
                     <div className="flex gap-1 flex-shrink-0">
-                      {(p.installment === 2 || p.installment === 3) && !isPaid && !esLatam && (
-                        <Btn size="sm" variant="secondary" onClick={() => { setEditId(p.id); setEditVal(String(p.amount)); }} title="Editar importe de la cuota">
-                          <Pencil className="h-3.5 w-3.5" /> Importe
-                        </Btn>
-                      )}
                       {isPaid && (
                         <Btn variant="secondary" size="sm" onClick={() => { setFacturaPayment(p); setFacturaOpen(true); }}>
                           <FileText className="h-3.5 w-3.5" /> Justificante
                         </Btn>
                       )}
                       {isLocked && p.installment !== 1 && (
-                        <Btn size="sm" onClick={() => unlock(p)} disabled={busyId === p.id}>
+                        <Btn size="sm" onClick={() => unlock(p)} disabled={busyId === p.id || Number(data.user?.application_phase || 1) < (p.installment === 2 ? 6 : 9)}>
                           {busyId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Desbloquear"}
                         </Btn>
                       )}
@@ -215,7 +142,6 @@ export function AdminPagos({ client }) {
                       )}
                     </div>
                     </>
-                    )}
                   </div>
                 );
               })}

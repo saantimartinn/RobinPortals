@@ -32,9 +32,10 @@ cliente de servidor y aplican sesión, rol y ownership en código. Los buckets `
 
 ## Reglas relevantes
 
-- `users`: `lead_id` y `username` únicos; `application_phase` entre 1 y 9. El perfil académico se conserva en `academic_system` y `academic_subjects` (JSONB con nombre y nivel opcional por asignatura).
+- `users`: `lead_id` y `username` únicos; Robin Jr utiliza `application_phase` entre 1 y 9, con `Wrap up` como fase final. El perfil académico se conserva en `academic_system` y `academic_subjects` (JSONB con nombre y nivel opcional por asignatura).
 - `birthday_events`: combinación `(user_id, birthday_year)` única; acceso exclusivo del backend mediante RLS sin políticas públicas.
 - `client_careers`: combinación `(user_id, career_template_id)` única.
+- `career_templates` conserva fichas visuales y datos básicos; los documentos y sus fechas límite se gestionan de forma independiente.
 - `payments`: `installment >= 1` y combinación `(user_id, installment)` única.
 - `notification_recipients`: combinación `(notification_id, user_id)` única.
 - `ai_chat_messages.role`: `user`, `assistant` o `advisor`.

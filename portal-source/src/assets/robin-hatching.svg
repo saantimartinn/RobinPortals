@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="Robin saliendo del huevo">
+  <g fill="none" stroke="#24386B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- ala saludando -->
+    <path d="M72 128 C54 122 38 104 34 80 C46 82 60 92 68 104 C64 90 66 80 72 72 C80 88 82 108 78 128 Z" fill="#fff"/>
+
+    <!-- cuerpo/cabeza asomando -->
+    <path d="M64 150 C58 108 66 62 108 56 C142 52 160 78 158 112 L156 150 Z" fill="#fff"/>
+
+    <!-- barriga -->
+    <path d="M92 146 C98 118 124 104 156 108 L156 146 Z" fill="#F9B043" stroke="none"/>
+
+    <!-- gafas de sol -->
+    <path d="M84 84 L170 76"/>
+    <path d="M102 84 C102 98 110 104 120 102 C130 100 134 92 132 81 Z" fill="#24386B"/>
+    <path d="M140 80 C140 92 146 97 153 95 C160 93 162 86 161 78 Z" fill="#24386B"/>
+
+    <!-- pico -->
+    <path d="M156 92 L184 100 L156 109" fill="#fff"/>
+
+    <!-- sonrisa -->
+    <path d="M108 110 C116 117 128 117 136 111"/>
+
+    <!-- cáscara de arriba en la cabeza -->
+    <path d="M82 52 L92 63 L102 50 L113 61 L124 47 L134 56 C134 30 116 16 99 20 C83 24 76 38 82 52 Z" fill="#fff" transform="rotate(-14 108 40)"/>
+
+    <!-- cáscara de abajo -->
+    <path d="M46 140 L60 128 L73 142 L88 126 L103 141 L118 125 L133 140 L148 127 L163 141 L174 132 C178 176 152 206 110 206 C68 206 42 178 46 140 Z" fill="#fff"/>
+    <path d="M78 170 L86 178 L82 188"/>
+    <path d="M146 166 L139 176 L146 183"/>
+
+    <!-- trocitos de cáscara -->
+    <path d="M28 176 L38 168 L42 180 Z" fill="#fff" stroke-width="4.5"/>
+    <path d="M186 162 L198 158 L194 171 Z" fill="#fff" stroke-width="4.5"/>
+  </g>
+</svg>

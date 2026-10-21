@@ -20,6 +20,9 @@ export async function adminDocumentsList(userId) { return api.get("/api/admin/do
 export async function adminDocumentsReview(id, decision, reason) {
   return api.post("/api/admin/documents/review", { id, decision, rejection_reason: reason });
 }
+export async function adminDocumentsSetDeadline(id, deadline) {
+  return api.post("/api/admin/documents/add", { action: "set_deadline", id, deadline });
+}
 export async function adminDocumentsAdd(payload, templateFile) {
   if (!templateFile) return api.post("/api/admin/documents/add", payload);
   const upload = await uploadFileDirect(templateFile, {
@@ -35,4 +38,3 @@ export async function adminDocumentsAdd(payload, templateFile) {
   });
 }
 export async function adminDocumentsDelete(id) { return api.post("/api/admin/documents/delete", { id }); }
-

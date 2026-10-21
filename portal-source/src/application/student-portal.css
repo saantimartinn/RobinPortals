@@ -21,12 +21,14 @@
 .student-brand { display: flex; align-items: center; gap: 28px; background: transparent; border: 0; padding: 0; text-align: left; }
 .student-brand img { width: 96px; height: 50px; object-fit: contain; }
 .student-brand > span { border-left: 1px solid #e2e6e9; padding-left: 28px; color: #6a7488; font-size: 12px; }
+.student-brand > .student-brand-logos { display: flex; align-items: center; gap: 10px; border-left: 0; padding-left: 0; }
+.student-brand img.student-brand-hatch { width: 50px; height: 50px; }
 .student-header-account { display: flex; align-items: center; gap: 24px; }
 .student-header-name { font-weight: 600; font-size: 13px; }
 .student-signout { display: flex; align-items: center; gap: 8px; color: #5a657b; border: 1px solid #dfe3e8; border-radius: 999px; padding: 10px 16px; background: #fff; font-size: 12px; font-weight: 600; }
 .student-signout:hover { background: #f3f5f8; }
 .student-layout { max-width: 1376px; margin: 0 auto; padding: 36px 28px 80px; display: grid; grid-template-columns: 226px minmax(0, 1fr); gap: 48px; align-items: start; }
-.student-sidebar { position: sticky; top: 94px; }
+.student-sidebar { position: sticky; top: 94px; padding: 12px; border: 1px solid #e8e9e5; border-radius: 20px; background: #fff; box-shadow: 0 6px 22px #29395f05; }
 .student-identity { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 16px 14px; background: var(--student-navy); color: white; border-radius: 14px; }
 .student-avatar { width: 46px; height: 46px; flex: 0 0 46px; background: #ffffff18; color: white; border: 1px solid #ffffff35; display: grid; place-items: center; border-radius: 50%; font-size: 18px; font-weight: 700; overflow: hidden; }
 .student-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -46,6 +48,116 @@
 .student-support h3 { font-size: 16px; font-weight: 700; line-height: 1.4; margin: 10px 0; letter-spacing: -.03em; }
 .student-support p { font-size: 12px; color: #72798a; line-height: 1.7; }
 .student-support button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; font-size: 11px; font-weight: 700; margin-top: 18px; text-align: left; }
+.student-career-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.student-career-card { display: flex; flex-direction: column; min-width: 0; min-height: 218px; padding: 18px; border: 1px solid #e7e9e5; border-radius: 18px; background: #fff; box-shadow: 0 3px 12px #29395f03; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.student-career-card:hover { border-color: #c4ccda; box-shadow: 0 10px 26px #29395f0b; transform: translateY(-2px); }
+.student-career-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.student-career-icon { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 13px; background: #f0f2f7; color: var(--student-navy); }
+.student-career-card-copy { min-width: 0; margin-top: 18px; }
+.student-career-card-copy h3 { margin: 0; color: #273653; font-size: 15px; font-weight: 750; line-height: 1.45; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.student-career-card-copy p { margin: 5px 0 0; color: #6f7b90; font-size: 12px; line-height: 1.5; }
+.student-career-city { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; color: #8791a0; font-size: 11px; }
+.student-career-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 16px; color: #788397; font-size: 10px; }
+.student-career-card-bottom svg { color: #ac8a43; }
+.student-career-photo-card { overflow: hidden; padding: 0; }
+.student-career-entry { cursor: pointer; }
+.student-career-entry:focus-visible { outline: 3px solid #b7944e; outline-offset: 3px; }
+.student-career-expand-label { color: #8a7445; font-size: 10px; font-weight: 700; }
+.student-career-modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px; background: rgba(20,29,46,.58); backdrop-filter: blur(4px); }
+.student-career-modal { position: relative; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); width: min(760px,100%); max-height: min(760px,calc(100dvh - 48px)); overflow: auto; border: 1px solid #ffffffaa; border-radius: 22px; background: #fff; box-shadow: 0 28px 90px #10192b45; animation: student-career-modal-in .18s ease-out; }
+.student-career-modal-close { position: absolute; z-index: 1; top: 13px; right: 13px; display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #e8ebef; border-radius: 50%; background: #ffffffed; color: #344158; box-shadow: 0 3px 12px #17203315; cursor: pointer; }
+.student-career-modal-close:focus-visible { outline: 3px solid #b7944e; outline-offset: 2px; }
+.student-career-modal-photo { display: block; width: 100%; height: 100%; min-height: 360px; max-height: 600px; object-fit: cover; background: #eff2f6; }
+.student-career-modal-content { align-self: center; padding: 38px 34px; }
+.student-career-modal-content h2 { margin: 14px 0 0; color: #273653; font-size: 25px; font-weight: 780; line-height: 1.25; letter-spacing: -.03em; }
+.student-career-modal-subtitle { margin: 8px 0 0; color: #778397; font-size: 13px; line-height: 1.55; }
+.student-career-modal-location { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; color: #8791a0; font-size: 12px; }
+.student-career-modal-description { margin: 20px 0 0; color: #58667c; font-size: 13px; line-height: 1.75; white-space: pre-line; }
+.student-career-modal-content .student-career-subjects { margin-top: 17px; font-size: 12px; }
+.student-career-modal-content .student-career-subjects strong { font-size: 11px; }
+@keyframes student-career-modal-in { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.student-career-photo { display: block; width: 100%; height: 142px; object-fit: cover; background: #eff2f6; }
+.student-career-photo-placeholder { display: grid; place-items: center; color: #8996ac; }
+.student-career-photo-card > .student-career-card-top, .student-career-photo-card > .student-career-card-copy, .student-career-photo-card > .student-career-subjects, .student-career-photo-card > .student-career-card-bottom { margin-right: 17px; margin-left: 17px; }
+.student-career-photo-card > .student-career-card-top { margin-top: 13px; }
+.student-career-photo-card > .student-career-card-copy { margin-top: 10px; }
+.student-career-description { margin-top: 8px !important; }
+.student-career-subjects { display: grid; gap: 4px; margin-top: 12px; color: #778397; font-size: 10px; line-height: 1.55; }
+.student-career-subjects strong { color: #516078; font-size: 10px; }
+.student-career-photo-card > .student-career-card-bottom { margin-top: auto; margin-bottom: 15px; }
+.admin-career-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.admin-career-card { min-height: 255px; }
+.admin-career-card.is-assigned { border-color: #c9d5e9; background: linear-gradient(155deg,#fff 55%,#f7f8fc); }
+.admin-career-status { color: #748196; font-size: 10px; font-weight: 700; }
+.admin-career-status.is-assigned { color: #34745c; }
+.admin-career-counts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.admin-career-counts span { padding: 5px 8px; border-radius: 999px; background: #f4f5f7; color: #69768a; font-size: 10px; font-weight: 600; }
+.admin-career-card-actions { display: flex; align-items: center; gap: 7px; margin-top: auto; padding-top: 15px; }
+.admin-career-card-actions > button { min-height: 34px; padding: 7px 10px; font-size: 11px; }
+.admin-career-delete { display: grid; place-items: center; width: 34px; height: 34px; margin-left: auto; border: 1px solid #e6e9ef; border-radius: 10px; background: #fff; color: #9aa3b1; }
+.admin-career-delete:hover:not(:disabled) { border-color: #f1cbd0; color: #bd5361; background: #fff8f8; }
+.admin-career-delete:disabled { opacity: .5; }
+.admin-career-photo-card { min-height: 440px; }
+.admin-career-card-photo { display: block; width: 100%; height: 145px; object-fit: cover; background: #eff2f6; }
+.admin-career-card-placeholder { display: grid; place-items: center; color: #8996ac; }
+.admin-career-photo-card > .student-career-card-top, .admin-career-photo-card > .student-career-card-copy, .admin-career-photo-card > .admin-career-detail-line, .admin-career-photo-card > .admin-career-card-actions { margin-right: 16px; margin-left: 16px; }
+.admin-career-photo-card > .student-career-card-top { margin-top: 13px; }
+.admin-career-photo-card > .student-career-card-copy { margin-top: 10px; }
+.admin-career-area { color: #748196; font-size: 10px; font-weight: 700; }
+.admin-career-detail-line { display: grid; gap: 3px; margin-top: 10px; color: #7a8597; font-size: 10px; line-height: 1.5; }
+.admin-career-detail-line strong { color: #4d5b72; font-size: 10px; }
+.admin-career-photo-card > .admin-career-card-actions { margin-top: auto; margin-bottom: 15px; }
+.admin-career-editor-grid { display: grid; grid-template-columns: minmax(210px,.7fr) minmax(0,1.3fr); gap: 20px; align-items: start; }
+.admin-career-photo-upload { position: relative; display: grid; place-items: center; min-height: 220px; overflow: hidden; border: 1px dashed #cbd3df; border-radius: 16px; background: #f8f9fb; color: #768399; cursor: pointer; text-align: center; }
+.admin-career-photo-upload > span:first-child { display: grid; justify-items: center; gap: 9px; padding: 20px; }
+.admin-career-photo-upload > span:first-child b { color: #526078; font-size: 12px; }
+.admin-career-photo-upload > span:first-child small { color: #9099a8; font-size: 10px; }
+.admin-career-photo-upload > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.admin-career-photo-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.admin-career-photo-change { position: absolute; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid #ffffffaa; border-radius: 999px; background: #fff; color: #41516c; font-size: 10px; font-weight: 700; }
+.admin-career-fields { display: grid; gap: 13px; }
+.student-plan-layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(260px,.8fr); gap: 24px; }
+.student-calendar { min-width: 0; }
+.student-calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.student-calendar-eyebrow { color: #8a93a1; font-size: 9px; font-weight: 750; letter-spacing: .14em; }
+.student-calendar-toolbar h2 { margin: 3px 0 0; color: #273653; font-size: 20px; font-weight: 750; text-transform: capitalize; }
+.student-calendar-controls { display: flex; align-items: center; gap: 6px; }
+.student-calendar-today, .student-calendar-arrow { display: grid; place-items: center; min-width: 34px; height: 34px; border: 1px solid #e2e6ed; border-radius: 10px; background: #fff; color: #52627b; font-size: 11px; font-weight: 650; }
+.student-calendar-today { padding: 0 10px; }
+.student-calendar-arrow { width: 34px; }
+.student-calendar-today:hover, .student-calendar-arrow:hover { border-color: #bdc7d7; color: var(--student-navy); background: #f8f9fb; }
+.student-calendar-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); border-top: 1px solid #edf0f3; border-left: 1px solid #edf0f3; border-radius: 12px; overflow: hidden; }
+.student-calendar-weekday { display: grid; place-items: center; min-height: 34px; border-right: 1px solid #edf0f3; border-bottom: 1px solid #edf0f3; color: #8993a3; font-size: 10px; font-weight: 700; }
+.student-calendar-day { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 7px; min-width: 0; min-height: 66px; padding: 9px 2px 5px; border: 0; border-right: 1px solid #edf0f3; border-bottom: 1px solid #edf0f3; background: #fff; color: #35435b; }
+.student-calendar-day:hover { background: #f8f9fb; }
+.student-calendar-day.is-outside { color: #c1c7d0; background: #fbfcfd; }
+.student-calendar-day.is-selected { position: relative; z-index: 1; box-shadow: inset 0 0 0 2px var(--student-navy); background: #f5f7fb; }
+.student-calendar-day.is-today .student-calendar-day-number { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--student-navy); color: #fff; }
+.student-calendar-day.is-selected.is-today .student-calendar-day-number { background: var(--student-gold); color: var(--student-navy); }
+.student-calendar-day-number { min-height: 25px; font-size: 11px; line-height: 25px; }
+.student-calendar-dots { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 5px; }
+.student-calendar-dots i, .student-calendar-legend i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #569879; }
+.student-calendar-dots i.is-event, .student-calendar-legend i.is-event { background: #d4a13b; }
+.student-calendar-dots i.is-call, .student-calendar-legend i.is-call { background: #6e82b1; }
+.student-calendar-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+.student-calendar-legend span { display: flex; align-items: center; gap: 6px; color: #778397; font-size: 10px; }
+.student-plan-agenda { min-width: 0; padding: 18px; border: 1px solid #e8eaf0; border-radius: 16px; background: #fbfcfd; }
+.student-plan-agenda-heading { padding-bottom: 14px; border-bottom: 1px solid #e8eaf0; }
+.student-plan-agenda-heading h3 { margin: 5px 0 0; color: #2e3c58; font-size: 14px; font-weight: 700; line-height: 1.5; text-transform: capitalize; }
+.student-plan-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 38px 10px; color: #97a0ae; text-align: center; }
+.student-plan-empty svg { color: #c5ccd6; }
+.student-plan-empty strong { color: #59667c; font-size: 12px; }
+.student-plan-empty span { max-width: 190px; font-size: 11px; line-height: 1.6; }
+.student-plan-items { display: grid; gap: 10px; padding-top: 14px; }
+.student-plan-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid #e9ecf1; border-radius: 12px; background: #fff; }
+.student-plan-item-icon { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 10px; background: #eef1f8; color: #53678e; }
+.student-plan-item.is-document .student-plan-item-icon { background: #eaf4ef; color: #498165; }
+.student-plan-item.is-event .student-plan-item-icon { background: #fff5df; color: #a47b29; }
+.student-plan-item-copy { display: grid; min-width: 0; gap: 4px; }
+.student-plan-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.student-plan-item-top time { color: #64728a; font-size: 10px; font-weight: 700; }
+.student-plan-item-copy > strong { color: #34415a; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.student-plan-item-copy > span { color: #8791a0; font-size: 10px; line-height: 1.5; }
 .student-main { min-width: 0; outline: none; }
 .student-main > * + * { margin-top: 24px; }
 .student-page-heading { margin: 0 0 28px; }
@@ -120,11 +232,14 @@
 @media (max-width: 1023px) {
   .student-header { height: 72px; padding: 0 24px; }
   .student-layout { display: block; padding: 0 24px 110px; }
-  .student-sidebar { top: 72px; z-index: 20; margin: 0 -24px 26px; padding: 12px 24px; background: #f8f7f2f5; border-bottom: 1px solid #e5e7e2; backdrop-filter: blur(12px); }
+  .student-sidebar { top: 72px; z-index: 20; margin: 0 -24px 26px; padding: 12px 24px; border: 0; border-bottom: 1px solid #e5e7e2; border-radius: 0; background: #f8f7f2f5; box-shadow: none; backdrop-filter: blur(12px); }
   .student-identity, .student-nav-caption, .student-support { display: none; }
   .student-nav-items { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: thin; padding: 2px 1px 5px; }
   .student-nav-item { width: auto; flex-shrink: 0; min-height: 44px; padding: 10px 15px; font-size: 12px; gap: 8px; }
   .student-nav-dot { display: none; }
+  .admin-career-grid, .student-career-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .admin-career-editor-grid { grid-template-columns: minmax(180px,.65fr) minmax(0,1.35fr); gap: 14px; }
+  .student-plan-layout { grid-template-columns: 1fr; }
   .student-chat-launcher { right: 22px; bottom: 22px; }
 }
 @media (max-width: 600px) {
@@ -132,13 +247,25 @@
   .student-brand { gap: 0; }
   .student-brand img { width: 79px; height: 42px; }
   .student-brand > span { display: none; }
+  .student-brand > .student-brand-logos { display: flex; gap: 6px; }
+  .student-brand img.student-brand-hatch { width: 42px; height: 42px; }
   .student-header-account { gap: 12px; }
   .student-header-name { font-size: 11px; max-width: 145px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .student-signout { padding: 8px 10px; font-size: 10px; }
   .student-layout { padding: 0 16px 100px; }
+  .student-career-modal-backdrop { padding: 12px; }
+  .student-career-modal { grid-template-columns: 1fr; max-height: calc(100dvh - 24px); border-radius: 18px; }
+  .student-career-modal-photo { height: 190px; min-height: 190px; max-height: 190px; }
+  .student-career-modal-content { padding: 23px 21px 26px; }
+  .student-career-modal-content h2 { font-size: 21px; }
   .student-sidebar { top: 64px; margin: 0 -16px 23px; padding: 9px 16px 5px; }
   .student-nav-item { padding: 10px 12px; font-size: 11px; }
   .student-nav-item svg { width: 16px; height: 16px; }
+  .admin-career-grid, .student-career-grid { grid-template-columns: 1fr; }
+  .admin-career-editor-grid { grid-template-columns: 1fr; }
+  .student-career-card { min-height: 200px; padding: 17px; }
+  .student-plan-agenda { padding: 15px; }
+  .student-calendar-day { min-height: 54px; padding-top: 6px; }
   .student-page-heading { margin-bottom: 22px; }
   .student-page-heading .student-page-title { font-size: 9px; }
   .student-progress-card { padding: 24px !important; border-radius: 18px !important; }

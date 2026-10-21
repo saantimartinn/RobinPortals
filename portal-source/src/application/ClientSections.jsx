@@ -1,12 +1,11 @@
 // Portal view or navigation module for client sections; the application shell owns session state.
-import React, { useEffect, useState } from "react";
-import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, Shield, UploadCloud } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, MapPin, Shield, UploadCloud, X } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
 import { CREAM, GOLD, NAVY } from "../theme.js";
 import { eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
 import { statusLabel } from "./documents/document-utils.js";
 import { Factura } from "./payments/InvoiceReceipt.jsx";
-import { CareerRequirementsTimeline } from "./careers/CareerRequirementsTimeline.jsx";
 import {
   paymentsList, paymentsCheckout, careersListMine,
   documentsList, documentsGet, documentsUpload,
@@ -85,7 +84,9 @@ export function PagosCliente() {
                       <div className="text-xs text-slate-400">
                         {isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
                         {isUnlocked && p.unlocked_at && `Disponible desde el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
-                        {isLocked && `Se desbloqueará cuando tu asesor lo indique`}
+                        {isLocked && p.installment === 2 && "Disponible tras completar las 3 mentorías con exalumnos"}
+                        {isLocked && p.installment === 3 && "Disponible al llegar a la fase Wrap up"}
+                        {isLocked && p.installment > 3 && "Se desbloqueará cuando tu asesor lo indique"}
                       </div>
                       {p.due_date && !isPaid && (
                         <div className="text-xs text-amber-600 mt-0.5">Fecha límite: {new Date(p.due_date + "T00:00:00").toLocaleDateString("es-ES")}</div>
@@ -121,8 +122,10 @@ export function PagosCliente() {
 
 export function CarrerasCliente() {
   const [careers, setCareers] = useState([]);
+  const [selectedCareer, setSelectedCareer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const closeButtonRef = useRef(null);
 
   async function refresh() {
     setLoading(true); setError("");
@@ -133,11 +136,26 @@ export function CarrerasCliente() {
     finally { setLoading(false); }
   }
   useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    if (!selectedCareer) return undefined;
+    const previouslyFocused = document.activeElement;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setSelectedCareer(null);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = "";
+      previouslyFocused?.focus?.();
+    };
+  }, [selectedCareer]);
 
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Mis carreras" subtitle="Tu asesor te ha asignado las siguientes" icon={BookOpen} />
+        <CardHeader title="Mis carreras" subtitle="Explora las opciones que tu asesor ha preparado para ti" icon={BookOpen} />
         <CardContent>
           {loading ? (
             <div className="text-sm text-slate-400 text-center py-8 flex items-center justify-center gap-2">
@@ -147,27 +165,46 @@ export function CarrerasCliente() {
             <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{error}</div>
           ) : careers.length === 0 ? (
             <div className="text-sm text-slate-400 text-center py-8">
-              Aún no tienes carreras asignadas. Tu asesor te las asignará tras la fase de presentación.
+              Aún no tienes carreras asignadas. Tu asesor te las asignará después del diagnóstico inicial.
             </div>
           ) : (
-            <div className="space-y-2">
-              {careers.map((c) => (
-                <div key={c.id} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3">
-                  <div className="h-9 w-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: CREAM }}>
-                    <BookOpen className="h-4 w-4" style={{ color: NAVY }} />
+            <div className="student-career-grid">
+              {careers.map((c) => {
+                return (
+                <article key={c.id} className="student-career-card student-career-photo-card student-career-entry" role="button" tabIndex={0} aria-haspopup="dialog" onClick={() => setSelectedCareer(c)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedCareer(c); } }}>
+                  {c.image_url ? <img className="student-career-photo" src={c.image_url} alt="" /> : <div className="student-career-photo student-career-photo-placeholder"><BookOpen size={25} /></div>}
+                  <div className="student-career-card-top">
+                    <Badge tone="green">Para ti</Badge>
+                    <span className="student-career-expand-label">Ver detalles</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-slate-900">{c.name}</div>
-                    <div className="text-xs text-slate-500 mt-1">{c.university}{c.city ? ` · ${c.city}` : ""}</div>
+                  <div className="student-career-card-copy">
+                    <h3>{c.name}</h3>
+                    {(c.details?.area || c.university) && <p>{c.details?.area || c.university}</p>}
                   </div>
-                  <Badge tone="green">Asignada</Badge>
-                </div>
-              ))}
+                  <div className="student-career-card-bottom">
+                    <span>{c.city ? <><MapPin size={12} />{c.city}</> : "Opción preparada para ti"}</span>
+                  </div>
+                </article>
+              );})}
             </div>
           )}
         </CardContent>
       </Card>
-      <CareerRequirementsTimeline careers={careers} />
+      {selectedCareer && <div className="student-career-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedCareer(null); }}>
+        <section className="student-career-modal" role="dialog" aria-modal="true" aria-labelledby="student-career-modal-title">
+          <button ref={closeButtonRef} type="button" className="student-career-modal-close" onClick={() => setSelectedCareer(null)} aria-label="Cerrar detalles"><X size={19} /></button>
+          {selectedCareer.image_url ? <img className="student-career-modal-photo" src={selectedCareer.image_url} alt="" /> : <div className="student-career-modal-photo student-career-photo-placeholder"><BookOpen size={30} /></div>}
+          <div className="student-career-modal-content">
+            <Badge tone="green">Para ti</Badge>
+            <h2 id="student-career-modal-title">{selectedCareer.name}</h2>
+            {(selectedCareer.details?.area || selectedCareer.university) && <p className="student-career-modal-subtitle">{selectedCareer.details?.area || selectedCareer.university}</p>}
+            {selectedCareer.city && <p className="student-career-modal-location"><MapPin size={14} />{selectedCareer.city}</p>}
+            {selectedCareer.details?.description && <p className="student-career-modal-description">{selectedCareer.details.description}</p>}
+            {Array.isArray(selectedCareer.details?.subjects) && selectedCareer.details.subjects.length > 0 && <div className="student-career-subjects"><strong>Asignaturas relacionadas</strong><span>{selectedCareer.details.subjects.join(" · ")}</span></div>}
+            {Array.isArray(selectedCareer.details?.requirements) && selectedCareer.details.requirements.length > 0 && <div className="student-career-subjects"><strong>Requisitos</strong><span>{selectedCareer.details.requirements.join(" · ")}</span></div>}
+          </div>
+        </section>
+      </div>}
     </div>
   );
 }
@@ -228,6 +265,7 @@ export function DocumentosCliente() {
             <div className="text-sm font-medium text-slate-900">{d.name}</div>
             <div className="text-xs text-slate-400">
               {d.required ? "Obligatorio" : "Opcional"}
+              {d.deadline && ` · fecha límite ${new Date(`${d.deadline}T00:00:00`).toLocaleDateString("es-ES")}`}
               {d.uploaded_at && ` · subido ${new Date(d.uploaded_at).toLocaleDateString("es-ES")}`}
               {d.rejection_reason && ` · ${d.rejection_reason}`}
             </div>

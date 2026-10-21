@@ -1,10 +1,11 @@
 // Shared financial config values or helpers used across this runtime.
 const CURRENCY = 'EUR';
 const DELFT_PRICE_VERSION = 'delft-2999-v1';
-const GENERAL_PRICE_VERSION = 'general-1999-2399-2499-v1';
+const GENERAL_PRICE_VERSION = 'robin-jr-499-3x-v1';
+const ROBIN_JR_TOTAL = 1499.99;
 
 const APPLICATION_TOTALS = Object.freeze({
-  general: Object.freeze({ 1: 1999, 2: 2399, 3: 2499 }),
+  general: Object.freeze({ 1: ROBIN_JR_TOTAL, 2: ROBIN_JR_TOTAL, 3: ROBIN_JR_TOTAL }),
   delft: 2999,
   llegada: 1700,
   mentoria: 450,
@@ -160,6 +161,14 @@ function generalPlan(totals, numCarreras, remainderToLast = false) {
   ];
 }
 
+function robinJrPlan() {
+  return [
+    { installment: 1, amount: 500 },
+    { installment: 2, amount: 500 },
+    { installment: 3, amount: 499.99 },
+  ];
+}
+
 function applicationPlan(tipo, numCarreras, origin, hasEuId, pais) {
   const client = { tipo, origin, has_eu_id: hasEuId, pais };
   if (usesInternational2700Plan(client)) {
@@ -168,7 +177,7 @@ function applicationPlan(tipo, numCarreras, origin, hasEuId, pais) {
   const key = String(tipo || 'general').toLowerCase();
   const careers = Number(numCarreras) || 1;
   if (key === 'general') {
-    return generalPlan(APPLICATION_TOTALS.general, careers, true);
+    return robinJrPlan();
   }
   if (key === 'delft') {
     return [
@@ -204,21 +213,9 @@ function pricingVersionForNewUser(tipo) {
  * vigente, y los contratos nuevos quedan marcados con DELFT_PRICE_VERSION.
  */
 function applicationPlanForUser(user) {
-  const source = user || {};
-  const key = String(source.tipo || 'general').toLowerCase();
-  const pricingVersion = contractPricingVersion(source.contract_data);
-  const isInternational = usesInternational2700Plan(source);
-  if (key === 'general' && !isInternational && pricingVersion !== GENERAL_PRICE_VERSION) {
-    return generalPlan(HISTORICAL_GENERAL_TOTALS, source.num_carreras);
-  }
-  if (key === 'delft' && source.contract_signed && pricingVersion !== DELFT_PRICE_VERSION) {
-    return [
-      { installment: 1, amount: 933 },
-      { installment: 2, amount: 933 },
-      { installment: 3, amount: 933 },
-    ];
-  }
-  return applicationPlan(source.tipo, source.num_carreras, source.origin, source.has_eu_id, source.pais);
+  // This repository is the Robin Jr portal: every program uses the same
+  // three fixed installments, regardless of legacy package metadata.
+  return robinJrPlan();
 }
 
 module.exports = {
@@ -226,6 +223,7 @@ module.exports = {
   CURRENCY,
   DELFT_PRICE_VERSION,
   GENERAL_PRICE_VERSION,
+  ROBIN_JR_TOTAL,
   HISTORICAL_GENERAL_TOTALS,
   FISCAL,
   EU_COUNTRIES,
@@ -238,6 +236,7 @@ module.exports = {
   isLatamClient,
   normalizeLocation,
   pricingVersionForNewUser,
+  robinJrPlan,
   splitEqual,
   taxRateForClient,
   usesInternational2700Plan,
