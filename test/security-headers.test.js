@@ -22,7 +22,7 @@ test('la CSP permite solo las capacidades que usa el frontend', () => {
     "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://ljavwdqrffkkblmyatuq.supabase.co",
+    "connect-src 'self' https://jptiqynxiigvgxzbglgh.supabase.co",
     "object-src 'none'",
     "frame-ancestors 'self'",
     "frame-src 'none'",

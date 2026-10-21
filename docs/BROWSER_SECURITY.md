@@ -20,7 +20,7 @@ data does not depend on CDN rule application.
 ## CSP rationale
 
 Browser API calls are same-origin, except PUT requests to short-lived signed upload URLs
-at `ljavwdqrffkkblmyatuq.supabase.co`. Revolut Checkout is reached by top-level
+at `jptiqynxiigvgxzbglgh.supabase.co`. Revolut Checkout is reached by top-level
 navigation to a server-returned URL, not by loading provider scripts or frames. The
 portal has no iframes or WebSockets.
 
