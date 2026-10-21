@@ -33,3 +33,16 @@ Secuencia dentro de un handler:
 ## Edge Functions
 
 `netlify/edge-functions/rate-limit-identity.mjs` y `rate-limit-expensive.mjs` ejecutan límites antes del compute de Function para grupos de rutas. La asignación concreta a endpoint se encuentra en `netlify.toml`; revisar rate-limit y Function conjuntamente para no confiar en middleware aislado.
+
+
+## Contrato de una FunctionContrato de una Function
+
+Considera cada Function un límite independiente: el redirect define cómo llega el cliente, el handler define la interfaz HTTP y `lib/` implementa reglas/adaptadores. Documenta método, sesión necesaria, rol/scope, validación, status y efectos. Para una mutación incluye ownership del recurso, consistencia, idempotencia y qué ve el cliente después.
+
+Pasos para seguir un endpoint: resuelve la ruta pública en `netlify.toml`; abre el handler bajo `netlify/functions/`; recorre imports hasta el servicio; encuentra la tabla/migración o API externa; vuelve al API client para comprender cómo interpreta fallos. Si es una ruta servida con prefijo, sigue también el Worker y verifica si elimina o conserva el prefijo.
+
+Los endpoints que consume otro repositorio son contratos públicos aunque no sean una API externa. Antes de cambiar una clave del JSON, rol o cookie busca consumidor en Admin y Subscriptions. Revisa [API_INVENTORY](../API_INVENTORY.md), pero valida en source porque los inventarios se generan a partir del código.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./03-application-and-admin-ui.md) · [Siguiente documento de lectura →](./05-data-integrations-security.md) · [READMELONG](../../READMELONG.md)

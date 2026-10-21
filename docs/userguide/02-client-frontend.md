@@ -30,3 +30,22 @@ El cliente envía credenciales same-origin y serializa JSON excepto `postForm`. 
 - `assets/`, `public/recursos/`: imágenes importadas y recursos descargables.
 
 La tabla fuente completa de módulos e imports está en [COMPONENT_MAP](../COMPONENT_MAP.md) y el árbol [portal-source](../codebase/portal-source/README.md).
+
+
+## Recorrido de una acción clienteRecorrido de una acción cliente
+
+La fachada `portal-source/src/api.js` protege a los consumidores del detalle de organización interna: exporta símbolos que delegan en `src/api/*`. Antes de mover un export busca imports en todas las features; conserva el export mientras exista consumidor. La respuesta de API atraviesa tres decisiones que conviene inspeccionar por separado: normalización en el cliente, estado del componente/hook y render de estados vacíos/errores.
+
+Para cambiar una interacción:
+
+1. Encuentra el owner visual bajo `portal-source/src/features/` y sus componentes compartidos.
+2. Localiza el método API importado desde la fachada y registra método, URL, body y shape usado.
+3. Comprueba cancelación de solicitudes, doble submit, optimistic updates y actualización de datos derivados.
+4. Ajusta el estado de carga, error y éxito; evita mostrar una mutación como guardada antes de respuesta confirmada.
+5. Confirma la ruta directa/refresh y los enlaces que incluyen prefijo `/portal`.
+
+Si cambia una respuesta, busca también formularios, vistas de resumen y consumidores no visuales: una exportación puede tener más de un call site.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./01-runtime-and-identity.md) · [Siguiente documento de lectura →](./03-application-and-admin-ui.md) · [READMELONG](../../READMELONG.md)

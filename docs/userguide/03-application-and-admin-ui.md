@@ -23,3 +23,16 @@ El onboarding se compone en `application/onboarding/OnboardingFlow.jsx` y delega
 - Chat/FAQ → `/api/chat`, `/api/admin/chat`, `/api/faqs`.
 
 Para métodos, roles, errores y tablas detectadas, usar [API_INVENTORY](../API_INVENTORY.md), y para interacción por archivo [FILE_MAP](../FILE_MAP.md).
+
+
+## Seguir un flujo de aplicación/adminSeguir un flujo de aplicación/admin
+
+Separa el flujo de solicitante/alumno del flujo de operador. Aunque compartan componentes visuales o datos, los roles, ownership y operaciones permitidas pueden diferir. Localiza primero la pantalla bajo `portal-source/src/features/`; sigue su composición y callbacks hasta el cliente API. Busca después el endpoint correspondiente y su guard server-side.
+
+Para una nueva acción administrativa confirma: en qué shell aparece, qué capability la habilita, qué registros puede afectar, qué validación de campo se aplica, y qué handler vuelve a autorizar la operación. Para un paso de onboarding confirma transiciones de estado, navegación al volver atrás, persistencia parcial y mensajes de recuperación si falla una integración.
+
+Al cambiar componentes compartidos, verifica al menos un consumidor cliente y uno admin. No extraigas código al directorio shared si contiene imports de Node, credenciales o reglas que solo el servidor puede hacer cumplir.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./02-client-frontend.md) · [Siguiente documento de lectura →](./04-api-functions-and-services.md) · [READMELONG](../../READMELONG.md)

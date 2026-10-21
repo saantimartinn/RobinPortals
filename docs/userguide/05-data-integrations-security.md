@@ -28,3 +28,16 @@
 ## Calidad y cambios de datos
 
 Los workflows y `scripts/` exigen inventarios, sintaxis, límites de funciones, detección de PII/empty catches y pruebas. Una migración no es equivalente a un cambio de código y puede afectar la base fuera del deploy; seguir backup, ownership, RLS y rollback de [OPERATIONS](../OPERATIONS.md).
+
+
+## Cambios de persistencia y proveedorCambios de persistencia y proveedor
+
+Antes de escribir SQL, identifica el proyecto y schema de destino, el consumidor y la política que restringe lectura/escritura. Revisa migraciones anteriores y clientes Supabase usados en la ruta: una service-role del servidor y una consulta autenticada no tienen el mismo alcance. Considera datos históricos, nullabilidad, índices, backfill y rollback; no modifiques una tabla por analogía con la de otro repo.
+
+Los adaptadores externalizan detalles de API y credenciales. Mantén el token en server-side, valida responses incompletas y limita requests con timeout/paginación. Un webhook debe verificar firma, deduplicar eventos y tolerar repetición; una tarea de sync debe permitir reintento sin producir duplicados.
+
+Si cambias datos de identidad o perfil, localiza al menos: writer, reader, UI, API de `/me`, migración/RLS y los repos que usan esa identidad. Usa la [USERGUIDE Admin](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md) y [USERGUIDE Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md) para identificar consumidores.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./04-api-functions-and-services.md) · [Siguiente documento de lectura →](./06-cloudflare-and-cross-repo.md) · [READMELONG](../../READMELONG.md)
