@@ -20,3 +20,16 @@ Cambios de ruta, role key, permisos de menú, profile fields, cookies, sesión, 
 - [Robin Subscriptions README largo](https://github.com/saantimartinn/robin-subscriptions/blob/main/READMELONG.md) y [USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md).
 
 No existe release atómico ni package compartido: cambios deben mantener consumidores antiguos durante integración/deploy por etapas. La fuente de verdad de tablas y permisos pertenece al repo que posee ese entorno de datos.
+
+
+## Cómo leer y modificar el WorkerCómo leer y modificar el Worker
+
+Resuelve la ruta en el orden en que ejecuta el Worker: hostname, pathname, regla seleccionada, transformación de URL/método/headers/body y fetch del origin. Luego inspecciona cómo reescribe la respuesta (por ejemplo, HTML o referencias de assets) y qué pasa cuando ninguna regla coincide. No supongas que un route observado en la ficha del servicio y un route configurado en la zona sean el mismo dato.
+
+El código versionado explica intención; [CLOUDFLARE_ROUTING.md](../CLOUDFLARE_ROUTING.md) registra el snapshot consultado en el dashboard y su discrepancia con la vista general de Routes. Si el dashboard cambia, actualiza fecha, alcance y observación concreta, no presentes una lectura anterior como live state.
+
+Antes de cambiar un patrón, construye una tabla de path y destino para `/admin`, `/portal`, `/therobinplan`, `/login` y las rutas API. Comprueba UI con prefijo retenido, API con su eventual prefijo eliminado, query string y el fallback no gestionado. Coordina con las guías de [Admin](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/userguide/06-cross-repository-flows.md) y [Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/userguide/06-cloudflare-cross-repo.md).
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./05-data-integrations-security.md) · [Siguiente documento de lectura →](./07-source-file-reference.md) · [READMELONG](../../READMELONG.md)

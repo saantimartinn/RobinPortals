@@ -28,3 +28,16 @@ Robin Admin usa los endpoints de identidad de Platform a través del Worker (`/p
 - [Cloudflare paths](../CLOUDFLARE_ROUTING.md)
 - [Robin Admin USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md)
 - [Robin Subscriptions USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md)
+
+
+## Cómo depurar identidadCómo depurar identidad
+
+Empieza por host y path: una navegación bajo `/portal/` y una llamada `/portal/api/*` pueden recorrer rutas diferentes del Worker. Comprueba la cookie de sesión en el navegador sin copiar su valor; después mira status y cuerpo saneado de `/api/me`. Sigue la implementación hasta el handler de identidad y el cliente Supabase configurado para la identidad de aplicación.
+
+Separa estos estados al diagnosticar: no autenticado, principal válido sin capability, sesión expirada, proveedor no disponible y fallo de transporte. Para un admin revisa la fuente de permisos y el chequeo backend en cada endpoint; los flags que devuelve UI son datos para presentar controles, no autoridad.
+
+Al editar roles o sesión revisa el emisor y el lector, expiración/logout, cookie domain/path/same-site/secure, rutas de Admin y el consumidor SSO de Subscriptions. Valida también la entrada directa al portal y el comportamiento tras refrescar el navegador.
+
+---
+
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [Siguiente documento de lectura →](./02-client-frontend.md) · [READMELONG](../../READMELONG.md)

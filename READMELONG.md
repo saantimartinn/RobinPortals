@@ -1,5 +1,9 @@
 # Robin Platform — guía técnica extendida
 
+> **¿Primera vez en el código?** Empieza por la [USERGUIDE](USERGUIDE.md), un recorrido desde la sesión y la UI hasta Functions, datos, Cloudflare y los contratos con los repos vecinos.
+>
+> Para los recorridos funcionales completos, abre [DATAFLOW](docs/DATAFLOW.md); para los flujos de datos personales, consulta [PRIVACY_DATA_MAP](docs/PRIVACY_DATA_MAP.md).
+
 ## Rol del repositorio
 
 Robin Platform contiene el portal de alumnos y la superficie administrativa del producto de aplicación, además del backend de Functions que sirve esas experiencias. Construye el frontend de `portal-source/` en `deploy/portal/`; las Netlify Functions y Edge Functions se empaquetan como runtime de servidor. La capa pública de `project-robin.com` está definida en `infrastructure/cloudflare/project-robin-router.js` y enruta por prefijos a tres proyectos Netlify distintos.
