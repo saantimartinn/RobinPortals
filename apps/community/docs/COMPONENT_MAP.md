@@ -6,7 +6,7 @@ Generado desde imports del código.
 |---|---|
 | [frontend/src/admin-permissions.js](../frontend/src/admin-permissions.js) | — |
 | [frontend/src/api/index.js](../frontend/src/api/index.js) | — |
-| [frontend/src/app.jsx](../frontend/src/app.jsx) | `./shared/theme.js`, `./features/admin/SubscriberAdmin.jsx`, `./features/auth/SubscriberAuthScreen.jsx`, `./application/SubscriberPortal.jsx`, `./api/index.js`, `./shared/utils.js`, `./application/CrossPortalNav.jsx`, `./admin-permissions.js` |
+| [frontend/src/app.jsx](../frontend/src/app.jsx) | `./shared/theme.js`, `./features/admin/SubscriberAdmin.jsx`, `./application/SubscriberPortal.jsx`, `./api/index.js`, `./shared/utils.js`, `./application/CrossPortalNav.jsx`, `./admin-permissions.js` |
 | [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | `../assets/robin-wordmark.png`, `../admin-permissions.js`, `./cross-portal-nav.css` |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | `./SubscriberShell.jsx`, `./SubscriptionPlanPicker.jsx` |
 | [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | `./subscription-portal.css`, `../shared/NotificationPopup.jsx`, `../shared/constants.js`, `../features/levels/RobinBenefitsPage.jsx`, `../features/levels/RobinLevelUpToast.jsx`, `../features/community/SubChallenges.jsx`, `../features/community/SubCommunity.jsx`, `../features/subscription/SubHome.jsx`, `../features/subscription/SubPayments.jsx`, `../features/services/SubPersonal.jsx`, `../features/career/SubProfesional.jsx`, `../features/profile/SubProfile.jsx`, `../features/profile/SubSettings.jsx`, `../features/community/SubSocial.jsx`, `../features/subscription/SubSupport.jsx`, `../features/subscription/SubFaqs.jsx`, `../api/index.js`, `../shared/utils.js` |
@@ -27,8 +27,6 @@ Generado desde imports del código.
 | [frontend/src/features/admin/SubscriberAdmin.jsx](../frontend/src/features/admin/SubscriberAdmin.jsx) | `./AdminChallengeManager.jsx`, `./AdminDiscountManager.jsx`, `./AdminEventManager.jsx`, `./AdminMentorManager.jsx`, `./AdminPanelOverview.jsx`, `./AdminPartnerManager.jsx`, `./AdminSubNotifications.jsx`, `./AdminUsers.jsx`, `./AdminFaqManager.jsx`, `../../api/index.js`, `../../admin-permissions.js`, `./RobinPlanDeveloperDatabase.jsx`, `../../application/subscription-portal.css` |
 | [frontend/src/features/admin/toLocalInput.js](../frontend/src/features/admin/toLocalInput.js) | — |
 | [frontend/src/features/auth/AuthShell.jsx](../frontend/src/features/auth/AuthShell.jsx) | `../../shared/theme.js`, `../../assets/robin-logo-transparent.png`, `./auth-shell.css` |
-| [frontend/src/features/auth/SubscriberAuthScreen.jsx](../frontend/src/features/auth/SubscriberAuthScreen.jsx) | `./AuthShell.jsx`, `../../shared/ui.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `../../shared/TermsModal.jsx`, `./useSubscriberAuth.js` |
-| [frontend/src/features/auth/useSubscriberAuth.js](../frontend/src/features/auth/useSubscriberAuth.js) | `../../api/index.js` |
 | [frontend/src/features/career/CvAiPage.jsx](../frontend/src/features/career/CvAiPage.jsx) | `../../shared/ui.jsx`, `./CvChoice.jsx`, `../../shared/theme.js`, `../services/SubIntro.jsx`, `./cvBuildHtml.jsx`, `./downloadCvDoc.jsx`, `../../api/index.js` |
 | [frontend/src/features/career/cvBuildHtml.jsx](../frontend/src/features/career/cvBuildHtml.jsx) | `./cvEsc.js` |
 | [frontend/src/features/career/CvChoice.jsx](../frontend/src/features/career/CvChoice.jsx) | `../../shared/theme.js` |

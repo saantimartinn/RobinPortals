@@ -8,7 +8,6 @@
 
 | Grupo de `frontend/src/features/` | Responsabilidad y servicios principales |
 |---|---|
-| `auth/` | Signup, login y password reset; `useSubscriberAuth.js` comparte validación/submit del auth screen. |
 | `subscription/` | Home, plan, payments, FAQs y support; checkout/portal/list plans y recibos. |
 | `profile/` | Información y preferencias del suscriptor, persistidas con API profile. |
 | `career/` | Empleo local, mentorías, CV AI, elección y generación/export del CV. |

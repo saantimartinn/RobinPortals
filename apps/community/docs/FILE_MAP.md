@@ -18,7 +18,6 @@ Este repo despliega un SPA React/Vite en Netlify junto con sus Functions Node. L
 
 | Carpeta | Pantallas y recorrido |
 |---|---|
-| [features/auth/](../frontend/src/features/auth/) | AuthShell, SubscriberAuthScreen, useSubscriberAuth: login/alta/estado antes de entrar. |
 | [features/subscription/](../frontend/src/features/subscription/) | Inicio, plan, pagos, FAQs y soporte; consume endpoints /api/subscription, /api/faqs y /api/me. |
 | [features/profile/](../frontend/src/features/profile/) | Perfil y configuración, en coordinación con endpoints de subscriber profile. |
 | [features/career/](../frontend/src/features/career/) | CV, empleos, mentorías y herramientas de documento. CV con IA pasa por backend. |
