@@ -1,0 +1,65 @@
+# Build or deployment configuration for ci.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            portal-source/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: npm --prefix portal-source ci --include=dev
+
+      - name: Backend syntax
+        run: |
+          node scripts/check-syntax.js
+          node scripts/check-function-boundaries.js
+
+      - name: Safety lint
+        run: |
+          npm audit --omit=dev --audit-level=high
+          npm --prefix portal-source audit --omit=dev --audit-level=high
+          node scripts/lint.js
+          node scripts/check-frontend-bindings.js
+          node scripts/check-empty-catches.js
+          node scripts/check-env-example.js
+          node scripts/check-pii-logs.js
+          node scripts/check-platform-scope.js
+
+      - name: Generated documentation is current
+        run: |
+          node scripts/generate-api-inventory.js
+          node scripts/generate-component-map.js
+          node scripts/generate-codebase-docs.js
+          node scripts/generate-file-map.js
+          node scripts/check-codebase-docs.js
+          git diff --exit-code -- docs/API_INVENTORY.md
+          git diff --exit-code -- docs/COMPONENT_MAP.md
+          git diff --exit-code -- docs/codebase
+          git diff --exit-code -- docs/FILE_MAP.md
+
+      - name: Tests
+        run: node --test test/*.test.js test/*.test.mjs test/*.test.cjs
+
+      - name: Frontend build
+        run: npm --prefix portal-source run build
