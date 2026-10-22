@@ -9,13 +9,13 @@
 ```text
 loading → sesión propia
   ├── 401 + identidad Platform válida → auth-sso → sesión propia
-  ├── sin user → SubscriberAuthScreen
+  ├── sin user → redirige al login común (/login)
   ├── role subscriber_admin + scope platform.robin_plan → SubscriberAdmin
   ├── role subscriber → SubscriberPortal
   └── cualquier otro role → alerta / logout
 ```
 
-`frontend/src/features/auth/SubscriberAuthScreen.jsx` gestiona formulario y alta; `useSubscriberAuth.js` es hook de operaciones/estado. `backend/lib/principal.js` canonicaliza role y display name. `backend/lib/auth.js` emite/lee cookie JWT y debe conservar frontera del producto.
+El login es el común del portal del alumno (`/login`); Community entra por SSO. `backend/lib/principal.js` canonicaliza role y display name. `backend/lib/auth.js` emite/lee cookie JWT y debe conservar frontera del producto.
 
 ## Recorrido SSO
 
