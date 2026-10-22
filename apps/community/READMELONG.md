@@ -34,7 +34,7 @@ El router versionado se encuentra en [Robin Platform](https://github.com/RobinMa
 
 `frontend/src/main.jsx` monta `frontend/src/app.jsx`. El componente raíz comprueba `/api/me`; si el backend devuelve 401 durante una entrada desde aplicación, intenta `/api/auth/sso`, vuelve a cargar sesión propia y después clasifica al usuario:
 
-- sin sesión → `SubscriberAuthScreen`;
+- sin sesión → redirige al login común (`/login`, portal del alumno);
 - rol `subscriber_admin` → `SubscriberAdmin`, solo si la identidad de aplicación concede la clave `platform.robin_plan`;
 - rol `subscriber` → `SubscriberPortal`;
 - cualquier rol ajeno → mensaje de incompatibilidad y logout.

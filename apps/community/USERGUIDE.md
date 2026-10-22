@@ -16,7 +16,7 @@ La aplicación se publica bajo `/therobinplan/` en el dominio común. El Worker 
 
 ```text
 index.html → frontend/src/main.jsx → frontend/src/app.jsx
-  → SubscriberAuthScreen / SubscriberPortal / SubscriberAdmin
+  → SubscriberPortal / SubscriberAdmin (sin sesión: login común /login)
   → frontend/src/api/index.js
   → /api/... → netlify.toml → backend/functions/<handler>.js
   → backend/lib/* → Supabase propia / Stripe / otro proveedor

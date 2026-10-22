@@ -45,7 +45,7 @@ Cada handler es una frontera HTTP: método/origen/parsing, sesión, autorizació
 ### Login local
 
 ```text
-SubscriberAuthScreen → api.login()
+login común (/login) → SSO → /api/auth/sso (el endpoint local de login queda para api.login())
   → POST /api/auth/login → auth-login Function
   → lookup/credential verification → signSession()
   → HttpOnly cookie local → GET /api/me → subscriber principal
