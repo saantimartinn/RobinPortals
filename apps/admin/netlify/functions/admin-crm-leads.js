@@ -1,0 +1,168 @@
+// Netlify handler for /api/admin/crm/leads; it owns the HTTP boundary and hands reusable work to server modules.
+const { getSupabase } = require('../../lib/supabase');
+const { getAdminSupabase } = require('../../lib/admin-supabase');
+const { readSessionFromEvent } = require('../../lib/auth');
+const { findAdminForSession } = require('../../lib/admin-auth');
+const { json, methodNotAllowed, serverError, parseJsonBody } = require('../../lib/http');
+const { isBlockedLeadName } = require('../../lib/crm-lead-ingest');
+const { resolveCrmOwner, syncCrmIdentity } = require('../../lib/crm-identity');
+
+const campaignNameCache = new Map();
+const CAMPAIGN_CACHE_MS = 6 * 60 * 60 * 1000;
+const LOST_REASONS = new Set(['price', 'more_destinations', 'competition', 'other']);
+const CONTACT_ROLES = new Set(['madre', 'padre', 'hijo', 'hija']);
+
+async function requireAdmin(event) {
+  const session = readSessionFromEvent(event);
+  if (!session) return null;
+  return findAdminForSession(getSupabase(), session, 'id,email,username,nombre,apellidos,role');
+}
+
+async function metaCampaignNames(leads) {
+  const version = process.env.META_API_VERSION || 'v26.0';
+  const allAdIds = [...new Set(leads.map((lead) => lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1]).filter(Boolean))];
+  const names = new Map();
+  for (const lead of leads) {
+    const adId = lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1];
+    const storedCampaign = String(lead.source_payload?.campaign_name || lead.campaign_notion_urls?.[0] || '').trim();
+    if (adId && storedCampaign && !storedCampaign.startsWith('meta-ad:')) names.set(String(adId), storedCampaign);
+  }
+  if (!process.env.META_ACCESS_TOKEN) return names;
+  const adIds = allAdIds.filter((adId) => {
+    if (names.has(String(adId))) return false;
+    const cached = campaignNameCache.get(adId);
+    if (cached && Date.now() - cached.savedAt < CAMPAIGN_CACHE_MS) { names.set(adId, cached.name); return false; }
+    return true;
+  });
+  for (let index = 0; index < adIds.length; index += 50) {
+    const ids = adIds.slice(index, index + 50);
+    try {
+      const url = new URL(`https://graph.facebook.com/${version}/`);
+      url.searchParams.set('ids', ids.join(','));
+      url.searchParams.set('fields', 'campaign{name}');
+      url.searchParams.set('access_token', process.env.META_ACCESS_TOKEN);
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const payload = await response.json();
+      for (const adId of ids) {
+        const name = String(payload?.[adId]?.campaign?.name || '').trim();
+        if (name) { names.set(adId, name); campaignNameCache.set(adId, { name, savedAt: Date.now() }); }
+      }
+    } catch (_) {}
+  }
+  return names;
+}
+
+exports.handler = async (event) => {
+  if (!['GET', 'POST', 'PATCH', 'DELETE'].includes(event.httpMethod)) return methodNotAllowed(['GET', 'POST', 'PATCH', 'DELETE']);
+  try {
+    const admin = await requireAdmin(event);
+    if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    const crm = getAdminSupabase();
+    const portal = getSupabase();
+    if (event.httpMethod === 'GET') {
+      const { data, error } = await crm.from('crm_leads').select('*')
+        .order('source_created_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      const leads = (data || []).filter((lead) => !lead.is_test && lead.source_payload?.simulated !== true);
+      const campaignNames = await metaCampaignNames(leads);
+      return json({ leads: leads.map((lead) => {
+        const adId = lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1];
+        const campaignName = adId && campaignNames.get(adId);
+        return campaignName ? { ...lead, source_payload: { ...(lead.source_payload || {}), campaign_name: campaignName } } : lead;
+      }) });
+    }
+    const body = parseJsonBody(event);
+    if (event.httpMethod === 'POST') {
+      const isGroup = Array.isArray(body.leads);
+      const inputs = isGroup ? body.leads.slice(0, 200) : [body];
+      if (!inputs.length) return json({ error: 'leads_required' }, { statusCode: 400 });
+      if (isGroup && body.leads.length > 200) return json({ error: 'too_many_leads' }, { statusCode: 400 });
+      const areas = new Set(['Concreto', 'Psycology', 'Engineering', 'Health', 'International studies', 'Business', 'chemistry']);
+      const leadTypes = new Set(['General', 'Delft', 'Llegada', 'Mentoría', 'LATAM', 'ESPECIAL']);
+      const lifecycles = new Set(['LOST 25-26', 'LOST', '26-27', 'INSIDE', '28-29', '27-28', 'año que viene', '25-26']);
+      const taskStatuses = new Set(['Sin empezar', 'En progreso', 'Listo']);
+      const allowedSources = new Set(['organic', 'organic_social', 'referral', 'other', 'schools', 'website', 'meta']);
+      if (inputs.some((input) => !String(input.name || '').trim())) return json({ error: 'name_required' }, { statusCode: 400 });
+      if (inputs.some((input) => isBlockedLeadName(String(input.name || '').trim()))) return json({ error: 'blocked_spam_lead' }, { statusCode: 400 });
+      const invalidEnum = inputs.some((input) => (input.area && !areas.has(input.area)) || (input.leadType && !leadTypes.has(input.leadType)) || (input.lifecycle && !lifecycles.has(input.lifecycle)) || (input.taskStatus && !taskStatuses.has(input.taskStatus)) || (input.heat != null && (!Number.isFinite(Number(input.heat)) || Number(input.heat) < 0 || Number(input.heat) > 100)));
+      if (invalidEnum) return json({ error: 'invalid_lead_fields' }, { statusCode: 400 });
+      const now = new Date().toISOString();
+      const actor = await syncCrmIdentity(crm, admin);
+      const inserts = await Promise.all(inputs.map(async (input) => {
+        const name = String(input.name || '').trim();
+        const email = String(input.email || '').trim().toLowerCase() || null;
+        const phone = String(input.phone || '').trim() || null;
+        const schoolName = String(input.schoolName || '').trim() || null;
+        const notes = String(input.notes || '').trim() || null;
+        const groupName = String(input.groupName || '').trim() || null;
+        const source = allowedSources.has(String(input.source || '')) ? String(input.source) : 'other';
+        const ownerName = String(input.owner || '').trim();
+        const owner = ownerName ? await resolveCrmOwner({ portal, crm, ownerName }) : { available: actor.available, user: null };
+        const insert = {
+          name,
+          email, phone, school_name: schoolName,
+          area: input.area || null, lead_type: input.leadType || null, lifecycle: input.lifecycle || null, task_status: input.taskStatus || null,
+          heat: input.heat == null ? 50 : Number(input.heat),
+          comment: notes, body_text: notes,
+          crm_stage: 'Por contactar', owner_names: ownerName ? [ownerName] : [],
+          is_test: false,
+          source_payload: { source, created_via: isGroup ? 'manual_group' : 'manual', created_by: admin.id, ...(input.campaign ? { campaign_name: String(input.campaign).trim() } : {}), ...(groupName ? { manual_group: groupName } : {}), ...(schoolName || source === 'schools' ? { form_name: 'colegios' } : {}) },
+          source_created_at: now, source_updated_at: now,
+        };
+        if (actor.available && owner.available) { insert.updated_by_user_id = admin.id; insert.owner_id = owner.user?.id || null; }
+        return insert;
+      }));
+      const { data, error } = await crm.from('crm_leads').insert(inserts).select('*');
+      if (error) throw error;
+      return isGroup ? json({ leads: data || [] }, { statusCode: 201 }) : json({ lead: data?.[0] }, { statusCode: 201 });
+    }
+    if (event.httpMethod === 'DELETE') {
+      const ids = Array.isArray(body.ids) ? body.ids.filter(Boolean).slice(0, 200) : (body.id ? [body.id] : []);
+      if (!ids.length) return json({ error: 'invalid_request' }, { statusCode: 400 });
+      const { error } = await crm.from('crm_leads').delete().in('id', ids);
+      if (error) throw error;
+      return json({ ok: true, deleted: ids.length });
+    }
+    if (!body.id || !body.patch || typeof body.patch !== 'object') return json({ error: 'invalid_request' }, { statusCode: 400 });
+    const lostReason = body.patch.lost_reason == null ? '' : String(body.patch.lost_reason).trim().toLowerCase();
+    const lostReasonDetail = body.patch.lost_reason_detail == null ? '' : String(body.patch.lost_reason_detail).trim();
+    if (body.patch.crm_stage === 'Lost') {
+      if (!LOST_REASONS.has(lostReason)) return json({ error: 'lost_reason_required' }, { statusCode: 400 });
+      if (lostReason === 'other' && !lostReasonDetail) return json({ error: 'lost_reason_detail_required' }, { statusCode: 400 });
+      if (lostReasonDetail.length > 120) return json({ error: 'lost_reason_detail_too_long' }, { statusCode: 400 });
+    }
+    if (body.patch.contact_role !== undefined && body.patch.contact_role !== null && !CONTACT_ROLES.has(String(body.patch.contact_role))) {
+      return json({ error: 'invalid_contact_role', detail: 'Selecciona madre, padre, hijo o hija.' }, { statusCode: 400 });
+    }
+    if (body.patch.source !== undefined || body.patch.lost_reason !== undefined || body.patch.lost_reason_detail !== undefined) {
+      const { data: current, error: currentError } = await crm.from('crm_leads').select('source_payload').eq('id', body.id).single();
+      if (currentError) throw currentError;
+      body.patch.source_payload = { ...(current?.source_payload || {}) };
+      if (body.patch.source !== undefined) body.patch.source_payload.source = String(body.patch.source || '').trim().toLowerCase() || 'manual';
+      if (body.patch.lost_reason !== undefined) body.patch.source_payload.lost_reason = lostReason || null;
+      if (body.patch.lost_reason_detail !== undefined) body.patch.source_payload.lost_reason_detail = lostReasonDetail || null;
+      delete body.patch.source;
+      delete body.patch.lost_reason;
+      delete body.patch.lost_reason_detail;
+    }
+    const allowed = ['owner_names', 'source_payload', 'lead_type', 'crm_stage', 'heat', 'comment', 'contact_role', 'lost_at'];
+    const update = Object.fromEntries(Object.entries(body.patch).filter(([key]) => allowed.includes(key)));
+    const actor = await syncCrmIdentity(crm, admin);
+    if (actor.available) {
+      update.updated_by_user_id = admin.id;
+      if (update.owner_names !== undefined) {
+        const ownerName = Array.isArray(update.owner_names) ? update.owner_names[0] : '';
+        const owner = await resolveCrmOwner({ portal, crm, ownerName });
+        if (owner.available) update.owner_id = owner.user?.id || null;
+      }
+    }
+    const { data, error } = await crm.from('crm_leads').update(update).eq('id', body.id).select('*').single();
+    if (error) throw error;
+    return json({ lead: data });
+  } catch (error) {
+    console.error('admin-crm-leads error', error);
+    return serverError(error);
+  }
+};
