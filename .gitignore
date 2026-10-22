@@ -17,3 +17,6 @@ coverage/
 
 # Independent public website repository kept beside the monorepo apps
 /Web-robin/
+
+# Shared site build output
+site/.output/

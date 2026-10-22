@@ -18,7 +18,7 @@ exports.handler = async (event) => {
   });
   log.start();
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!revolut.isConfigured() || !process.env.REVOLUT_WEBHOOK_SIGNING_SECRET) {
+  if (!revolut.isConfigured() || !process.env.JR_REVOLUT_WEBHOOK_SIGNING_SECRET) {
     log.warn('degraded', { error_code: 'revolut_not_configured' });
     return { statusCode: 503, body: 'revolut_not_configured' };
   }

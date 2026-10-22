@@ -3,11 +3,10 @@ const { getSupabase } = require('../../lib/supabase');
 const { signSession, buildSessionCookie } = require('../../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { isApplicationAdmin } = require('../../lib/authorization');
-
-const VERIFY_URL = 'https://project-robin.com/portal/api/auth/sso-verify';
+const { siteUrl } = require('../../../../packages/auth/site.cjs');
 
 async function verifyPlatformTicket(ticket) {
-  const response = await fetch(VERIFY_URL, {
+  const response = await fetch(`${siteUrl()}/portal/api/auth/sso-verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ticket }),

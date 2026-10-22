@@ -203,7 +203,7 @@ exports.handler = async (event) => {
       username,
       assigned_to: assignedEmail || null,
       responsable: responsable || null,
-      login_url: '/portal/',
+      login_url: '/robinjr/',
       email_sent: !!accessEmail.sent,
       email_reason: accessEmail.sent ? null : accessEmail.reason || 'not_sent',
     });

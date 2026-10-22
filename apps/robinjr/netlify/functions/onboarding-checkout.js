@@ -81,7 +81,7 @@ exports.handler = async (event) => {
         email: u.email,
         attemptId: attempt.id,
         kind: 'onboarding',
-        redirectUrl: `${revolut.getBaseUrl(event)}/portal/?payment_attempt=${attempt.id}`,
+        redirectUrl: `${revolut.getBaseUrl(event)}/robinjr/?payment_attempt=${attempt.id}`,
       });
       await attempts.attachProviderOrder(sb, attempt.id, order);
       log.success({ entity_type: 'revolut_order', entity_id: order.id });

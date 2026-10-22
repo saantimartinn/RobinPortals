@@ -4,14 +4,15 @@ const { verifyPassword, signSession, buildSessionCookie } = require('../../lib/a
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { findIdentityCandidates, resolvePasswordCandidate } = require('../../lib/identity');
 const { createOperationLogger } = require('../../lib/observability');
+const { siteUrl } = require('../../../../packages/auth/site.cjs');
 
 const IDENTITY_PROVIDERS = [
-  ['robinjr', 'https://robinjr.netlify.app/.netlify/functions/auth-verify-login'],
-  ['community', 'https://suscriptions-santi.netlify.app/.netlify/functions/auth-verify-login'],
+  ['robinjr', '/robinjr/api/auth/verify-login'],
+  ['community', '/therobinplan/api/auth/verify-login'],
 ];
 
-async function verifyExternalIdentity(url, username, password) {
-  const response = await fetch(url, {
+async function verifyExternalIdentity(path, username, password) {
+  const response = await fetch(`${siteUrl()}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),

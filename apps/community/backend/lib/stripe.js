@@ -2,7 +2,7 @@
  * Helper compartido de Stripe (pasarela de pago real, modo Checkout hosted).
  * Env vars (todas opcionales — si faltan el código degrada con gracia):
  *   - STRIPE_SECRET_KEY      (sk_test_... / sk_live_...)
- *   - STRIPE_WEBHOOK_SECRET  (whsec_... · sólo para stripe-webhook)
+ *   - COMMUNITY_STRIPE_WEBHOOK_SECRET  (whsec_... · sólo para stripe-webhook)
  * Sin STRIPE_SECRET_KEY, isConfigured()=false y los endpoints devuelven
  * `stripe_not_configured` (el frontend puede seguir mostrando el mock).
  */

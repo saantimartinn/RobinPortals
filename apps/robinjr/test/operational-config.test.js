@@ -36,5 +36,5 @@ test('la URL pública usa la configuración de Netlify y nunca el dominio retira
   assert.equal(publicBaseUrl({}), DEFAULT_PUBLIC_BASE_URL);
   assert.equal(publicBaseUrl({ PUBLIC_BASE_URL: 'https://example.test/' }), 'https://example.test');
   assert.equal(publicBaseUrl({ URL: 'https://deploy.example.test/' }), 'https://deploy.example.test');
-  assert.equal(portalUrl({ PUBLIC_BASE_URL: 'https://example.test/' }), 'https://example.test/portal/');
+  assert.equal(portalUrl({ PUBLIC_BASE_URL: 'https://example.test/' }), 'https://example.test/robinjr/');
 });

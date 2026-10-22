@@ -5,11 +5,11 @@ const { fulfillPayment } = require('./payment-fulfill');
 const DEFAULT_API_VERSION = '2026-03-12';
 
 function secretKey() {
-  return String(process.env.REVOLUT_MERCHANT_SECRET_KEY || '').trim();
+  return String(process.env.JR_REVOLUT_MERCHANT_SECRET_KEY || '').trim();
 }
 
 function apiBase() {
-  return String(process.env.REVOLUT_API_BASE || '').trim().replace(/\/$/, '');
+  return String(process.env.JR_REVOLUT_API_BASE || '').trim().replace(/\/$/, '');
 }
 
 function apiVersion() {
@@ -88,7 +88,7 @@ function timestampMs(value) {
 }
 
 function verifyWebhookSignature(rawBody, timestamp, signatureHeader, signingSecret) {
-  const secret = String(signingSecret || process.env.REVOLUT_WEBHOOK_SIGNING_SECRET || '').trim();
+  const secret = String(signingSecret || process.env.JR_REVOLUT_WEBHOOK_SIGNING_SECRET || '').trim();
   if (!secret || !timestamp || !signatureHeader) return false;
   if (Math.abs(Date.now() - timestampMs(timestamp)) > 5 * 60 * 1000) return false;
   const payload = `v1.${timestamp}.${rawBody}`;

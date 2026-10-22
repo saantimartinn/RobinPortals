@@ -3,7 +3,7 @@ const REVOLUT_SANDBOX_BASE = 'https://sandbox-merchant.revolut.com';
 
 function isIsolatedSandbox(env = process.env) {
   const provider = String(env.PAYMENT_PROVIDER || '').trim().toLowerCase();
-  const apiBase = String(env.REVOLUT_API_BASE || '').trim().replace(/\/$/, '');
+  const apiBase = String(env.JR_REVOLUT_API_BASE || '').trim().replace(/\/$/, '');
   const context = String(env.CONTEXT || '').trim().toLowerCase();
   return provider === 'revolut' &&
     apiBase === REVOLUT_SANDBOX_BASE &&

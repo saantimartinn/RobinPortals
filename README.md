@@ -1,17 +1,26 @@
 # Project Robin
 
-Monorepo for the Robin student portal, Robin Jr, community subscriptions, and admin app.
-The public website remains independent in the sibling `Web-robin` repository.
+Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro apps se publican como **un único sitio de Netlify**; la web pública sigue siendo independiente en el repositorio hermano `Web-robin`.
 
-## Structure
+## Estructura
 
-- `apps/portal` — Robin-platform-cliente
-- `apps/robinjr` — Robin Jr
-- `apps/community` — robin-subscriptions
-- `apps/admin` — Robin-Admin
-- `packages/auth` — shared authentication primitives
-- `packages/portal-nav` — shared cross-portal navigation
-- `infra/cloudflare` — Cloudflare routing configuration
-- `dev` — local development tools and ignored environment files
+- `apps/portal` — portal del alumno y login común (`/portal`, `/login`)
+- `apps/robinjr` — Robin Jr (`/robinjr`)
+- `apps/community` — Robin Community (`/therobinplan`)
+- `apps/admin` — admin (`/admin`, funciones en `/api/admin`, `/api/internal`, …)
+- `packages/auth` — cookies, HTTP y URL del sitio compartidos
+- `packages/portal-nav` — enlaces entre portales
+- `site/` — herramientas del sitio unificado (config, build, entorno, tests)
+- `dev/` — arranque local (ver `dev/README.md`)
 
-See `dev/README.md` for local startup instructions.
+## Comandos
+
+| Comando | Qué hace |
+| --- | --- |
+| `npm run dev` | Arranca todo en local en http://localhost:8888 |
+| `npm test` | Tests de las cuatro apps |
+| `npm run site:config` | Regenera `netlify.toml` a partir de `apps/*/netlify.toml` |
+| `npm run site:build` | Compila el sitio en `site/.output` |
+| `npm run site:env` | Regenera `./.env` a partir de `apps/*/.env` |
+
+`netlify.toml` de la raíz es generado: cada app sigue definiendo sus rutas en su propio `netlify.toml`, y `site/generate-config.mjs` las monta bajo su ruta y renombra sus funciones con el prefijo de la app.

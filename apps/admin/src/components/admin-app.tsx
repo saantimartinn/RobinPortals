@@ -60,9 +60,7 @@ import { adminDataClient } from "@/services/admin-data";
 import type { FutureAcademicYear } from "@/services/admin-data";
 import { integrationClient } from "@/services/integrations";
 import type { AnalyticsDateRange, HoldedSnapshot, SalesDashboard } from "@/services/integrations";
-const robinPlanWordmark = /(^|\.)project-robin\.com$/i.test(window.location.hostname)
-  ? "/admin/robin-wordmark.png"
-  : "/robin-wordmark.png";
+const robinPlanWordmark = "/admin/robin-wordmark.png";
 import { DashboardLoader } from "@/components/dashboard-loader";
 import { EmptyChartBar } from "@/components/empty-chart-bar";
 import { allAdminTabPermissions, isDeveloperAdminEmail, isProAdminEmail } from "@/lib/admin-permissions";

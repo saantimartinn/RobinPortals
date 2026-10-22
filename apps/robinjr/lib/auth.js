@@ -10,7 +10,7 @@ const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
 const { createCookieHelpers } = require('../../../packages/auth/cookies.cjs');
 const sharedCookies = createCookieHelpers({ parse: parseCookies, serialize: serializeCookie });
 
-const COOKIE_NAME = 'robin_portal_session';
+const COOKIE_NAME = 'robinjr_session';
 const COOKIE_MAX_AGE_S = 60 * 60 * 24 * 7; // 7 dias
 
 function getJwtSecret() {

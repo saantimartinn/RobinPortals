@@ -9,11 +9,8 @@ async function request(method, url, body) {
     opts.headers["Content-Type"] = "application/json";
     opts.body = JSON.stringify(body);
   }
-  const publicUrl = typeof window !== "undefined"
-    && /(^|\.)project-robin\.com$/i.test(window.location.hostname)
-    && url.startsWith("/api/")
-      ? "/portal" + url
-      : url;
+  // Each app's functions are mounted under its own path prefix on the shared Robin site.
+  const publicUrl = url.startsWith("/api/") ? "/robinjr" + url : url;
   const resp = await fetch(publicUrl, opts);
   let data = null;
   try { data = await resp.json(); } catch (error) { console.warn("[api] optional operation failed", error && error.message); }
