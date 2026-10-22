@@ -5,6 +5,7 @@ import { GOLD, NAVY } from "../../theme.js";
 import { Btn, Field } from "../../ui.jsx";
 import { originSave } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
+import { useOnboardingNav } from './onboarding-nav.js';
 
 // Spanish flag (rojo, amarillo, rojo in 1:2:1 bands) for the "España" choice.
 function SpainFlag({ className }) {
@@ -17,6 +18,7 @@ function SpainFlag({ className }) {
 }
 
 export function OnboardingOrigin({ user, onLogout, onDone }) {
+  const nav = useOnboardingNav();
   const [origin, setOrigin] = useState(user.origin || "");
   const [level, setLevel]   = useState(user.application_level || "");
   const [pais, setPais]     = useState(user.pais || "");
@@ -61,7 +63,11 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
     if (hasEu == null) { setError("Indica si posees un documento de identidad europeo."); return; }
     save();
   }
-  function back() { setError(""); setScreen((s) => Math.max(0, s - 1)); }
+  function back() {
+    setError("");
+    if (screen === 0) { nav?.goBack?.(); return; } // first screen: back to the previous step
+    setScreen((s) => Math.max(0, s - 1));
+  }
 
   const Choice = ({ active, onClick, title, desc, icon: Ic, flag = false }) => (
     <button type="button" onClick={onClick}
@@ -138,7 +144,7 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
         )}
 
         <div className="onboarding-question-nav flex items-center gap-3">
-          <Btn variant="secondary" onClick={back} disabled={busy || screen === 0}>
+          <Btn variant="secondary" onClick={back} disabled={busy || (screen === 0 && !nav?.goBack)}>
             <ChevronLeft className="h-4 w-4" /> Atrás
           </Btn>
           <Btn className="flex-1" size="lg" onClick={next} disabled={busy}>

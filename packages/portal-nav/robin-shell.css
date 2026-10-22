@@ -69,6 +69,10 @@
 .student-portal .onboarding-steps{margin:0;list-style:none}
 .student-portal .onboarding-steps .student-nav-item,.student-portal .onboarding-steps .student-nav-item:hover{cursor:default;background:transparent;color:var(--robin-on-navy-muted)}
 .student-portal .onboarding-steps .student-nav-item.is-active{background:var(--robin-on-navy-line);color:var(--robin-on-navy)}
+.student-portal .onboarding-steps button.student-nav-item{cursor:pointer}
+.student-portal .onboarding-steps button.student-nav-item:hover{background:var(--robin-on-navy-line);color:var(--robin-on-navy)}
+.onboarding-back-step{display:flex;align-items:center;gap:.2rem;margin:0 0 .6rem -.2rem;padding:0;border:0;background:none;color:var(--robin-ink-600);font:500 .875rem var(--robin-font-text);cursor:pointer}
+.onboarding-back-step:hover{color:var(--robin-navy);text-decoration:underline}
 .student-portal .onboarding-steps .student-nav-item.is-next{opacity:.6}
 .onboarding-step-mark{display:grid;place-items:center;flex:0 0 1.5rem;width:1.5rem;height:1.5rem;border:1.5px solid currentColor;border-radius:50%;font:600 .75rem var(--robin-font-text)}
 .is-done .onboarding-step-mark{border-color:var(--robin-orange);background:var(--robin-orange);color:var(--robin-navy)}

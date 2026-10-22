@@ -8,10 +8,12 @@ import academicSystemsConfig from "../../../../shared/academic-systems.cjs";
 import { Btn, Field } from "../../ui.jsx";
 import { profileSave } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
+import { useOnboardingNav } from './onboarding-nav.js';
 
 const { ACADEMIC_SYSTEMS, MAX_ACADEMIC_SUBJECTS, academicSystemByValue } = academicSystemsConfig;
 
 export function OnboardingProfile({ user, onLogout, onDone }) {
+  const nav = useOnboardingNav();
   const [email, setEmail] = useState(user.email || "");
   const [intereses, setIntereses] = useState(user.intereses || []);
   const [answers, setAnswers] = useState(initQuestionnaireAnswers);
@@ -181,6 +183,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
   }
   function back() {
     setError("");
+    if (screen === 0) { nav?.goBack?.(); return; } // first screen: back to the previous step
     setScreen((s) => Math.max(0, s - 1));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -310,7 +313,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
         )}
 
         <div className="onboarding-question-nav flex items-center gap-3">
-          <Btn variant="secondary" onClick={back} disabled={busy || screen === 0}>
+          <Btn variant="secondary" onClick={back} disabled={busy || (screen === 0 && !nav?.goBack)}>
             <ChevronLeft className="h-4 w-4" /> Atrás
           </Btn>
           <Btn className="flex-1" size="lg" onClick={next}
