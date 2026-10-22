@@ -17,6 +17,25 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
+  if (session.auth_source === 'external_client' && session.external_identity) {
+    const identity = session.external_identity;
+    return json({
+      id: session.uid,
+      lead_id: identity.lead_id || null,
+      username: identity.username || identity.email,
+      email: identity.email || null,
+      role: 'client',
+      nombre: identity.nombre || null,
+      apellidos: identity.apellidos || null,
+      is_application_admin: false,
+      is_pro_admin: false,
+      visible_tabs: [],
+      auth_source: 'external_client',
+      external_source: identity.source || null,
+      external_identity_id: identity.id || null,
+      available_portals: session.available_portals || [],
+    });
+  }
   try {
     const sb = getSupabase();
     const { data: u, error } = await sb.from('users').select('*').eq('id', session.uid).single();

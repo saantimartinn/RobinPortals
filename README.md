@@ -20,6 +20,8 @@ se deben guardar secretos, datos personales ni exports de producción en Git.
 
 ## Documentación principal
 
+- [Referencia de datos y métricas](docs/REFERENCIA_DATOS_METRICAS.md): fuentes, campos, fórmulas, ejemplos y límites conocidos de las estadísticas de Robin.
+
 - [READMELONG](READMELONG.md): guía técnica extensa de la plataforma y sus runtimes.
 - [USERGUIDE](USERGUIDE.md): árbol de lectura por flujo, archivo y repositorio conectado.
 - [Cloudflare y enrutamiento](docs/CLOUDFLARE_ROUTING.md): referencia principal del Worker público y sus destinos.

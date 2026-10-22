@@ -5,6 +5,50 @@ const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = req
 const { findIdentityCandidates, resolvePasswordCandidate } = require('../../lib/identity');
 const { createOperationLogger } = require('../../lib/observability');
 
+const IDENTITY_PROVIDERS = [
+  ['robinjr', 'https://robinjr.netlify.app/.netlify/functions/auth-verify-login'],
+  ['community', 'https://suscriptions-santi.netlify.app/.netlify/functions/auth-verify-login'],
+];
+
+async function verifyExternalIdentity(url, username, password) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(8000),
+  });
+  if (response.status === 401) return { status: 'invalid' };
+  if (response.status === 409) return { status: 'ambiguous' };
+  if (!response.ok) throw new Error('identity_provider_unavailable');
+  const payload = await response.json();
+  return payload?.identity ? { status: 'ok', identity: payload.identity } : { status: 'invalid' };
+}
+
+async function findExternalIdentity(username, password) {
+  const results = await Promise.allSettled(IDENTITY_PROVIDERS.map(([, url]) => verifyExternalIdentity(url, username, password)));
+  const identities = [];
+  let providerUnavailable = false;
+  for (const result of results) {
+    if (result.status === 'rejected') providerUnavailable = true;
+    else if (result.value.status === 'ambiguous') return { status: 'ambiguous' };
+    else if (result.value.status === 'ok') identities.push(result.value.identity);
+  }
+  if (!identities.length) return providerUnavailable ? { status: 'unavailable' } : { status: 'invalid' };
+  const emails = new Set(identities.map((identity) => String(identity.email || '').trim().toLowerCase()).filter(Boolean));
+  const leadIds = new Set(identities.map((identity) => String(identity.lead_id || '').trim()).filter(Boolean));
+  if (emails.size > 1 || (emails.size === 0 && leadIds.size > 1)) return { status: 'ambiguous' };
+  const identity = identities[0];
+  return {
+    status: 'ok',
+    identity: {
+      ...identity,
+      source: identity.source || IDENTITY_PROVIDERS[0][0],
+      available_portals: [...new Set(identities.map((item) => item.source).filter(Boolean))],
+    },
+  };
+}
+
 exports.handler = async (event) => {
   const log = createOperationLogger(event, { operation: 'auth.login', actor_role: 'anonymous' });
   log.start();
@@ -33,8 +77,35 @@ exports.handler = async (event) => {
     const candidates = await findIdentityCandidates(sb, username);
     const resolved = resolvePasswordCandidate(candidates, password, verifyPassword);
     if (resolved.status === 'invalid') {
-      log.warn('rejected', { error_code: 'invalid_credentials' });
-      return json({ error: 'invalid_credentials' }, { statusCode: 401 });
+      const external = await findExternalIdentity(username, password);
+      if (external.status === 'ambiguous') {
+        log.warn('rejected', { error_code: 'ambiguous_identity' });
+        return json({ error: 'ambiguous_identity' }, { statusCode: 409 });
+      }
+      if (external.status === 'unavailable') {
+        log.warn('rejected', { error_code: 'identity_provider_unavailable' });
+        return json({ error: 'identity_provider_unavailable' }, { statusCode: 503 });
+      }
+      if (external.status !== 'ok') {
+        log.warn('rejected', { error_code: 'invalid_credentials' });
+        return json({ error: 'invalid_credentials' }, { statusCode: 401 });
+      }
+      const identity = external.identity;
+      const externalUser = {
+        id: 'external:' + identity.source + ':' + identity.id,
+        lead_id: identity.lead_id,
+        username: identity.username || identity.email,
+        email: identity.email,
+        nombre: identity.nombre,
+        apellidos: identity.apellidos,
+        role: 'client',
+        auth_source: 'external_client',
+        external_identity: identity,
+        available_portals: identity.available_portals,
+      };
+      const cookie = buildSessionCookie(signSession(externalUser));
+      log.success({ actor_id: externalUser.id, actor_role: 'external_client', entity_type: 'session' });
+      return json({ ok: true, user: { id: externalUser.id, username: externalUser.username, role: externalUser.role } }, { cookies: [cookie] });
     }
     if (resolved.status === 'ambiguous') {
       log.warn('rejected', { error_code: 'ambiguous_identity', count: candidates.length });

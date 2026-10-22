@@ -10,6 +10,9 @@ export async function logout() {
 export async function me() {
   return api.get("/api/me");
 }
+export async function issueSsoTicket(target) {
+  return api.post("/api/auth/sso-ticket", { target });
+}
 export async function onboardingState() {
   return api.get("/api/onboarding/state");
 }
@@ -107,4 +110,3 @@ export async function dniSave(fields) {
 export async function profileSave(payload) {
   return api.post("/api/onboarding/profile", payload);
 }
-

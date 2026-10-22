@@ -1,14 +1,12 @@
 // Resolves the current session and chooses the student or staff portal.
-import React, { useEffect, useState } from "react";
-import { AlertCircle, ArrowLeft, ChevronRight, GraduationCap, Loader2, Sparkles } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { AlertCircle, ArrowLeft, ChevronRight, Loader2 } from "lucide-react";
 import robinLogoTransparent from "./assets/robin-logo-transparent.png";
 
 import { isAdminUser } from "./session.js";
-import { canAdminSee, firstAllowedAdminUrl } from "./admin-permissions.js";
 import { CREAM, NAVY, NAVY_DARK } from "./theme.js";
 import { Btn, Field } from "./ui.jsx";
 import { reportClientError } from "./client-utils.js";
-import { AdminPortal } from "./application/AdminPortal.jsx";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
 import {
@@ -22,6 +20,7 @@ import {
   login as apiLogin,
   logout as apiLogout,
   me as apiMe,
+  issueSsoTicket,
   onboardingState,
   paymentsVerify,
 } from "./api.js";
@@ -44,8 +43,11 @@ export default function PortalRobin() {
     onboardingStep: null,
   });
   const [active, setActive] = useState("estado");
-  const [selectedPortal, setSelectedPortal] = useState(null);
-  const isSelectorRoute = typeof window !== "undefined" && /^\/login\/?$/.test(window.location.pathname);
+  const [subscriptionAccess, setSubscriptionAccess] = useState(false);
+  const [checkingSubscriptionAccess, setCheckingSubscriptionAccess] = useState(false);
+  const [subscriptionAccessResolved, setSubscriptionAccessResolved] = useState(false);
+  const [entryNotice, setEntryNotice] = useState("");
+  const landingHandled = useRef(false);
 
   function setAuthenticatedUser(user) {
     const onboardingStep = nextOnboardingStep(user);
@@ -58,6 +60,14 @@ export default function PortalRobin() {
   }
 
   useEffect(() => {
+    if (window.location.pathname.replace(/\/+$/, "") === "/portal/logout") {
+      (async () => {
+        try { await fetch("/therobinplan/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {}
+        try { await apiLogout(); } catch (_) {}
+        window.location.replace("/login");
+      })();
+      return undefined;
+    }
     (async () => {
       try {
         setAuthenticatedUser(await apiMe());
@@ -66,6 +76,106 @@ export default function PortalRobin() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!authState.user || isAdminUser(authState.user)) {
+      setSubscriptionAccess(false);
+      setCheckingSubscriptionAccess(false);
+      setSubscriptionAccessResolved(!!authState.user);
+      return undefined;
+    }
+    let mounted = true;
+    setCheckingSubscriptionAccess(true);
+    setSubscriptionAccessResolved(false);
+    (async () => {
+      let allowed = false;
+      try {
+        const sso = await fetch("/therobinplan/api/auth/sso", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+          cache: "no-store",
+        });
+        if (sso.ok) {
+          const response = await fetch("/therobinplan/api/me", { credentials: "same-origin", cache: "no-store" });
+          if (response.ok) {
+            const subscriber = await response.json();
+            allowed = subscriber.subscription_status === "active" || subscriber.subscription_status === "trialing";
+          }
+        }
+      } catch (_) {}
+      if (mounted) {
+        setSubscriptionAccess(allowed);
+        setCheckingSubscriptionAccess(false);
+        setSubscriptionAccessResolved(true);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [authState.user?.id]);
+
+  useEffect(() => {
+    if (!authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
+    const admin = isAdminUser(authState.user);
+    const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+    let next = null;
+    try { next = new URLSearchParams(window.location.search).get("next"); } catch (_) {}
+    if (admin) {
+      if (pathname !== "/admin") {
+        landingHandled.current = true;
+        window.location.replace("/admin");
+      }
+      return;
+    }
+    if (next === "robinjr") {
+      landingHandled.current = true;
+      (async () => {
+        try {
+          const result = await issueSsoTicket("robinjr");
+          window.location.replace("https://robinjr.netlify.app/portal/?sso_ticket=" + encodeURIComponent(result.ticket));
+        } catch (_) {
+          setEntryNotice("No se ha podido validar tu acceso a RobinJr.");
+          window.history.replaceState({}, "", "/portal/");
+          landingHandled.current = false;
+        }
+      })();
+      return;
+    }
+    if (next === "/therobinplan/" || next === "/therobinplan") {
+      if (subscriptionAccess) {
+        landingHandled.current = true;
+        window.location.replace("/therobinplan/");
+      } else {
+        setEntryNotice("No tienes una cuenta activa en Robin Community.");
+        window.history.replaceState({}, "", "/portal/");
+      }
+      return;
+    }
+    if (authState.user.auth_source === "external_client" && !next) {
+      if (authState.user.external_source === "robinjr") {
+        landingHandled.current = true;
+        (async () => {
+          try {
+            const result = await issueSsoTicket("robinjr");
+            window.location.replace("https://robinjr.netlify.app/portal/?sso_ticket=" + encodeURIComponent(result.ticket));
+          } catch (_) {
+            setEntryNotice("No se ha podido validar tu acceso a RobinJr.");
+          }
+        })();
+      } else if (authState.user.external_source === "community" && subscriptionAccess) {
+        landingHandled.current = true;
+        window.location.replace("/therobinplan/");
+      } else {
+        setEntryNotice("Tu cuenta no tiene acceso activo a Robin Community.");
+        if (pathname === "/login") window.history.replaceState({}, "", "/portal/");
+      }
+      return;
+    }
+    if (pathname === "/login") {
+      landingHandled.current = true;
+      window.location.replace("/portal/");
+    }
+  }, [authState.user?.id, checkingSubscriptionAccess, subscriptionAccess, subscriptionAccessResolved]);
 
   useEffect(() => {
     let active = true;
@@ -99,9 +209,7 @@ export default function PortalRobin() {
   }
 
   async function handleLogout() {
-    await apiLogout();
-    setAuthState({ loading: false, user: null, needsOnboarding: false, onboardingStep: null });
-    setActive("estado");
+    window.location.replace("/portal/logout");
   }
 
   async function refreshUser() {
@@ -135,31 +243,34 @@ export default function PortalRobin() {
     );
   }
 
-  if (!authState.user && isSelectorRoute && !selectedPortal) return <PortalSelector onSelectPortal={() => window.location.assign("/portal/")} />;
+  if (authState.user && isAdminUser(authState.user)) {
+    return <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Abriendo el portal del administrador" /></div>;
+  }
+
   if (!authState.user) return <LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} />;
-  if (isAdminUser(authState.user)) return <>
-    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} />
-    {canAdminSee(authState.user, "platform.student_portal")
-      ? <AdminPortal user={authState.user} />
-      : <main className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]" role="alert"><h1 className="text-2xl font-bold">Portal no disponible</h1><p>Tu perfil no tiene acceso al Portal del Alumno.</p><a className="underline" href={firstAllowedAdminUrl(authState.user)}>Ir a una sección disponible</a></main>}
+  if (authState.user.auth_source === "external_client") return <>
+    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
+    <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#263b6a]" role="status">
+      <h1 className="text-2xl font-bold">Portal del Alumno no disponible</h1>
+      <p>Esta cuenta no tiene un usuario en la base de datos del Portal del Alumno.</p>
+    </main>
   </>;
 
   const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
-  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingOrigin {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingDNI {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingContract {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingPayment {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingProfile {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingOrigin {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingDNI {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingContract {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingPayment {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingProfile {...onboardingProps} /></>;
 
   const user = authState.user;
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();
   return (
     <>
-      <CrossPortalNav current="application" user={user} onLogout={handleLogout} />
+      <CrossPortalNav current="application" user={user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
       <PortalShell
         user={user}
         clientName={clientName}
-        onLogout={handleLogout}
         active={active}
         setActive={setActive}
         onUserRefresh={refreshUser}
@@ -224,46 +335,6 @@ function AuthShell({ children }) {
   );
 }
 
-function PortalSelector({ onSelectPortal }) {
-  const choices = [
-    {
-      title: "Portal de aplicación",
-      description: "Tu proceso de admisión, documentación y seguimiento personalizado.",
-      icon: GraduationCap,
-      onClick: onSelectPortal,
-    },
-    {
-      title: "The Robin Plan",
-      description: "Tu suscripción, ventajas y servicios para tu vida internacional.",
-      icon: Sparkles,
-      onClick: () => { window.location.assign("/therobinplan/"); },
-    },
-  ];
-
-  return (
-    <AuthShell>
-      <div className="space-y-7">
-        <div>
-          <div className="text-2xl font-bold text-slate-900 mb-2">¿A qué portal quieres acceder?</div>
-          <div className="text-sm text-slate-500">Elige el espacio que quieres gestionar.</div>
-        </div>
-        <div className="grid gap-3">
-          {choices.map(({ title, description, icon: Icon, onClick }) => (
-            <button key={title} type="button" onClick={onClick} className="group w-full flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/40">
-              <span className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-200"><Icon className="h-5 w-5" /></span>
-              <span className="min-w-0 flex-1">
-                <strong className="block text-base text-slate-900">{title}</strong>
-                <span className="mt-1 block text-xs leading-relaxed text-slate-500">{description}</span>
-              </span>
-              <ChevronRight className="h-5 w-5 flex-shrink-0 text-slate-400 transition group-hover:translate-x-1" />
-            </button>
-          ))}
-        </div>
-      </div>
-    </AuthShell>
-  );
-}
-
 function LoginScreen({ onLogin, onBack }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -277,7 +348,11 @@ function LoginScreen({ onLogin, onBack }) {
     try {
       await onLogin(email, password);
     } catch (submitError) {
-      setError(submitError.status === 401 ? "Usuario o contraseña incorrectos." : submitError.message || "No hemos podido iniciar sesión.");
+      setError(submitError.status === 401
+        ? "Usuario o contraseña incorrectos."
+        : submitError.message === "identity_provider_unavailable"
+          ? "Ahora mismo no se puede comprobar la cuenta. Inténtalo de nuevo en unos minutos."
+          : submitError.message || "No hemos podido iniciar sesión.");
     } finally {
       setLoading(false);
     }
@@ -288,7 +363,7 @@ function LoginScreen({ onLogin, onBack }) {
       <div className="bg-white rounded-3xl shadow-[0_24px_70px_rgba(31,48,83,.10)] border border-slate-200/80 overflow-hidden">
         <div className="p-7 sm:p-8 space-y-5">
           <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
-            <ArrowLeft className="h-4 w-4" /> Cambiar de portal
+            <ArrowLeft className="h-4 w-4" /> Volver al portal
           </button>
           <div>
             <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "'Georgia', serif" }}>Bienvenido de vuelta</div>
