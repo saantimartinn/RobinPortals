@@ -1,6 +1,7 @@
 // Netlify handler for /api/admin/payments/set-carreras; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { ensurePayments } = require('../../lib/payments');
@@ -19,7 +20,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: admin } = await sb.from('users').select('id, email, username, role').eq('id', session.uid).single();
+    const { data: admin } = await getSessionUser(sb, session, 'id, email, username, role');
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });

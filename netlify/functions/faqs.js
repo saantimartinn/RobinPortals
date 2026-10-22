@@ -1,6 +1,7 @@
 // Netlify handler for /api/faqs; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { FAQ_ITEMS } = require('../../lib/faq-knowledge');
@@ -22,8 +23,8 @@ function withBuiltInFaqs(storedFaqs) {
     .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
 }
 
-async function adminFor(sb, uid) {
-  const { data } = await sb.from('users').select('id,email,username,role').eq('id', uid).single();
+async function adminFor(sb, session) {
+  const { data } = await getSessionUser(sb, session, 'id,email,username,role');
   return !!data && isApplicationAdmin(data);
 }
 
@@ -32,7 +33,7 @@ exports.handler = async (event) => {
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   try {
     const sb = getSupabase();
-    const isAdmin = await adminFor(sb, session.uid);
+    const isAdmin = await adminFor(sb, session);
     if (event.httpMethod === 'GET') {
       let query = sb.from('portal_faqs').select('id,question,answer,category,published,sort_order,created_at,updated_at')
         .order('sort_order', { ascending: true }).order('created_at', { ascending: true });

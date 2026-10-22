@@ -12,6 +12,7 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, isListedAdvisor, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 
@@ -24,11 +25,7 @@ function cutoffISO() {
 
 /** Devuelve el admin de la sesión (o null si no es admin). */
 async function getAdmin(sb, session) {
-  const { data: admin } = await sb
-    .from('users')
-    .select('id, email, username, role')
-    .eq('id', session.uid)
-    .single();
+  const { data: admin } = await getSessionUser(sb, session, 'id, email, username, role');
   if (!admin) return null;
   const email = normalizeEmail(admin);
   const isSuper = isListedAdvisor(admin);

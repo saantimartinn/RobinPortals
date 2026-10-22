@@ -22,6 +22,7 @@ import {
   login as apiLogin,
   logout as apiLogout,
   me as apiMe,
+  exchangeApplicationSession,
   onboardingState,
   paymentsVerify,
 } from "./api.js";
@@ -44,8 +45,7 @@ export default function PortalRobin() {
     onboardingStep: null,
   });
   const [active, setActive] = useState("estado");
-  const [selectedPortal, setSelectedPortal] = useState(null);
-  const isSelectorRoute = typeof window !== "undefined" && /^\/login\/?$/.test(window.location.pathname);
+  const [entryError, setEntryError] = useState("");
 
   function setAuthenticatedUser(user) {
     const onboardingStep = nextOnboardingStep(user);
@@ -59,10 +59,24 @@ export default function PortalRobin() {
 
   useEffect(() => {
     (async () => {
+      let ticket = null;
       try {
+        const params = new URLSearchParams(window.location.search);
+        ticket = params.get("sso_ticket");
+        if (ticket) {
+          window.history.replaceState({}, "", window.location.pathname);
+          await exchangeApplicationSession(ticket);
+        }
         setAuthenticatedUser(await apiMe());
-      } catch (_error) {
-        setAuthState({ loading: false, user: null, needsOnboarding: false, onboardingStep: null });
+      } catch (error) {
+        if (ticket || error?.data?.error === "robinjr_account_required" || error?.data?.error === "invalid_ticket" || error?.data?.error === "ambiguous_identity") {
+          setEntryError(error?.data?.error === "robinjr_account_required"
+            ? "Esta cuenta no tiene usuario en la base de RobinJr."
+            : "No se ha podido validar el acceso. Vuelve a iniciar sesión.");
+          setAuthState({ loading: false, user: null, needsOnboarding: false, onboardingStep: null });
+          return;
+        }
+        window.location.replace("https://project-robin.com/login?next=robinjr");
       }
     })();
   }, []);
@@ -91,17 +105,9 @@ export default function PortalRobin() {
     })();
   }, []);
 
-  async function handleLogin(username, password) {
-    const data = await apiLogin(username.trim(), password);
-    setAuthenticatedUser(await apiMe());
-    setActive("estado");
-    return data;
-  }
-
   async function handleLogout() {
     await apiLogout();
-    setAuthState({ loading: false, user: null, needsOnboarding: false, onboardingStep: null });
-    setActive("estado");
+    window.location.replace("https://project-robin.com/portal/logout");
   }
 
   async function refreshUser() {
@@ -135,27 +141,24 @@ export default function PortalRobin() {
     );
   }
 
-  if (!authState.user && isSelectorRoute && !selectedPortal) return <PortalSelector onSelectPortal={() => window.location.assign("/portal/")} />;
-  if (!authState.user) return <LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} />;
+  if (!authState.user) return <main className="min-h-screen grid place-content-center gap-4 px-6 text-center text-[#263b6a]" role="alert"><h1 className="text-2xl font-bold">Acceso a RobinJr</h1><p>{entryError || "Redirigiendo al inicio de sesión común…"}</p>{entryError && <a className="underline" href="https://project-robin.com/login?next=robinjr">Volver al inicio de sesión</a>}</main>;
   if (isAdminUser(authState.user)) return <>
-    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} />
-    {canAdminSee(authState.user, "platform.student_portal")
-      ? <AdminPortal user={authState.user} />
-      : <main className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]" role="alert"><h1 className="text-2xl font-bold">Portal no disponible</h1><p>Tu perfil no tiene acceso al Portal del Alumno.</p><a className="underline" href={firstAllowedAdminUrl(authState.user)}>Ir a una sección disponible</a></main>}
+    <CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} />
+    <AdminPortal user={authState.user} />
   </>;
 
   const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
-  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingOrigin {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingDNI {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingContract {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingPayment {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} /><OnboardingProfile {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingOrigin {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingDNI {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingContract {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingPayment {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingProfile {...onboardingProps} /></>;
 
   const user = authState.user;
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();
   return (
     <>
-      <CrossPortalNav current="application" user={user} onLogout={handleLogout} />
+      <CrossPortalNav current="robinjr" user={user} onLogout={handleLogout} />
       <PortalShell
         user={user}
         clientName={clientName}

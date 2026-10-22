@@ -16,16 +16,13 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { generateSuggestions } = require('../../lib/career-suggestions');
 
 async function requireAdmin(sb, session) {
-  const { data: admin } = await sb
-    .from('users')
-    .select('id, email, username, role')
-    .eq('id', session.uid)
-    .single();
+  const { data: admin } = await getSessionUser(sb, session, 'id, email, username, role');
   if (!admin) return null;
   const email = normalizeEmail(admin);
   const isAdmin = isApplicationAdmin(admin);

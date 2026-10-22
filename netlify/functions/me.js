@@ -17,9 +17,26 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
+  if (!['application_sso', 'application_admin'].includes(session.auth_source)) {
+    return json({ error: 'common_login_required' }, { statusCode: 401 });
+  }
   try {
     const sb = getSupabase();
     const { data: u, error } = await sb.from('users').select('*').eq('id', session.uid).single();
+    if (session.auth_source === 'application_admin' && (!u || error)) {
+      return json({
+        id: session.uid,
+        lead_id: session.lead_id || null,
+        username: session.username || session.email,
+        email: session.email || null,
+        role: 'application_admin',
+        nombre: session.nombre || null,
+        apellidos: session.apellidos || null,
+        is_application_admin: true,
+        is_pro_admin: true,
+        visible_tabs: session.visible_tabs || [],
+      });
+    }
     if (error || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const firstPayment = applicationPlanForUser(u)[0];
     const avatarUrl = u.avatar_path
@@ -31,9 +48,9 @@ exports.handler = async (event) => {
       username: u.username,
       email: u.email,
       role: u.role,
-      is_application_admin: isApplicationAdmin(u),
-      is_pro_admin: isApplicationAdmin(u) && PRO_ADMIN_EMAILS.has(String(u.email || '').trim().toLowerCase()),
-      visible_tabs: Array.isArray(u.visible_tabs) ? u.visible_tabs : [],
+      is_application_admin: session.auth_source === 'application_admin' || isApplicationAdmin(u),
+      is_pro_admin: session.is_pro_admin === true || (isApplicationAdmin(u) && PRO_ADMIN_EMAILS.has(String(u.email || '').trim().toLowerCase())),
+      visible_tabs: Array.isArray(session.visible_tabs) ? session.visible_tabs : (Array.isArray(u.visible_tabs) ? u.visible_tabs : []),
       requires_onboarding: !!u.requires_onboarding,
       dni_completed: !!u.dni_completed,
       profile_completed: !!u.profile_completed,

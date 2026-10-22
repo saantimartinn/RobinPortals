@@ -8,6 +8,7 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { chatCompletion } = require('../../lib/anthropic-chat');
@@ -48,11 +49,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: admin } = await sb
-      .from('users')
-      .select('id, email, username, role, nombre, apellidos')
-      .eq('id', session.uid)
-      .single();
+    const { data: admin } = await getSessionUser(sb, session, 'id, email, username, role, nombre, apellidos');
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const adminEmail = normalizeEmail(admin);
     const isAdmin = isApplicationAdmin(admin);

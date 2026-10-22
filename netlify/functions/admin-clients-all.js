@@ -5,6 +5,7 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { attachStudentPhones } = require('../../lib/student-phone');
@@ -16,11 +17,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: admin, error: e1 } = await sb
-      .from('users')
-      .select('id, email, username, role')
-      .eq('id', session.uid)
-      .single();
+    const { data: admin, error: e1 } = await getSessionUser(sb, session, 'id, email, username, role');
     if (e1 || !admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
 
     const adminEmail = normalizeEmail(admin);

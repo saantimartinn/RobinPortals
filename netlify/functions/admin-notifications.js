@@ -5,15 +5,12 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 
-async function getAdmin(sb, uid) {
-  const { data: admin, error } = await sb
-    .from('users')
-    .select('id, email, username, role')
-    .eq('id', uid)
-    .single();
+async function getAdmin(sb, session) {
+  const { data: admin, error } = await getSessionUser(sb, session, 'id, email, username, role');
   if (error || !admin) return null;
   const email = normalizeEmail(admin);
   const isAdmin = isApplicationAdmin(admin);
@@ -27,7 +24,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const admin = await getAdmin(sb, session.uid);
+    const admin = await getAdmin(sb, session);
     if (!admin) return json({ error: 'forbidden' }, { statusCode: 403 });
 
     // ---------- GET: listado + estado por destinatario ----------

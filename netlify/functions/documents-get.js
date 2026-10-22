@@ -6,6 +6,7 @@
 const { getSupabase } = require('../../lib/supabase');
 const storage = require('../../lib/storage');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, ownsRecord } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 
@@ -18,7 +19,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: u } = await sb.from('users').select('id, email, username, role').eq('id', session.uid).single();
+    const { data: u } = await getSessionUser(sb, session, 'id, email, username, role');
     if (!u) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(u);
 

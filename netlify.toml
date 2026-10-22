@@ -14,10 +14,35 @@
   status = 302
   force = true
 
+# ---------- Robin Community lives on the shared public domain ----------
+[[redirects]]
+  from = "/login"
+  to = "https://project-robin.com/login?next=robinjr"
+  status = 302
+  force = true
+[[redirects]]
+  from = "/therobinplan"
+  to = "https://project-robin.com/therobinplan/"
+  status = 302
+  force = true
+[[redirects]]
+  from = "/therobinplan/*"
+  to = "https://project-robin.com/therobinplan/:splat"
+  status = 302
+  force = true
+
 # ---------- API del portal -> Netlify Functions ----------
 [[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/auth-login"
+  status = 200
+[[redirects]]
+  from = "/api/auth/sso"
+  to = "/.netlify/functions/auth-sso"
+  status = 200
+[[redirects]]
+  from = "/api/auth/verify-login"
+  to = "/.netlify/functions/auth-verify-login"
   status = 200
 [[redirects]]
   from = "/api/auth/logout"

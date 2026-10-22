@@ -4,6 +4,7 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const revolut = require('../../lib/revolut');
@@ -16,11 +17,7 @@ exports.handler = async (event) => {
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   try {
     const sb = getSupabase();
-    const { data: admin, error: adminError } = await sb
-      .from('users')
-      .select('id, email, username, role, nombre, apellidos')
-      .eq('id', session.uid)
-      .single();
+    const { data: admin, error: adminError } = await getSessionUser(sb, session, 'id, email, username, role, nombre, apellidos');
     if (adminError || !admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     if (!isApplicationAdmin(admin)) return json({ error: 'forbidden' }, { statusCode: 403 });
 

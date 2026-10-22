@@ -1,6 +1,7 @@
 // Netlify handler for /api/admin/developer-clients; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 
@@ -11,8 +12,7 @@ exports.handler = async (event) => {
     const session = readSessionFromEvent(event);
     if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const db = getSupabase();
-    const { data: actor, error: actorError } = await db.from('users')
-      .select('id,email,role').eq('id', session.uid).single();
+    const { data: actor, error: actorError } = await getSessionUser(db, session, 'id,email,role');
     if (actorError || !isApplicationAdmin(actor) || normalizeEmail(actor) !== 'santimartin1203@gmail.com') {
       return json({ error: 'developer_admin_required' }, { statusCode: 403 });
     }

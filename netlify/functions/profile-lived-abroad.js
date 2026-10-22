@@ -10,6 +10,7 @@
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 
@@ -25,8 +26,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: caller } = await sb.from('users')
-      .select('id, email, username, role').eq('id', session.uid).single();
+    const { data: caller } = await getSessionUser(sb, session, 'id, email, username, role');
     if (!caller) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(caller);
 

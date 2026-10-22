@@ -1,6 +1,7 @@
 /** GET /api/admin/dashboard — HTTP/auth boundary. */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, canUseStudentPortal, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { loadAdminDashboard } = require('../../lib/admin-dashboard');
@@ -12,11 +13,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: admin, error } = await sb
-      .from('users')
-      .select('id, email, username, role, visible_tabs, nombre, apellidos')
-      .eq('id', session.uid)
-      .single();
+    const { data: admin, error } = await getSessionUser(sb, session, 'id, email, username, role, visible_tabs, nombre, apellidos');
     if (error || !admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     if (!isApplicationAdmin(admin)) return json({ error: 'forbidden' }, { statusCode: 403 });
     if (!canUseStudentPortal(admin)) return json({ error: 'portal_access_denied' }, { statusCode: 403 });

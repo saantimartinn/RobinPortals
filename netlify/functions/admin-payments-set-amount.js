@@ -3,6 +3,7 @@
  * fixed amount, so authorized admins receive a clear conflict response.
  */
 const { readSessionFromEvent } = require('../../lib/auth');
+const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError, verifyOrigin } = require('../../lib/http');
 const { getSupabase } = require('../../lib/supabase');
@@ -15,7 +16,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: admin } = await sb.from('users').select('id, email, username, role').eq('id', session.uid).single();
+    const { data: admin } = await getSessionUser(sb, session, 'id, email, username, role');
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     if (!isApplicationAdmin(admin)) return json({ error: 'forbidden' }, { statusCode: 403 });
     return json({ error: 'robin_jr_installments_are_fixed' }, { statusCode: 409 });
