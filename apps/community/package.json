@@ -1,0 +1,38 @@
+{
+  "name": "robin-subscriptions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Robin Plan: portal independiente de suscripciones",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "bcryptjs": "^2.4.3",
+    "cookie": "^1.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "stripe": "^16.12.0",
+    "mammoth": "^1.8.0"
+  },
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "netlify dev",
+    "dev:frontend": "npm run dev --workspace frontend -- --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "npm run build --workspace frontend",
+    "build:netlify": "netlify build --offline",
+    "test": "node --test test/*.test.cjs",
+    "check": "node scripts/check-architecture.cjs",
+    "docs:generate": "node scripts/generate-docs.cjs",
+    "docs:check": "node scripts/generate-docs.cjs --check",
+    "verify": "npm run check && npm test && npm run build && npm run docs:check"
+  },
+  "devDependencies": {
+    "@babel/parser": "^7.26.0",
+    "@babel/traverse": "^7.26.0",
+    "netlify-cli": "^27.3.1"
+  }
+}
