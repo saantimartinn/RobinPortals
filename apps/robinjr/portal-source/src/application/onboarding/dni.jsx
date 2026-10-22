@@ -1,6 +1,6 @@
 // Onboarding step or helper for dni; OnboardingFlow owns the step sequence.
 import { useState } from "react";
-import { Shield, UploadCloud, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { UploadCloud, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { NAVY } from "../../theme.js";
 import { Btn, Field } from "../../ui.jsx";
 import { dniExtract, dniSave } from "../../api.js";
@@ -70,13 +70,12 @@ export function OnboardingDNI({ user, onLogout, onDone }) {
   }
 
   return (
-    <OnboardingShell
+    <OnboardingShell user={user}
       title="Verifica la identidad del alumno"
       subtitle={esPasaporte
         ? "Necesitamos una foto del pasaporte del alumno para activar la cuenta."
         : "Necesitamos dos fotos del DNI del alumno para activar la cuenta."}
       stepNumber={2}
-      icon={<Shield className="h-4 w-4" />}
       onLogout={onLogout}
     >
       {phase === "upload" ? (

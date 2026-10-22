@@ -61,6 +61,23 @@
 .student-portal .student-support p,.admin-workspace .admin-sidebar-note p{margin:0;color:var(--robin-ink-600);font-size:.8125rem;line-height:1.5}
 .student-portal .student-support button{justify-content:center;margin-top:.75rem;color:var(--robin-navy);font-size:.8125rem;font-weight:600}
 
+/* Onboarding (apps/*/application/onboarding/onboarding-shared.jsx): the same
+   layout, with the steps in the sidebar and the current step in a paper card. */
+.student-portal.is-onboarding{min-height:100vh}
+.student-portal.is-onboarding .student-sidebar{top:0;height:100vh}
+.onboarding-logo{display:block;width:7rem;height:auto;margin:.25rem 1.5rem 1.25rem}
+.student-portal .onboarding-steps{margin:0;list-style:none}
+.student-portal .onboarding-steps .student-nav-item,.student-portal .onboarding-steps .student-nav-item:hover{cursor:default;background:transparent;color:var(--robin-on-navy-muted)}
+.student-portal .onboarding-steps .student-nav-item.is-active{background:var(--robin-on-navy-line);color:var(--robin-on-navy)}
+.student-portal .onboarding-steps .student-nav-item.is-next{opacity:.6}
+.onboarding-step-mark{display:grid;place-items:center;flex:0 0 1.5rem;width:1.5rem;height:1.5rem;border:1.5px solid currentColor;border-radius:50%;font:600 .75rem var(--robin-font-text)}
+.is-done .onboarding-step-mark{border-color:var(--robin-orange);background:var(--robin-orange);color:var(--robin-navy)}
+.is-active .onboarding-step-mark{border-color:var(--robin-paper);background:var(--robin-paper);color:var(--robin-navy)}
+.student-page-heading .onboarding-subtitle{max-width:60ch;margin:.6rem 0 0;color:var(--robin-ink-600);font-size:.95rem;line-height:1.5}
+.student-portal .onboarding-card{max-width:46rem;padding:1.75rem}
+.onboarding-logout{display:none;margin-top:1rem;border:0;background:none;color:var(--robin-ink-600);font-size:.875rem;text-decoration:underline;cursor:pointer}
+@media(max-width:1023px){.onboarding-logout{display:block}.student-portal .onboarding-card{padding:1.25rem}.student-portal.is-onboarding .student-sidebar{top:0;height:auto}.onboarding-logo{display:none}}
+
 /* The sidebar never scrolls: long menus (the Community admin has 15 links) get
    tighter rows and drop the foot note, and so do short windows. */
 .student-portal .student-sidebar:has(.student-nav-items>:nth-child(10)) .student-support{display:none}

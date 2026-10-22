@@ -147,11 +147,11 @@ export default function PortalRobin() {
   </>;
 
   const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
-  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingOrigin {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingDNI {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingContract {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingPayment {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <><CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} /><OnboardingProfile {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <OnboardingOrigin {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <OnboardingDNI {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <OnboardingContract {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <OnboardingPayment {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <OnboardingProfile {...onboardingProps} />;
 
   const user = authState.user;
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();
