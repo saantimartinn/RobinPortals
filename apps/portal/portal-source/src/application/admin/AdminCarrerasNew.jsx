@@ -139,12 +139,12 @@ export function AdminCarrerasNew({ client }) {
             <div className="flex gap-2">
               <button type="button" onClick={() => changeLevel("grado")}
                 className="px-4 py-2 rounded-xl border text-sm font-medium transition"
-                style={cLevel === "grado" ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
+                style={cLevel === "grado" ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
                 Grado
               </button>
               <button type="button" onClick={() => changeLevel("maestria")}
                 className="px-4 py-2 rounded-xl border text-sm font-medium transition"
-                style={cLevel === "maestria" ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
+                style={cLevel === "maestria" ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
                 Máster
               </button>
             </div>
@@ -218,9 +218,9 @@ export function AdminCarrerasNew({ client }) {
                 const sel = assigned.includes(t.id);
                 return (
                   <div key={t.id} className="flex items-center gap-3 rounded-xl border px-3 py-2.5"
-                    style={sel ? { background: SOFT, borderColor: NAVY } : { background: "#FEFBE5", borderColor: "#EDECDB" }}>
+                    style={sel ? { background: SOFT, borderColor: NAVY } : { background: "#FFFDF5", borderColor: "#EDECDB" }}>
                     <div className="h-8 w-8 rounded-lg flex-shrink-0 grid place-items-center"
-                      style={sel ? { background: NAVY, color: "#FEFBE5" } : { background: "#FEFBE5", color: "#687088" }}>
+                      style={sel ? { background: NAVY, color: "#FEFBE5" } : { background: "#FFFDF5", color: "#687088" }}>
                       {sel ? <CheckCircle2 className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                     </div>
                     <div className="flex-1 min-w-0">

@@ -5,6 +5,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app.jsx";
 import "./index.css";
+
+// Selects this portal's Robin (packages/brand/brand.css --robin-stage-art).
+document.documentElement.dataset.portal = "robinjr";
 // Last, so the shared admin look (navy sidebar, typography) wins over the app styles.
 import "../../../../packages/portal-nav/robin-shell.css";
 

@@ -15,6 +15,9 @@
   --robin-navy:#2D3A64;
   --robin-orange:#ECB450;
   --robin-cream:#FEFBE5;
+  /* Surfaces that sit on the cream page (cards, charts, fields, top bar):
+     cream lifted towards white, so they read apart from the page. */
+  --robin-paper:#FFFDF5;
   /* Navy over cream (tailwind-preset.cjs `slate`) */
   --robin-ink-50:#F6F3E0;
   --robin-ink-100:#EDECDB;
@@ -44,6 +47,8 @@
   --robin-radius-card:1rem;
   --robin-radius-photo:1.5rem;
   --robin-line:1px solid var(--robin-ink-200);
+  /* Robin of each stage (RobinJr, portal, Community); apps set html[data-portal]. */
+  --robin-stage-art:url("./assets/robin-student.svg");
   /* Stamp (sello) perforations for a cream block sitting on navy: navy half
      dots along the four edges. Use as the first background layer. */
   --robin-stamp-dot:radial-gradient(circle,var(--robin-navy) 3px,#0000 3.5px);
@@ -51,6 +56,8 @@
 }
 
 html{background:var(--robin-cream)}
+html[data-portal="robinjr"]{--robin-stage-art:url("./assets/robin-jr.svg")}
+html[data-portal="community"]{--robin-stage-art:url("./assets/robin-community.svg")}
 body{margin:0;background:var(--robin-cream);color:var(--robin-navy);font-family:var(--robin-font-text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 ::selection{background:var(--robin-orange);color:var(--robin-navy)}
 :focus-visible{outline:3px solid var(--robin-navy);outline-offset:3px}

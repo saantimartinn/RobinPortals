@@ -56,7 +56,7 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
   const Choice = ({ active, onClick, title, desc, icon: Ic }) => (
     <button type="button" onClick={onClick}
       className="flex items-start gap-3 rounded-xl border px-4 py-3.5 text-left transition w-full"
-      style={active ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
+      style={active ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
       <span className="h-9 w-9 rounded-lg grid place-items-center flex-shrink-0"
         style={active ? { background: GOLD } : { background: "#F6F3E0" }}>
         {Ic && <Ic className="h-4 w-4" style={{ color: active ? NAVY : "#687088" }} />}

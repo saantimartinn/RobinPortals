@@ -104,7 +104,7 @@ function CvAiPage({ onBack }) {
               <div className="text-sm font-semibold text-slate-800">Sube tu CV o pega el texto</div>
               <label onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={onDrop}
                 className="block cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition"
-                style={dragOver ? { borderColor: NAVY, background: "#F6F3E0" } : { borderColor: "#DFDED2", background: "#FEFBE5" }}>
+                style={dragOver ? { borderColor: NAVY, background: "#F6F3E0" } : { borderColor: "#DFDED2", background: "#FFFDF5" }}>
                 <UploadCloud className="h-6 w-6 mx-auto mb-1" style={{ color: NAVY }} />
                 <div className="text-sm text-slate-700 font-medium">{cvFile ? cvFile.name : "Arrastra tu CV aquí o haz clic para subir"}</div>
                 <div className="text-[11px] text-slate-400 mt-0.5">PDF o Word (.doc, .docx) · también .txt</div>

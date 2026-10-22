@@ -113,7 +113,7 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
                   </div>
                 )}
                 <div className="max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words min-w-0"
-                  style={mine ? { background: NAVY, color: "#FEFBE5" } : { background: "#FEFBE5", color: "#2D3A64", border: "1px solid #EDECDB" }}>
+                  style={mine ? { background: NAVY, color: "#FEFBE5" } : { background: "#FFFDF5", color: "#2D3A64", border: "1px solid #EDECDB" }}>
                   {!mine && <div className="text-[11px] font-semibold mb-0.5" style={{ color: isAdvisor ? "#0F6E56" : NAVY }}>{isAdvisor ? "Tu asesor/a" : "Asistente IA"}</div>}
                   <div>{m.content}</div>
                   {!mine && !isAdvisor && m.faq_citations?.length > 0 && <div className="student-chat-faq-links">{m.faq_citations.map(citation => <button key={citation.number} onClick={() => onOpenFaq(citation.number)} title={citation.question}>FAQ {citation.number}<ArrowRight size={12} /></button>)}</div>}

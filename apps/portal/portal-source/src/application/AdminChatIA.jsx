@@ -105,7 +105,7 @@ export function AdminChatIA({ client }) {
                   </div>
                 )}
                 <div className="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap"
-                  style={mine ? { background: "#0F6E56", color: "#FEFBE5" } : { background: "#FEFBE5", color: "#2D3A64", border: "1px solid #EDECDB" }}>
+                  style={mine ? { background: "#0F6E56", color: "#FEFBE5" } : { background: "#FFFDF5", color: "#2D3A64", border: "1px solid #EDECDB" }}>
                   {!mine && <div className="text-[11px] font-semibold mb-0.5" style={{ color: isStudent ? NAVY : "#4E5979" }}>{label}</div>}
                   <div>{m.content}</div>
                   <div className={`text-[11px] mt-1 ${mine ? "text-white/50" : "text-slate-400"}`}>{formatTime(new Date(m.created_at))}</div>
