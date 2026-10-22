@@ -6,7 +6,7 @@ import robinLogoTransparent from "./assets/robin-logo-transparent.png";
 
 import { isAdminUser } from "./session.js";
 import { canAdminSee, firstAllowedAdminUrl } from "./admin-permissions.js";
-import { CREAM, NAVY, NAVY_DARK } from "./theme.js";
+import { CANVAS, NAVY, NAVY_DARK } from "./theme.js";
 import { Btn, Field } from "./ui.jsx";
 import { reportClientError } from "./client-utils.js";
 import { AdminPortal } from "./application/AdminPortal.jsx";
@@ -134,7 +134,7 @@ export default function PortalRobin() {
 
   if (authState.loading) {
     return (
-      <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}>
+      <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}>
         <div className="flex items-center gap-3 text-slate-500 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" /> Cargando portal…
         </div>
@@ -174,7 +174,7 @@ export default function PortalRobin() {
 
 function AuthShell({ children }) {
   return (
-    <div className="min-h-screen flex bg-[#f4f5f7]" style={{ fontFamily: "'system-ui', sans-serif" }}>
+    <div className="min-h-screen flex bg-white" style={{ fontFamily: "'system-ui', sans-serif" }}>
       <div
         className="hidden lg:flex flex-col justify-between w-[min(39vw,480px)] flex-shrink-0 px-11 py-11 relative overflow-hidden"
         style={{ background: `linear-gradient(160deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #2a4a8e 100%)` }}

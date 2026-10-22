@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Calendar, FileText, CheckCircle2, GraduationCap, Compass, ArrowUpRight } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";
-import { CREAM, GOLD, NAVY } from "../theme.js";
+import { SOFT, GOLD, NAVY } from "../theme.js";
 import { Card, CardContent, CardHeader } from "../ui.jsx";
 
 export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
@@ -48,7 +48,7 @@ export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
             const act = s.key === step;
             return (
               <div key={s.key} className={`student-roadmap-step flex items-center gap-4 rounded-xl border px-4 py-3 ${act ? "is-current" : ""}`} aria-current={act ? "step" : undefined}
-                style={act ? { borderColor: NAVY, background: CREAM } : { borderColor: "#f1f5f9", background: "white" }}>
+                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#f1f5f9", background: "white" }}>
                 <div className="h-8 w-8 rounded-full flex-shrink-0 grid place-items-center font-bold text-sm border-2"
                   style={done ? { background: "#10b981", borderColor: "#10b981", color: "white" }
                     : act ? { background: GOLD, borderColor: GOLD, color: "white" }

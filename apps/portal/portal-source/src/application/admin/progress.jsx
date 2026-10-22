@@ -1,7 +1,7 @@
 // Admin workspace module for progress; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { LayoutDashboard, CheckCircle2 } from "lucide-react";
-import { CREAM, GOLD, NAVY, NAVY_DARK } from "../../theme.js";
+import { SOFT, GOLD, NAVY, NAVY_DARK } from "../../theme.js";
 import { Card, CardContent, CardHeader } from "../../ui.jsx";
 import { APP_PHASE_LABELS } from "../documents/document-utils.js";
 import { adminPhaseSet } from "../../api.js";
@@ -50,7 +50,7 @@ export function AdminEstadoFases({ client, onChangedPhase }) {
             return (
               <button key={p.key} onClick={() => setP(p.key)} disabled={busy}
                 className="w-full flex items-center gap-4 rounded-xl border px-4 py-3 text-left transition"
-                style={act ? { borderColor: NAVY, background: CREAM } : { borderColor: "#f1f5f9", background: "white" }}>
+                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#f1f5f9", background: "white" }}>
                 <div className="h-8 w-8 rounded-full flex-shrink-0 grid place-items-center font-bold text-sm border-2"
                   style={done ? { background: "#10b981", borderColor: "#10b981", color: "white" }
                     : act ? { background: GOLD, borderColor: GOLD, color: "white" }

@@ -1,9 +1,10 @@
 // Shared theme values or helpers used across this runtime.
 
 
-const CREAM = "#FAF8F0";
+// Page background, the same white canvas as the admin.
+const CANVAS = "#ffffff";
 
-export { CREAM };
+export { CANVAS };
 
 const GOLD = "#F5A623";
 

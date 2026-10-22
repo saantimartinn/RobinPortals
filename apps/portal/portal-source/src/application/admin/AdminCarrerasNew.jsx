@@ -1,7 +1,7 @@
 // Admin workspace module for admin carreras new; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { CheckCircle2, Plus, Trash2, BookOpen, Loader2, Pencil } from "lucide-react";
-import { CREAM, NAVY } from "../../theme.js";
+import { SOFT, NAVY } from "../../theme.js";
 import { Btn, Card, CardContent, CardHeader, Divider, Field } from "../../ui.jsx";
 import { buildDefaultDocs, newCareerRequirement, normalizeCareerRequirement } from "../documents/document-utils.js";
 import { CareerRequirementsTimeline } from "../careers/CareerRequirementsTimeline.jsx";
@@ -218,7 +218,7 @@ export function AdminCarrerasNew({ client }) {
                 const sel = assigned.includes(t.id);
                 return (
                   <div key={t.id} className="flex items-center gap-3 rounded-xl border px-3 py-2.5"
-                    style={sel ? { background: CREAM, borderColor: NAVY } : { background: "white", borderColor: "#e2e8f0" }}>
+                    style={sel ? { background: SOFT, borderColor: NAVY } : { background: "white", borderColor: "#e2e8f0" }}>
                     <div className="h-8 w-8 rounded-lg flex-shrink-0 grid place-items-center"
                       style={sel ? { background: NAVY, color: "white" } : { background: "#f8fafc", color: "#94a3b8" }}>
                       {sel ? <CheckCircle2 className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
