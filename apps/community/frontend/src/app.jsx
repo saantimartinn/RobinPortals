@@ -2,6 +2,7 @@
 import { CREAM } from "./shared/theme.js";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { loginUrl } from "../../../../packages/portal-nav/links.js";
 import { SubscriberAdmin } from "./features/admin/SubscriberAdmin.jsx";
 import { SubscriberPortal } from "./application/SubscriberPortal.jsx";
 import { logout as apiLogout, me as apiMe, exchangeApplicationSession } from "./api/index.js";
@@ -19,7 +20,7 @@ function PortalRobin() {
     return () => { mounted = false; };
   }, []);
   useEffect(() => {
-    if (!state.loading && !state.user) window.location.replace(`/login?next=${encodeURIComponent("/therobinplan/")}`);
+    if (!state.loading && !state.user) window.location.replace(loginUrl("/therobinplan/"));
   }, [state.loading, state.user]);
   useEffect(() => {
     if (!isSubscriberAdmin(state.user)) { setApplicationIdentity(null); setCheckingAdminPermission(false); return undefined; }

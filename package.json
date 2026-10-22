@@ -1,0 +1,14 @@
+{
+  "name": "project-robin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Robin student portal, Robin Jr, community, and admin monorepo",
+  "scripts": {
+    "dev:all": "node dev/run-all.mjs",
+    "build:robinjr": "npm --prefix apps/robinjr/portal-source run build",
+    "build:portal": "npm --prefix apps/portal/portal-source run build",
+    "build:community": "npm --prefix apps/community run build",
+    "build:admin": "npm --prefix apps/admin run build",
+    "build:all": "npm run build:robinjr && npm run build:portal && npm run build:community && npm run build:admin"
+  }
+}

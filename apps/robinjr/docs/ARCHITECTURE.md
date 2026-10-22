@@ -66,9 +66,24 @@ del cliente de servidor se encuentra en cada Function. Véanse
 
 - **Identidad**: cookie JWT firmada y una raíz persistente `users` para alumnos/admins.
   No se usa Supabase Auth como identidad de aplicación.
-- **Aplicación**: onboarding, expediente, carreras, documentos, pagos, reservas y chat.
+- **Aplicación Robin Jr**: perfil, progreso por nueve fases, carreras asignadas, documentos
+  con deadlines independientes, pagos, reservas y chat. Las carreras son fichas reutilizables
+  con imagen, asignaturas y requisitos; no agrupan documentos.
 - **Administración**: vistas y acciones para advisors y admins de aplicación.
 - **Integraciones**: Revolut, Google, Holded, Resend, Anthropic y webhooks autenticados.
+
+### Reglas del programa Robin Jr
+
+- La secuencia canónica está en `portal-source/src/application-steps.js`: Diagnóstico,
+  Tus resultados, tres mentorías con exalumnos, dos sesiones grupales, diagnóstico final
+  con la profesora y Wrap up (nueve fases en total).
+- El admin crea y asigna tarjetas de carrera. `career_templates` guarda la ficha y
+  `client_careers` la asignación; documentos y fechas límite permanecen en el dominio
+  independiente de documentos.
+- Las cuotas son 500 €, 500 € y 499,99 €. La segunda se habilita al alcanzar la fase 6
+  y la tercera en la fase 9; un admin realiza la acción de habilitación.
+- El alumno reserva huecos de 60 minutos generados desde eventos `RobinJr` en el calendario
+  del advisor. El backend vuelve a consultar Calendar al confirmar la reserva.
 
 Los entrypoints conservan los detalles HTTP y delegan lógica reutilizable a `lib/`.
 [API_INVENTORY.md](API_INVENTORY.md) enumera todas las Functions y

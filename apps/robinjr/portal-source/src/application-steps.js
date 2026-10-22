@@ -1,4 +1,5 @@
-// Browser-side application steps helper used by the application.
+// Orden canónico de las nueve fases de Robin Jr. Las keys coinciden con
+// users.application_phase; si cambia el programa, hay que coordinar UI y backend.
 export const APP_STEPS = [
   { key: 1, label: "Diagnóstico", desc: "Conocemos tu punto de partida y lo que te interesa." },
   { key: 2, label: "Tus resultados", desc: "Revisamos contigo los resultados del diagnóstico." },

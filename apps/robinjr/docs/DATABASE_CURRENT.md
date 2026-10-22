@@ -19,8 +19,8 @@ cliente de servidor y aplican sesión, rol y ownership en código. Los buckets `
 | `ai_chat_state` | Pausa/reanudación de IA por alumno | `user_id → users.id` | `chat-ai`, `admin-chat`, `chat-cleanup` |
 | `bookings` | Reservas Calendar/Meet | `user_id → users.id` | bookings, dashboard y transcripciones |
 | `birthday_events` | Deduplicación anual de felicitaciones y aviso al asesor | `user_id → users.id` | tarea programada de cumpleaños |
-| `career_templates` | Catálogo de carreras y requisitos | — | careers, documentos, asistentes y reservas |
-| `client_careers` | Asignación alumno–carrera | `user_id → users.id` | careers, asistentes y reservas |
+| `career_templates` | Fichas reutilizables de carreras (datos, imagen, asignaturas y requisitos) | — | careers y asignación admin |
+| `client_careers` | Asignación alumno–carrera | `user_id → users.id` | carreras del alumno y vistas admin |
 | `documents` | Requisitos y ficheros del alumno | `user_id → users.id` | endpoints de documentos, dashboard y asistentes |
 | `notification_recipients` | Estado por destinatario | `notification_id → notifications.id` | notificaciones de alumnos/admins |
 | `notifications` | Cabeceras de avisos | — | notificaciones de alumnos/admins |
@@ -36,6 +36,8 @@ cliente de servidor y aplican sesión, rol y ownership en código. Los buckets `
 - `birthday_events`: combinación `(user_id, birthday_year)` única; acceso exclusivo del backend mediante RLS sin políticas públicas.
 - `client_careers`: combinación `(user_id, career_template_id)` única.
 - `career_templates` conserva fichas visuales y datos básicos; los documentos y sus fechas límite se gestionan de forma independiente.
+- El campo heredado `career_templates.required_docs` se vacía por compatibilidad; no es fuente de requisitos documentales. La migración `202610210004_detach_career_documents.sql` también elimina el vínculo de las carreras existentes con `documents`, sin borrar documentos del alumno.
+- Robin Jr usa nueve fases. Su plan económico suma 1.499,99 € en tres cuotas: 500 €, 500 € y 499,99 €; la habilitación de las cuotas posteriores se vincula a las fases 6 y 9.
 - `payments`: `installment >= 1` y combinación `(user_id, installment)` única.
 - `notification_recipients`: combinación `(notification_id, user_id)` única.
 - `ai_chat_messages.role`: `user`, `assistant` o `advisor`.

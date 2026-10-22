@@ -22,6 +22,10 @@ Contenido mantenido de `supabase/migrations/`.
 | [`202610060001_create_payment_attempts.sql`](../../../../supabase/migrations/202610060001_create_payment_attempts.sql) | Archivo mantenido del repositorio: 202610060001_create_payment_attempts.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610060002_add_academic_profile.sql`](../../../../supabase/migrations/202610060002_add_academic_profile.sql) | Archivo mantenido del repositorio: 202610060002_add_academic_profile.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610060003_create_birthday_notifications.sql`](../../../../supabase/migrations/202610060003_create_birthday_notifications.sql) | Archivo mantenido del repositorio: 202610060003_create_birthday_notifications.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610210001_add_career_card_details_and_document_deadlines.sql`](../../../../supabase/migrations/202610210001_add_career_card_details_and_document_deadlines.sql) | Archivo mantenido del repositorio: 202610210001_add_career_card_details_and_document_deadlines.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610210002_set_robin_jr_phases.sql`](../../../../supabase/migrations/202610210002_set_robin_jr_phases.sql) | Archivo mantenido del repositorio: 202610210002_set_robin_jr_phases.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610210003_add_wrap_up_phase.sql`](../../../../supabase/migrations/202610210003_add_wrap_up_phase.sql) | Archivo mantenido del repositorio: 202610210003_add_wrap_up_phase.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610210004_detach_career_documents.sql`](../../../../supabase/migrations/202610210004_detach_career_documents.sql) | Archivo mantenido del repositorio: 202610210004_detach_career_documents.sql. | — | Cuando cambie la responsabilidad indicada. |
 
 ---
 

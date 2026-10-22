@@ -66,14 +66,15 @@ const robinPlanWordmark = /(^|\.)project-robin\.com$/i.test(window.location.host
 import { DashboardLoader } from "@/components/dashboard-loader";
 import { EmptyChartBar } from "@/components/empty-chart-bar";
 import { allAdminTabPermissions, isDeveloperAdminEmail, isProAdminEmail } from "@/lib/admin-permissions";
+import { ROBIN_LINKS } from "../../../../packages/portal-nav/links.js";
 
 type NavItem = [string, string, typeof LayoutDashboard, string];
 
 const workspaceTabs: readonly (readonly [string, string, string, string | null])[] = [
-  ["https://project-robin.com/admin", "Inicio", "home", null],
-  ["https://robinjr.netlify.app/portal/", "RobinJr", "robinjr", null],
-  ["https://project-robin.com/portal/", "Portal del Alumno", "external", null],
-  ["https://project-robin.com/therobinplan/", "Robin Community", "subscriptions", null],
+  [ROBIN_LINKS[0][0], "Inicio", "home", null],
+  [ROBIN_LINKS[1][0], "RobinJr", "robinjr", null],
+  [ROBIN_LINKS[2][0], "Portal del Alumno", "external", null],
+  [ROBIN_LINKS[3][0], "Robin Community", "subscriptions", null],
   ["/crm", "CRM", "crm", "crm."],
   ["/analiticas/ventas", "Otras métricas", "analytics", "analytics."],
 ] as const;

@@ -14,3 +14,6 @@ coverage/
 # Netlify local state and databases
 .netlify/
 **/.netlify/
+
+# Independent public website repository kept beside the monorepo apps
+/Web-robin/

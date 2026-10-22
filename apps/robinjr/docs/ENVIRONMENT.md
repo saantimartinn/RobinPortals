@@ -39,8 +39,8 @@ Netlify reports `CONTEXT=production`; scope Sandbox variables to previews or bra
 - `ALLOWED_ORIGINS` extends automatically derived same-site origins.
 - `PUBLIC_BASE_URL` overrides the public URL used in messages.
 - bucket variables override existing names; code does not create buckets.
-- booking variables define the Calendar window title, slot duration and maximum
-  horizon; their validated behavior is documented in `BOOKING_CONFIGURATION.md`.
+- `BOOKING_MAX_DAYS` controls the maximum Calendar lookup horizon. Availability uses the
+  fixed event title `RobinJr` and 60-minute slots; see `BOOKING_CONFIGURATION.md`.
 - Sandbox Revolut payments are marked `simulated` and never create fiscal invoices in Holded.
 
 ## Verification

@@ -1,17 +1,10 @@
 // Common Robin navigation; membership is checked by the destination portal backend.
 import React, { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
+import { ROBIN_LINKS as LINKS } from "../../../../../packages/portal-nav/links.js";
 import robinWordmark from "../assets/robin-wordmark.png";
 import "./cross-portal-nav.css";
 
-const LINKS = [
-  ["https://project-robin.com/admin", "Inicio", "admin"],
-  ["https://robinjr.netlify.app/portal/", "RobinJr", "robinjr"],
-  ["https://project-robin.com/portal/", "Portal del Alumno", "application"],
-  ["https://project-robin.com/therobinplan/", "Robin Community", "subscriptions"],
-  ["https://project-robin.com/admin/crm", "CRM", "admin-crm"],
-  ["https://project-robin.com/admin/analiticas/ventas", "Otras métricas", "admin-analytics"],
-];
 const STUDENT_KEYS = new Set(["robinjr", "application", "subscriptions"]);
 
 export function CrossPortalNav({ current = "subscriptions", user = null, onLogout }) {

@@ -8,11 +8,12 @@ process.env.JWT_SECRET = 'test-only-not-a-production-secret-123456789';
 const event = token => ({ headers: { cookie: `${auth.COOKIE_NAME}=${token}` } });
 test('subscriber sessions round trip; application roles are rejected', () => {
   for (const role of ['subscriber','subscriber_admin']) {
-    const token = auth.signSession({ id:'user-1', username:'test', role });
+    const token = auth.signSession({ id:'user-1', username:'test', role, auth_source:'application_sso' });
     assert.equal(auth.readSessionFromEvent(event(token)).role, role);
     assert.equal(principalTable(role), 'subscribers');
   }
-  assert.equal(auth.readSessionFromEvent(event(auth.signSession({ id:'user-1',role:'admin' }))), null);
+  assert.equal(auth.readSessionFromEvent(event(auth.signSession({ id:'user-1',role:'admin',auth_source:'application_sso' }))), null);
+  assert.equal(auth.readSessionFromEvent(event(auth.signSession({ id:'user-1',role:'subscriber' }))), null);
   assert.throws(()=>principalTable('admin'), /unsupported_role/);
 });
 test('subscriber display names retain the existing name and fallback order', () => {

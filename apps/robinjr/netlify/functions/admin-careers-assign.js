@@ -35,7 +35,9 @@ exports.handler = async (event) => {
       return json({ ok: true });
     }
 
-    // asignar (idempotente)
+    // La relación solo asigna la ficha al alumno. Los documentos y deadlines
+    // se administran por separado y nunca se generan desde una carrera.
+    // Mantener la operación idempotente evita duplicar la tarjeta al reintentar.
     const { data: existing } = await sb.from('client_careers').select('id').eq('user_id', user_id).eq('career_template_id', ctid).maybeSingle();
     if (existing) return json({ ok: true, already_assigned: true });
 

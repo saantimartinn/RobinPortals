@@ -35,6 +35,8 @@ exports.handler = async (event) => {
       .eq('id', user_id)
       .single();
     if (!u) return json({ error: 'user_not_found' }, { statusCode: 404 });
+    // La cuota 2 corresponde al hito posterior a las mentorías (fase 6);
+    // la cuota 3 se habilita al cerrar el programa (fase 9, Wrap up).
     const requiredPhase = installment === 2 ? 6 : 9;
     if (Number(u.application_phase || 1) < requiredPhase) {
       return json({ error: 'payment_milestone_not_reached', required_phase: requiredPhase }, { statusCode: 409 });

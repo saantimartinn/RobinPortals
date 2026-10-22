@@ -122,6 +122,8 @@ export function PagosCliente() {
 
 export function CarrerasCliente() {
   const [careers, setCareers] = useState([]);
+  // El detalle se abre como diálogo modal para mantener la cuadrícula de
+  // tarjetas estable y dar un punto de cierre claro en escritorio y móvil.
   const [selectedCareer, setSelectedCareer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

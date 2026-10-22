@@ -7,6 +7,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
+const { createCookieHelpers } = require('../../../packages/auth/cookies.cjs');
+const sharedCookies = createCookieHelpers({ parse: parseCookies, serialize: serializeCookie });
 
 const COOKIE_NAME = 'robin_portal_session';
 const COOKIE_MAX_AGE_S = 60 * 60 * 24 * 7; // 7 dias
@@ -40,19 +42,11 @@ function signSession(user) {
 }
 
 function buildSessionCookie(token, { clear = false } = {}) {
-  return serializeCookie(COOKIE_NAME, clear ? '' : token, {
-    httpOnly: true,
-    secure: true,            // En Netlify siempre es HTTPS
-    sameSite: 'lax',
-    path: '/',
-    maxAge: clear ? 0 : COOKIE_MAX_AGE_S,
-  });
+  return sharedCookies.build(COOKIE_NAME, token, { clear, maxAge: COOKIE_MAX_AGE_S });
 }
 
 function readSessionFromEvent(event) {
-  const header = (event.headers && (event.headers.cookie || event.headers.Cookie)) || '';
-  const cookies = parseCookies(header || '');
-  const token = cookies[COOKIE_NAME];
+  const token = sharedCookies.read(event, COOKIE_NAME);
   if (!token) return null;
   try {
     const session = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });

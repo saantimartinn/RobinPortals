@@ -17,6 +17,7 @@ Logotipos importados y procesados por Vite.
 | [`logo-robin-azul.png`](../../../../../portal-source/src/assets/logo-robin-azul.png) | Activo visual fuente: logo-robin-azul.png. | — | Al cambiar esa parte de la experiencia React. |
 | [`robin-bike.jpg`](../../../../../portal-source/src/assets/robin-bike.jpg) | Activo visual fuente: robin-bike.jpg. | — | Al cambiar esa parte de la experiencia React. |
 | [`robin-graduate.jpg`](../../../../../portal-source/src/assets/robin-graduate.jpg) | Activo visual fuente: robin-graduate.jpg. | — | Al cambiar esa parte de la experiencia React. |
+| [`robin-hatching.svg`](../../../../../portal-source/src/assets/robin-hatching.svg) | Activo visual fuente: robin-hatching.svg. | — | Al cambiar esa parte de la experiencia React. |
 | [`robin-keys.webp`](../../../../../portal-source/src/assets/robin-keys.webp) | Activo visual fuente: robin-keys.webp. | — | Al cambiar esa parte de la experiencia React. |
 | [`robin-logo-transparent.png`](../../../../../portal-source/src/assets/robin-logo-transparent.png) | Activo visual fuente: robin-logo-transparent.png. | — | Al cambiar esa parte de la experiencia React. |
 | [`robin-skate.png`](../../../../../portal-source/src/assets/robin-skate.png) | Activo visual fuente: robin-skate.png. | — | Al cambiar esa parte de la experiencia React. |

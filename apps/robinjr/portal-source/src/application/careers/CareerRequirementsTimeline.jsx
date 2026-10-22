@@ -1,4 +1,5 @@
-// Portal view or navigation module for career requirements timeline; the application shell owns session state.
+// LEGADO: la experiencia activa de Robin Jr muestra carreras como tarjetas con
+// detalle modal. Los documentos/deadlines ya no se derivan de career_templates.
 import React from "react";
 import { CalendarDays, FileText, Flag } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "../../ui.jsx";
@@ -28,7 +29,7 @@ function formatDeadline(value) {
   });
 }
 
-export function CareerRequirementsTimeline({ careers = [], title = "Timeline de requerimientos" }) {
+export function CareerRequirementsTimeline({ careers = [], title = "Requisitos de carrera" }) {
   const items = careerTimelineItems(careers);
   return (
     <Card>

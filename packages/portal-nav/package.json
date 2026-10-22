@@ -1,0 +1,9 @@
+{
+  "name": "@robin/portal-nav",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./links": "./links.js"
+  }
+}

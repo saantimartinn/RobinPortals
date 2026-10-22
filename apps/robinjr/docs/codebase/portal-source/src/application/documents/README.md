@@ -12,7 +12,7 @@ Reglas de presentación y estado de documentos.
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
-| [`document-utils.js`](../../../../../../portal-source/src/application/documents/document-utils.js) | Módulo frontend de document utils. | — | Al cambiar esa parte de la experiencia React. |
+| [`document-utils.js`](../../../../../../portal-source/src/application/documents/document-utils.js) | Módulo frontend de document utils. | `../../application-steps.js` | Al cambiar esa parte de la experiencia React. |
 
 ---
 

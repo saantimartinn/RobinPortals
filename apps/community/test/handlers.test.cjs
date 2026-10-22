@@ -29,24 +29,26 @@ test('every session-protected handler rejects unauthenticated requests before ac
   }
 });
 
-test('login queries only subscribers with equality filters and creates subscriber session',async()=>{
-  const queried=[];
+test('local login requires the shared Robin Platform identity',async()=>{
+  let providerAccessed=false;
   const handler=loadHandler('auth-login',{
-    '../lib/supabase':{getSupabase:()=>({from(table){queried.push(table);return {select:()=>({eq:(field,value)=>({limit:async()=>({data:[{id:'u1',role:'subscriber',username:value,password_hash:'hash'}]})})})};}})},
-    '../lib/auth':{verifyPassword:()=>true,signSession:()=> 'signed-token',buildSessionCookie:()=> 'session-cookie'},
+    '../lib/supabase':{getSupabase:()=>{providerAccessed=true;throw new Error('local login must not query Supabase');}},
   });
   const response=await handler({httpMethod:'POST',headers:{},body:JSON.stringify({username:'demo@example.test',password:'test-only'})});
-  assert.equal(response.statusCode,200);
-  assert.equal(JSON.parse(response.body).user.role,'subscriber');
-  assert.deepEqual(queried,['subscribers']);
+  assert.equal(response.statusCode,403);
+  assert.equal(JSON.parse(response.body).error,'application_login_required');
+  assert.equal(providerAccessed,false);
 });
 
-test('login refuses application admin even when a row exists',async()=>{
+test('local login rejects application admins and subscribers alike',async()=>{
+  let providerAccessed=false;
   const handler=loadHandler('auth-login',{
-    '../lib/supabase':{getSupabase:()=>({from:()=>({select:()=>({eq:()=>({limit:async()=>({data:[{id:'u1',role:'admin'}]})})})})})},
+    '../lib/supabase':{getSupabase:()=>{providerAccessed=true;throw new Error('local login must not query Supabase');}},
   });
   const response=await handler({httpMethod:'POST',headers:{},body:'{"username":"demo","password":"test-only"}'});
-  assert.equal(response.statusCode,401);
+  assert.equal(response.statusCode,403);
+  assert.equal(JSON.parse(response.body).error,'application_login_required');
+  assert.equal(providerAccessed,false);
 });
 
 test('password recovery uses the existing public password endpoint without a session',async()=>{
