@@ -17,9 +17,7 @@ async function readApplicationIdentity(event) {
 }
 
 function canUseRobinPlan(identity) {
-  if (!identity?.is_application_admin) return false;
-  if (identity.is_pro_admin) return true;
-  return Array.isArray(identity.visible_tabs) && identity.visible_tabs.includes('platform.robin_plan');
+  return identity?.is_application_admin === true;
 }
 
 module.exports = { readApplicationIdentity, canUseRobinPlan };

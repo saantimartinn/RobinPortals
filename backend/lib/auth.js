@@ -59,8 +59,10 @@ function isCurrentPasswordResetToken(payload, passwordHash) {
 }
 
 function signSession(user) {
+  const payload = { uid: user.id, lead_id: user.lead_id, username: user.username, role: user.role };
+  if (user.auth_source) payload.auth_source = user.auth_source;
   return jwt.sign(
-    { uid: user.id, lead_id: user.lead_id, username: user.username, role: user.role },
+    payload,
     getJwtSecret(),
     { expiresIn: '7d' }
   );
@@ -93,7 +95,11 @@ function readSessionFromEvent(event) {
   if (!token) return null;
   try {
     const session = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
-    return session.uid && require('./principal').isSubscriberRole(session.role) ? session : null;
+    return session.uid
+      && require('./principal').isSubscriberRole(session.role)
+      && ['application_sso', 'application_admin'].includes(session.auth_source)
+      ? session
+      : null;
   } catch (e) {
     return null;
   }

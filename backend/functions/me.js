@@ -3,12 +3,36 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { principalTable } = require('../lib/principal');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
+const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   try {
+    if (session.auth_source === 'application_admin') {
+      const identity = await readApplicationIdentity(event);
+      if (!identity || identity.id !== session.uid || !canUseRobinPlan(identity)) {
+        return json({ error: 'unauthorized' }, { statusCode: 401 });
+      }
+      return json({
+        id: identity.id,
+        lead_id: identity.lead_id || null,
+        username: identity.username || identity.email,
+        email: identity.email,
+        role: 'subscriber_admin',
+        nombre: identity.nombre || null,
+        apellidos: identity.apellidos || null,
+        ciudad: identity.ciudad || null,
+        avatar_url: identity.avatar_url || null,
+        is_subscriber: false,
+        subscription_plan: null,
+        subscription_status: 'none',
+        subscription_started_at: null,
+        current_period_end: null,
+        cancel_at_period_end: false,
+      });
+    }
     const sb = getSupabase();
     const { data: u, error } = await sb.from(principalTable(session.role)).select('*').eq('id', session.uid).single();
     if (error || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });

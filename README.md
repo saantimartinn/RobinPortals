@@ -40,6 +40,8 @@ empaqueta aparte. No subir compilados, dependencias, credenciales o exports de d
 
 ## Documentación
 
+- [Referencia de datos y métricas](docs/REFERENCIA_DATOS_METRICAS.md): fuentes, campos, fórmulas, ejemplos y límites conocidos de las estadísticas de Robin.
+
 - [READMELONG](READMELONG.md): proyecto, contratos, flujos y runtimes con contexto técnico extendido.
 - [USERGUIDE](USERGUIDE.md): índice de lectura por módulos, endpoints y repos conectados.
 - [Cloudflare y enrutamiento](docs/CLOUDFLARE_ROUTING.md): paths públicos, Worker y salto a Netlify.

@@ -11,10 +11,11 @@ async function findSubscriber(sb, identity) {
     ['email', email],
     ['email', email.toLowerCase()],
     ['lead_id', identity.lead_id],
+    ...(identity.external_source === 'community' && identity.external_identity_id ? [['id', identity.external_identity_id]] : []),
   ].filter(([, value]) => value);
   let ambiguous = false;
   for (const [field, value] of lookups) {
-    const { data, error } = await sb.from('subscribers').select('id, lead_id, username, email, role').eq(field, value).limit(2);
+    const { data, error } = await sb.from('subscribers').select('id, lead_id, username, email, role, subscription_status').eq(field, value).limit(2);
     if (error) throw error;
     // Nota: no elegimos una cuenta si un identificador duplicado puede enlazar a otra persona.
     if (data?.length > 1) { ambiguous = true; continue; }
@@ -31,10 +32,25 @@ exports.handler = async (event) => {
   try {
     const identity = await readApplicationIdentity(event);
     if (!identity) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    if (identity.is_application_admin === true && canUseRobinPlan(identity)) {
+      const adminSession = {
+        id: identity.id,
+        lead_id: identity.lead_id,
+        username: identity.username || identity.email,
+        email: identity.email,
+        role: 'subscriber_admin',
+        auth_source: 'application_admin',
+      };
+      return json({ ok: true }, { cookies: [buildSessionCookie(signSession(adminSession))] });
+    }
     const { user, ambiguous } = await findSubscriber(getSupabase(), identity);
     if (ambiguous) return json({ error: 'ambiguous_identity' }, { statusCode: 409 });
     if (!user) return json({ error: 'subscription_account_required' }, { statusCode: 403 });
     if (user.role === 'subscriber_admin' && !canUseRobinPlan(identity)) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
+    if (user.role === 'subscriber' && !['active', 'trialing'].includes(user.subscription_status)) {
+      return json({ error: 'active_subscription_required' }, { statusCode: 403, cookies: [buildSessionCookie('', { clear: true })] });
+    }
+    user.auth_source = 'application_sso';
     const cookie = buildSessionCookie(signSession(user));
     return json({ ok: true }, { cookies: [cookie] });
   } catch (error) {
