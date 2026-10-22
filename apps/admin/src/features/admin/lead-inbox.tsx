@@ -1,9 +1,10 @@
 // Admin feature module for lead inbox; the feature registry connects it to the authenticated shell.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Download, Filter, Plus, Search, UserCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Contact } from "@/types/domain";
+import { adminDataClient, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, Title, ContactDrawer } from './feature-shared';
 import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
@@ -16,6 +17,28 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
   const [view, setView] = useState<InboxView>("all");
+  // Website consultation bookings (hello@ calendar), loaded when Reservas is opened.
+  const [bookings, setBookings] = useState<WebBooking[] | null>(null);
+  const [bookingsError, setBookingsError] = useState("");
+  useEffect(() => {
+    if (view !== "reservas" || bookings) return;
+    let active = true;
+    adminDataClient.listBookings()
+      .then((result) => { if (active) setBookings(result); })
+      .catch((error) => { if (active) { setBookings([]); setBookingsError(error instanceof Error ? error.message : String(error)); } });
+    return () => { active = false; };
+  }, [view, bookings]);
+  // Booking per email: the next upcoming one, else the latest past one.
+  const bookingTimes = useMemo(() => {
+    const times: Record<string, string> = {};
+    const now = Date.now();
+    for (const booking of bookings || []) {
+      for (const email of booking.emails) {
+        if (!times[email] || meetingOrder(booking.start, now) < meetingOrder(times[email], now)) times[email] = booking.start;
+      }
+    }
+    return times;
+  }, [bookings]);
   const [addingLead, setAddingLead] = useState(false);
   const [manualLead, setManualLead] = useState({ name: "", email: "", phone: "", notes: "", owner: "", source: "organic" });
   const [savingLead, setSavingLead] = useState(false);
@@ -23,7 +46,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [groupName, setGroupName] = useState("");
   const [groupRows, setGroupRows] = useState<LeadGroupRow[]>(() => Array.from({ length: 6 }, emptyLeadGroupRow));
   const [savingGroup, setSavingGroup] = useState(false);
-  const list = useMemo(() => contacts.filter((contact) => {
+  const list = useMemo(() => (view === "reservas" ? contacts.map((contact) => ({ ...contact, meetingAt: bookingTimes[contact.email.toLowerCase()] })) : contacts).filter((contact) => {
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
     if (view === "reservas") {
       // Las reservas siguen aquí aunque ya tengan responsable: la consulta está pendiente.
@@ -41,7 +64,20 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
     return view === "all" || view === "reservas" || (contact.country || "Otros") === view;
   }).sort(view === "reservas"
     ? (a, b) => meetingOrder(a.meetingAt) - meetingOrder(b.meetingAt) || a.id.localeCompare(b.id)
-    : (a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view]);
+    : (a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view, bookingTimes]);
+  // Reservas: the booking leads plus website bookings whose email is not in the CRM.
+  const bookingRows = useMemo(() => {
+    if (view !== "reservas") return [];
+    const known = new Set(contacts.map((contact) => contact.email.toLowerCase()).filter(Boolean));
+    const search = query.trim().toLowerCase();
+    const extraAllowed = [sourceFilter, campaignFilter, courseFilter].every((value) => value === "all");
+    const extra: BookingRow[] = extraAllowed ? (bookings || [])
+      .filter((booking) => booking.emails.length && !booking.emails.some((email) => known.has(email)))
+      .map((booking) => ({ key: booking.eventId, meetingAt: booking.start, name: booking.name || booking.emails[0], email: booking.emails[0], course: "", country: "—" }))
+      .filter((row) => `${row.name} ${row.email}`.toLowerCase().includes(search)) : [];
+    const rows: BookingRow[] = list.map((contact) => ({ key: contact.id, meetingAt: contact.meetingAt, contact, name: contact.name, email: contact.email, course: contact.course || "", country: contact.country || "Otros" }));
+    return [...rows, ...extra].sort((a, b) => meetingOrder(a.meetingAt) - meetingOrder(b.meetingAt) || a.key.localeCompare(b.key));
+  }, [view, contacts, bookings, list, query, sourceFilter, campaignFilter, courseFilter]);
   const sources = useMemo(() => [...new Set(contacts.map((contact) => contact.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const campaigns = useMemo(() => [...new Set(contacts.map((contact) => contact.campaign).filter((campaign) => campaign && campaign !== "Pendiente de identificar"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const courses = useMemo(() => [...new Set(contacts.map((contact) => contact.course?.trim()).filter((course): course is string => Boolean(course)))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })), [contacts]);
@@ -75,7 +111,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   return (
     <div className="page">
       <Title name="Bandeja de entrada de leads" sub="Asigna cada nuevo lead al administrador que lo gestionará." eyebrow="Inicio / Vista global">
-        <Badge variant="outline">{list.length} LEADS</Badge>
+        <Badge variant="outline">{view === "reservas" ? `${bookingRows.length} reservas` : `${list.length} leads`}</Badge>
       </Title>
       <div className="module-toolbar">
         <label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nombre, email o canal…" /></label>
@@ -88,7 +124,8 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
       <nav className="inbox-views" aria-label="Secciones de la bandeja">
         {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => setView(key)}>{label}</button>)}
       </nav>
-      {view === "reservas" ? <BookingTable list={list} admins={admins} leadOwners={leadOwners} onAssignLead={onAssignLead} notify={notify} onOpen={setSelected} /> :
+      {view === "reservas" && bookingsError && <p className="assignment-note">{bookingsError}. Se muestran las reservas sin fecha.</p>}
+      {view === "reservas" && !bookings ? <section className="panel inbox-panel"><p className="empty-copy">Cargando reservas…</p></section> : view === "reservas" ? <BookingTable rows={bookingRows} admins={admins} leadOwners={leadOwners} onAssignLead={onAssignLead} notify={notify} onOpen={setSelected} /> :
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
@@ -157,36 +194,38 @@ type InboxView = "all" | "España" | "Portugal" | "reservas";
 const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["reservas", "Reservas"]];
 
 // Upcoming consultations first (closest on top), then past ones (most recent first), then undated.
-function meetingOrder(meetingAt?: string) {
+function meetingOrder(meetingAt?: string, now = Date.now()) {
   const time = meetingAt ? new Date(meetingAt).getTime() : NaN;
   if (!Number.isFinite(time)) return Number.MAX_SAFE_INTEGER;
-  const now = Date.now();
   return time >= now ? time - now : 1e15 + (now - time);
 }
 
 const meetingDate = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Madrid" });
 const meetingTime = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" });
 
-function BookingTable({ list, admins, leadOwners, onAssignLead, notify, onOpen }: { list: Contact[]; admins: string[]; leadOwners: Record<string, string>; onAssignLead: FeatureModuleProps["onAssignLead"]; notify: FeatureModuleProps["notify"]; onOpen: (contact: Contact) => void }) {
+type BookingRow = { key: string; meetingAt?: string; contact?: Contact; name: string; email: string; course: string; country: string };
+
+function BookingTable({ rows, admins, leadOwners, onAssignLead, notify, onOpen }: { rows: BookingRow[]; admins: string[]; leadOwners: Record<string, string>; onAssignLead: FeatureModuleProps["onAssignLead"]; notify: FeatureModuleProps["notify"]; onOpen: (contact: Contact) => void }) {
   return (
     <section className="panel inbox-panel">
       <div className="data-table">
         <table>
           <thead><tr><th>Lead</th><th>Fecha</th><th>Hora</th><th>Curso</th><th>País</th><th>Responsable</th></tr></thead>
           <tbody>
-            {list.length === 0 && <tr><td colSpan={6} className="empty-copy">No hay reservas de consulta pendientes.</td></tr>}
-            {list.map((contact) => {
-              const at = contact.meetingAt ? new Date(contact.meetingAt) : null;
-              const valid = at && Number.isFinite(at.getTime());
-              const past = valid && at.getTime() < Date.now();
+            {rows.length === 0 && <tr><td colSpan={6} className="empty-copy">No hay reservas de consulta.</td></tr>}
+            {rows.map((row) => {
+              const at = row.meetingAt ? new Date(row.meetingAt) : null;
+              const valid = Boolean(at && Number.isFinite(at.getTime()));
+              const past = valid && (at as Date).getTime() < Date.now();
+              const contact = row.contact;
               return (
-                <tr key={contact.id} className={past ? "booking-past" : undefined} onClick={() => onOpen(contact)}>
-                  <td><button type="button" className="lead-name-button" onClick={() => onOpen(contact)}><b>{contact.name}</b><small>{contact.email}</small></button></td>
-                  <td>{valid ? <time dateTime={contact.meetingAt}>{meetingDate.format(at)}</time> : "Sin fecha"}</td>
-                  <td>{valid ? meetingTime.format(at) : "—"}</td>
-                  <td>{contact.course || ""}</td>
-                  <td>{contact.country || "Otros"}</td>
-                  <td>
+                <tr key={row.key} className={past ? "booking-past" : undefined} onClick={contact ? () => onOpen(contact) : undefined}>
+                  <td>{contact ? <button type="button" className="lead-name-button" onClick={() => onOpen(contact)}><b>{row.name}</b><small>{row.email}</small></button> : <span className="lead-name-button"><b>{row.name}</b><small>{row.email} · sin lead en el CRM</small></span>}</td>
+                  <td>{valid ? <time dateTime={row.meetingAt}>{meetingDate.format(at as Date)}</time> : "Sin fecha"}</td>
+                  <td>{valid ? meetingTime.format(at as Date) : "—"}</td>
+                  <td>{row.course}</td>
+                  <td>{row.country}</td>
+                  <td>{contact ? (
                     <select className="owner-select" value={leadOwners[contact.id] || ""} onClick={(event) => event.stopPropagation()} onChange={(event) => {
                       onAssignLead(contact.id, event.target.value);
                       notify(`${contact.name} asignado a ${event.target.value || "nadie"}`);
@@ -194,7 +233,7 @@ function BookingTable({ list, admins, leadOwners, onAssignLead, notify, onOpen }
                       <option value="">Sin asignar</option>
                       {admins.map((admin) => <option key={admin}>{admin}</option>)}
                     </select>
-                  </td>
+                  ) : "—"}</td>
                 </tr>
               );
             })}
