@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { EmptyChartBar } from "@/components/empty-chart-bar";
 import { integrationClient } from "@/services/integrations";
+import { DashboardLoader } from "@/components/dashboard-loader";
 import type { HoldedSnapshot, SalesDashboard } from "@/services/integrations";
 import type { Contact, CrmStage } from "@/types/domain";
 import type { PortalClient, PortalSnapshot } from "@/services/portal";
@@ -28,12 +29,17 @@ function dashboardReportUrl(type: "altas" | "embudo" | "facturacion", period: st
 export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded, isDeveloperAdmin }: { snapshot: PortalSnapshot | null; contacts: Contact[]; leadStages: Record<string, CrmStage>; currentUser: string; holded: HoldedSnapshot | null; isDeveloperAdmin: boolean }) {
   const [period, setPeriod] = useState<"7" | "15" | "30" | "all">("all");
   const [acquisition, setAcquisition] = useState<SalesDashboard["acquisition"] | null>(null);
+  // The charts and counts wait for the acquisition data instead of drawing a local
+  // estimate first and jumping when it arrives; if it fails, the local estimate stays.
+  const [acquisitionLoading, setAcquisitionLoading] = useState(true);
   useEffect(() => {
     let active = true;
     setAcquisition(null);
+    setAcquisitionLoading(true);
     integrationClient.salesDashboard(dashboardAcquisitionPeriod(period))
       .then((result) => { if (active) setAcquisition(result.acquisition); })
-      .catch(() => { if (active) setAcquisition(null); });
+      .catch(() => { if (active) setAcquisition(null); })
+      .finally(() => { if (active) setAcquisitionLoading(false); });
     return () => { active = false; };
   }, [period]);
   const today = new Date(); today.setHours(23, 59, 59, 999);
@@ -71,6 +77,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
         <label className="dashboard-period"><CalendarDays /><select value={period} onChange={(event) => setPeriod(event.target.value as "7" | "15" | "30" | "all")}><option value="7">Últimos 7 días</option><option value="15">Últimos 15 días</option><option value="30">Últimos 30 días</option><option value="all">Todo</option></select><ChevronDown /></label>
       </div>
 
+      {acquisitionLoading ? <DashboardLoader /> : <>
       <section className="stats">
         {liveStats.map(([label, value, detail, Icon, tone, report]) => report ? <a className="stat-report-link" href={report} target="_blank" rel="noreferrer" key={label} aria-label={`Abrir informe de ${label}`}><article><i className={tone}><Icon /></i><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div><ExternalLink /></article></a> : <article key={label}><i className={tone}><Icon /></i><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div></article>)}
       </section>
@@ -102,6 +109,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
           <div className="comparison-legend"><span className="current">Este año</span><span className="previous">Año anterior</span></div><ResponsiveContainer width="100%" height={210}><BarChart data={financeData} layout="vertical" margin={{ left: 24, right: 18 }} barGap={-12}><CartesianGrid horizontal={false} stroke="#EDECDB" /><XAxis type="number" axisLine={false} tickLine={false} /><YAxis type="category" dataKey="label" axisLine={false} tickLine={false} width={72} /><Tooltip formatter={(value) => `${Number(value).toLocaleString("es-ES")} €`} /><Bar dataKey="previousValue" name="Año anterior" fill="#EDECDB" radius={[0,5,5,0]} /><Bar dataKey="value" name="Este año" fill="#2D3A64" radius={[0,5,5,0]} /></BarChart></ResponsiveContainer>
         </a>
       </div>
+      </>}
     </div>
   );
 }

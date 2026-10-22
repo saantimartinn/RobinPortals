@@ -16,6 +16,9 @@ import { RobinPlanDeveloperDatabase } from "./RobinPlanDeveloperDatabase.jsx";
 import "../../application/subscription-portal.css";
 
 function SubscriberAdmin({ applicationIdentity }) {
+  // Signed-in admin, shown in the sidebar stamp as in the admin app.
+  const adminKey = String(applicationIdentity?.email || applicationIdentity?.username || "").split("@")[0];
+  const adminName = applicationIdentity?.nombre || (adminKey ? adminKey.charAt(0).toUpperCase() + adminKey.slice(1) : "Administrador");
   const [section, setSection] = useState("panel");
   const [data, setData] = useState({ users: [], events: [], partners: [], requests: [], discount_codes: [], notifications: [], challenges: [], submissions: [] });
   const [loading, setLoading] = useState(true);
@@ -61,8 +64,8 @@ function SubscriberAdmin({ applicationIdentity }) {
       <div className="student-layout">
         <nav className="student-sidebar" aria-label="Navegación de administración">
           <div className="student-identity">
-            <div className="student-avatar">A</div>
-            <div><strong>Equipo Robin</strong><span>Panel de suscriptores</span></div>
+            <div className="student-avatar">{applicationIdentity?.avatar_url ? <img src={applicationIdentity.avatar_url} alt="" /> : adminName.slice(0, 2).toUpperCase()}</div>
+            <div><strong>{adminName}</strong><span>Administración</span></div>
           </div>
           <p className="student-nav-caption">Gestión</p>
           <div className="student-nav-items">

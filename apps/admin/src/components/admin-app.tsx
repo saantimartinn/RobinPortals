@@ -318,7 +318,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   }
 
   const dashboardLoading =
-    (!crmLoaded && (path === "/bandeja-leads" || path.startsWith("/crm"))) ||
+    (!crmLoaded && (path === "/" || path === "/bandeja-leads" || path.startsWith("/crm"))) ||
     (portalLoading && (["/", "/alumnos-global", "/analitica-global"].includes(path) || path.startsWith("/informes/inicio"))) ||
     (!crmLoaded && path.startsWith("/informes/inicio"));
 

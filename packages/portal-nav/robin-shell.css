@@ -6,8 +6,9 @@
  * (sello) with a perforated edge, from the brand's travel elements.
  * Each app imports this file last, so these rules win over the app styles. */
 
-/* Page and type */
-.student-portal,.admin-workspace{background:var(--robin-cream);color:var(--robin-navy);font-family:var(--robin-font-text);font-size:15px}
+/* Page and type. The shell fills exactly the window below the top bar, so short
+   pages do not scroll and the sticky sidebar never slides away. */
+.student-portal,.admin-workspace{min-height:calc(100vh - 4.75rem);background:var(--robin-cream);color:var(--robin-navy);font-family:var(--robin-font-text);font-size:15px}
 .student-main :is(h1,h2,h3),.admin-workarea :is(h1,h2,h3){font-family:var(--robin-font-display);font-weight:600;letter-spacing:.005em;color:var(--robin-navy)}
 .student-main .student-progress-card :is(h1,h2,h3),.student-main [class*="text-white"] :is(h1,h2,h3),.student-main :is(h1,h2,h3)[class*="text-white"]{color:var(--robin-on-navy)}
 .student-page-heading,.admin-page-heading{margin:0 0 1.75rem}
@@ -36,7 +37,8 @@
 .student-portal .student-identity,.admin-workspace .admin-team{position:relative;display:flex;align-items:center;gap:.75rem;width:auto;min-height:4.75rem;margin:0 1rem 1rem;padding:.9rem 1.1rem;border:0;border-radius:0;color:var(--robin-navy);text-align:left;background:var(--robin-stamp-edge),var(--robin-paper)}
 .student-portal .student-identity>div:last-child,.admin-workspace .admin-team>div{min-width:0;flex:1}
 .student-portal .student-identity::after,.admin-workspace .admin-team::after{content:"";position:absolute;inset:8px;border:1px solid var(--robin-ink-200);pointer-events:none}
-.student-portal .student-avatar,.admin-workspace .admin-team-icon{width:2.5rem;height:2.5rem;flex:0 0 2.5rem;border:0;border-radius:50%;background:var(--robin-orange);color:var(--robin-navy);font:600 1.15rem var(--robin-font-display)}
+.student-portal .student-avatar,.admin-workspace .admin-team-icon{display:grid;place-items:center;width:2.5rem;height:2.5rem;flex:0 0 2.5rem;overflow:hidden;border:0;border-radius:50%;background:var(--robin-orange);color:var(--robin-navy);font:600 1rem var(--robin-font-display)}
+.student-portal .student-avatar img,.admin-workspace .admin-team-icon img{width:100%;height:100%;object-fit:cover}
 .student-portal .student-identity strong,.admin-workspace .admin-team strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 1.15rem/1.15 var(--robin-font-display);color:var(--robin-navy)}
 .student-portal .student-identity span,.admin-workspace .admin-team div span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.15rem;font:400 .85rem/1.2 var(--robin-font-subtitle);color:var(--robin-ink-600)}
 
@@ -66,6 +68,7 @@
 @media (max-height:820px){.student-portal .student-support,.admin-workspace .admin-sidebar-note{display:none}}
 
 /* Narrow screens: the sidebar becomes a navy strip of links under the top bar. */
+@media(max-width:800px){.student-portal,.admin-workspace{min-height:calc(100vh - 4rem)}}
 @media(max-width:1023px){
   .student-portal .student-layout,.admin-workspace .admin-layout{display:block}
   .student-portal .student-sidebar,.admin-workspace .admin-sidebar{top:4rem;z-index:20;height:auto;padding:.5rem .75rem}
