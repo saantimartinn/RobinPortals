@@ -1,5 +1,5 @@
 // Resolves the local subscriber session and selects the subscriber or admin shell.
-import { CREAM } from "./shared/theme.js";
+import { CANVAS } from "./shared/theme.js";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { loginUrl } from "../../../../packages/portal-nav/links.js";
@@ -49,9 +49,9 @@ function PortalRobin() {
     await apiLogout();
     window.location.replace("/portal/logout");
   }
-  if (state.loading || (isSubscriberAdmin(state.user) && checkingAdminPermission)) return <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Cargando portal" /></div>;
+  if (state.loading || (isSubscriberAdmin(state.user) && checkingAdminPermission)) return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Cargando portal" /></div>;
   if (!state.user) {
-    return <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Redirigiendo al acceso común" /></div>;
+    return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Redirigiendo al acceso común" /></div>;
   }
   if (isSubscriberAdmin(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={applicationIdentity} onLogout={handleLogout} />

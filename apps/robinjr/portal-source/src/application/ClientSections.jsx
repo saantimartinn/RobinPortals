@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, MapPin, Shield, UploadCloud, X } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
-import { CREAM, GOLD, NAVY } from "../theme.js";
+import { SOFT, GOLD, NAVY } from "../theme.js";
 import { eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
 import { statusLabel } from "./documents/document-utils.js";
 import { Factura } from "./payments/InvoiceReceipt.jsx";

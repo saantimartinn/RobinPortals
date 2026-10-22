@@ -38,7 +38,7 @@ import financialConfig from "../../../shared/financial-config.cjs";
 import academicSystemsConfig from "../../../shared/academic-systems.cjs";
 import { APP_STEPS } from "../application-steps.js";
 import { fileToDataURL, uid } from "../browser-utils.js";
-import { CREAM, GOLD, NAVY, NAVY_DARK } from "../theme.js";
+import { SOFT, GOLD, NAVY, NAVY_DARK } from "../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader, Divider, Field, SelectField, TextareaField } from "../ui.jsx";
 import { daysBetween, eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
 import { Factura } from "./payments/InvoiceReceipt.jsx";

@@ -1,5 +1,5 @@
 /* Application UI for admin portal; shared navigation and session state are owned by the surrounding shell. */
-.admin-workspace { --admin-navy: #29395f; --admin-gold: #f4be4f; min-height: 100vh; background: #f7f8fa; color: #253452; font-family: Inter, 'Segoe UI', sans-serif; }
+.admin-workspace { --admin-navy: #29395f; --admin-gold: #f4be4f; min-height: 100vh; background: #fff; color: #253452; font-family: Inter, 'Segoe UI', sans-serif; }
 .admin-workspace * { box-sizing: border-box; }
 .admin-workspace button, .admin-workspace input, .admin-workspace select, .admin-workspace textarea { font: inherit; }
 .admin-workspace button { cursor: pointer; }
@@ -10,7 +10,7 @@
 .admin-layout { max-width: 1600px; margin: auto; display: grid; grid-template-columns: 235px minmax(0,1fr); }
 .admin-sidebar { padding: 32px 20px; border-right: 1px solid #e5e9ef; background: white; }
 .admin-team { display: flex; gap: 12px; align-items: center; margin-bottom: 38px; }
-.admin-team-icon { background: #f7edce; display: grid; place-items: center; width: 42px; height: 44px; border-radius: 14px; }
+.admin-team-icon { background: #fff4df; display: grid; place-items: center; width: 42px; height: 44px; border-radius: 14px; }
 .admin-team strong, .admin-team div span { display: block; font-size: 14px; }
 .admin-team div span { font-size: 12px; margin-top: 3px; color: #758196; }
 .admin-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: .13em; color: #71809a; }
@@ -20,7 +20,7 @@
 .admin-global-nav button:hover { background: #f3f5f8; }
 .admin-global-nav button[aria-current] { background: var(--admin-navy); color: white; }
 .admin-global-nav small { margin-left: auto; border-radius: 6px; padding: 1px 6px; background: #ffffff22; font-size: 11px; }
-.admin-sidebar-note { margin: 50px 3px 0; background: #faf7ed; border: 1px solid #eee8d8; border-radius: 16px; padding: 21px 18px; }
+.admin-sidebar-note { margin: 50px 3px 0; background: #f8fafc; border: 1px solid #e0e6ed; border-radius: 16px; padding: 21px 18px; }
 .admin-sidebar-note h3 { font-size: 15px; font-weight: 750; margin: 16px 0 8px; }
 .admin-sidebar-note p { color: #78808c; font-size: 12px; line-height: 1.8; }
 .admin-workarea { min-width: 0; padding: 34px 32px 100px; }
@@ -43,11 +43,11 @@
 .admin-dashboard-kpis > div:first-child > div:nth-child(2) { color: white; }
 .admin-workspace .ui-card button { min-height: 36px; }
 .admin-workspace .ui-card input:not([type=checkbox]), .admin-workspace .ui-card select, .admin-workspace .ui-card textarea { min-width: 0; max-width: 100%; }
-.admin-client-context { position: sticky; top: 0; z-index: 15; background: #f7f8faf5; backdrop-filter: blur(14px); padding-top: 14px; margin: -14px 0 24px; border-bottom: 1px solid #dfe5ec; }
+.admin-client-context { position: sticky; top: 0; z-index: 15; background: #fffffff5; backdrop-filter: blur(14px); padding-top: 14px; margin: -14px 0 24px; border-bottom: 1px solid #dfe5ec; }
 .admin-breadcrumb { display: flex; align-items: center; gap: 10px; font-size: 11px; color: #7b8799; margin-bottom: 20px; }
 .admin-breadcrumb button { display: flex; align-items: center; gap: 6px; color: #34466b; background: none; border: 0; }
 .admin-client-heading { display: flex; align-items: center; gap: 15px; }
-.admin-client-avatar { display: grid; place-items: center; width: 54px; height: 58px; flex-shrink: 0; border-radius: 17px; background: #ede7d4; color: var(--admin-navy); font-weight: 750; font-size: 19px; text-transform: uppercase; }
+.admin-client-avatar { display: grid; place-items: center; width: 54px; height: 58px; flex-shrink: 0; border-radius: 17px; background: #edf3fa; color: var(--admin-navy); font-weight: 750; font-size: 19px; text-transform: uppercase; }
 .admin-client-identity { flex: 1; min-width: 0; }
 .admin-client-identity h1 { font-size: clamp(20px,2.4vw,28px); font-weight: 760; letter-spacing: -.03em; overflow-wrap: anywhere; }
 .admin-client-identity p { font-size: 12px; color: #71809a; overflow-wrap: anywhere; margin-top: 3px; }

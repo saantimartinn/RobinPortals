@@ -1,7 +1,7 @@
 // Shell or navigation module for subscription plan picker; local authentication state stays in the application layer.
 import { AlertCircle, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Badge, Btn } from "../shared/ui.jsx";
-import { CREAM, NAVY } from "../shared/theme.js";
+import { CANVAS, NAVY } from "../shared/theme.js";
 import React, { useEffect, useState } from "react";
 import { SUBSCRIBER_SERVICES } from "../shared/constants.js";
 import { formatMoney } from "../shared/utils.js";
@@ -38,7 +38,7 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || "").trim();
 
   return (
-    <div className="min-h-screen" style={{ background: CREAM }}>
+    <div className="min-h-screen" style={{ background: CANVAS }}>
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="text-center mb-8">
           <div className="text-2xl md:text-3xl font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>

@@ -24,7 +24,7 @@ import robinBike from "../assets/robin-bike.jpg";
 import financialConfig from "../../../shared/financial-config.cjs";
 import { APP_STEPS } from "../application-steps.js";
 import { uid } from "../browser-utils.js";
-import { CREAM, GOLD, NAVY, NAVY_DARK } from "../theme.js";
+import { SOFT, GOLD, NAVY, NAVY_DARK } from "../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader, Divider, Field, SelectField, TextareaField } from "../ui.jsx";
 import { daysBetween, eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
 import { reportClientError, formatTime, formatDate } from "../client-utils.js";

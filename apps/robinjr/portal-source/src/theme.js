@@ -2,4 +2,6 @@
 export const NAVY = "#1B2F6E";
 export const NAVY_DARK = "#0e1c45";
 export const GOLD = "#F5A623";
-export const CREAM = "#FAF8F0";
+// Same tints as the admin: SOFT for selected states and icon boxes, CANVAS for page backgrounds.
+export const SOFT = "#edf3fa";
+export const CANVAS = "#ffffff";

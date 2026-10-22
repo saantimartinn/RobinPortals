@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, Shield, UploadCloud } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
-import { CREAM, GOLD, NAVY } from "../theme.js";
+import { SOFT, GOLD, NAVY } from "../theme.js";
 import { eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
 import { statusLabel } from "./documents/document-utils.js";
 import { Factura } from "./payments/InvoiceReceipt.jsx";
@@ -153,7 +153,7 @@ export function CarrerasCliente() {
             <div className="space-y-2">
               {careers.map((c) => (
                 <div key={c.id} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3">
-                  <div className="h-9 w-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: CREAM }}>
+                  <div className="h-9 w-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: SOFT }}>
                     <BookOpen className="h-4 w-4" style={{ color: NAVY }} />
                   </div>
                   <div className="flex-1 min-w-0">

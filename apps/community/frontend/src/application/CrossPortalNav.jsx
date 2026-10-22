@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { ROBIN_LINKS as LINKS } from "../../../../../packages/portal-nav/links.js";
 import robinWordmark from "../assets/robin-wordmark.png";
-import "./cross-portal-nav.css";
+import "../../../../../packages/portal-nav/cross-portal-nav.css";
 
 const STUDENT_KEYS = new Set(["robinjr", "application", "subscriptions"]);
 
