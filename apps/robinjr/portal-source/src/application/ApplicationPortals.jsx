@@ -116,7 +116,7 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
         <nav className="student-sidebar" aria-label="Navegación del alumno">
           <div className="student-identity">
             <div className="student-avatar">{profilePhoto ? <img src={profilePhoto} alt="Tu foto de perfil" /> : (clientName || "R").charAt(0).toUpperCase()}</div>
-            <div><strong>{clientName}</strong><span>Estudiante Robin Jr</span></div>
+            <div><strong>{user?.nombre?.trim() || clientName.split(" ")[0]}</strong><span>Estudiante Robin Jr</span></div>
           </div>
           <p className="student-nav-caption">Tu espacio</p>
           <div className="student-nav-items">
