@@ -1,0 +1,42 @@
+/* Browser-side index module for the application. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.birthday-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.birthday-confetti-piece {
+  position: absolute;
+  top: -12vh;
+  width: 9px;
+  height: 16px;
+  border-radius: 2px;
+  opacity: .95;
+  animation: birthday-confetti-fall var(--birthday-duration) linear infinite;
+  animation-delay: var(--birthday-delay);
+}
+
+@keyframes birthday-confetti-fall {
+  to {
+    transform: translate3d(var(--birthday-drift), 124vh, 0) rotate(var(--birthday-rotation));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .birthday-confetti-piece { animation: none; top: 8%; opacity: .45; }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
