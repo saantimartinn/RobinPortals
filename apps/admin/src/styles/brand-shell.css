@@ -71,3 +71,10 @@ body,.work,.page{background:var(--robin-cream)!important;font-family:var(--robin
   .crm-board .outcome-dropzones{min-width:0}
   .crm-board .outcome-dropzones span{padding:0 .5rem;overflow-wrap:anywhere}
 }
+
+/* Lead inbox sections: General, España, Portugal, Reservas. */
+.inbox-views{display:inline-flex;gap:.25rem;margin:0 0 1rem;padding:.25rem;border:var(--robin-line);border-radius:calc(var(--robin-radius-control) + .25rem);background:var(--robin-paper)}
+.inbox-views button{height:2.25rem;padding:0 1rem;border:0;border-radius:var(--robin-radius-control);background:transparent;color:var(--robin-ink-600);font:500 .875rem var(--robin-font-text);cursor:pointer}
+.inbox-views button:hover{color:var(--robin-navy);background:var(--robin-ink-50)}
+.inbox-views button[aria-pressed="true"]{background:var(--robin-navy);color:var(--robin-paper);font-weight:600}
+.inbox-panel tbody tr.booking-past td{color:var(--robin-ink-500)}

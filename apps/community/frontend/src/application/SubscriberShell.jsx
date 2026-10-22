@@ -99,7 +99,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
         <nav className="student-sidebar" aria-label="Navegación de Robin Community">
           <button type="button" className="student-identity w-full text-left" onClick={() => setActive("perfil")} title="Ver tu perfil">
             <div className="student-avatar">{user.avatar_url ? <img src={user.avatar_url} alt="Tu foto de perfil" /> : (clientName || "R").charAt(0).toUpperCase()}</div>
-            <div><strong>{clientName}</strong><span>Miembro {rdefShell.label}</span></div>
+            <div><strong>{user?.nombre?.trim() || clientName.split(" ")[0]}</strong><span>Miembro {rdefShell.label}</span></div>
           </button>
           <p className="student-nav-caption">Tu espacio</p>
           <div className="student-nav-items">
