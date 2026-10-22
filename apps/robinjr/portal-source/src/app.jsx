@@ -108,7 +108,7 @@ export default function PortalRobin() {
 
   async function handleLogout() {
     await apiLogout();
-    window.location.replace("https://project-robin.com/portal/logout");
+    window.location.replace("/portal/logout");
   }
 
   async function refreshUser() {
@@ -142,7 +142,7 @@ export default function PortalRobin() {
     );
   }
 
-  if (!authState.user) return <main className="min-h-screen grid place-content-center gap-4 px-6 text-center text-[#263b6a]" role="alert"><h1 className="text-2xl font-bold">Acceso a RobinJr</h1><p>{entryError || "Redirigiendo al inicio de sesión común…"}</p>{entryError && <a className="underline" href="https://project-robin.com/login?next=robinjr">Volver al inicio de sesión</a>}</main>;
+  if (!authState.user) return <main className="min-h-screen grid place-content-center gap-4 px-6 text-center text-[#263b6a]" role="alert"><h1 className="text-2xl font-bold">Acceso a RobinJr</h1><p>{entryError || "Redirigiendo al inicio de sesión común…"}</p>{entryError && <a className="underline" href="/login?next=robinjr">Volver al inicio de sesión</a>}</main>;
   if (isAdminUser(authState.user)) return <>
     <CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} />
     <AdminPortal user={authState.user} />

@@ -13,7 +13,7 @@
 const { sendEmail } = require('./email');
 const { publicBaseUrl } = require('./operational-config');
 
-// Documentos: { slug alojado en /portal/recursos, nombre visible del adjunto }
+// Documentos: { slug alojado en /robinjr/recursos, nombre visible del adjunto }
 const DOCS = [
   { file: 'adaptacion-cultural-holanda.pdf',      name: 'Adaptación cultural y vida diaria en Holanda.pdf' },
   { file: 'trabajar-y-estudiar-nl.pdf',           name: 'Cómo trabajar y estudiar en los Países Bajos.pdf' },
@@ -138,7 +138,7 @@ async function sendWelcomeEmail(sb, userId) {
     if (base) {
       attachments = DOCS.map((d) => ({
         filename: d.name,
-        path: `${base}/portal/recursos/${d.file}`,
+        path: `${base}/robinjr/recursos/${d.file}`,
       }));
     } else {
       console.error('[welcome] sin base URL: correo enviado SIN adjuntos');

@@ -1,6 +1,6 @@
 /**
  * POST /api/stripe/webhook  (público · sin auth ni verifyOrigin)
- * Verifica la firma con STRIPE_WEBHOOK_SECRET y cumple el pago de forma
+ * Verifica la firma con COMMUNITY_STRIPE_WEBHOOK_SECRET y cumple el pago de forma
  * autoritativa al recibir checkout.session.completed.
  *
  * Requiere el body crudo (Stripe firma el payload exacto). Netlify entrega
@@ -11,7 +11,7 @@ const stripeLib = require('../lib/stripe');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
-  if (!stripeLib.isConfigured() || !process.env.STRIPE_WEBHOOK_SECRET) {
+  if (!stripeLib.isConfigured() || !process.env.COMMUNITY_STRIPE_WEBHOOK_SECRET) {
     return { statusCode: 503, body: 'stripe_not_configured' };
   }
 
@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
   let evt;
   try {
-    evt = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    evt = stripe.webhooks.constructEvent(raw, sig, process.env.COMMUNITY_STRIPE_WEBHOOK_SECRET);
   } catch (e) {
     console.error('stripe-webhook signature error:', e && e.message);
     return { statusCode: 400, body: `Webhook Error: ${e && e.message}` };

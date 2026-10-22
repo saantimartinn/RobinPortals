@@ -1,10 +1,9 @@
+// All Robin apps are served from one origin, so cross-portal links are same-origin paths.
+// VITE_ROBIN_ORIGIN can point them at another host (for example a standalone preview).
 const env = import.meta.env || {};
 
-const admin = (env.VITE_ROBIN_ADMIN_URL || 'https://project-robin.com').replace(/\/$/, '');
-const robinJr = (env.VITE_ROBINJR_URL || 'https://robinjr.netlify.app').replace(/\/$/, '');
-const portal = (env.VITE_ROBIN_PORTAL_URL || 'https://project-robin.com').replace(/\/$/, '');
-const community = (env.VITE_ROBIN_COMMUNITY_URL || 'https://project-robin.com').replace(/\/$/, '');
-export const ROBIN_LOGIN_URL = env.VITE_ROBIN_LOGIN_URL || 'https://project-robin.com/login';
+const origin = (env.VITE_ROBIN_ORIGIN || '').replace(/\/$/, '');
+export const ROBIN_LOGIN_URL = `${origin}/login`;
 
 export function loginUrl(next) {
   const url = new URL(ROBIN_LOGIN_URL, window.location.origin);
@@ -13,10 +12,10 @@ export function loginUrl(next) {
 }
 
 export const ROBIN_LINKS = [
-  [`${admin}/admin`, 'Inicio', 'admin'],
-  [`${robinJr}/portal/`, 'RobinJr', 'robinjr'],
-  [`${portal}/portal/`, 'Portal del Alumno', 'application'],
-  [`${community}/therobinplan/`, 'Robin Community', 'subscriptions'],
-  [`${admin}/admin/crm`, 'CRM', 'admin-crm'],
-  [`${admin}/admin/analiticas/ventas`, 'Otras métricas', 'admin-analytics'],
+  [`${origin}/admin`, 'Inicio', 'admin'],
+  [`${origin}/robinjr/`, 'RobinJr', 'robinjr'],
+  [`${origin}/portal/`, 'Portal del Alumno', 'application'],
+  [`${origin}/therobinplan/`, 'Robin Community', 'subscriptions'],
+  [`${origin}/admin/crm`, 'CRM', 'admin-crm'],
+  [`${origin}/admin/analiticas/ventas`, 'Otras métricas', 'admin-analytics'],
 ];

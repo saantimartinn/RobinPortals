@@ -4,11 +4,13 @@
   "private": true,
   "description": "Robin student portal, Robin Jr, community, and admin monorepo",
   "scripts": {
-    "dev:all": "node dev/run-all.mjs",
-    "build:robinjr": "npm --prefix apps/robinjr/portal-source run build",
-    "build:portal": "npm --prefix apps/portal/portal-source run build",
-    "build:community": "npm --prefix apps/community run build",
-    "build:admin": "npm --prefix apps/admin run build",
-    "build:all": "npm run build:robinjr && npm run build:portal && npm run build:community && npm run build:admin"
+    "dev": "node dev/run-all.mjs",
+    "site:config": "node site/generate-config.mjs",
+    "site:build": "node site/build.mjs",
+    "site:env": "node site/env.mjs",
+    "test": "node site/test-all.mjs"
+  },
+  "devDependencies": {
+    "smol-toml": "1.9.0"
   }
 }

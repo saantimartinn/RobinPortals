@@ -47,7 +47,7 @@ function PortalRobin() {
   }
   async function handleLogout() {
     await apiLogout();
-    window.location.replace("https://project-robin.com/portal/logout");
+    window.location.replace("/portal/logout");
   }
   if (state.loading || (isSubscriberAdmin(state.user) && checkingAdminPermission)) return <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Cargando portal" /></div>;
   if (!state.user) {
@@ -55,7 +55,7 @@ function PortalRobin() {
   }
   if (isSubscriberAdmin(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={applicationIdentity} onLogout={handleLogout} />
-    {applicationIdentity?.is_application_admin ? <SubscriberAdmin applicationIdentity={applicationIdentity} /> : <main role="alert" className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]"><h1 className="text-2xl font-bold">Robin Community no disponible</h1><p>No se ha podido validar la cuenta de administrador.</p><a className="underline" href="https://project-robin.com/admin">Volver al portal del administrador</a></main>}
+    {applicationIdentity?.is_application_admin ? <SubscriberAdmin applicationIdentity={applicationIdentity} /> : <main role="alert" className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#263b6a]"><h1 className="text-2xl font-bold">Robin Community no disponible</h1><p>No se ha podido validar la cuenta de administrador.</p><a className="underline" href="/admin">Volver al portal del administrador</a></main>}
   </>;
   if (isSubscriberUser(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} />

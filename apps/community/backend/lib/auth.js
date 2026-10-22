@@ -15,8 +15,8 @@ const COOKIE_NAME = 'robin_subscription_session';
 const COOKIE_MAX_AGE_S = 60 * 60 * 24 * 7; // 7 dias
 
 function getJwtSecret() {
-  const s = process.env.JWT_SECRET;
-  if (!s) throw new Error('JWT_SECRET no configurado');
+  const s = process.env.COMMUNITY_JWT_SECRET;
+  if (!s) throw new Error('COMMUNITY_JWT_SECRET no configurado');
   return s;
 }
 

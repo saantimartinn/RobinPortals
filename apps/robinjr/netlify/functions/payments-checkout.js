@@ -70,7 +70,7 @@ exports.handler = async (event) => {
         email: u.email,
         attemptId: attempt.id,
         kind: 'installment',
-        redirectUrl: `${revolut.getBaseUrl(event)}/portal/?payment_attempt=${attempt.id}`,
+        redirectUrl: `${revolut.getBaseUrl(event)}/robinjr/?payment_attempt=${attempt.id}`,
       });
       await attempts.attachProviderOrder(sb, attempt.id, order);
       return json({ url: order.checkout_url, id: order.id, attempt_id: attempt.id, provider });

@@ -37,7 +37,7 @@ export function PagosCliente() {
     // Si el pago tiene factura de Holded, se abre su PDF; si no (pagos antiguos),
     // se usa la factura imprimible del portal como respaldo.
     if (p && p.payment_data && p.payment_data.holded_invoice_id) {
-      window.open("/api/invoice-pdf?payment_id=" + encodeURIComponent(p.id), "_blank", "noopener");
+      window.open("/robinjr/api/invoice-pdf?payment_id=" + encodeURIComponent(p.id), "_blank", "noopener");
     } else {
       openFactura(p);
     }

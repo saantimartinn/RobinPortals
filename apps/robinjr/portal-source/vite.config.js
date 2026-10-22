@@ -7,7 +7,7 @@ import { legacyCjsBrowser } from "../../../dev/vite-legacy-cjs.mjs";
 export default defineConfig({
   plugins: [legacyCjsBrowser({ sharedDir: fileURLToPath(new URL("../shared/", import.meta.url)) }), react()],
   server: { fs: { allow: [fileURLToPath(new URL("../../../", import.meta.url))] } },
-  base: "/portal/",
+  base: "/robinjr/",
   build: {
     outDir: "dist",
     emptyOutDir: true,

@@ -35,7 +35,7 @@ function publicBaseUrl(env = currentEnvironment()) {
 }
 
 function portalUrl(env = currentEnvironment()) {
-  return `${publicBaseUrl(env)}/portal/`;
+  return `${publicBaseUrl(env)}/robinjr/`;
 }
 
 module.exports = {
