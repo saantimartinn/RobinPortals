@@ -1,0 +1,26 @@
+# Dependencies (restored with npm install / npm ci)
+node_modules/
+portal-source/node_modules/
+
+# Generated frontend builds
+portal/
+portal-source/dist/
+deploy/
+
+# Vite temporary files
+portal-source/vite.config.*.mjs
+
+# Local operating-system and editor files
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+
+# Netlify local state
+.netlify/
+
+# Supabase local state and read-only exports
+supabase/.temp/
+supabase-export*/

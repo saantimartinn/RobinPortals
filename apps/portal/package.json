@@ -1,0 +1,18 @@
+{
+  "name": "robin-portal-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma de alumnos y administración de Project Robin",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "bcryptjs": "^2.4.3",
+    "cookie": "^1.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "pdfkit": "^0.15.0"
+  }
+}
