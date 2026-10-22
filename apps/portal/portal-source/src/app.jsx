@@ -10,6 +10,7 @@ import { Btn, Field } from "./ui.jsx";
 import { reportClientError } from "./client-utils.js";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
+import { AdminPortal } from "./application/AdminPortal.jsx";
 import {
   OnboardingContract,
   OnboardingDNI,
@@ -121,8 +122,9 @@ export default function PortalRobin() {
     const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
     let next = null;
     try { next = new URLSearchParams(window.location.search).get("next"); } catch (_) {}
+    // Admins land in the admin after logging in; on /portal they get the admin view of the student portal.
     if (admin) {
-      if (pathname !== "/admin") {
+      if (next === "/admin" || pathname === "/login") {
         landingHandled.current = true;
         window.location.replace("/admin");
       }
@@ -244,11 +246,11 @@ export default function PortalRobin() {
     );
   }
 
-  if (authState.user && isAdminUser(authState.user)) {
-    return <div className="min-h-screen grid place-items-center" style={{ background: CREAM }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Abriendo el portal del administrador" /></div>;
-  }
-
   if (!authState.user) return <LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} />;
+  if (isAdminUser(authState.user)) return <>
+    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
+    <AdminPortal user={authState.user} />
+  </>;
   if (authState.user.auth_source === "external_client") return <>
     <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#263b6a]" role="status">
