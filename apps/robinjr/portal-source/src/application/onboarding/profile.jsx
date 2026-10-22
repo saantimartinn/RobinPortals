@@ -24,7 +24,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     const system = academicSystemByValue(user.academic_system);
     return system ? Array.from({ length: system.subjectCount }, () => ({ name: "", level: "" })) : [];
   });
-  const [screen, setScreen] = useState(0); // 0 = correo + intereses
+  const [screen, setScreen] = useState(0); // index into screens (0 = correo + intereses)
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -45,8 +45,15 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       : [Q_GENERAL, ...intereses.map((i) => Q_AREAS[i]).filter(Boolean), Q_VOCACIONAL],
     [intereses, esMaestria]
   );
-  const academicScreen = blocks.length + 1;
-  const totalScreens = academicScreen + 1;
+  // One screen per question, between the intro (correo + intereses) and the academic system.
+  const screens = useMemo(() => [
+    { kind: "intro" },
+    ...blocks.flatMap((block) => block.questions.map((q) => ({ kind: "question", block, q }))),
+    { kind: "academic" },
+  ], [blocks]);
+  const questionCount = screens.length - 2;
+  const academicScreen = screens.length - 1;
+  const totalScreens = screens.length;
   const selectedAcademicSystem = academicSystemByValue(academicSystem);
 
   function toggle(v) {
@@ -97,18 +104,13 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       }
       return "";
     }
-    const blk = blocks[idx - 1];
-    if (!blk) return "";
-    for (let k = 0; k < blk.questions.length; k++) {
-      const q = blk.questions[k];
-      if (q.optional || q.type === "slider") continue;
-      const v = answers[q.id];
-      const ok = q.type === "multi"
-        ? Array.isArray(v) && v.length > 0
-        : v != null && String(v).trim() !== "";
-      if (!ok) return "Por favor, completa todas las preguntas obligatorias de esta sección.";
-    }
-    return "";
+    const q = screens[idx]?.q;
+    if (!q || q.optional || q.type === "slider") return "";
+    const v = answers[q.id];
+    const ok = q.type === "multi"
+      ? Array.isArray(v) && v.length > 0
+      : v != null && String(v).trim() !== "";
+    return ok ? "" : "Responde a esta pregunta para continuar.";
   }
 
   function buildQuestionnaire() {
@@ -183,24 +185,22 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const curBlock = screen > 0 && screen < academicScreen ? blocks[screen - 1] : null;
+  const current = screens[screen];
   const subtitle = screen === 0
     ? "Tu correo será tu usuario para entrar al portal."
     : screen === academicScreen
       ? "Última sección · sistema y asignaturas"
-      : "Cuestionario de orientación · sección " + screen + " de " + blocks.length;
+      : `Cuestionario de orientación · pregunta ${screen} de ${questionCount}`;
   const isLast = screen === totalScreens - 1;
 
   return (
-    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={4} onLogout={onLogout}>
-      <div className="space-y-5">
+    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={4} onLogout={onLogout} fullscreen>
+      <div className="onboarding-question-flow" onKeyDown={(event) => { if (event.key === "Enter" && event.target.tagName === "INPUT" && !busy) { event.preventDefault(); next(); } }}>
         {/* Progreso interno del cuestionario */}
-        <div className="flex items-center gap-1.5">
-          {Array.from({ length: totalScreens }).map((_, i) => (
-            <div key={i} className="h-1.5 rounded-full flex-1 transition"
-              style={{ background: i <= screen ? NAVY : "#EDECDB" }} />
-          ))}
+        <div className="onboarding-progress" role="progressbar" aria-valuemin={1} aria-valuemax={totalScreens} aria-valuenow={screen + 1}>
+          <span style={{ width: `${((screen + 1) / totalScreens) * 100}%`, background: NAVY }} />
         </div>
+        <div className="onboarding-question-body">
 
         {screen === 0 && (
           <>
@@ -228,24 +228,18 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
           </>
         )}
 
-        {screen > 0 && screen < academicScreen && curBlock && (
-          <>
-            <div className="rounded-xl px-4 py-3" style={{ background: "#F6F3E0" }}>
-              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "var(--robin-font-display)" }}>{curBlock.title}</div>
-              <div className="text-xs text-slate-500 mt-0.5">
+        {current?.kind === "question" && (
+          <div className="onboarding-question">
+            <p className="onboarding-question-section">{current.block.title}</p>
+            <QuestionField key={current.q.id} def={current.q} value={answers[current.q.id]} onChange={(v) => setAns(current.q.id, v)} />
+            {screen === 1 && (
+              <p className="onboarding-question-hint">
                 {esMaestria
                   ? "Estas respuestas ayudan a tu asesor a preparar tu candidatura al máster."
-                  : screen === 1
-                    ? "Estas respuestas ayudan a tu asesor y a nuestra IA a recomendarte las carreras más compatibles."
-                    : "Cuanto más concreto seas, mejores serán las recomendaciones."}
-              </div>
-            </div>
-            <div className="space-y-5">
-              {curBlock.questions.map((q) => (
-                <QuestionField key={q.id} def={q} value={answers[q.id]} onChange={(v) => setAns(q.id, v)} />
-              ))}
-            </div>
-          </>
+                  : "Estas respuestas ayudan a tu asesor y a nuestra IA a recomendarte las carreras más compatibles."}
+              </p>
+            )}
+          </div>
         )}
 
         {screen === academicScreen && (
@@ -307,18 +301,18 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
           </>
         )}
 
+        </div>
+
         {error && (
           <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{error}</span>
           </div>
         )}
 
-        <div className="flex items-center gap-3">
-          {screen > 0 && (
-            <Btn variant="secondary" onClick={back} disabled={busy}>
-              <ChevronLeft className="h-4 w-4" /> Atrás
-            </Btn>
-          )}
+        <div className="onboarding-question-nav flex items-center gap-3">
+          <Btn variant="secondary" onClick={back} disabled={busy || screen === 0}>
+            <ChevronLeft className="h-4 w-4" /> Atrás
+          </Btn>
           <Btn className="flex-1" size="lg" onClick={next}
             disabled={busy || (screen === 0 && (!email.trim() || intereses.length === 0))}>
             {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</>

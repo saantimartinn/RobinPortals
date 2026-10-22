@@ -75,8 +75,23 @@
 .is-active .onboarding-step-mark{border-color:var(--robin-paper);background:var(--robin-paper);color:var(--robin-navy)}
 .student-page-heading .onboarding-subtitle{max-width:60ch;margin:.6rem 0 0;color:var(--robin-ink-600);font-size:.95rem;line-height:1.5}
 .student-portal .onboarding-card{max-width:46rem;padding:1.75rem}
+/* Questionnaires: one question per screen, filling the main area. */
+.student-portal .onboarding-card.is-fullscreen{display:flex;flex-direction:column;max-width:none;min-height:calc(100vh - 14rem);padding:2rem 2.5rem}
+.onboarding-question-flow{display:flex;flex:1;flex-direction:column;gap:1.25rem}
+.onboarding-progress{height:6px;overflow:hidden;border-radius:6px;background:var(--robin-ink-100)}
+.onboarding-progress span{display:block;height:100%;border-radius:6px;transition:width .3s ease}
+.onboarding-question-body{display:flex;flex:1;flex-direction:column;justify-content:center;gap:1.25rem;width:100%;max-width:52rem;margin:0 auto}
+.onboarding-question-nav{width:100%;max-width:52rem;margin:0 auto}
+.onboarding-question-section{margin:0;font:400 1rem var(--robin-font-subtitle);color:var(--robin-ink-600)}
+.onboarding-question-hint{margin:1rem 0 0;font-size:.875rem;color:var(--robin-ink-600)}
+.is-fullscreen .onboarding-question .q-label,.is-fullscreen .onboarding-q-title{margin:0 0 1.5rem;font:600 clamp(1.75rem,2.6vw,2.5rem)/1.15 var(--robin-font-display);letter-spacing:.005em;color:var(--robin-navy)}
+.is-fullscreen .onboarding-question .q-label span{font:400 .45em var(--robin-font-text);color:var(--robin-ink-500)}
+.is-fullscreen .q-choices{gap:.75rem}
+.is-fullscreen .q-choice{padding:1rem 1.1rem;font-size:1rem}
+.is-fullscreen .q-input{padding:.9rem 1rem;font-size:1.0625rem}
+.is-fullscreen .q-slider{max-width:36rem}
 .onboarding-logout{display:none;margin-top:1rem;border:0;background:none;color:var(--robin-ink-600);font-size:.875rem;text-decoration:underline;cursor:pointer}
-@media(max-width:1023px){.onboarding-logout{display:block}.student-portal .onboarding-card{padding:1.25rem}.student-portal.is-onboarding .student-sidebar{top:0;height:auto}.onboarding-logo{display:none}}
+@media(max-width:1023px){.onboarding-logout{display:block}.student-portal .onboarding-card,.student-portal .onboarding-card.is-fullscreen{padding:1.25rem}.student-portal .onboarding-card.is-fullscreen{min-height:calc(100vh - 16rem)}.is-fullscreen .q-choices{grid-template-columns:1fr}.student-portal.is-onboarding .student-sidebar{top:0;height:auto}.onboarding-logo{display:none}}
 
 /* The sidebar never scrolls: long menus (the Community admin has 15 links) get
    tighter rows and drop the foot note, and so do short windows. */

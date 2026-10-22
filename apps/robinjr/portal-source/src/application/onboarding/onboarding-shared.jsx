@@ -7,7 +7,8 @@ import robinLogo from "../../assets/robin-logo-transparent.png";
 
 const STEPS = ["Tu destino", "Identidad", "Contrato", "Perfil académico", "Primer pago"];
 
-export function OnboardingShell({ user, title, subtitle, stepNumber, totalSteps = STEPS.length, onLogout, children }) {
+// fullscreen: one question per screen, filling the main area (questionnaires).
+export function OnboardingShell({ user, title, subtitle, stepNumber, totalSteps = STEPS.length, onLogout, fullscreen = false, children }) {
   const firstName = user?.nombre?.trim() || String(user?.email || user?.username || "").split("@")[0];
   return (
     <div className="student-portal is-onboarding">
@@ -43,7 +44,7 @@ export function OnboardingShell({ user, title, subtitle, stepNumber, totalSteps 
             <h1>{title}</h1>
             {subtitle && <p className="onboarding-subtitle">{subtitle}</p>}
           </div>
-          <section className="ui-card onboarding-card">{children}</section>
+          <section className={`ui-card onboarding-card${fullscreen ? " is-fullscreen" : ""}`}>{children}</section>
           <button type="button" onClick={onLogout} className="onboarding-logout">Cerrar sesión</button>
         </main>
       </div>
