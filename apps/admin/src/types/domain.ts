@@ -1,0 +1,8 @@
+// Shared TypeScript shapes for data passed between admin views and API clients.
+export type LeadStatus="Nuevo"|"Contactado"|"Reunión"|"Propuesta"|"Cliente";
+export type LeadCategory="delft"|"Llegada"|"Mentoría"|"General"|"LATAM"|"ESPECIAL";
+export type CrmStage="Por contactar"|"Contactado"|"Propuesta enviada"|"Llamada programada"|"Llamada tenida"|"En espera"|"Cliente"|"Lost";
+export type LostReason="price"|"more_destinations"|"competition"|"other";
+export type LeadContactRole="madre"|"padre"|"hijo"|"hija";
+export interface Contact{id:string;displayId?:string;name:string;initials:string;email:string;phone:string;country:string;university:string;course:string;interest?:string;comment?:string;contactAt?:string;contactRole?:LeadContactRole;product:"Aplicación"|"The Robin Plan";status:LeadStatus;source:string;campaign:string;owner:string;probability:number;nextAction:string;lastContact:string;value:number;tags:string[];databaseFields?:Record<string,string>;formName?:string;duplicate?:boolean;category?:LeadCategory;heat?:number;notes?:string;stage?:CrmStage;lostAt?:string;lostReason?:LostReason;lostReasonDetail?:string;portalUserId?:string;createdAt?:string;clientAt?:string}
+export interface ActivityItem{id:string;contactId:string;type:"mensaje"|"pago"|"documento"|"reunión"|"nota";title:string;detail:string;time:string}
