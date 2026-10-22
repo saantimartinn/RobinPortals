@@ -102,7 +102,7 @@ function AdminPartnerManager({ partners, onChanged }) {
                 {p.logo_url ? <img src={p.logo_url} alt={`Logo de ${p.name}`} className="h-full w-full object-contain" /> : <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-200 font-semibold text-slate-500">{p.name.charAt(0).toUpperCase()}</div>}
               </div>
               <div className="flex items-start justify-between gap-2">
-                <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{p.name}</div>
+                <div className="font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{p.name}</div>
                 {p.active === false && <Badge tone="slate">Oculto</Badge>}
               </div>
               <div className="text-xs text-slate-400">{PARTNER_CATEGORY_LABELS[p.category] || p.category} · {p.city || "Nacional"}</div>

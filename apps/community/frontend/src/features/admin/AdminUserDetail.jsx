@@ -45,10 +45,10 @@ function AdminUserDetail({ u, requests, onChanged, onClose }) {
         <Btn disabled={saving} onClick={saveUser}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar cambios</Btn>
 
         <Divider />
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Robin Progress</div>
+        <div className="text-xs font-semibold text-slate-500 ">Robin Progress</div>
         <div className="rounded-xl border border-slate-100 p-4 space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <div className="text-sm font-semibold text-slate-800">{rpDef.emoji} {rpDef.label}{rlOverride ? <span className="ml-2 text-[10px] font-semibold rounded-full px-2 py-0.5" style={{ background: "#EEF3FC", color: NAVY, border: "1px solid #D7E1F4" }}>Override</span> : null}</div>
+            <div className="text-sm font-semibold text-slate-800">{rpDef.emoji} {rpDef.label}{rlOverride ? <span className="ml-2 text-[10px] font-semibold rounded-full px-2 py-0.5" style={{ background: "#F6F3E0", color: NAVY, border: "1px solid #DFDED2" }}>Override</span> : null}</div>
             <div className="text-xs text-slate-400">Alta: {formatDate(u.created_at)}</div>
           </div>
           <div className="text-xs text-slate-500">{rp.daysActive} días acumulados · {rp.nextLevel ? `faltan ${rp.daysRemaining} para ${robinLevelDef(rp.nextLevel).label}` : "nivel máximo alcanzado"}</div>
@@ -60,7 +60,7 @@ function AdminUserDetail({ u, requests, onChanged, onClose }) {
         <div className="text-[11px] text-slate-400 -mt-1">Con override manual se ignora el cálculo automático. Recuerda pulsar «Guardar cambios».</div>
 
         <Divider />
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Servicios solicitados ({mine.length})</div>
+        <div className="text-xs font-semibold text-slate-500 ">Servicios solicitados ({mine.length})</div>
         {mine.length === 0 && <div className="text-sm text-slate-400">Este usuario no ha solicitado servicios.</div>}
         {mine.map((r) => (
           <div key={r.id} className="flex items-center justify-between gap-3 py-1.5 border-b border-slate-50 last:border-0">

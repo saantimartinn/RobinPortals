@@ -116,11 +116,11 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
             <div className="student-avatar">{profilePhoto ? <img src={profilePhoto} alt="Tu foto de perfil" /> : (clientName || "R").charAt(0).toUpperCase()}</div>
             <div><strong>{clientName}</strong><span>Estudiante Robin</span></div>
           </div>
-          <p className="student-nav-caption">TU ESPACIO</p>
+          <p className="student-nav-caption">Tu espacio</p>
           <div className="student-nav-items">
             {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{label}</span>{active === key && <span className="student-nav-dot" />}</button>)}
           </div>
-          <div className="student-support"><span className="student-eyebrow">VAMOS CONTIGO</span><h3>Un equipo detrás de cada paso.</h3><p>Habla con tu asesor y prepara lo que viene.</p><button onClick={() => setActive("reservas")}>Reservar una llamada <ArrowUpRight size={16} /></button></div>
+          <div className="student-support"><span className="student-eyebrow">Vamos contigo</span><h3>Un equipo detrás de cada paso.</h3><p>Habla con tu asesor y prepara lo que viene.</p><button onClick={() => setActive("reservas")}>Reservar una llamada <ArrowUpRight size={16} /></button></div>
         </nav>
 
         <AnimatePresence mode="wait">
@@ -149,7 +149,7 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
             )}
             {active === "faqs" && <FaqsPage />}
 
-            <footer className="student-footer"><span>PROJECT ROBIN</span><span>The world is your campus.</span></footer>
+            <footer className="student-footer"><span>Project Robin</span><span>The world is your campus.</span></footer>
           </motion.main>
         </AnimatePresence>
       </div>

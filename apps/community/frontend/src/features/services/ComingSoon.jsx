@@ -11,10 +11,10 @@ function ComingSoon({ title, subtitle, onBack, bullets = [] }) {
       <SubIntro title={title} subtitle={subtitle} onBack={onBack} />
       <Card>
         <CardContent className="py-10 text-center space-y-3">
-          <div className="h-14 w-14 rounded-2xl grid place-items-center text-white mx-auto" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+          <div className="h-14 w-14 rounded-2xl grid place-items-center text-white mx-auto" style={{ background: NAVY }}>
             <Sparkles className="h-6 w-6" />
           </div>
-          <div className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Georgia', serif" }}>Próximamente</div>
+          <div className="text-lg font-bold text-slate-800" style={{ fontFamily: "var(--robin-font-display)" }}>Próximamente</div>
           <div className="text-sm text-slate-500 max-w-md mx-auto">Estamos desarrollando esta funcionalidad. Muy pronto estará disponible en tu portal.</div>
           {bullets.length > 0 && (
             <div className="max-w-md mx-auto text-left pt-2 space-y-2">

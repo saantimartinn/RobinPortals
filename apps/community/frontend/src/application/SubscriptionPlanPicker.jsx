@@ -41,7 +41,7 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
     <div className="min-h-screen" style={{ background: CANVAS }}>
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="text-center mb-8">
-          <div className="text-2xl md:text-3xl font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>
+          <div className="text-2xl md:text-3xl font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>
             Hola {clientName || ""}, activa tu suscripción
           </div>
           <div className="text-sm text-slate-500 mt-2 max-w-lg mx-auto">
@@ -75,9 +75,9 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
             return (
               <button key={key} type="button" onClick={() => setSelected(key)}
                 className="text-left rounded-2xl border-2 p-6 bg-white transition"
-                style={{ borderColor: isSel ? NAVY : "#e2e8f0" }}>
+                style={{ borderColor: isSel ? NAVY : "#EDECDB" }}>
                 <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{label}</div>
+                  <div className="font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{label}</div>
                   {key === "annual" && <Badge tone="gold">{savings > 0 ? `Ahorra ${savings}€/año` : "Ahorra"}</Badge>}
                 </div>
                 <div className="mt-3 text-3xl font-bold text-slate-900">
@@ -98,7 +98,7 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
 
         <div className="max-w-2xl mx-auto mt-6">
           <div className="rounded-2xl bg-white border border-slate-100 p-5">
-            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Incluido en tu plan</div>
+            <div className="text-xs font-semibold text-slate-500 mb-3">Incluido en tu plan</div>
             <div className="grid sm:grid-cols-2 gap-2">
               {SUBSCRIBER_SERVICES.slice(0, 8).map((s) => (
                 <div key={s.key} className="flex items-center gap-2 text-sm text-slate-700">

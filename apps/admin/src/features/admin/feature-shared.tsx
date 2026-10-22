@@ -207,7 +207,7 @@ export const contactRoleOptions = Object.keys(contactRoleLabels) as LeadContactR
 export function DeveloperDatabasePage() {
   const [kind, setKind] = useState<"leads" | "clients">("leads");
   return <div className="page">
-    <Title name="Base de datos" sub="Consulta y edita todos los leads y clientes desde tu perfil de desarrollador." eyebrow="DESARROLLADOR" />
+    <Title name="Base de datos" sub="Consulta y edita todos los leads y clientes desde tu perfil de desarrollador." eyebrow="Desarrollador" />
     <div className="developer-records-tabs" role="tablist" aria-label="Base de datos">
       <button type="button" role="tab" aria-selected={kind === "leads"} onClick={() => setKind("leads")}>Leads · crm_leads</button>
       <button type="button" role="tab" aria-selected={kind === "clients"} onClick={() => setKind("clients")}>Clientes · users</button>

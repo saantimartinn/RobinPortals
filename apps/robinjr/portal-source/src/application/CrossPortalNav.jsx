@@ -18,7 +18,7 @@ export function CrossPortalNav({ current = "robinjr", user = null, onLogout, onR
     <header className="robin-cross-nav">
       <a className="robin-cross-brand" href={isAdmin ? LINKS[0][0] : LINKS[1][0]} aria-label={isAdmin ? "Robin Admin Platform, inicio" : "RobinJr, inicio"}>
         <img src={robinWordmark} alt="ROBIN" />
-        {isAdmin ? <span>ADMIN<br />PLATFORM</span> : <span>ROBIN<br />JR</span>}
+        <span>{isAdmin ? "Admin" : "Robin Jr"}</span>
       </a>
       <nav aria-label="Navegación de Robin">
         {links.map(([href, label, key]) => {

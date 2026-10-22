@@ -253,7 +253,7 @@ export default function PortalRobin() {
   </>;
   if (authState.user.auth_source === "external_client") return <>
     <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
-    <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#263b6a]" role="status">
+    <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#2D3A64]" role="status">
       <h1 className="text-2xl font-bold">Portal del Alumno no disponible</h1>
       <p>Esta cuenta no tiene un usuario en la base de datos del Portal del Alumno.</p>
     </main>
@@ -284,10 +284,10 @@ export default function PortalRobin() {
 
 function AuthShell({ children }) {
   return (
-    <div className="min-h-screen flex bg-white" style={{ fontFamily: "'system-ui', sans-serif" }}>
+    <div className="min-h-screen flex bg-white" style={{ fontFamily: "var(--robin-font-text)" }}>
       <div
         className="hidden lg:flex flex-col justify-between w-[min(39vw,480px)] flex-shrink-0 px-11 py-11 relative overflow-hidden"
-        style={{ background: `linear-gradient(160deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #2a4a8e 100%)` }}
+        style={{ background: NAVY }}
       >
         <div className="absolute inset-0 opacity-5">
           {[...Array(6)].map((_, index) => (
@@ -302,7 +302,7 @@ function AuthShell({ children }) {
           <img src={robinLogoTransparent} alt="Robin" className="h-[94px] w-28 object-contain" />
         </div>
         <div className="relative">
-          <div className="text-[clamp(36px,3.6vw,46px)] font-bold text-white mb-5 tracking-[-.03em]" style={{ fontFamily: "'Georgia', serif", lineHeight: 1.1 }}>
+          <div className="text-[clamp(36px,3.6vw,46px)] font-bold text-white mb-5 tracking-[-.03em]" style={{ fontFamily: "var(--robin-font-display)", lineHeight: 1.1 }}>
             Tu futuro<br />empieza aquí.
           </div>
           <div className="max-w-[300px] text-[13px] text-white/60 leading-relaxed">
@@ -318,16 +318,16 @@ function AuthShell({ children }) {
           </a>
         </div>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center px-7 py-12 bg-[radial-gradient(circle_at_75%_15%,#fff_0,transparent_34%)]">
+      <div className="flex-1 flex flex-col items-center justify-center px-7 py-12">
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8 text-[#29395f]">
-            <img src={robinLogoTransparent} alt="Robin" className="h-20 w-24 rounded-2xl bg-[#29395f] p-2 object-contain" />
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-8 text-[#2D3A64]">
+            <img src={robinLogoTransparent} alt="Robin" className="h-20 w-24 rounded-2xl bg-[#2D3A64] p-2 object-contain" />
           </div>
           {children}
-          <div className="mt-8 text-center text-xs text-[#29395f]/40 lg:hidden">
+          <div className="mt-8 text-center text-xs text-[#2D3A64]/40 lg:hidden">
             <a
               href="/admin"
-              className="transition-colors hover:text-[#29395f]/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#29395f]/70"
+              className="transition-colors hover:text-[#2D3A64]/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#2D3A64]/70"
             >
               © Project Robin · Portal de Cliente
             </a>
@@ -363,13 +363,13 @@ function LoginScreen({ onLogin, onBack }) {
 
   return (
     <AuthShell>
-      <div className="bg-white rounded-3xl shadow-[0_24px_70px_rgba(31,48,83,.10)] border border-slate-200/80 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         <div className="p-7 sm:p-8 space-y-5">
           <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
             <ArrowLeft className="h-4 w-4" /> Volver al portal
           </button>
           <div>
-            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "'Georgia', serif" }}>Bienvenido de vuelta</div>
+            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "var(--robin-font-display)" }}>Bienvenido de vuelta</div>
             <div className="text-sm text-slate-500">Accede a tu portal personalizado</div>
           </div>
           <Field label="Usuario o correo" value={email} onChange={setEmail} placeholder="tu@correo.com" />

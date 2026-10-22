@@ -135,22 +135,22 @@ export function AdminCarrerasNew({ client }) {
           </div>
           <Divider />
           <div>
-            <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Nivel del programa</div>
+            <div className="text-xs font-semibold text-slate-600 mb-2">Nivel del programa</div>
             <div className="flex gap-2">
               <button type="button" onClick={() => changeLevel("grado")}
                 className="px-4 py-2 rounded-xl border text-sm font-medium transition"
-                style={cLevel === "grado" ? { background: NAVY, color: "white", borderColor: NAVY } : { background: "white", color: "#475569", borderColor: "#e2e8f0" }}>
+                style={cLevel === "grado" ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
                 Grado
               </button>
               <button type="button" onClick={() => changeLevel("maestria")}
                 className="px-4 py-2 rounded-xl border text-sm font-medium transition"
-                style={cLevel === "maestria" ? { background: NAVY, color: "white", borderColor: NAVY } : { background: "white", color: "#475569", borderColor: "#e2e8f0" }}>
+                style={cLevel === "maestria" ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
                 Máster
               </button>
             </div>
             <div className="text-[11px] text-slate-400 mt-1.5">Carga la lista de documentos por defecto según el nivel. Puedes editarlos igualmente debajo.</div>
           </div>
-          <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Requerimientos de la carrera</div>
+          <div className="text-xs font-semibold text-slate-600 ">Requerimientos de la carrera</div>
           <div className="space-y-2">
             {cDocs.map((d, i) => (
               <div key={i} className="rounded-xl border border-slate-100 bg-white px-3 py-2.5 space-y-2">
@@ -218,9 +218,9 @@ export function AdminCarrerasNew({ client }) {
                 const sel = assigned.includes(t.id);
                 return (
                   <div key={t.id} className="flex items-center gap-3 rounded-xl border px-3 py-2.5"
-                    style={sel ? { background: SOFT, borderColor: NAVY } : { background: "white", borderColor: "#e2e8f0" }}>
+                    style={sel ? { background: SOFT, borderColor: NAVY } : { background: "#FEFBE5", borderColor: "#EDECDB" }}>
                     <div className="h-8 w-8 rounded-lg flex-shrink-0 grid place-items-center"
-                      style={sel ? { background: NAVY, color: "white" } : { background: "#f8fafc", color: "#94a3b8" }}>
+                      style={sel ? { background: NAVY, color: "#FEFBE5" } : { background: "#FEFBE5", color: "#687088" }}>
                       {sel ? <CheckCircle2 className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                     </div>
                     <div className="flex-1 min-w-0">

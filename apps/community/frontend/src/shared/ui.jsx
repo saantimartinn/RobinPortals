@@ -10,7 +10,7 @@ const Badge = ({ children, tone = "slate" }) => {
     blue: "bg-sky-50 text-sky-700 border border-sky-200",
     navy: "text-white",
     rose: "bg-rose-50 text-rose-700 border border-rose-200",
-    gold: "text-white",
+    gold: "text-[#2D3A64]",
   };
   const inlineStyle =
     tone === "navy" ? { backgroundColor: NAVY } :
@@ -28,15 +28,15 @@ const Btn = ({ children, onClick, variant = "primary", className = "", disabled,
   const base = "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed";
   const sizes = { sm: "px-3 py-1.5 text-xs", md: "px-4 py-2 text-sm", lg: "px-6 py-3 text-base" };
   const vars = {
-    primary: "text-white shadow-sm hover:opacity-90",
+    primary: "text-white hover:opacity-90",
     secondary: "bg-white text-slate-800 border border-slate-200 hover:bg-slate-50",
     ghost: "bg-transparent text-slate-700 hover:bg-slate-100",
     danger: "bg-rose-600 text-white hover:bg-rose-500",
-    gold: "text-white shadow-sm hover:opacity-90",
+    gold: "text-[#2D3A64] hover:opacity-90",
   };
   const inlineStyle =
-    variant === "primary" ? { background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` } :
-    variant === "gold" ? { background: `linear-gradient(135deg, ${GOLD}, #e8941a)` } : undefined;
+    variant === "primary" ? { background: NAVY } :
+    variant === "gold" ? { background: GOLD } : undefined;
 
   return (
     <button type={type} disabled={disabled} onClick={onClick} style={inlineStyle}
@@ -49,7 +49,7 @@ const Btn = ({ children, onClick, variant = "primary", className = "", disabled,
 export { Btn };
 
 const Card = ({ children, className = "" }) => (
-  <div className={`ui-card rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden ${className}`}>
+  <div className={`ui-card rounded-2xl bg-white border border-slate-100 overflow-hidden ${className}`}>
     {children}
   </div>
 );
@@ -65,12 +65,12 @@ const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
     <div className="flex items-center gap-3 min-w-0">
       {Icon && (
         <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0"
-          style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+          style={{ background: NAVY }}>
           <Icon className="h-4 w-4" />
         </div>
       )}
       <div className="min-w-0">
-        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "'Georgia', serif" }}>{title}</div>
+        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{title}</div>
         {subtitle && <div className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</div>}
       </div>
     </div>
@@ -86,7 +86,7 @@ export { Divider };
 
 const Field = ({ label, value, onChange, placeholder, type = "text" }) => (
   <label className="block">
-    <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">{label}</div>
+    <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>
     <input type={type} value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
   </label>
@@ -95,17 +95,19 @@ const Field = ({ label, value, onChange, placeholder, type = "text" }) => (
 export { Field };
 
 function KpiCard({ icon: Icon, label, value, sub, tone = "navy" }) {
-  const bg = tone === "navy" ? `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` :
-             tone === "gold" ? `linear-gradient(135deg, ${GOLD}, #e8941a)` :
-             tone === "rose" ? "linear-gradient(135deg, #be123c, #e11d48)" :
-             "linear-gradient(135deg, #475569, #64748b)";
+  const bg = tone === "navy" ? NAVY :
+             tone === "gold" ? GOLD :
+             tone === "rose" ? "#B4424F" :
+             "#4E5979";
+  // Navy text on orange (cream on orange is unreadable); cream on every other tone.
+  const fg = tone === "gold" ? NAVY : "#FEFBE5";
   return (
-    <div className="rounded-2xl p-4 shadow-sm" style={{ background: bg }}>
-      <div className="flex items-center gap-2 text-white/80 text-[11px] uppercase tracking-wider font-semibold">
+    <div className="rounded-2xl p-4" style={{ background: bg, color: fg }}>
+      <div className="flex items-center gap-2 opacity-80 text-xs font-semibold">
         {Icon && <Icon className="h-3.5 w-3.5" />} {label}
       </div>
-      <div className="text-white text-2xl font-bold mt-1.5" style={{ fontFamily: "'Georgia', serif" }}>{value}</div>
-      {sub && <div className="text-white/70 text-[11px] mt-1 truncate">{sub}</div>}
+      <div className="text-2xl font-bold mt-1.5" style={{ fontFamily: "var(--robin-font-display)" }}>{value}</div>
+      {sub && <div className="opacity-80 text-xs mt-1 truncate">{sub}</div>}
     </div>
   );
 }
@@ -128,7 +130,7 @@ export { Row };
 
 const SelectField = ({ label, value, onChange, options = [], placeholder = "Selecciona…", allowEmpty = true }) => (
   <label className="block">
-    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">{label}</div>}
+    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>}
     <select value={value || ""} onChange={(e) => onChange(e.target.value)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition">
       {allowEmpty && <option value="">{placeholder}</option>}
@@ -145,7 +147,7 @@ export { SelectField };
 
 const TextareaField = ({ label, value, onChange, placeholder, rows = 4 }) => (
   <label className="block">
-    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">{label}</div>}
+    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>}
     <textarea rows={rows} value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
   </label>

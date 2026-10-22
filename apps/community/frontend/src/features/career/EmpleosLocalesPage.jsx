@@ -22,11 +22,11 @@ function EmpleosLocalesPage({ events = [], ciudad = "", onBack }) {
         <CardContent className="space-y-3">
           <div className="flex gap-1.5">
             <button onClick={() => setShowAll(false)} className="rounded-full px-3 py-1.5 text-xs font-semibold transition"
-              style={!showAll ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+              style={!showAll ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
               {ciudad ? `${ciudad} + Nacional` : "Mi ciudad + Nacional"}
             </button>
             <button onClick={() => setShowAll(true)} className="rounded-full px-3 py-1.5 text-xs font-semibold transition"
-              style={showAll ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+              style={showAll ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
               Todas las ciudades
             </button>
           </div>
@@ -37,7 +37,7 @@ function EmpleosLocalesPage({ events = [], ciudad = "", onBack }) {
               return (
                 <div key={j.id} className="rounded-xl border border-slate-100 p-4 space-y-2">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{j.title}</div>
+                    <div className="font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{j.title}</div>
                     <Badge tone="navy">{j.city || "Nacional"}</Badge>
                   </div>
                   <div className="text-xs text-slate-500">{[m.company, m.job_type, m.salary].filter(Boolean).join(" · ")}</div>

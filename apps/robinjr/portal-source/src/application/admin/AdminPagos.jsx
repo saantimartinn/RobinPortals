@@ -1,7 +1,7 @@
 // Admin workspace module for admin pagos; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { FileText, Shield, CheckCircle2, Plus, Trash2, CreditCard, Loader2 } from "lucide-react";
-import { GOLD } from "../../theme.js";
+import { GOLD, NAVY } from "../../theme.js";
 import { Btn, Card, CardContent, CardHeader, Field } from "../../ui.jsx";
 import { daysBetween, eur, PaymentStatusBadge, paymentTitle } from "../payments/payment-utils.jsx";
 import { Factura } from "../payments/InvoiceReceipt.jsx";
@@ -97,9 +97,9 @@ export function AdminPagos({ client }) {
                 return (
                   <div key={p.id} className="admin-payment-row rounded-xl border border-slate-100 bg-white px-4 py-3 flex items-center gap-4">
                     <div className="h-10 w-10 rounded-xl grid place-items-center flex-shrink-0"
-                      style={isPaid ? { background: "#10b981", color: "white" }
-                        : isUnlocked ? { background: GOLD, color: "white" }
-                        : { background: "#e2e8f0", color: "#94a3b8" }}>
+                      style={isPaid ? { background: "#10b981", color: "#FEFBE5" }
+                        : isUnlocked ? { background: GOLD, color: NAVY }
+                        : { background: "#EDECDB", color: "#687088" }}>
                       {isPaid ? <CheckCircle2 className="h-5 w-5" /> : isLocked ? <Shield className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -116,7 +116,7 @@ export function AdminPagos({ client }) {
                           <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold"
                             style={overdue
                               ? { background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca" }
-                              : { background: "#fffbeb", color: "#b45309", border: "1px solid #fde68a" }}>
+                              : { background: "#FCF2D3", color: "#2D3A64", border: "1px solid #ECB450" }}>
                             {daysSinceUnlock} día{daysSinceUnlock === 1 ? "" : "s"} desde el desbloqueo {overdue ? "· vencido" : ""}
                           </span>
                         </div>

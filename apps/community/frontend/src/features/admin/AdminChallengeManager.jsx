@@ -61,7 +61,7 @@ function AdminChallengeManager({ challenges = [], submissions = [], onChanged })
               <Field label="Orden" type="number" value={String(editing.sort_order)} onChange={(v) => setEditing((p) => ({ ...p, sort_order: v }))} placeholder="0" />
             </div>
             <div>
-              <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Archivos descargables</div>
+              <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Archivos descargables</div>
               {(editing.files || []).length > 0 && (
                 <div className="space-y-1 mb-2">
                   {editing.files.map((f, i) => (
@@ -77,7 +77,7 @@ function AdminChallengeManager({ challenges = [], submissions = [], onChanged })
               </label>
             </div>
             <div>
-              <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Cuestionario</div>
+              <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Cuestionario</div>
               {(editing.questions || []).length > 0 && (
                 <div className="space-y-1 mb-2">
                   {editing.questions.map((qq, i) => (

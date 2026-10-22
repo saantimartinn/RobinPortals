@@ -8,12 +8,12 @@ function CityFilterBar({ ciudad, showAll, setShowAll }) {
       <span className="text-slate-400">Mostrando:</span>
       <button onClick={() => setShowAll(false)}
         className="rounded-full px-3 py-1 font-semibold transition"
-        style={!showAll ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+        style={!showAll ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
         {ciudad ? `${ciudad} + Nacional` : "Mi ciudad"}
       </button>
       <button onClick={() => setShowAll(true)}
         className="rounded-full px-3 py-1 font-semibold transition"
-        style={showAll ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+        style={showAll ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
         Todas las ciudades
       </button>
     </div>

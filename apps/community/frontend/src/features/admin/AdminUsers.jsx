@@ -30,7 +30,7 @@ function AdminUsers({ users, requests, onChanged }) {
         <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-100">
+              <tr className="text-left text-xs text-slate-400 border-b border-slate-100">
                 <th className="px-4 py-3">Usuario</th><th className="px-4 py-3">Ciudad</th><th className="px-4 py-3">Plan</th>
                 <th className="px-4 py-3">Solicitudes</th><th className="px-4 py-3">Eventos</th><th className="px-4 py-3"></th>
               </tr>

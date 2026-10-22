@@ -50,7 +50,7 @@ function AdminMentorManager({ events, onChanged }) {
         {editing && (
           <CardContent className="space-y-3 border-t border-slate-100">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-2xl overflow-hidden border border-slate-200 grid place-items-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+              <div className="h-16 w-16 rounded-2xl overflow-hidden border border-slate-200 grid place-items-center flex-shrink-0" style={{ background: NAVY }}>
                 {editing.meta.photo ? <img src={editing.meta.photo} alt="" className="h-full w-full object-cover" /> : <span className="text-white font-bold text-lg">{(editing.title || "M").charAt(0).toUpperCase()}</span>}
               </div>
               <label className="cursor-pointer">
@@ -79,7 +79,7 @@ function AdminMentorManager({ events, onChanged }) {
           {mentors.length === 0 && <div className="text-sm text-slate-400 px-2">No hay mentores todavía.</div>}
           {mentors.map((m) => (
             <div key={m.id} className="rounded-xl border border-slate-100 p-4 flex items-start gap-3">
-              <div className="h-12 w-12 rounded-xl overflow-hidden grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+              <div className="h-12 w-12 rounded-xl overflow-hidden grid place-items-center text-white flex-shrink-0" style={{ background: NAVY }}>
                 {m.meta && m.meta.photo ? <img src={m.meta.photo} alt="" className="h-full w-full object-cover" /> : <span className="font-bold">{(m.title || "M").charAt(0)}</span>}
               </div>
               <div className="min-w-0 flex-1">
@@ -101,7 +101,7 @@ function AdminMentorManager({ events, onChanged }) {
           <div className="grid sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
             <SelectField label="Mentor" value={slotMentor} onChange={setSlotMentor} options={mentors.map((m) => ({ value: m.id, label: `${m.title}${m.meta && m.meta.sector ? ` (${m.meta.sector})` : ""}` }))} placeholder="Selecciona mentor" />
             <label className="block">
-              <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Fecha</div>
+              <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Fecha</div>
               <input type="date" value={slotDate} onChange={(e) => setSlotDate(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
             </label>
             <Btn disabled={slotBusy || !slotMentor || !slotDate} onClick={addSlot}>{slotBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Añadir</Btn>

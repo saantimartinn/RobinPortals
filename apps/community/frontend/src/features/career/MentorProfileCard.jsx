@@ -13,11 +13,11 @@ function MentorProfileCard({ mentor, onBack }) {
       <Card>
         <CardContent className="space-y-4 py-5">
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-2xl overflow-hidden grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+            <div className="h-20 w-20 rounded-2xl overflow-hidden grid place-items-center text-white flex-shrink-0" style={{ background: NAVY }}>
               {m.photo ? <img src={m.photo} alt="" className="h-full w-full object-cover" /> : <span className="text-2xl font-bold">{(mentor.title || "M").charAt(0)}</span>}
             </div>
             <div className="min-w-0">
-              <div className="text-lg font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{mentor.title}</div>
+              <div className="text-lg font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{mentor.title}</div>
               {m.job && <div className="text-sm text-slate-600">{m.job}</div>}
               {m.sector && <div className="mt-1"><Badge tone="gold">{m.sector}</Badge></div>}
             </div>

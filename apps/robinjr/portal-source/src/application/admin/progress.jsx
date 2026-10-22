@@ -26,12 +26,12 @@ export function AdminEstadoFases({ client, onChangedPhase }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+      <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: NAVY }}>
         <div className="relative flex items-center gap-4">
           <ClientAvatar nombre={client.nombre} apellidos={client.apellidos} size="lg" />
           <div className="min-w-0">
-            <div className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">Fase actual de la aplicación</div>
-            <div className="text-white text-xl font-bold truncate" style={{ fontFamily: "'Georgia', serif" }}>
+            <div className="text-white/50 text-xs font-semibold mb-1">Fase actual de la aplicación</div>
+            <div className="text-white text-xl font-bold truncate" style={{ fontFamily: "var(--robin-font-display)" }}>
               {APP_PHASE_LABELS.find((p) => p.key === phase)?.label}
             </div>
             <div className="text-white/60 text-sm truncate">{APP_PHASE_LABELS.find((p) => p.key === phase)?.desc}</div>
@@ -50,11 +50,11 @@ export function AdminEstadoFases({ client, onChangedPhase }) {
             return (
               <button key={p.key} onClick={() => setP(p.key)} disabled={busy}
                 className="w-full flex items-center gap-4 rounded-xl border px-4 py-3 text-left transition"
-                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#f1f5f9", background: "white" }}>
+                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#F6F3E0", background: "#FEFBE5" }}>
                 <div className="h-8 w-8 rounded-full flex-shrink-0 grid place-items-center font-bold text-sm border-2"
-                  style={done ? { background: "#10b981", borderColor: "#10b981", color: "white" }
-                    : act ? { background: GOLD, borderColor: GOLD, color: "white" }
-                    : { background: "white", borderColor: "#e2e8f0", color: "#94a3b8" }}>
+                  style={done ? { background: "#10b981", borderColor: "#10b981", color: "#FEFBE5" }
+                    : act ? { background: GOLD, borderColor: GOLD, color: NAVY }
+                    : { background: "#FEFBE5", borderColor: "#EDECDB", color: "#687088" }}>
                   {done ? <CheckCircle2 className="h-4 w-4" /> : p.key}
                 </div>
                 <div className="flex-1 min-w-0">

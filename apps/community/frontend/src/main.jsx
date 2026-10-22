@@ -1,4 +1,6 @@
 // Browser entry point: mounts The Robin Plan app and global styles.
+// Brand fonts and tokens first, so every app stylesheet can use them.
+import "../../../../packages/brand/brand.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app.jsx";

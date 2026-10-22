@@ -92,7 +92,7 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
     <div className="student-chat-body">
         {aiPaused && (
           <div className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
-            style={{ background: "#FFF7E6", borderColor: "#F5C97B", color: "#8a5a00" }}>
+            style={{ background: "#FCF2D3", borderColor: "#ECB450", color: "#2D3A64" }}>
             <Shield className="h-4 w-4 flex-shrink-0" /> Tu asesor/a está atendiendo esta conversación en persona.
           </div>
         )}
@@ -113,7 +113,7 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
                   </div>
                 )}
                 <div className="max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words min-w-0"
-                  style={mine ? { background: NAVY, color: "white" } : { background: "white", color: "#1e293b", border: "1px solid #e2e8f0" }}>
+                  style={mine ? { background: NAVY, color: "#FEFBE5" } : { background: "#FEFBE5", color: "#2D3A64", border: "1px solid #EDECDB" }}>
                   {!mine && <div className="text-[11px] font-semibold mb-0.5" style={{ color: isAdvisor ? "#0F6E56" : NAVY }}>{isAdvisor ? "Tu asesor/a" : "Asistente IA"}</div>}
                   <div>{m.content}</div>
                   {!mine && !isAdvisor && m.faq_citations?.length > 0 && <div className="student-chat-faq-links">{m.faq_citations.map(citation => <button key={citation.number} onClick={() => onOpenFaq(citation.number)} title={citation.question}>FAQ {citation.number}<ArrowRight size={12} /></button>)}</div>}

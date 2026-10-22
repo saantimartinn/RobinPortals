@@ -47,7 +47,7 @@ function ChallengeCard({ ch, submission, onSubmitted }) {
       <CardContent className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{ch.title}</div>
+            <div className="font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{ch.title}</div>
             {ch.description && <div className="text-sm text-slate-600 mt-0.5 whitespace-pre-wrap">{ch.description}</div>}
           </div>
           <div className="flex-shrink-0">{statusBadge}</div>
@@ -81,7 +81,7 @@ function ChallengeCard({ ch, submission, onSubmitted }) {
                   <TextareaField key={q.id} label={q.q} rows={2} value={answers[q.id] || ""} onChange={(v) => setAnswers((p) => ({ ...p, [q.id]: v }))} placeholder="Tu respuesta…" />
                 ))}
                 <div>
-                  <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Archivos (máx. 2 MB c/u)</div>
+                  <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Archivos (máx. 2 MB c/u)</div>
                   {files.length > 0 && (
                     <div className="space-y-1 mb-2">
                       {files.map((f, i) => (

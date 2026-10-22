@@ -101,7 +101,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
             <div className="student-avatar">{user.avatar_url ? <img src={user.avatar_url} alt="Tu foto de perfil" /> : (clientName || "R").charAt(0).toUpperCase()}</div>
             <div><strong>{clientName}</strong><span>Miembro {rdefShell.label}</span></div>
           </button>
-          <p className="student-nav-caption">TU ESPACIO</p>
+          <p className="student-nav-caption">Tu espacio</p>
           <div className="student-nav-items">
             {navItems.map(({ key, label, icon: Icon }) => {
               const isAct = active === key;
@@ -112,7 +112,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
             })}
           </div>
           <div className="student-support">
-            <span className="student-eyebrow">VAMOS CONTIGO</span>
+            <span className="student-eyebrow">Vamos contigo</span>
             <h3>Tu vida fuera, un poco más fácil.</h3>
             <p>Servicios, comunidad y apoyo cuando los necesites.</p>
             <button onClick={() => setActive("soporte")}>Pedir ayuda <HelpCircle size={16} /></button>
@@ -159,7 +159,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
               <SubSettings user={user} requests={requests} onUserRefresh={onUserRefresh} onLogout={onLogout} />
             )}
 
-            <footer className="student-footer"><span>PROJECT ROBIN</span><span>The world is your campus.</span></footer>
+            <footer className="student-footer"><span>Project Robin</span><span>The world is your campus.</span></footer>
           </motion.main>
         </AnimatePresence>
       </div>

@@ -2,18 +2,18 @@
 
 
 // Page background, the same white canvas as the admin.
-const CANVAS = "#ffffff";
+const CANVAS = "#FEFBE5";
 
 export { CANVAS };
 
-const GOLD = "#F5A623";
+const GOLD = "#ECB450";
 
 export { GOLD };
 
-const NAVY = "#1B2F6E";
+const NAVY = "#2D3A64";
 
 export { NAVY };
 
-const NAVY_DARK = "#0e1c45";
+const NAVY_DARK = "#2D3A64";
 
 export { NAVY_DARK };

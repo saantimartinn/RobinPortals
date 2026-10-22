@@ -5,9 +5,9 @@ import { NAVY, NAVY_DARK } from "../../theme.js";
 
 export function OnboardingShell({ title, subtitle, stepNumber, totalSteps = 5, icon, onLogout, children }) {
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: "'system-ui', sans-serif" }}>
+    <div className="min-h-screen flex" style={{ fontFamily: "var(--robin-font-text)" }}>
       <div className="hidden lg:flex flex-col justify-between w-[420px] flex-shrink-0 p-10 relative overflow-hidden"
-        style={{ background: `linear-gradient(160deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #2a4a8e 100%)` }}>
+        style={{ background: NAVY }}>
         <div className="absolute inset-0 opacity-5">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="absolute rounded-full border border-white"
@@ -18,8 +18,8 @@ export function OnboardingShell({ title, subtitle, stepNumber, totalSteps = 5, i
           <img src={logoRBlanco} alt="Robin" className="h-16 w-auto" />
         </div>
         <div className="relative">
-          <div className="text-white/60 text-xs uppercase tracking-widest mb-2">Paso {stepNumber} de {totalSteps} · Onboarding</div>
-          <div className="text-3xl font-bold text-white mb-4" style={{ fontFamily: "'Georgia', serif", lineHeight: 1.2 }}>
+          <div className="text-white/60 text-xs mb-2">Paso {stepNumber} de {totalSteps} · Onboarding</div>
+          <div className="text-3xl font-bold text-white mb-4" style={{ fontFamily: "var(--robin-font-display)", lineHeight: 1.2 }}>
             Activamos<br />tu cuenta<br />Robin.
           </div>
           <div className="text-white/60 text-sm leading-relaxed">Solo unos minutos y ya podrás acceder a documentos, llamadas y el chat con tu asesor.</div>
@@ -29,18 +29,18 @@ export function OnboardingShell({ title, subtitle, stepNumber, totalSteps = 5, i
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 bg-white overflow-y-auto">
         <div className="w-full max-w-xl">
-          <div className="bg-white rounded-2xl border border-[#e0e6ed] overflow-hidden">
+          <div className="bg-white rounded-2xl border border-[#EDECDB] overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+                  style={{ background: NAVY }}>
                   {icon || (stepNumber === 1 ? <CreditCard className="h-4 w-4" />
                     : stepNumber === 2 ? <FileText className="h-4 w-4" />
                     : stepNumber === 3 ? <Mail className="h-4 w-4" />
                     : <CreditCard className="h-4 w-4" />)}
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[15px] font-bold text-slate-900 truncate" style={{ fontFamily: "'Georgia', serif" }}>{title}</div>
+                  <div className="text-[15px] font-bold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{title}</div>
                   <div className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</div>
                 </div>
               </div>
@@ -62,10 +62,10 @@ export function Stepper({ current, total = 3 }) {
       {steps.map((n) => (
         <div key={n} className="flex items-center gap-1.5">
           <div className="h-6 w-6 rounded-full grid place-items-center text-[11px] font-bold"
-            style={n < current ? { background: "#10b981", color: "white" } : n === current ? { background: NAVY, color: "white" } : { background: "#e2e8f0", color: "#64748b" }}>
+            style={n < current ? { background: "#10b981", color: "#FEFBE5" } : n === current ? { background: NAVY, color: "#FEFBE5" } : { background: "#EDECDB", color: "#687088" }}>
             {n < current ? <CheckCircle2 className="h-3.5 w-3.5" /> : n}
           </div>
-          {n < total && <div className="h-px w-6" style={{ background: "#e2e8f0" }} />}
+          {n < total && <div className="h-px w-6" style={{ background: "#EDECDB" }} />}
         </div>
       ))}
     </div>

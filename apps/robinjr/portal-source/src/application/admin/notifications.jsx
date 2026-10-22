@@ -91,17 +91,17 @@ export function AdminNotificaciones({ adminId, clients }) {
         <CardContent className="space-y-4">
           {/* Tipo */}
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Tipo de notificación</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Tipo de notificación</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button type="button" onClick={() => setType("info")}
                 className="text-left rounded-xl border px-4 py-3 transition"
-                style={type === "info" ? { borderColor: NAVY, background: "#f5f8ff" } : { borderColor: "#e2e8f0" }}>
+                style={type === "info" ? { borderColor: NAVY, background: "#FEFBE5" } : { borderColor: "#EDECDB" }}>
                 <div className="flex items-center gap-2 font-semibold text-sm text-slate-800"><Bell className="h-4 w-4" style={{ color: NAVY }} /> Informativa</div>
                 <div className="text-xs text-slate-500 mt-1">El cliente solo la lee y confirma. Se muestra una vez.</div>
               </button>
               <button type="button" onClick={() => setType("terms")}
                 className="text-left rounded-xl border px-4 py-3 transition"
-                style={type === "terms" ? { borderColor: NAVY, background: "#f5f8ff" } : { borderColor: "#e2e8f0" }}>
+                style={type === "terms" ? { borderColor: NAVY, background: "#FEFBE5" } : { borderColor: "#EDECDB" }}>
                 <div className="flex items-center gap-2 font-semibold text-sm text-slate-800"><FileText className="h-4 w-4" style={{ color: NAVY }} /> Cambio de términos</div>
                 <div className="text-xs text-slate-500 mt-1">Implica un cambio en los términos del contrato. El cliente debe aceptarlo y recibe email de confirmación.</div>
               </button>
@@ -121,14 +121,14 @@ export function AdminNotificaciones({ adminId, clients }) {
           {/* Destinatarios */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Destinatarios ({selected.size} seleccionado(s))</div>
+              <div className="text-xs font-semibold text-slate-600 ">Destinatarios ({selected.size} seleccionado(s))</div>
               <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
                 <button type="button" onClick={() => switchScope("assigned")}
                   className="px-3 py-1 rounded-md text-xs font-medium transition"
-                  style={scope === "assigned" ? { background: NAVY, color: "white" } : { color: "#475569" }}>Mis clientes</button>
+                  style={scope === "assigned" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Mis clientes</button>
                 <button type="button" onClick={() => switchScope("all")}
                   className="px-3 py-1 rounded-md text-xs font-medium transition"
-                  style={scope === "all" ? { background: NAVY, color: "white" } : { color: "#475569" }}>Todos</button>
+                  style={scope === "all" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Todos</button>
               </div>
             </div>
             <div className="flex items-center gap-2 mb-2">
@@ -152,7 +152,7 @@ export function AdminNotificaciones({ adminId, clients }) {
                   <button key={c.id} type="button" onClick={() => toggle(c.id)}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition">
                     <div className="h-5 w-5 rounded-md border flex items-center justify-center flex-shrink-0"
-                      style={on ? { background: NAVY, borderColor: NAVY } : { borderColor: "#cbd5e1" }}>
+                      style={on ? { background: NAVY, borderColor: NAVY } : { borderColor: "#DFDED2" }}>
                       {on && <CheckCircle2 className="h-4 w-4 text-white" />}
                     </div>
                     <div className="min-w-0 flex-1">

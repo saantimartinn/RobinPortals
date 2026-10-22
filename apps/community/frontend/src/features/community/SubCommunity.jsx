@@ -1,7 +1,7 @@
 // Community feature UI for sub community; the application shell selects this view.
 import { Building2, CalendarCheck, Handshake, Lock, Plane, Sparkles, Tag, Users } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
-import { GOLD } from "../../shared/theme.js";
+import { GOLD, NAVY } from "../../shared/theme.js";
 import { OtrosRobinsCarousel } from "./OtrosRobinsCarousel.jsx";
 import { OtrosRobinsPage } from "./OtrosRobinsPage.jsx";
 import React, { useState } from "react";
@@ -39,7 +39,7 @@ function SubCommunity({ user, events, partners, loading, onRefresh }) {
             {tabs.map(({ key, label, icon: Icon }) => (
               <button key={key} onClick={() => setTab(key)}
                 className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition"
-                style={tab === key ? { background: `linear-gradient(135deg, ${GOLD}, #E08600)`, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+                style={tab === key ? { background: GOLD, color: NAVY } : { background: "#F6F3E0", color: "#4E5979" }}>
                 <Icon className="h-3.5 w-3.5" /> {label}
                 {key === "viajes" && viajesLock && <Lock className="h-3 w-3" />}
               </button>

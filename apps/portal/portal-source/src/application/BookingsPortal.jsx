@@ -103,7 +103,7 @@ export function Reservas() {
 
           {!avLoading && avDays.length > 0 && (
             <>
-              <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Día</div>
+              <div className="text-xs font-semibold text-slate-600 mb-2 ">Día</div>
               <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
                 {avDays.map((d) => {
                   const f = fmtDayBtn(d.date);
@@ -114,14 +114,14 @@ export function Reservas() {
                       onClick={() => { setSelectedDate(d.date); setSelectedSlot(""); }}
                       className={"flex-shrink-0 rounded-xl border px-3 py-2 text-center min-w-[68px] " + (sel ? "border-transparent text-white" : has ? "border-slate-200 bg-white text-slate-700 hover:border-slate-300" : "border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed")}
                       style={sel ? { background: NAVY } : undefined}>
-                      <div className="text-[10px] uppercase tracking-wide">{f.wd}</div>
+                      <div className="text-[10px] ">{f.wd}</div>
                       <div className="text-sm font-semibold">{f.dm}</div>
                     </button>
                   );
                 })}
               </div>
 
-              <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Hora ({slotMin} min)</div>
+              <div className="text-xs font-semibold text-slate-600 mb-2 ">Hora ({slotMin} min)</div>
               {daySlots.length === 0 ? (
                 <div className="text-xs text-slate-500 mb-4">Sin huecos disponibles este día.</div>
               ) : (

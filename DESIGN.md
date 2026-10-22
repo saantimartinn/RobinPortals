@@ -7,16 +7,56 @@ colors:
   navy: "#2D3A64"    # Azul marino: color base; tono oscuro de la paleta
   orange: "#ECB450"  # Naranja intenso: acento; energía, optimismo y cercanía
   cream: "#FEFBE5"   # Amarillo claro: tono claro de la paleta
+  # Derivados para los portales: azul marino mezclado sobre amarillo claro
+  ink-50: "#F6F3E0"   # fondos suaves, filas, estados hover
+  ink-100: "#EDECDB"
+  ink-200: "#DFDED2"  # líneas y bordes
+  ink-300: "#C3C5C1"
+  ink-400: "#8B919E"  # iconos y placeholders (3:1)
+  ink-500: "#687088"  # texto secundario (4,7:1)
+  ink-600: "#4E5979"
+  ink-700: "#3C486D"
+  orange-50: "#FCF2D3"  # naranja mezclado sobre amarillo claro, solo rellenos
+  orange-100: "#FAE9C0"
+  orange-200: "#F6DBA2"
+  on-navy: "#FEFBE5"        # texto sobre azul marino
+  on-navy-muted: "#C9CBC4"
+  success: "#2F7D5B"   # funcional, solo estados
+  danger: "#B4424F"    # funcional, solo estados
 typography:
   display:
     fontFamily: Champion
-    role: titulares
+    fallback: Oswald
+    role: titulares y cifras
+    fontWeight: 600
   subtitle:
     fontFamily: Almoneda
-    role: subtítulos
+    fallback: Bodoni Moda
+    role: subtítulos, rótulos y nombre del espacio
+    fontWeight: 400
   body:
     fontFamily: Theinhardt
-    role: cuerpo de texto
+    fallback: Archivo
+    role: cuerpo de texto e interfaz
+    fontSize: 0.9375rem
+rounded:
+  control: 0.625rem
+  card: 1rem
+  photo: 1.5rem
+components:
+  top-bar:
+    height: 4.75rem
+    backgroundColor: "{colors.cream}"
+    borderColor: "{colors.ink-200}"
+    activeMarker: "4px {colors.orange}"
+  sidebar:
+    width: 15rem
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.on-navy-muted}"
+    activeMarker: "inset 4px 0 {colors.orange}"
+  identity-stamp:
+    backgroundColor: "{colors.cream}"
+    edge: perforated
 ---
 
 ## Overview
@@ -131,10 +171,38 @@ Este lenguaje conecta con la idea de empezar una nueva etapa fuera de casa y hac
   - dibujar a Robin quieto o fuera de su estilo de línea.
 - **Don't change:** la paleta (`#2D3A64`, `#ECB450`, `#FEFBE5`), las tres tipografías y sus papeles, el logo y Robin.
 
+## Aplicación en los portales
+
+Portal del alumno, RobinJr, Robin Community y admin (no la web, que es un proyecto aparte).
+
+- **Código:**
+  - `packages/brand/brand.css`: fuentes, tokens y base de página. Cada app lo importa el primero.
+  - `packages/brand/tailwind-preset.cjs`: escala de color y tipografías para Tailwind. Remapea `slate`, `gray`, `sky` y `blue` a la escala ink; `amber` y `yellow` al naranja; `white` al amarillo claro; `black` al azul marino.
+  - `packages/portal-nav/cross-portal-nav.css`: barra superior de los portales.
+  - `packages/portal-nav/robin-shell.css`: menú lateral, títulos y superficies de los portales.
+  - `apps/admin/src/styles/brand-shell.css`: lo mismo para el admin.
+- **Fondo y superficies:**
+  - Página en amarillo claro. Tarjetas planas en amarillo claro con línea `ink-200`, sin sombras ni degradados.
+  - Solo flotan, con sombra, los elementos que se superponen: avisos, modales, chat y desplegables.
+- **Barra superior:**
+  - Amarillo claro, con el logo tipográfico y el nombre del espacio en la letra de subtítulos.
+  - La pestaña activa se marca con una barra naranja debajo.
+- **Menú lateral:**
+  - Azul marino con texto amarillo claro. La opción activa lleva fondo translúcido y una barra naranja a la izquierda.
+  - Quién ha entrado se muestra como un **sello** (borde dentado, elemento de viaje de la marca).
+  - Al pie, una nota con Robin leyendo (`packages/brand/assets/robin-reading.png`).
+- **Tipografía:**
+  - Títulos de página en display a 2.5rem. Rótulos sobre el título en subtítulo, en minúscula inicial.
+  - No se usan rótulos en mayúsculas espaciadas.
+- **Naranja:**
+  - Marca lo activo y rellena (pestaña, opción, avatar, barras de progreso, tarjetas destacadas).
+  - Sobre naranja el texto es azul marino. Nunca hay texto naranja sobre amarillo claro.
+- **Gráficos:** series en azul marino y naranja; si hacen falta más, los tonos ink. Los colores de estado solo indican estado.
+
 ## Notas
 
 - El manual es un **borrador**:
   - falta el índice (página 2);
   - la numeración salta de 05 a 07, así que la sección 06 no está;
   - no fija tamaños, interlineados, radios ni márgenes. Se definirán en el rediseño y se añadirán aquí como tokens.
-- **Licencias de fuentes:** Champion, Almoneda y Theinhardt hay que licenciarlas para web y alojar sus archivos. Al menos Champion y Theinhardt son comerciales.
+- **Licencias de fuentes:** Champion, Almoneda y Theinhardt hay que licenciarlas para web y alojar sus archivos (al menos Champion y Theinhardt son comerciales). Hasta entonces los portales usan sustitutas libres (Oswald, Bodoni Moda y Archivo, licencia SIL OFL) bajo los nombres `Robin Display`, `Robin Subtitle` y `Robin Text`. Para usar las de verdad basta cambiar las tres líneas `src` de `packages/brand/brand.css`.

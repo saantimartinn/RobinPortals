@@ -333,11 +333,11 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
       <aside className={open ? "side open" : "side"}>
         <div className="brand">
           <img src={robinPlanWordmark} alt="ROBIN" />
-          <div><small>ADMIN PLATFORM</small></div>
+          <div><small>Admin</small></div>
           <button onClick={() => setOpen(false)} aria-label="Cerrar menú"><X /></button>
         </div>
         <div className="context-title">
-          <small>ESPACIO ACTUAL</small>
+          <small>Espacio actual</small>
           <strong>{areaNames[area]}</strong>
           {area !== "home" && <span>Vista de {currentUser}</span>}
         </div>
@@ -464,5 +464,5 @@ function AdminLogin({ onAuthenticated }: { onAuthenticated: (user: PortalAdmin) 
       setError(loginError instanceof Error ? loginError.message : "No se pudo iniciar sesión");
     } finally { setBusy(false); }
   }
-  return <div className="auth-shell"><form className="auth-card" onSubmit={submit}><span className="auth-mark"><img src={robinPlanWordmark} alt="Robin" /></span><small>ROBIN ADMIN PLATFORM</small><h1>Acceso administrativo</h1><p>Usa las mismas credenciales que en el portal de aplicación.</p><label>Usuario o email<input autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /></label><label>Contraseña<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <div className="auth-error">{error}</div>}<Button type="submit" disabled={busy}>{busy ? "Entrando…" : "Entrar"}</Button></form></div>;
+  return <div className="auth-shell"><form className="auth-card" onSubmit={submit}><span className="auth-mark"><img src={robinPlanWordmark} alt="Robin" /></span><small>Robin admin platform</small><h1>Acceso administrativo</h1><p>Usa las mismas credenciales que en el portal de aplicación.</p><label>Usuario o email<input autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} required /></label><label>Contraseña<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <div className="auth-error">{error}</div>}<Button type="submit" disabled={busy}>{busy ? "Entrando…" : "Entrar"}</Button></form></div>;
 }

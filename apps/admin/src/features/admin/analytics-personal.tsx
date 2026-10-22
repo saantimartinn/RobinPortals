@@ -22,7 +22,7 @@ export function PersonalAnalytics({ path, currentUser, contacts, leadStages, sna
     { label: "Clientes cerrados", value: String(owned.filter((lead) => (leadStages[lead.id] || lead.stage) === "Cliente").length), detail: "CRM" },
     { label: "En onboarding", value: String(snapshot?.clients.filter((client) => client.requires_onboarding).length || 0), detail: "Requieren seguimiento" },
   ];
-  return <div className="page"><Title name="Otras métricas" sub={`Carga operativa real · ${currentUser}`} eyebrow="OPERACIONES" /><ReadonlyMetricGrid metrics={metrics} /></div>;
+  return <div className="page"><Title name="Otras métricas" sub={`Carga operativa real · ${currentUser}`} eyebrow="Operaciones" /><ReadonlyMetricGrid metrics={metrics} /></div>;
 }
 
 export function ReadonlyMetricGrid({ metrics }: { metrics: { label: string; value: string; detail: string }[] }) {
@@ -52,8 +52,8 @@ export function Campaigns({ currentUser, notify }: { currentUser: string; notify
   if (syncing && !snapshot) return <div className="page"><DashboardLoader /></div>;
   return (
     <div className="page">
-      <Title name="Meta Ads" sub={`Resultados reales de la cuenta publicitaria · acceso de ${currentUser}.`} eyebrow="CAMPAÑAS"><Button variant="outline" onClick={() => void syncMeta(true)} disabled={syncing}><Megaphone />{syncing ? "Sincronizando…" : "Actualizar datos"}</Button></Title>
-      <div className="meta-banner"><ShieldCheck /><div><strong>{connection}</strong><p>Periodo: últimos 30 días · importes en {snapshot?.account.currency || "EUR"} · zona horaria {snapshot?.account.timezone || "de la cuenta"}</p></div><Badge variant="outline">DATOS REALES</Badge></div>
+      <Title name="Meta Ads" sub={`Resultados reales de la cuenta publicitaria · acceso de ${currentUser}.`} eyebrow="Campañas"><Button variant="outline" onClick={() => void syncMeta(true)} disabled={syncing}><Megaphone />{syncing ? "Sincronizando…" : "Actualizar datos"}</Button></Title>
+      <div className="meta-banner"><ShieldCheck /><div><strong>{connection}</strong><p>Periodo: últimos 30 días · importes en {snapshot?.account.currency || "EUR"} · zona horaria {snapshot?.account.timezone || "de la cuenta"}</p></div><Badge variant="outline">Datos reales</Badge></div>
       <section className="ads-kpi-grid">{[
         ["Inversión", summary ? euro(summary.spend) : "—", "Gasto total"], ["Impresiones", summary ? summary.impressions.toLocaleString("es-ES") : "—", summary ? `${(summary.impressions / 1000).toFixed(1)}k` : "—"], ["Clics", summary ? summary.clicks.toLocaleString("es-ES") : "—", summary ? `${summary.ctr.toFixed(2)}% CTR` : "—"], ["CTR", summary ? `${summary.ctr.toFixed(2)}%` : "—", "Clics / impresiones"],
         ["CPC medio", summary ? euro(summary.cpc) : "—", "Coste por clic"], ["CPM", summary ? euro(summary.cpm) : "—", "Coste por mil"], ["Alcance", summary ? summary.reach.toLocaleString("es-ES") : "—", "Personas únicas"], ["Leads", summary ? summary.leads.toLocaleString("es-ES") : "—", "Conversiones atribuidas"],

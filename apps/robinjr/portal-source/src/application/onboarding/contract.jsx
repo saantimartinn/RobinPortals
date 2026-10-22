@@ -91,7 +91,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
 
         <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-            <div className="text-[13px] font-semibold text-slate-800" style={{ fontFamily: "'Georgia', serif" }}>
+            <div className="text-[13px] font-semibold text-slate-800" style={{ fontFamily: "var(--robin-font-display)" }}>
               {contractTitulo}
             </div>
             <div className="text-[11px] text-slate-400">Fecha: {todayStr}</div>
@@ -113,7 +113,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
             })()}
 
             <div className="pt-3 mt-3 border-t border-slate-100 space-y-2.5">
-              <p className="font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>Firmas</p>
+              <p className="font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>Firmas</p>
               <p>
                 Por PROJECT ROBIN STUDENTS MOBILITY S.L.<br />
                 Administrador: Noel Cortes Cordoba — NIF B75355057<br />
@@ -134,7 +134,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Datos del alumno (extraídos del DNI)</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2 ">Datos del alumno (extraídos del DNI)</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FieldReadOnly label="Nombre del alumno" value={alumnoNombre} />
             <FieldReadOnly label="DNI del alumno" value={alumnoDni} />
@@ -145,7 +145,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Datos del cliente{esMaestria ? "" : " (tutor legal)"}</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2 ">Datos del cliente{esMaestria ? "" : " (tutor legal)"}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Nombre completo del cliente" value={nombreCliente} onChange={setNombreCliente} placeholder="Nombre y apellidos" />
             <Field label="DNI del cliente" value={dniCliente} onChange={(v) => setDniCliente(v.toUpperCase())} placeholder="12345678A" />
@@ -154,18 +154,18 @@ export function OnboardingContract({ user, onLogout, onDone }) {
 
         {variant.extras.length > 0 && (
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Extras opcionales</div>
+            <div className="text-xs font-semibold text-slate-600 mb-2 ">Extras opcionales</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {variant.extras.map((x) => {
                 const on = selectedExtras.includes(x.id);
                 return (
                   <label key={x.id}
                     className="flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-sm cursor-pointer transition"
-                    style={on ? { background: NAVY, color: "white", borderColor: NAVY } : { background: "white", color: "#475569", borderColor: "#e2e8f0" }}>
+                    style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
                     <span className="flex items-center gap-2">
                       <input type="checkbox" checked={on} onChange={() => toggleExtra(x.id)} className="hidden" />
                       <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"
-                        style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #cbd5e1" }}>
+                        style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
                         {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}
                       </span>
                       <span className="font-medium">{x.label}</span>
@@ -179,7 +179,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
         )}
 
         <div>
-          <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Firma digital</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2 ">Firma digital</div>
           <SignaturePad onChange={setSigDataUrl} />
         </div>
 
@@ -235,7 +235,7 @@ const CONTRACT_VARIANTS = {
 function renderContractBlock(b, i, values) {
   switch (b.type) {
     case "h2":
-      return <p key={i} className="font-bold text-slate-900 mt-3" style={{ fontFamily: "'Georgia', serif" }}>{b.text}</p>;
+      return <p key={i} className="font-bold text-slate-900 mt-3" style={{ fontFamily: "var(--robin-font-display)" }}>{b.text}</p>;
     case "h3":
       return <p key={i} className="font-semibold text-slate-800 mt-2">{b.text}</p>;
     case "p":
@@ -274,7 +274,7 @@ function Hl({ children }) {
 function FieldReadOnly({ label, value }) {
   return (
     <div>
-      <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">{label}</div>
+      <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>
       <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700 border border-slate-100">{value || "—"}</div>
     </div>
   );
@@ -295,7 +295,7 @@ function SignaturePad({ onChange }) {
     const ctx = canvas.getContext("2d");
     ctx.scale(ratio, ratio);
     ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 2;
-    ctx.strokeStyle = "#0e1c45";
+    ctx.strokeStyle = "#2D3A64";
   }, []);
 
   function pointerXY(e) {

@@ -3,7 +3,7 @@ import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Briefcase, CalendarCheck, ChevronRight, HeartHandshake, Tag, Users } from "lucide-react";
 import { COMMUNITY_TYPE_LABELS, SUB_STATUS_LABELS } from "../../shared/constants.js";
 import { EVENT_TAB_TYPES } from "../community/EVENT_TAB_TYPES.js";
-import { GOLD, NAVY, NAVY_DARK } from "../../shared/theme.js";
+import { GOLD, NAVY } from "../../shared/theme.js";
 import React from "react";
 import { RobinProgressBar } from "../levels/RobinProgressBar.jsx";
 import { cityVisible } from "../community/cityVisible.js";
@@ -37,15 +37,15 @@ function SubHome({ user, events, partners, requests, setActive }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+      <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: NAVY }}>
         <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none select-none">
-          <div className="text-[140px] font-black text-white leading-none" style={{ fontFamily: "'Georgia', serif" }}>R</div>
+          <div className="text-[140px] font-black text-white leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>R</div>
         </div>
         <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div>
-            <div className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-2">The Robin Plan</div>
+            <div className="text-white/50 text-xs font-semibold mb-2">The Robin Plan</div>
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="text-white text-2xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>
+              <div className="text-white text-2xl font-bold" style={{ fontFamily: "var(--robin-font-display)" }}>
                 {user.subscription_plan === "annual" ? "Plan Anual" : "Plan Mensual"}
               </div>
               <Badge tone={statusInfo.tone}>{statusInfo.label}</Badge>
@@ -54,9 +54,9 @@ function SubHome({ user, events, partners, requests, setActive }) {
           </div>
           {daysAsRobin != null && (
             <div className="rounded-2xl px-5 py-4 text-center flex-shrink-0 bg-white/10 border border-white/15">
-              <div className="text-white/60 text-[11px] font-semibold uppercase tracking-widest">Robin desde hace</div>
-              <div className="text-3xl font-bold mt-1" style={{ fontFamily: "'Georgia', serif", color: GOLD }}>{daysAsRobin}</div>
-              <div className="text-white/60 text-[11px] uppercase tracking-widest">{daysAsRobin === 1 ? "día" : "días"}</div>
+              <div className="text-white/60 text-[11px] font-semibold ">Robin desde hace</div>
+              <div className="text-3xl font-bold mt-1" style={{ fontFamily: "var(--robin-font-display)", color: GOLD }}>{daysAsRobin}</div>
+              <div className="text-white/60 text-[11px] ">{daysAsRobin === 1 ? "día" : "días"}</div>
             </div>
           )}
         </div>
@@ -73,20 +73,21 @@ function SubHome({ user, events, partners, requests, setActive }) {
         {tiles.map((t) => {
           const Icon = t.icon;
           const orange = t.id === "eventos";
-          const bg = orange ? `linear-gradient(135deg, ${GOLD}, #E08600)` : `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})`;
+          const bg = orange ? GOLD : NAVY;
+          const fg = orange ? NAVY : "#FEFBE5";
           return (
             <button key={t.id} onClick={() => setActive(t.target)}
-              className="rounded-2xl p-5 shadow-sm text-left transition hover:brightness-110 min-h-[140px] flex flex-col justify-between"
-              style={{ background: bg }}>
-              <div className="flex items-center gap-2 text-white/85 text-[11px] uppercase tracking-wider font-semibold">
+              className="rounded-2xl p-5 text-left min-h-[140px] flex flex-col justify-between"
+              style={{ background: bg, color: fg }}>
+              <div className="flex items-center gap-2 text-sm font-semibold">
                 <Icon className="h-4 w-4" style={orange ? {} : { color: GOLD }} /> {t.label}
               </div>
               {t.value !== undefined ? (
-                <div className="text-white text-4xl font-bold leading-none" style={{ fontFamily: "'Georgia', serif" }}>{t.value}</div>
+                <div className="text-4xl font-bold leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>{t.value}</div>
               ) : (
-                <div className="text-white text-sm font-semibold inline-flex items-center gap-1">Abrir <ChevronRight className="h-4 w-4" style={orange ? {} : { color: GOLD }} /></div>
+                <div className="text-sm font-semibold inline-flex items-center gap-1">Abrir <ChevronRight className="h-4 w-4" style={orange ? {} : { color: GOLD }} /></div>
               )}
-              <div className="text-white/60 text-[11px]">{t.hint}</div>
+              <div className="text-[13px] opacity-80">{t.hint}</div>
             </button>
           );
         })}
@@ -94,7 +95,7 @@ function SubHome({ user, events, partners, requests, setActive }) {
 
       <div className="grid lg:grid-cols-2 gap-5">
         <Card>
-          <CardHeader title="Próximos eventos" subtitle={ciudad ? `Personalizado para ${ciudad}` : undefined} icon={CalendarCheck} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: GOLD }}>Ver todos</button>} />
+          <CardHeader title="Próximos eventos" subtitle={ciudad ? `Personalizado para ${ciudad}` : undefined} icon={CalendarCheck} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
           <CardContent className="space-y-3">
             {upcomingEvents.length === 0 && <div className="text-sm text-slate-400">No hay eventos próximos por ahora.</div>}
             {upcomingEvents.slice(0, 6).map((e) => (
@@ -110,7 +111,7 @@ function SubHome({ user, events, partners, requests, setActive }) {
         </Card>
 
         <Card>
-          <CardHeader title="Perks & Partners" subtitle="Ventajas para miembros" icon={Tag} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: GOLD }}>Ver todos</button>} />
+          <CardHeader title="Perks & Partners" subtitle="Ventajas para miembros" icon={Tag} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
           <CardContent className="space-y-2.5">
             {homeOffers.length === 0 && <div className="text-sm text-slate-400">No hay perks activos ahora mismo.</div>}
             {homeOffers.slice(0, 6).map((o) => (

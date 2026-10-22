@@ -1,7 +1,7 @@
 // Community feature UI for sub challenges; the application shell selects this view.
 import { Card, CardContent } from "../../shared/ui.jsx";
 import { ChallengeCard } from "./ChallengeCard.jsx";
-import { GOLD } from "../../shared/theme.js";
+import { GOLD, NAVY } from "../../shared/theme.js";
 import { Loader2, Sparkles } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { SubIntro } from "../services/SubIntro.jsx";
@@ -27,11 +27,11 @@ function SubChallenges({ user, onBack, onUserRefresh }) {
       <SubIntro title="Acelerar progreso" subtitle="Completa retos para adelantar días y subir de nivel más rápido." onBack={onBack} />
       <Card>
         <CardContent className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${GOLD}, #E08600)` }}>
+          <div className="h-12 w-12 rounded-xl grid place-items-center flex-shrink-0" style={{ background: GOLD, color: NAVY }}>
             <Sparkles className="h-6 w-6" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm text-slate-600">Llevas <span className="font-semibold text-slate-900">{rlevel.daysActive}</span> días en Robin{user.bonus_days ? <> · <span className="font-semibold" style={{ color: "#E08600" }}>+{user.bonus_days}</span> por retos</> : null}.</div>
+            <div className="text-sm text-slate-600">Llevas <span className="font-semibold text-slate-900">{rlevel.daysActive}</span> días en Robin{user.bonus_days ? <> · <span className="font-semibold" style={{ color: "#ECB450" }}>+{user.bonus_days}</span> por retos</> : null}.</div>
             <div className="text-xs text-slate-400 mt-0.5">{rlevel.nextLevel ? `Te faltan ${rlevel.daysRemaining} días para ${robinLevelDef(rlevel.nextLevel).label}` : "Nivel máximo alcanzado"}</div>
           </div>
         </CardContent>

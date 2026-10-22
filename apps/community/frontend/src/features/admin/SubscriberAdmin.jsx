@@ -64,7 +64,7 @@ function SubscriberAdmin({ applicationIdentity }) {
             <div className="student-avatar">A</div>
             <div><strong>Equipo Robin</strong><span>Panel de suscriptores</span></div>
           </div>
-          <p className="student-nav-caption">GESTIÓN</p>
+          <p className="student-nav-caption">Gestión</p>
           <div className="student-nav-items">
             {nav.map(({ key, label, icon: Icon }) => {
               const isAct = section === key;
@@ -73,11 +73,11 @@ function SubscriberAdmin({ applicationIdentity }) {
               </button>;
             })}
           </div>
-          <div className="student-support"><span className="student-eyebrow">CONTROL ROBIN</span><h3>Todo el plan, bien organizado.</h3><p>Usuarios, comunidad, partners y contenido desde un mismo espacio.</p></div>
+          <div className="student-support"><span className="student-eyebrow">Control Robin</span><h3>Todo el plan, bien organizado.</h3><p>Usuarios, comunidad, partners y contenido desde un mismo espacio.</p></div>
         </nav>
 
         <main className="student-main" id="subscription-admin-content" tabIndex={-1}>
-          <div className="student-page-heading"><span className="student-eyebrow">THE ROBIN PLAN</span><h1>{nav.find((item) => item.key === section)?.label || "Panel general"}</h1></div>
+          <div className="student-page-heading"><span className="student-eyebrow">The Robin Plan</span><h1>{nav.find((item) => item.key === section)?.label || "Panel general"}</h1></div>
           {loading && <div className="flex items-center gap-2 text-slate-500 text-sm px-2"><Loader2 className="h-4 w-4 animate-spin" /> Cargando panel…</div>}
           {err && !loading && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-4 py-3">{err}</div>}
           {!loading && !err && (
@@ -99,7 +99,7 @@ function SubscriberAdmin({ applicationIdentity }) {
               {section === "database" && isDeveloper && <RobinPlanDeveloperDatabase />}
             </>
           )}
-          <footer className="student-footer"><span>PROJECT ROBIN</span><span>Panel de administración</span></footer>
+          <footer className="student-footer"><span>Project Robin</span><span>Panel de administración</span></footer>
         </main>
       </div>
     </div>

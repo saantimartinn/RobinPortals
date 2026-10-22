@@ -8,7 +8,7 @@ function AuthShell({ children }) {
   return (
     <div className="subscription-auth-shell">
       <aside className="subscription-auth-brand"
-        style={{ background: `linear-gradient(160deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #2a4a8e 100%)` }}>
+        style={{ background: NAVY }}>
         <div className="subscription-auth-rings">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="absolute rounded-full border border-white"

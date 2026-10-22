@@ -38,7 +38,7 @@ export function AdminWorkspace({ active, client, clients, loading, error, onNavi
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-team"><span className="admin-team-icon"><Shield size={21} /></span><div><strong>Equipo Robin</strong><span>Administración</span></div></div>
-        <p className="admin-eyebrow admin-nav-caption">VISTA GENERAL</p>
+        <p className="admin-eyebrow admin-nav-caption">Vista general</p>
         <nav className="admin-global-nav" aria-label="Administración">
           {globalTabs.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key || (key === "clientes" && clientPage) ? "page" : undefined}><Icon size={19} /><span>{key === "clientes" && isDeveloper ? "Todos los clientes" : label}</span>{key === "clientes" && !loading && !error && <small>{clients.length}</small>}</button>)}
         </nav>
@@ -49,7 +49,7 @@ export function AdminWorkspace({ active, client, clients, loading, error, onNavi
           <div className="admin-breadcrumb"><button onClick={() => onNavigate("clientes")}><ArrowLeft size={14} />Mis clientes</button><ChevronRight size={13} /><span>Expediente del alumno</span></div>
           <div className="admin-client-heading">
             <div className="admin-client-avatar" aria-hidden="true">{(client.nombre || fullName(client)).charAt(0)}{(client.apellidos || "").charAt(0)}</div>
-            <div className="admin-client-identity"><span className="admin-eyebrow">ESTÁS GESTIONANDO A</span><h1>{fullName(client)}</h1><p>{client.email || client.username || "Sin email"}<span> · ID: {client.lead_id || client.username || client.id}</span></p></div>
+            <div className="admin-client-identity"><span className="admin-eyebrow">Estás gestionando a</span><h1>{fullName(client)}</h1><p>{client.email || client.username || "Sin email"}<span> · ID: {client.lead_id || client.username || client.id}</span></p></div>
             <button ref={switchRef} className="admin-switch" onClick={() => setPickerOpen(true)}><ArrowLeftRight size={16} />Cambiar cliente</button>
           </div>
           <div className="admin-client-phase"><span className={client.requires_onboarding ? "is-onboarding" : ""}>{client.requires_onboarding ? "Registro pendiente" : "Expediente activo"}</span><p>Paso {client.application_phase || 1} · {APP_STEPS.find(s => s.key === (client.application_phase || 1))?.label || "Proceso de admisión"}</p></div>
@@ -75,7 +75,7 @@ function ClientPicker({ clients, selectedId, onSelect, onClose, returnRef }) {
   const filtered = clients.filter(c => `${fullName(c)} ${c.email || ""} ${c.username || ""} ${c.lead_id || ""}`.toLocaleLowerCase("es").includes(query.trim().toLocaleLowerCase("es")));
   return <dialog ref={dialogRef} className="admin-client-picker" aria-labelledby="client-picker-title" onCancel={onClose}
     onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); onClose(); } }}>
-    <div className="admin-picker-header"><div><span className="admin-eyebrow">MIS CLIENTES</span><h2 id="client-picker-title">Cambiar de expediente</h2></div><button onClick={onClose} aria-label="Cerrar selector de clientes"><X size={20} /></button></div>
+    <div className="admin-picker-header"><div><span className="admin-eyebrow">Mis clientes</span><h2 id="client-picker-title">Cambiar de expediente</h2></div><button onClick={onClose} aria-label="Cerrar selector de clientes"><X size={20} /></button></div>
     <p className="admin-picker-hint">Abrirás la misma sección para el alumno que selecciones. Los borradores sin guardar no se trasladan y el asistente iniciará un contexto nuevo.</p>
     <label className="admin-picker-search"><Search size={18} /><input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Nombre, email o identificador" aria-label="Buscar cliente" /></label>
     <div className="admin-picker-results">{filtered.length === 0 ? <p>No hay clientes que coincidan con tu búsqueda.</p> : filtered.map(c => <button key={c.id} onClick={() => onSelect(c)} aria-current={c.id === selectedId ? "true" : undefined}><span><strong>{fullName(c)}</strong><small>{c.email || c.username} · ID: {c.lead_id || c.id}</small></span><span>{c.id === selectedId ? "Actual" : <ChevronRight size={18} />}</span></button>)}</div>

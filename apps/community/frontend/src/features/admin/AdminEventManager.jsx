@@ -87,7 +87,7 @@ function AdminEventManager({ kind, events, onChanged }) {
             </div>
             {cfg.hasDate && (
               <label className="block">
-                <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Fecha y hora</div>
+                <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Fecha y hora</div>
                 <input type="datetime-local" value={editing.starts_at || ""} onChange={(e) => setEditing((p) => ({ ...p, starts_at: e.target.value }))}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
               </label>
@@ -132,7 +132,7 @@ function AdminEventManager({ kind, events, onChanged }) {
             )}
             {cfg.hasExpiry && (
               <label className="block">
-                <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Caduca el</div>
+                <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Caduca el</div>
                 <input type="date" value={editing.expires_at || ""} onChange={(e) => setEditing((p) => ({ ...p, expires_at: e.target.value }))}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
               </label>

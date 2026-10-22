@@ -17,11 +17,11 @@ function SubAssociationsView({ events = [], ciudad }) {
         <CardContent>
           <div className="flex gap-1.5">
             <button onClick={() => setShowAll(false)} className="rounded-full px-3 py-1.5 text-xs font-semibold transition"
-              style={!showAll ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+              style={!showAll ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
               {ciudad ? `${ciudad} + Nacional` : "Mi ciudad + Nacional"}
             </button>
             <button onClick={() => setShowAll(true)} className="rounded-full px-3 py-1.5 text-xs font-semibold transition"
-              style={showAll ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+              style={showAll ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
               Todas las ciudades
             </button>
           </div>
@@ -36,7 +36,7 @@ function SubAssociationsView({ events = [], ciudad }) {
             <Card key={a.id}>
               <CardContent className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{a.title}</div>
+                  <div className="font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{a.title}</div>
                   <Badge tone="navy">{a.city || "Nacional"}</Badge>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
