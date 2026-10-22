@@ -363,7 +363,8 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
           <button className="menub" onClick={() => setOpen(true)} aria-label="Abrir menú"><Menu /></button>
           <nav className="workspace-tabs" aria-label="Áreas del gestor">
             {workspaceTabs.map(([href, label, tabArea]) => {
-              const external = href.startsWith("https://");
+              // Links to the other portals (and Inicio) are already full site paths.
+              const external = /^https?:\/\//.test(href) || ROBIN_LINKS.some(([link]) => link === href);
               const destination = external ? href : adminPath(href);
               const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
                 if (tabArea === "robinjr") {
