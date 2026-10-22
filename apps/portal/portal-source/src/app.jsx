@@ -263,11 +263,11 @@ export default function PortalRobin() {
   </>;
 
   const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
-  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingOrigin {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingDNI {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingContract {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingPayment {...onboardingProps} /></>;
-  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <><CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} /><OnboardingProfile {...onboardingProps} /></>;
+  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <OnboardingOrigin {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <OnboardingDNI {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <OnboardingContract {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <OnboardingPayment {...onboardingProps} />;
+  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <OnboardingProfile {...onboardingProps} />;
 
   const user = authState.user;
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();

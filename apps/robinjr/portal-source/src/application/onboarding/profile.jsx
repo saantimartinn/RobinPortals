@@ -1,6 +1,6 @@
 // Onboarding step or helper for profile; OnboardingFlow owns the step sequence.
 import { useMemo, useState } from "react";
-import { CheckCircle2, Plus, Trash2, ChevronRight, Loader2, Mail, AlertCircle, ChevronLeft } from "lucide-react";
+import { CheckCircle2, Plus, Trash2, ChevronRight, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
 import { initQuestionnaireAnswers, QuestionField, qOptLabel, qFmtSlider } from "./questionnaire-fields.jsx";
 import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL } from "../../questionnaire-data.js";
 import { GOLD, NAVY } from "../../theme.js";
@@ -192,7 +192,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
   const isLast = screen === totalScreens - 1;
 
   return (
-    <OnboardingShell title="Tu perfil académico" subtitle={subtitle} stepNumber={4} icon={<Mail className="h-4 w-4" />} onLogout={onLogout}>
+    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={4} onLogout={onLogout}>
       <div className="space-y-5">
         {/* Progreso interno del cuestionario */}
         <div className="flex items-center gap-1.5">

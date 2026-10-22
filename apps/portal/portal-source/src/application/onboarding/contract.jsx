@@ -1,6 +1,6 @@
 // Onboarding step or helper for contract; OnboardingFlow owns the step sequence.
 import React, { useState, useEffect, useRef } from "react";
-import { FileText, CheckCircle2, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";
 import { Btn, Field } from "../../ui.jsx";
 import { contractSave } from "../../api.js";
@@ -75,11 +75,10 @@ export function OnboardingContract({ user, onLogout, onDone }) {
   }
 
   return (
-    <OnboardingShell
+    <OnboardingShell user={user}
       title={contractTitulo}
       subtitle={contractSubtitle}
       stepNumber={3}
-      icon={<FileText className="h-4 w-4" />}
       onLogout={onLogout}
     >
       <div className="space-y-5">

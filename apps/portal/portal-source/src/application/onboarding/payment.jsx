@@ -43,11 +43,10 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
     : null;
 
   return (
-    <OnboardingShell
+    <OnboardingShell user={user}
       title="Realiza el primer pago"
       subtitle={amountStr ? `Pago seguro con tarjeta · Importe: ${amountStr} €` : "Pago seguro con tarjeta"}
       stepNumber={5}
-      icon={<CreditCard className="h-4 w-4" />}
       onLogout={onLogout}
     >
       <div className="space-y-5">

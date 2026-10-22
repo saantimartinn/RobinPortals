@@ -1,73 +1,52 @@
 // Onboarding step or helper for onboarding shared; OnboardingFlow owns the step sequence.
-import { FileText, CheckCircle2, CreditCard, Mail } from "lucide-react";
-import logoRBlanco from "../../assets/logo-r-blanco.png";
-import { NAVY, NAVY_DARK } from "../../theme.js";
+// The shell reuses the student portal layout (student-portal.css + packages/portal-nav/robin-shell.css):
+// navy sidebar with the stamp and the steps, page heading and the step inside a paper card.
+// It has no top bar: the logo sits at the top of the sidebar.
+import { Check } from "lucide-react";
+import robinLogo from "../../assets/robin-logo-transparent.png";
 
-export function OnboardingShell({ title, subtitle, stepNumber, totalSteps = 5, icon, onLogout, children }) {
+const STEPS = ["Tu destino", "Identidad", "Contrato", "Perfil académico", "Primer pago"];
+
+export function OnboardingShell({ user, title, subtitle, stepNumber, totalSteps = STEPS.length, onLogout, children }) {
+  const firstName = user?.nombre?.trim() || String(user?.email || user?.username || "").split("@")[0];
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: "var(--robin-font-text)" }}>
-      <div className="hidden lg:flex flex-col justify-between w-[420px] flex-shrink-0 p-10 relative overflow-hidden"
-        style={{ background: NAVY }}>
-        <div className="absolute inset-0 opacity-5">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="absolute rounded-full border border-white"
-              style={{ width: (i + 1) * 180, height: (i + 1) * 180, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }} />
-          ))}
-        </div>
-        <div className="relative">
-          <img src={logoRBlanco} alt="Robin" className="h-16 w-auto" />
-        </div>
-        <div className="relative">
-          <div className="text-white/60 text-xs mb-2">Paso {stepNumber} de {totalSteps} · Onboarding</div>
-          <div className="text-3xl font-bold text-white mb-4" style={{ fontFamily: "var(--robin-font-display)", lineHeight: 1.2 }}>
-            Activamos<br />tu cuenta<br />Robin.
+    <div className="student-portal is-onboarding">
+      <div className="student-layout">
+        <nav className="student-sidebar" aria-label="Pasos para activar tu cuenta">
+          <img className="onboarding-logo" src={robinLogo} alt="Robin" />
+          <div className="student-identity">
+            <div className="student-avatar">{(firstName || "R").charAt(0).toUpperCase()}</div>
+            <div><strong>{firstName}</strong><span>Activando tu cuenta</span></div>
           </div>
-          <div className="text-white/60 text-sm leading-relaxed">Solo unos minutos y ya podrás acceder a documentos, llamadas y el chat con tu asesor.</div>
-        </div>
-        <button onClick={onLogout} className="relative text-white/40 text-xs hover:text-white/80 underline self-start">Cerrar sesión</button>
+          <p className="student-nav-caption">Pasos</p>
+          <ol className="student-nav-items onboarding-steps">
+            {STEPS.slice(0, totalSteps).map((label, index) => {
+              const n = index + 1;
+              const state = n < stepNumber ? "is-done" : n === stepNumber ? "is-active" : "is-next";
+              return (
+                <li key={label} className={`student-nav-item ${state}`} aria-current={n === stepNumber ? "step" : undefined}>
+                  <span className="onboarding-step-mark">{n < stepNumber ? <Check size={14} strokeWidth={2.5} /> : n}</span>
+                  <span>{label}</span>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="student-support">
+            <h3>Solo unos minutos.</h3>
+            <p>Después tendrás tus documentos, tus llamadas y el chat con tu asesor.</p>
+            <button type="button" onClick={onLogout}>Cerrar sesión</button>
+          </div>
+        </nav>
+        <main className="student-main" id="onboarding-content" tabIndex={-1}>
+          <div className="student-page-heading">
+            <span className="student-eyebrow">Paso {stepNumber} de {totalSteps}</span>
+            <h1>{title}</h1>
+            {subtitle && <p className="onboarding-subtitle">{subtitle}</p>}
+          </div>
+          <section className="ui-card onboarding-card">{children}</section>
+          <button type="button" onClick={onLogout} className="onboarding-logout">Cerrar sesión</button>
+        </main>
       </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-white overflow-y-auto">
-        <div className="w-full max-w-xl">
-          <div className="bg-white rounded-2xl border border-[#EDECDB] overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0"
-                  style={{ background: NAVY }}>
-                  {icon || (stepNumber === 1 ? <CreditCard className="h-4 w-4" />
-                    : stepNumber === 2 ? <FileText className="h-4 w-4" />
-                    : stepNumber === 3 ? <Mail className="h-4 w-4" />
-                    : <CreditCard className="h-4 w-4" />)}
-                </div>
-                <div className="min-w-0">
-                  <div className="text-[15px] font-bold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{title}</div>
-                  <div className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</div>
-                </div>
-              </div>
-              <Stepper current={stepNumber} total={totalSteps} />
-            </div>
-            <div className="p-6">{children}</div>
-          </div>
-          <button onClick={onLogout} className="mt-4 text-xs text-slate-400 hover:text-slate-700 underline w-full text-center lg:hidden">Cerrar sesión</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function Stepper({ current, total = 3 }) {
-  const steps = Array.from({ length: total }, (_, i) => i + 1);
-  return (
-    <div className="hidden sm:flex items-center gap-1.5">
-      {steps.map((n) => (
-        <div key={n} className="flex items-center gap-1.5">
-          <div className="h-6 w-6 rounded-full grid place-items-center text-[11px] font-bold"
-            style={n < current ? { background: "#10b981", color: "#FEFBE5" } : n === current ? { background: NAVY, color: "#FEFBE5" } : { background: "#EDECDB", color: "#687088" }}>
-            {n < current ? <CheckCircle2 className="h-3.5 w-3.5" /> : n}
-          </div>
-          {n < total && <div className="h-px w-6" style={{ background: "#EDECDB" }} />}
-        </div>
-      ))}
     </div>
   );
 }

@@ -73,8 +73,7 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
     : "Solicitud internacional · " + screen + " de 3";
 
   return (
-    <OnboardingShell title="Bienvenido a Robin" subtitle={subtitle} stepNumber={1} totalSteps={5}
-      icon={<MapPin className="h-4 w-4" />} onLogout={onLogout}>
+    <OnboardingShell user={user} title="Bienvenido a Robin" subtitle={subtitle} stepNumber={1} totalSteps={5} onLogout={onLogout}>
       <div className="space-y-5">
         {screen === 0 && (
           <>
