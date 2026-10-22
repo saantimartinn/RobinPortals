@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 const auth = require('../backend/lib/auth');
 const { principalTable, subscriberDisplayName } = require('../backend/lib/principal');
-process.env.COMMUNITY_JWT_SECRET = 'test-only-not-a-production-secret-123456789';
+process.env.JWT_SECRET = 'test-only-not-a-production-secret-123456789';
 const event = token => ({ headers: { cookie: `${auth.COOKIE_NAME}=${token}` } });
 test('subscriber sessions round trip; application roles are rejected', () => {
   for (const role of ['subscriber','subscriber_admin']) {
@@ -25,7 +25,7 @@ test('subscriber display names retain the existing name and fallback order', () 
 test('tampered, expired and missing sessions fail closed', () => {
   assert.equal(auth.readSessionFromEvent(event('invalid')), null);
   assert.equal(auth.readSessionFromEvent({headers:{}}), null);
-  assert.equal(auth.readSessionFromEvent(event(jwt.sign({uid:'1',role:'subscriber'},process.env.COMMUNITY_JWT_SECRET,{expiresIn:-1}))),null);
+  assert.equal(auth.readSessionFromEvent(event(jwt.sign({uid:'1',role:'subscriber'},process.env.JWT_SECRET,{expiresIn:-1}))),null);
 });
 test('session cookie remains HttpOnly, Secure and SameSite=Lax', () => {
   const cookie=auth.buildSessionCookie('test');

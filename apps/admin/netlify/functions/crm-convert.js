@@ -63,7 +63,7 @@ exports.handler = async (event) => {
       await ensureDriveFolder(portal, existing.id);
     } else {
       if (await identityExists(portal, [leadId, lead.email])) return json({ error: 'identity_collision' }, { statusCode: 409 });
-      const password = String(process.env.ADMIN_DEFAULT_PASSWORD || '');
+      const password = String(process.env.NOTION_BOOTSTRAP_PASSWORD || process.env.DEFAULT_PASSWORD || '');
       if (!password || !passwordPolicy(password).ok) return json({ error: 'invalid_bootstrap_password_configuration' }, { statusCode: 500 });
       const { data: inserted, error: insertError } = await portal.from('users').insert({
         lead_id: leadId, notion_page_id: notionPageId, username: leadId, email: lead.email,

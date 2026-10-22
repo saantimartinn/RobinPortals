@@ -39,13 +39,13 @@ test('rechaza firmas con más de cinco minutos o con body alterado', () => {
 
 test('crea una orden alojada sin exponer la clave al frontend', async () => {
   const previous = {
-    key: process.env.JR_REVOLUT_MERCHANT_SECRET_KEY,
-    base: process.env.JR_REVOLUT_API_BASE,
+    key: process.env.REVOLUT_MERCHANT_SECRET_KEY,
+    base: process.env.REVOLUT_API_BASE,
     version: process.env.REVOLUT_API_VERSION,
     fetch: global.fetch,
   };
-  process.env.JR_REVOLUT_MERCHANT_SECRET_KEY = 'sk_sandbox';
-  process.env.JR_REVOLUT_API_BASE = 'https://sandbox-merchant.revolut.com';
+  process.env.REVOLUT_MERCHANT_SECRET_KEY = 'sk_sandbox';
+  process.env.REVOLUT_API_BASE = 'https://sandbox-merchant.revolut.com';
   process.env.REVOLUT_API_VERSION = '2026-03-12';
   let request;
   global.fetch = async (url, options) => {
@@ -72,28 +72,28 @@ test('crea una orden alojada sin exponer la clave al frontend', async () => {
     assert.equal(body.merchant_order_data.reference, 'attempt-1');
   } finally {
     global.fetch = previous.fetch;
-    restoreEnv('JR_REVOLUT_MERCHANT_SECRET_KEY', previous.key);
-    restoreEnv('JR_REVOLUT_API_BASE', previous.base);
+    restoreEnv('REVOLUT_MERCHANT_SECRET_KEY', previous.key);
+    restoreEnv('REVOLUT_API_BASE', previous.base);
     restoreEnv('REVOLUT_API_VERSION', previous.version);
   }
 });
 
 test('impide usar Sandbox dentro del contexto Production de Netlify', () => {
   const previous = {
-    key: process.env.JR_REVOLUT_MERCHANT_SECRET_KEY,
-    base: process.env.JR_REVOLUT_API_BASE,
+    key: process.env.REVOLUT_MERCHANT_SECRET_KEY,
+    base: process.env.REVOLUT_API_BASE,
     context: process.env.CONTEXT,
   };
-  process.env.JR_REVOLUT_MERCHANT_SECRET_KEY = 'sk_sandbox';
-  process.env.JR_REVOLUT_API_BASE = 'https://sandbox-merchant.revolut.com';
+  process.env.REVOLUT_MERCHANT_SECRET_KEY = 'sk_sandbox';
+  process.env.REVOLUT_API_BASE = 'https://sandbox-merchant.revolut.com';
   process.env.CONTEXT = 'production';
   try {
     assert.equal(revolut.isSandbox(), true);
     assert.equal(revolut.isAllowedEnvironment(), false);
     assert.equal(revolut.isConfigured(), false);
   } finally {
-    restoreEnv('JR_REVOLUT_MERCHANT_SECRET_KEY', previous.key);
-    restoreEnv('JR_REVOLUT_API_BASE', previous.base);
+    restoreEnv('REVOLUT_MERCHANT_SECRET_KEY', previous.key);
+    restoreEnv('REVOLUT_API_BASE', previous.base);
     restoreEnv('CONTEXT', previous.context);
   }
 });

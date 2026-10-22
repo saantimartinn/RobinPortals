@@ -26,14 +26,13 @@ El proxy manda `/portal`, `/robinjr`, `/therobinplan`, `/admin`, `/login`, `/api
 
 ## Variables de entorno
 
-`npm run dev` genera `./.env` (ignorado por Git) a partir de `apps/*/.env` con `site/env.mjs`. Son **credenciales reales**: Supabase, Revolut, Stripe, correo, etc. de producción.
+Cada app tiene su propio `apps/<app>/.env` con las mismas variables que su proyecto de Netlify actual (portal → `santipruebas`, Robin Jr → `robinjr`, Community → `suscriptions-santi`, Admin → `robin-admin-platform`). Son **credenciales reales** de producción. Para volver a copiarlas desde Netlify (solo lectura):
 
-Las variables que tienen valores distintos según la app conservan el valor de portal/admin con el nombre normal; el resto de apps las leen con prefijo:
+```sh
+npm run site:pull-env            # las cuatro apps
+npm run site:pull-env -- portal  # solo una
+```
 
-| App | Variables propias |
-| --- | --- |
-| Robin Jr | `JR_SUPABASE_URL`, `JR_SUPABASE_SERVICE_ROLE_KEY`, `JR_REVOLUT_API_BASE`, `JR_REVOLUT_MERCHANT_SECRET_KEY`, `JR_REVOLUT_WEBHOOK_SIGNING_SECRET` |
-| Community | `COMMUNITY_SUPABASE_URL`, `COMMUNITY_SUPABASE_SERVICE_ROLE_KEY`, `COMMUNITY_JWT_SECRET`, `COMMUNITY_STRIPE_WEBHOOK_SECRET` |
-| Admin | `ADMIN_DEFAULT_PASSWORD` |
+Netlify no deja leer el valor de producción de las variables secretas; para esas se usa el valor del contexto `dev` de ese proyecto y, si no lo hay, el que ya estuviera en el `.env` local. El script avisa de cuáles son. El `.env` anterior queda en `apps/<app>/.env.bak`.
 
-Si aparece una variable nueva con valores distintos entre apps, `site/env.mjs` se detiene y la indica; hay que añadirla a `SCOPED` y leerla con prefijo en el código de esa app.
+`npm run dev` junta los cuatro en `./.env` con un prefijo por app (`PORTAL__…`, `ROBINJR__…`, `COMMUNITY__…`, `ADMIN__…`). Cada función se ejecuta con el entorno de su app (`site/app-env.cjs`): ve sus variables con el nombre normal y no ve las de las demás apps, así que el código de cada app no cambia. Solo `PUBLIC_BASE_URL`, `ALLOWED_ORIGINS` y `ROBIN_SITE_URL` son del sitio y apuntan a localhost.

@@ -67,8 +67,8 @@ test('password recovery uses the existing public password endpoint without a ses
 });
 
 test('Stripe webhook rejects invalid signatures and retries persistence failures',async()=>{
-  const original=process.env.COMMUNITY_STRIPE_WEBHOOK_SECRET;
-  process.env.COMMUNITY_STRIPE_WEBHOOK_SECRET='test-only';
+  const original=process.env.STRIPE_WEBHOOK_SECRET;
+  process.env.STRIPE_WEBHOOK_SECRET='test-only';
   try {
     const invalid=loadHandler('stripe-webhook',{'../lib/stripe':{isConfigured:()=>true,getStripe:()=>({webhooks:{constructEvent(){throw new Error('invalid signature');}}})}});
     assert.equal((await invalid({httpMethod:'POST',headers:{},body:'{}'})).statusCode,400);
@@ -77,7 +77,7 @@ test('Stripe webhook rejects invalid signatures and retries persistence failures
       '../lib/supabase':{getSupabase:()=>({})},
     });
     assert.equal((await failing({httpMethod:'POST',headers:{},body:'{}'})).statusCode,500);
-  } finally { if(original===undefined)delete process.env.COMMUNITY_STRIPE_WEBHOOK_SECRET;else process.env.COMMUNITY_STRIPE_WEBHOOK_SECRET=original; }
+  } finally { if(original===undefined)delete process.env.STRIPE_WEBHOOK_SECRET;else process.env.STRIPE_WEBHOOK_SECRET=original; }
 });
 
 test('partner logo parser accepts real image signatures and rejects disguised content',()=>{
