@@ -1,6 +1,6 @@
 # Project Robin
 
-Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro apps se publican como **un único sitio de Netlify**; la web pública sigue siendo independiente en el repositorio hermano `Web-robin`.
+Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro apps se publican como **un único sitio de Netlify**. La web pública es un proyecto aparte y no forma parte de este repositorio.
 
 ## Estructura
 

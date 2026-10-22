@@ -1,16 +1,13 @@
-// Starts the whole Robin stack locally, laid out like production:
-//   http://localhost:8888  front door (dev/proxy.mjs), stands in for project-robin.com
+// Starts the Robin apps locally, laid out like production:
+//   http://localhost:8888  front door (dev/proxy.mjs)
 //   http://localhost:8889  shared apps site: portal, Robin Jr, Community and Admin
-//   http://localhost:8890  public website (Web-robin, its own repository)
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const PROXY_PORT = 8888;
 const APPS_PORT = 8889;
-const WEB_PORT = 8890;
 const publicUrl = `http://localhost:${PROXY_PORT}`;
 
 const children = [];
@@ -46,17 +43,10 @@ for (const step of [
 }
 
 start('proxy', process.execPath, ['dev/proxy.mjs'], {
-  env: { ROBIN_PROXY_PORT: String(PROXY_PORT), ROBIN_APPS_PORT: String(APPS_PORT), ROBIN_WEB_PORT: String(WEB_PORT) },
+  env: { ROBIN_PROXY_PORT: String(PROXY_PORT), ROBIN_APPS_PORT: String(APPS_PORT) },
 });
 start('build', process.execPath, ['site/build.mjs', '--watch']);
 start('apps', 'netlify', ['dev', '--offline', '--port', String(APPS_PORT), '--no-open']);
 
-const web = resolve(root, 'Web-robin');
-if (existsSync(web)) {
-  start('web', 'netlify', [
-    'dev', '--offline', '--port', String(WEB_PORT), '--no-open',
-    '--command', 'npm run dev -- --host 127.0.0.1 --port 4321 --strictPort', '--target-port', '4321',
-  ], { cwd: web, env: { PUBLIC_LOGIN_URL: `${publicUrl}/login` } });
-}
 
-console.log(`\nRobin en local: ${publicUrl}  (web, /portal, /robinjr, /therobinplan, /admin)\n`);
+console.log(`\nRobin en local: ${publicUrl}  (/portal, /robinjr, /therobinplan, /admin)\n`);

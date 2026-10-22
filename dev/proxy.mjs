@@ -1,17 +1,10 @@
-// Local stand-in for project-robin.com: sends the apps' paths to the shared
-// apps site and everything else to the public website, as production will.
+// Local front door for the shared apps site: forwards everything to
+// `netlify dev` and adapts its production headers to plain-http localhost.
 import http from 'node:http';
 import net from 'node:net';
 
 const PORT = Number(process.env.ROBIN_PROXY_PORT || 8888);
 const APPS_PORT = Number(process.env.ROBIN_APPS_PORT || 8889);
-const WEB_PORT = Number(process.env.ROBIN_WEB_PORT || 8890);
-const APPS_PATH = /^\/(portal|robinjr|therobinplan|admin)(\/|$)|^\/login\/?$|^\/api\/(admin|internal)(\/|$)/;
-
-function upstreamPort(url) {
-  const pathname = new URL(url, 'http://localhost').pathname;
-  return APPS_PATH.test(pathname) ? APPS_PORT : WEB_PORT;
-}
 
 // The CSP asks browsers to upgrade to https, which a plain-http local server cannot serve.
 function localHeaders(headers) {
@@ -24,7 +17,7 @@ function localHeaders(headers) {
 }
 
 const server = http.createServer((request, response) => {
-  const port = upstreamPort(request.url);
+  const port = APPS_PORT;
   const upstream = http.request({
     hostname: '127.0.0.1',
     port,
@@ -42,9 +35,9 @@ const server = http.createServer((request, response) => {
   request.pipe(upstream);
 });
 
-// Websockets (Vite/Astro hot reload) go to the same upstream as the page.
+// Websockets (hot reload) go to the apps site too.
 server.on('upgrade', (request, client, head) => {
-  const upstream = net.connect(upstreamPort(request.url), '127.0.0.1', () => {
+  const upstream = net.connect(APPS_PORT, '127.0.0.1', () => {
     const lines = [`${request.method} ${request.url} HTTP/${request.httpVersion}`];
     for (let i = 0; i < request.rawHeaders.length; i += 2) lines.push(`${request.rawHeaders[i]}: ${request.rawHeaders[i + 1]}`);
     upstream.write(`${lines.join('\r\n')}\r\n\r\n`);
@@ -57,5 +50,5 @@ server.on('upgrade', (request, client, head) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`[proxy] http://localhost:${PORT} -> apps :${APPS_PORT} | web :${WEB_PORT}`);
+  console.log(`[proxy] http://localhost:${PORT} -> apps :${APPS_PORT}`);
 });

@@ -10,19 +10,17 @@ Arranca todo con la misma forma que tendrá producción:
 
 | URL | Qué es |
 | --- | --- |
-| http://localhost:8888 | Entrada única (`dev/proxy.mjs`), hace de `project-robin.com` |
+| http://localhost:8888 | Entrada única (`dev/proxy.mjs`) |
 | http://localhost:8888/portal/ | Portal del alumno (y `/login`, el login común) |
 | http://localhost:8888/robinjr/ | Robin Jr |
 | http://localhost:8888/therobinplan/ | Robin Community |
 | http://localhost:8888/admin/ | Admin |
-| http://localhost:8888/ | Web pública (`Web-robin`, repositorio aparte) |
 
 Por detrás:
 
 - **8889**: el sitio de apps (`netlify dev` en la raíz). Sirve los cuatro frontends compilados en `site/.output/public` y las funciones de todas las apps con su prefijo (`portal-*`, `robinjr-*`, `community-*`, `admin-*`). Los frontends se recompilan solos al guardar (`vite build --watch`); recarga la página para ver el cambio.
-- **8890**: la web (`netlify dev` dentro de `Web-robin`, con Astro en 4321).
 
-El proxy manda `/portal`, `/robinjr`, `/therobinplan`, `/admin`, `/login`, `/api/admin/*` y `/api/internal/*` al sitio de apps, y todo lo demás a la web.
+El proxy del 8888 lo manda todo al sitio de apps y solo adapta a `http://localhost` las cabeceras de seguridad de producción (quita `upgrade-insecure-requests` y HSTS). `/` lleva a `/portal/`.
 
 ## Variables de entorno
 
