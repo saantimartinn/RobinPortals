@@ -23,11 +23,11 @@ function SubGroupsView({ events, ciudad }) {
             <Card key={g.id}>
               <CardContent className="space-y-2.5">
                 <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+                  <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: NAVY }}>
                     <Users className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{g.title}</div>
+                    <div className="text-sm font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{g.title}</div>
                     <div className="text-xs text-slate-400">{g.city || "Nacional"}{meta.members ? ` · ${meta.members} miembros` : ""}</div>
                   </div>
                 </div>

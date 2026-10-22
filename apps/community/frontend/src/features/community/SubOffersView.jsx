@@ -29,10 +29,10 @@ function SubOffersView({ events, ciudad }) {
               <CardContent className="space-y-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+                    <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: NAVY }}>
                       <Tag className="h-4 w-4" />
                     </div>
-                    <div className="font-semibold text-slate-900 truncate" style={{ fontFamily: "'Georgia', serif" }}>{meta.partner || o.title}</div>
+                    <div className="font-semibold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{meta.partner || o.title}</div>
                   </div>
                   {meta.tag && <Badge tone="gold">{meta.tag}</Badge>}
                 </div>

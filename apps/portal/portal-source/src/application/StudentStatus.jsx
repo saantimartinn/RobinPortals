@@ -14,7 +14,7 @@ export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
       <div className="student-page-heading"><h1 className="student-eyebrow student-page-title">Mi camino</h1></div>
       <div className="student-progress-card rounded-2xl p-6 relative overflow-hidden">
         <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none select-none">
-          <div className="text-[140px] font-black text-white leading-none" style={{ fontFamily: "'Georgia', serif" }}>R</div>
+          <div className="text-[140px] font-black text-white leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>R</div>
         </div>
         <div className="relative">
           <div className="student-step-pill"><span />PASO {step} DE {APP_STEPS.length} · EN CURSO</div>
@@ -48,11 +48,11 @@ export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
             const act = s.key === step;
             return (
               <div key={s.key} className={`student-roadmap-step flex items-center gap-4 rounded-xl border px-4 py-3 ${act ? "is-current" : ""}`} aria-current={act ? "step" : undefined}
-                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#f1f5f9", background: "white" }}>
+                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#F6F3E0", background: "#FEFBE5" }}>
                 <div className="h-8 w-8 rounded-full flex-shrink-0 grid place-items-center font-bold text-sm border-2"
-                  style={done ? { background: "#10b981", borderColor: "#10b981", color: "white" }
-                    : act ? { background: GOLD, borderColor: GOLD, color: "white" }
-                    : { background: "white", borderColor: "#e2e8f0", color: "#94a3b8" }}>
+                  style={done ? { background: "#10b981", borderColor: "#10b981", color: "#FEFBE5" }
+                    : act ? { background: GOLD, borderColor: GOLD, color: NAVY }
+                    : { background: "#FEFBE5", borderColor: "#EDECDB", color: "#687088" }}>
                   {done ? <CheckCircle2 className="h-4 w-4" /> : s.key}
                 </div>
                 <div className="flex-1 min-w-0">

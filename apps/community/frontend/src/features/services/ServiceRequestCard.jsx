@@ -21,9 +21,9 @@ function ServiceRequestCard({ service, requests = [], onRefresh, section }) {
     finally { setSending(false); }
   }
   return (
-    <div className="rounded-2xl border border-[#D7E1F4] bg-[#EEF3FC] p-5 flex flex-col min-h-[150px]">
+    <div className="rounded-2xl border border-[#DFDED2] bg-[#F6F3E0] p-5 flex flex-col min-h-[150px]">
       <div className="flex items-start gap-3">
-        <div className="h-11 w-11 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+        <div className="h-11 w-11 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: NAVY }}>
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">

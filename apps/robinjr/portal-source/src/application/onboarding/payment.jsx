@@ -62,9 +62,9 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
         )}
 
         <div className="rounded-2xl p-5 relative overflow-hidden text-white"
-          style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+          style={{ background: NAVY }}>
           <div className="flex items-center justify-between">
-            <div className="text-xs uppercase tracking-widest text-white/50">Project Robin · Pago</div>
+            <div className="text-xs text-white/50">Project Robin · Pago</div>
             <CreditCard className="h-5 w-5 text-white/70" />
           </div>
           <div className="text-3xl font-bold mt-4 tracking-tight">{amountStr ? `${amountStr} €` : "Importe calculado al continuar"}</div>

@@ -69,7 +69,7 @@ export function WebAnalytics({ notify }: { notify?: (message: string) => void })
     <div className="page web-analytics">
       <div className="title">
         <div>
-          <span>INICIO · WEB</span>
+          <span>Inicio / Web</span>
           <h1>Web project-robin.com</h1>
           <p>Tráfico, comportamiento, conversión y contenido. Solo se mide en detalle a quien acepta las cookies de analítica.</p>
         </div>

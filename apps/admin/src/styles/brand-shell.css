@@ -1,0 +1,60 @@
+/* Admin chrome on the Project Robin brand (DESIGN.md, packages/brand/brand.css).
+ * Same measures and rules as the portals' shell (packages/portal-nav:
+ * cross-portal-nav.css and robin-shell.css): a 4.75rem cream top bar with an
+ * orange marker under the active tab, and a 15rem navy sidebar whose current
+ * area is shown as a stamp. Loaded after global.css so these rules win. */
+body,.work,.page{background:var(--robin-cream)!important;font-family:var(--robin-font-text)}
+
+/* Sidebar */
+@media (min-width:801px){.side{width:15rem}.work{margin-left:15rem}}
+.side{background:var(--robin-navy)!important;color:var(--robin-on-navy)}
+.side :focus-visible{outline-color:var(--robin-orange)}
+.side .brand,.top{height:4.75rem}
+.side .brand{background:var(--robin-cream);border-bottom:var(--robin-line);padding:0 1.25rem;gap:.75rem}
+.side .brand>img{width:78px;height:40px}
+.side .brand>div{padding-left:.75rem;border-left:var(--robin-line)}
+.side .brand small{font:400 .95rem/1.1 var(--robin-font-subtitle);letter-spacing:0;color:var(--robin-navy)}
+.side .brand button{color:var(--robin-navy)}
+
+/* Current area: a stamp with a perforated edge (the portals' identity block). */
+.context-title{position:relative;margin:1.25rem 1rem;padding:1.1rem 1rem;border:0;color:var(--robin-navy);background:var(--robin-stamp-edge),var(--robin-cream)}
+.context-title::after{content:"";position:absolute;inset:8px;border:1px solid var(--robin-ink-200);pointer-events:none}
+.context-title small{font:400 .85rem var(--robin-font-subtitle);letter-spacing:0;color:var(--robin-ink-600)}
+.context-title strong{font:600 1.15rem/1.1 var(--robin-font-display);color:var(--robin-navy);margin-top:.15rem}
+.context-title span{font:400 .85rem var(--robin-font-subtitle);color:var(--robin-ink-600)}
+.side nav{padding:0 .75rem}
+.side nav a{height:2.75rem;padding:0 .9rem;border-radius:var(--robin-radius-control);color:var(--robin-on-navy-muted);font:500 .9375rem var(--robin-font-text);margin:.08rem 0}
+.side nav a svg{width:1.1rem}
+.side nav a:hover{background:var(--robin-on-navy-line);color:var(--robin-on-navy)}
+.side nav a.active{background:var(--robin-on-navy-line);color:var(--robin-on-navy);font-weight:600;box-shadow:inset 4px 0 var(--robin-orange)}
+.side nav b{background:var(--robin-orange);color:var(--robin-navy)}
+.profile{border-top:1px solid var(--robin-on-navy-line)}
+.profile>i{background:var(--robin-orange);color:var(--robin-navy);font:600 .85rem var(--robin-font-display)}
+.profile strong{font-size:.875rem;color:var(--robin-on-navy)}
+.profile small{font:400 .8rem var(--robin-font-subtitle);color:var(--robin-on-navy-muted)}
+
+/* Top bar */
+.top{background:var(--robin-cream);border-bottom:var(--robin-line);padding:0 1.75rem}
+.workspace-tabs{gap:.25rem}
+.workspace-tabs a{position:relative;padding:0 .85rem;border-bottom:0;color:var(--robin-ink-600);font-size:.875rem;font-weight:500}
+.workspace-tabs a::after{content:"";position:absolute;left:.85rem;right:.85rem;bottom:0;height:4px;border-radius:4px 4px 0 0;background:transparent}
+.workspace-tabs a:hover{background:transparent;color:var(--robin-navy)}
+.workspace-tabs a.active{color:var(--robin-navy);font-weight:650;border-bottom:0}
+.workspace-tabs a.active::after{background:var(--robin-orange)}
+.authenticated-user{font-size:.875rem;font-weight:600;color:var(--robin-navy)}
+.top>div>button,.top-actions button{border:var(--robin-line);background:transparent;color:var(--robin-navy);border-radius:var(--robin-radius-control)}
+
+/* Page heading */
+.title>div:first-child>span{font:400 1rem var(--robin-font-subtitle);letter-spacing:0;color:var(--robin-ink-600)}
+.title h1{font:600 2.5rem/1.05 var(--robin-font-display);letter-spacing:.005em;color:var(--robin-navy);margin:.2rem 0 .35rem}
+.title p{font-size:.875rem;color:var(--robin-ink-600)}
+
+/* Surfaces: flat cream with navy hairlines */
+.panel,.stats article{background:var(--robin-cream);border:var(--robin-line);border-radius:var(--robin-radius-card);box-shadow:none}
+.panel-heading h2{font:500 1.15rem var(--robin-font-display);letter-spacing:.005em;color:var(--robin-navy)}
+.stats strong{font:600 1.75rem var(--robin-font-display);color:var(--robin-navy)}
+.stats article>i{background:var(--robin-ink-50);color:var(--robin-navy);border-radius:var(--robin-radius-control)}
+.stats article>i.gold{background:var(--robin-orange-100);color:var(--robin-navy)}
+
+@media (max-width:1320px){.workspace-tabs a{padding:0 .6rem}.workspace-tabs a::after{left:.6rem;right:.6rem}}
+@media (max-width:800px){.side .brand,.top{height:4rem}.top{padding:0 .75rem}.workspace-tabs a{font-size:.8125rem;padding:0 .5rem}.workspace-tabs a::after{left:.5rem;right:.5rem}.title h1{font-size:2rem}}

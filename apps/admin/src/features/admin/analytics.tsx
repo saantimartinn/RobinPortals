@@ -17,7 +17,7 @@ export function GlobalAnalytics({ contacts, leadStages, snapshot, connected }: {
   const validRange = Boolean(range.from && range.to && range.from <= range.to);
   return (
     <div className="page">
-      <Title name="Analíticas generales" sub="Rendimiento consolidado de Robin." eyebrow="INICIO · VISTA GLOBAL">
+      <Title name="Analíticas generales" sub="Rendimiento consolidado de Robin." eyebrow="Inicio / Vista global">
         <div className="analytics-tabs" role="tablist" aria-label="Secciones de analíticas generales">
           <button type="button" role="tab" aria-selected={activeTab === "finance"} className={activeTab === "finance" ? "active" : ""} onClick={() => setActiveTab("finance")}>Finance</button>
           <button type="button" role="tab" aria-selected={activeTab === "sales"} className={activeTab === "sales" ? "active" : ""} onClick={() => setActiveTab("sales")}>Ventas</button>

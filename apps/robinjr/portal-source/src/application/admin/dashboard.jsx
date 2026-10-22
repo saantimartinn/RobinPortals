@@ -155,7 +155,7 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
                 <div key={p.key} className="rounded-xl border border-slate-200 px-3 py-2.5 bg-white">
                   <div className="flex items-center justify-between gap-3 mb-1.5">
                     <div className="min-w-0">
-                      <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Fase {p.key}</div>
+                      <div className="text-[11px] text-slate-400 font-semibold">Fase {p.key}</div>
                       <div className="text-sm font-semibold text-slate-800 truncate">{p.label}</div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -212,12 +212,12 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
                     className="w-full text-left rounded-lg px-2 py-1.5 hover:bg-slate-50 flex items-start gap-2">
                     <div className="h-1.5 w-1.5 rounded-full mt-2 flex-shrink-0"
                       style={{ background:
-                        ev.type==="document_upload"   ? "#0ea5e9" :
+                        ev.type==="document_upload"   ? "#687088" :
                         ev.type==="document_validate" ? "#10b981" :
                         ev.type==="document_reject"   ? "#f43f5e" :
                         ev.type==="payment_paid"      ? "#10b981" :
-                        ev.type==="payment_unlock"    ? "#f59e0b" :
-                        "#94a3b8" }} />
+                        ev.type==="payment_unlock"    ? "#ECB450" :
+                        "#687088" }} />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs text-slate-700 truncate">
                         <span className="font-semibold">{ev.title}</span>

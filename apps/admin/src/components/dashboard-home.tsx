@@ -67,7 +67,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
   return (
     <div className="page">
       <div className="title">
-        <div><span>INICIO COMPARTIDO</span><h1>Visión general de Robin</h1><p>Información común para todo el equipo de administración.</p></div>
+        <div><span>Inicio compartido</span><h1>Visión general de Robin</h1><p>Información común para todo el equipo de administración.</p></div>
         <label className="dashboard-period"><CalendarDays /><select value={period} onChange={(event) => setPeriod(event.target.value as "7" | "15" | "30" | "all")}><option value="7">Últimos 7 días</option><option value="15">Últimos 15 días</option><option value="30">Últimos 30 días</option><option value="all">Todo</option></select><ChevronDown /></label>
       </div>
 
@@ -80,7 +80,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
           <header className="phead"><div><h2>Nuevos leads y clientes</h2><p>Altas diarias · {periodLabel.toLowerCase()}</p></div><span className="report-hint">Ver informe <ExternalLink /></span></header>
           <div className="chart-legend"><span className="leads">Leads</span><span className="clients">Clientes</span></div>
           {chartHasValues ? <ResponsiveContainer width="100%" height={270}>
-            <LineChart data={chartData} margin={{ top: 18, left: -16, right: 18, bottom: 4 }}><CartesianGrid vertical={false} stroke="#e8edf3" /><XAxis dataKey="day" axisLine={false} tickLine={false} /><YAxis allowDecimals={false} axisLine={false} tickLine={false} padding={{ top: 12 }} /><Tooltip /><Line type="monotone" dataKey="leads" name="Leads" stroke="#1f416f" strokeWidth={3} dot={{ r: 3, fill: "#1f416f" }} activeDot={{ r: 5 }} /><Line type="monotone" dataKey="clients" name="Clientes" stroke="#d69b3b" strokeWidth={3} dot={{ r: 3, fill: "#d69b3b" }} activeDot={{ r: 5 }} /></LineChart>
+            <LineChart data={chartData} margin={{ top: 18, left: -16, right: 18, bottom: 4 }}><CartesianGrid vertical={false} stroke="#EDECDB" /><XAxis dataKey="day" axisLine={false} tickLine={false} /><YAxis allowDecimals={false} axisLine={false} tickLine={false} padding={{ top: 12 }} /><Tooltip /><Line type="monotone" dataKey="leads" name="Leads" stroke="#2D3A64" strokeWidth={3} dot={{ r: 3, fill: "#2D3A64" }} activeDot={{ r: 5 }} /><Line type="monotone" dataKey="clients" name="Clientes" stroke="#ECB450" strokeWidth={3} dot={{ r: 3, fill: "#ECB450" }} activeDot={{ r: 5 }} /></LineChart>
           </ResponsiveContainer> : <EmptyChartBar className="dashboard-empty-chart" />}
         </a>
 
@@ -99,7 +99,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
 
         <a className="panel report-chart" href={dashboardReportUrl("facturacion", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe de facturación anual">
           <header className="phead"><div><h2>Ventas anuales</h2><p>Base imponible real de Holded</p></div><span className="report-hint">Ver informe <ExternalLink /></span></header>
-          <div className="comparison-legend"><span className="current">Este año</span><span className="previous">Año anterior</span></div><ResponsiveContainer width="100%" height={210}><BarChart data={financeData} layout="vertical" margin={{ left: 24, right: 18 }} barGap={-12}><CartesianGrid horizontal={false} stroke="#e8edf3" /><XAxis type="number" axisLine={false} tickLine={false} /><YAxis type="category" dataKey="label" axisLine={false} tickLine={false} width={72} /><Tooltip formatter={(value) => `${Number(value).toLocaleString("es-ES")} €`} /><Bar dataKey="previousValue" name="Año anterior" fill="#dfe6ee" radius={[0,5,5,0]} /><Bar dataKey="value" name="Este año" fill="#1f416f" radius={[0,5,5,0]} /></BarChart></ResponsiveContainer>
+          <div className="comparison-legend"><span className="current">Este año</span><span className="previous">Año anterior</span></div><ResponsiveContainer width="100%" height={210}><BarChart data={financeData} layout="vertical" margin={{ left: 24, right: 18 }} barGap={-12}><CartesianGrid horizontal={false} stroke="#EDECDB" /><XAxis type="number" axisLine={false} tickLine={false} /><YAxis type="category" dataKey="label" axisLine={false} tickLine={false} width={72} /><Tooltip formatter={(value) => `${Number(value).toLocaleString("es-ES")} €`} /><Bar dataKey="previousValue" name="Año anterior" fill="#EDECDB" radius={[0,5,5,0]} /><Bar dataKey="value" name="Este año" fill="#2D3A64" radius={[0,5,5,0]} /></BarChart></ResponsiveContainer>
         </a>
       </div>
     </div>

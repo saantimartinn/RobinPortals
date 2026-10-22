@@ -1,4 +1,6 @@
 // Browser entry point: mounts the Robin application and shared styles.
+// Brand fonts and tokens first, so every app stylesheet can use them.
+import "../../../../packages/brand/brand.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app.jsx";

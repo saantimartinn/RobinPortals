@@ -34,7 +34,7 @@ function MentoriasPage({ events = [], onBack }) {
           <CardContent className="grid sm:grid-cols-2 gap-3">
             {sectors.length === 0 && <div className="text-sm text-slate-400">Todavía no hay mentores disponibles. Vuelve pronto.</div>}
             {sectors.map((sec) => (
-              <button key={sec} onClick={() => setSector(sec)} className="text-left rounded-2xl border border-[#D7E1F4] bg-[#EEF3FC] p-5 hover:shadow-md transition">
+              <button key={sec} onClick={() => setSector(sec)} className="text-left rounded-2xl border border-[#DFDED2] bg-[#F6F3E0] p-5 hover: transition">
                 <div className="text-sm font-semibold text-slate-800">{sec}</div>
                 <div className="text-xs text-slate-500 mt-0.5">{mentors.filter((m) => (m.meta && m.meta.sector) === sec).length} mentor(es)</div>
               </button>
@@ -50,9 +50,9 @@ function MentoriasPage({ events = [], onBack }) {
             {slots.map((s) => {
               const m = s.meta && mentorById[s.meta.mentor_id];
               return (
-                <button key={s.id} onClick={() => m && setSelMentor(m.id)} className="w-full text-left rounded-xl border border-slate-100 p-4 flex items-center justify-between gap-3 hover:shadow-sm hover:border-slate-200 transition">
+                <button key={s.id} onClick={() => m && setSelMentor(m.id)} className="w-full text-left rounded-xl border border-slate-100 p-4 flex items-center justify-between gap-3 hover: hover:border-slate-200 transition">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-11 w-11 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}><Calendar className="h-5 w-5" /></div>
+                    <div className="h-11 w-11 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: NAVY }}><Calendar className="h-5 w-5" /></div>
                     <div className="min-w-0">
                       <div className="text-sm font-semibold text-slate-800">{formatDate(s.starts_at)}</div>
                       <div className="text-xs text-slate-500 truncate">{m ? m.title : "Mentor"}{m && m.meta && m.meta.job ? ` · ${m.meta.job}` : ""}</div>

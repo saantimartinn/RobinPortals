@@ -51,12 +51,12 @@ function AdminSubNotifications({ notifications = [], users = [], onChanged }) {
           <TextareaField label="Contenido" value={content} onChange={setContent} rows={4} placeholder="Escribe el mensaje que verá el suscriptor…" />
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Destinatarios</div>
+              <div className="text-xs font-semibold text-slate-600 ">Destinatarios</div>
               <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
                 <button type="button" onClick={() => setScope("all")} className="px-3 py-1 rounded-md text-xs font-medium transition"
-                  style={scope === "all" ? { background: NAVY, color: "white" } : { color: "#475569" }}>Todos</button>
+                  style={scope === "all" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Todos</button>
                 <button type="button" onClick={() => setScope("select")} className="px-3 py-1 rounded-md text-xs font-medium transition"
-                  style={scope === "select" ? { background: NAVY, color: "white" } : { color: "#475569" }}>Seleccionar</button>
+                  style={scope === "select" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Seleccionar</button>
               </div>
             </div>
             {scope === "all" ? (

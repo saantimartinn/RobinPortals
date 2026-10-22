@@ -1,55 +1,68 @@
-/* Admin look for the student portal, RobinJr and Robin Community: the navy
- * sidebar and the typography of apps/admin/src/styles/global.css (.side,
- * .context-title, .side nav a, .page, .title, .panel-heading). Each app
- * imports this file last, after its own stylesheets, so these rules win. */
+/* Shell of the student portal, RobinJr and Robin Community (and the admin view
+ * inside the portal), following DESIGN.md and packages/brand/brand.css:
+ * a navy sidebar with cream text, the cream page with navy ink, Champion-style
+ * titles, Almoneda-style subtitles and Theinhardt-style text, flat surfaces with
+ * navy hairlines. The one signature detail is the identity block as a stamp
+ * (sello) with a perforated edge, from the brand's travel elements.
+ * Each app imports this file last, so these rules win over the app styles. */
 
-/* Typography: Inter for text, Georgia for titles and figures, as in the admin. */
-.student-portal,.admin-workspace{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#17263d}
-.student-portal [style*="Georgia"],.admin-workspace [style*="Georgia"]{font-family:Georgia,serif!important}
-.student-main :is(h1,h2,h3),.admin-workarea :is(h1,h2,h3){font-family:Georgia,serif;font-weight:700;color:#19375f;letter-spacing:0}
-.student-main .student-progress-card :is(h1,h2,h3){color:#fff}
-.student-main [class*="text-white"] :is(h1,h2,h3),.student-main :is(h1,h2,h3)[class*="text-white"]{color:#fff}
-.student-page-heading .student-eyebrow,.student-page-heading .student-page-title,.admin-page-heading .admin-eyebrow{font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:.63rem;font-weight:800;letter-spacing:.13em;color:#a6752e}
-.student-main .student-quick-action>strong{font-family:Georgia,serif;color:#1d385d;letter-spacing:0}
-.student-page-heading h1:not(.student-page-title),.admin-page-heading h1:not(.admin-page-title){font:700 2rem Georgia,serif;margin:.35rem 0;color:#19375f}
+/* Page and type */
+.student-portal,.admin-workspace{background:var(--robin-cream);color:var(--robin-navy);font-family:var(--robin-font-text);font-size:15px}
+.student-main :is(h1,h2,h3),.admin-workarea :is(h1,h2,h3){font-family:var(--robin-font-display);font-weight:600;letter-spacing:.005em;color:var(--robin-navy)}
+.student-main .student-progress-card :is(h1,h2,h3),.student-main [class*="text-white"] :is(h1,h2,h3),.student-main :is(h1,h2,h3)[class*="text-white"]{color:var(--robin-on-navy)}
+.student-page-heading,.admin-page-heading{margin:0 0 1.75rem}
+.student-page-heading .student-eyebrow,.student-page-heading .student-page-title,.admin-page-heading .admin-eyebrow{font-family:var(--robin-font-subtitle);font-size:1rem;font-weight:400;letter-spacing:0;text-transform:none;color:var(--robin-ink-600)}
+.student-page-heading h1:not(.student-page-title),.admin-page-heading h1:not(.admin-page-title){margin:.2rem 0 0;font:600 2.5rem/1.05 var(--robin-font-display);color:var(--robin-navy)}
+.student-portal .ui-card-title,.admin-workspace .ui-card-title{font-family:var(--robin-font-display)!important;font-size:1.15rem!important;font-weight:500!important;letter-spacing:.005em}
+.student-main .student-quick-action>strong{font-family:var(--robin-font-display);font-weight:600;letter-spacing:0;color:var(--robin-navy)}
 
-/* Layout: navy column flush left under the top bar, white work area beside it. */
-.student-portal .student-layout,.admin-workspace .admin-layout{max-width:none;margin:0;padding:0;display:grid;grid-template-columns:14.6875rem minmax(0,1fr);gap:0;align-items:start}
-.student-portal .student-main,.admin-workspace .admin-workarea{padding:2rem 2rem 5rem;max-width:100rem;width:100%;margin:0 auto}
+/* Surfaces: flat, cream, navy hairlines */
+.student-portal .ui-card,.admin-workspace .ui-card,.student-portal .student-quick-action{background:var(--robin-cream)!important;border:var(--robin-line)!important;border-radius:var(--robin-radius-card)!important;box-shadow:none!important}
+.student-portal .student-quick-action:hover{border-color:var(--robin-navy)!important;transform:none}
+.student-portal .student-quick-icon{background:var(--robin-ink-50)!important;color:var(--robin-navy);border-radius:var(--robin-radius-control)}
+.student-portal .student-progress-card{background:var(--robin-navy)!important;border-radius:var(--robin-radius-card)!important;color:var(--robin-on-navy)}
+.student-portal [style*="backdrop-filter"],.student-portal .student-sidebar,.admin-workspace .admin-client-context{backdrop-filter:none!important}
 
-/* Sidebar (admin .side). */
-.student-portal .student-sidebar,.admin-workspace .admin-sidebar{position:sticky;top:5.25rem;height:calc(100vh - 5.25rem);overflow-y:auto;display:flex;flex-direction:column;padding:0 0 1rem;border:0;border-radius:0;background:linear-gradient(180deg,#102b4b,#0c213a);box-shadow:none;color:#dbe6f2}
+/* Layout: navy column flush left under the top bar, cream work area beside it. */
+.student-portal .student-layout,.admin-workspace .admin-layout{max-width:none;margin:0;padding:0;display:grid;grid-template-columns:15rem minmax(0,1fr);gap:0;align-items:start}
+.student-portal .student-main,.admin-workspace .admin-workarea{width:100%;max-width:90rem;margin:0 auto;padding:2.25rem 2.5rem 5rem}
 
-/* Who is signed in (admin .context-title). */
-.student-portal .student-identity,.admin-workspace .admin-team{display:flex;align-items:center;gap:.7rem;width:100%;margin:0;padding:1.25rem 1.35rem .85rem;border:0;border-bottom:1px solid #ffffff10;border-radius:0;background:transparent;color:#fff;text-align:left}
-.student-portal .student-avatar,.admin-workspace .admin-team-icon{width:2.4rem;height:2.4rem;flex:0 0 2.4rem;border:0;border-radius:50%;background:#dda348;color:#102947;font:800 .95rem Georgia,serif}
-.student-portal .student-identity strong,.admin-workspace .admin-team strong{font:700 .95rem Georgia,serif;color:#fff}
-.student-portal .student-identity span,.admin-workspace .admin-team div span{font-size:.6rem;color:#d6a34f;margin-top:.2rem}
+/* Sidebar */
+.student-portal .student-sidebar,.admin-workspace .admin-sidebar{position:sticky;top:4.75rem;height:calc(100vh - 4.75rem);overflow-y:auto;display:flex;flex-direction:column;gap:0;margin:0;padding:1.25rem 0 1.25rem;border:0;border-radius:0;background:var(--robin-navy);box-shadow:none;color:var(--robin-on-navy)}
+.student-portal .student-sidebar :focus-visible,.admin-workspace .admin-sidebar :focus-visible{outline-color:var(--robin-orange)}
 
-/* Section caption and links (admin .side nav). */
-.student-portal .student-nav-caption,.admin-workspace .admin-nav-caption{margin:1rem 1.75rem .35rem;font-size:.53rem;font-weight:800;letter-spacing:.13em;color:#7890aa}
-.student-portal .student-nav-items,.admin-workspace .admin-global-nav{display:grid;gap:0;padding:0 .9rem}
-.student-portal .student-nav-item,.admin-workspace .admin-global-nav button{display:flex;align-items:center;gap:.72rem;width:100%;min-height:0;height:2.75rem;margin:.16rem 0;padding:0 .85rem;border:0;border-radius:.72rem;background:transparent;box-shadow:none;color:#aebfd2;font-size:.8125rem;font-weight:500;text-align:left}
-.student-portal .student-nav-item svg,.admin-workspace .admin-global-nav button svg{width:1rem;height:1rem}
-.student-portal .student-nav-item:hover,.admin-workspace .admin-global-nav button:hover{background:#ffffff12;color:#fff}
-.student-portal .student-nav-item.is-active,.admin-workspace .admin-global-nav button[aria-current]{background:#ffffff12;color:#fff;box-shadow:inset 3px 0 #dda348}
-.student-portal .student-nav-dot{background:#dda348}
-.admin-workspace .admin-global-nav small{background:#dda348;color:#17304d;border-radius:1rem;padding:.15rem .42rem;font-size:.63rem}
+/* Who is signed in: a stamp with a perforated edge. */
+.student-portal .student-identity,.admin-workspace .admin-team{position:relative;display:flex;align-items:center;gap:.75rem;width:auto;margin:0 1rem 1.25rem;padding:1.1rem 1rem;border:0;border-radius:0;color:var(--robin-navy);text-align:left;background:var(--robin-stamp-edge),var(--robin-cream)}
+.student-portal .student-identity::after,.admin-workspace .admin-team::after{content:"";position:absolute;inset:8px;border:1px solid var(--robin-ink-200);pointer-events:none}
+.student-portal .student-avatar,.admin-workspace .admin-team-icon{width:2.5rem;height:2.5rem;flex:0 0 2.5rem;border:0;border-radius:50%;background:var(--robin-orange);color:var(--robin-navy);font:600 1.15rem var(--robin-font-display)}
+.student-portal .student-identity strong,.admin-workspace .admin-team strong{display:block;font:600 1.15rem/1.1 var(--robin-font-display);color:var(--robin-navy)}
+.student-portal .student-identity span,.admin-workspace .admin-team div span{display:block;margin-top:.15rem;font:400 .85rem/1.2 var(--robin-font-subtitle);color:var(--robin-ink-600)}
 
-/* Note at the bottom of the sidebar. */
-.student-portal .student-support,.admin-workspace .admin-sidebar-note{margin:auto .9rem 0;padding:1rem;border:1px solid #ffffff14;border-radius:.8rem;background:#ffffff0a;color:#dbe6f2}
-.student-portal .student-support .student-eyebrow{color:#d6a34f}
-.student-portal .student-support h3,.admin-workspace .admin-sidebar-note h3{font:700 .95rem/1.35 Georgia,serif;color:#fff;letter-spacing:0}
-.student-portal .student-support p,.admin-workspace .admin-sidebar-note p{color:#aebfd2;font-size:.7rem}
-.student-portal .student-support button{color:#fff}
-.admin-workspace .admin-sidebar-note svg{color:#dda348}
+/* Section caption and links */
+.student-portal .student-nav-caption,.admin-workspace .admin-nav-caption{margin:0 1.5rem .4rem;font:400 .95rem var(--robin-font-subtitle);letter-spacing:0;text-transform:none;color:var(--robin-on-navy-muted)}
+.student-portal .student-nav-items,.admin-workspace .admin-global-nav{display:grid;gap:.15rem;padding:0 .75rem}
+.student-portal .student-nav-item,.admin-workspace .admin-global-nav button{position:relative;display:flex;align-items:center;gap:.75rem;width:100%;min-height:0;height:2.75rem;margin:0;padding:0 .9rem;border:0;border-radius:var(--robin-radius-control);background:transparent;box-shadow:none;color:var(--robin-on-navy-muted);font:500 .9375rem var(--robin-font-text);text-align:left}
+.student-portal .student-nav-item svg,.admin-workspace .admin-global-nav button svg{width:1.1rem;height:1.1rem;stroke-width:1.75}
+.student-portal .student-nav-item:hover,.admin-workspace .admin-global-nav button:hover{background:var(--robin-on-navy-line);color:var(--robin-on-navy)}
+.student-portal .student-nav-item.is-active,.admin-workspace .admin-global-nav button[aria-current]{background:var(--robin-on-navy-line);color:var(--robin-on-navy);font-weight:600;box-shadow:inset 4px 0 var(--robin-orange)}
+.student-portal .student-nav-dot{background:var(--robin-orange)}
+.admin-workspace .admin-global-nav small{background:var(--robin-orange);color:var(--robin-navy);border-radius:1rem;padding:.1rem .45rem;font-size:.75rem;font-weight:600}
 
-/* Narrow screens: the navy sidebar becomes a navy strip of links under the top bar. */
+/* Note at the foot of the sidebar: Robin reading, the brand's key asset. */
+.student-portal .student-support,.admin-workspace .admin-sidebar-note{position:relative;margin:auto 1rem 0;padding:6.25rem 1rem 1rem;border:0;border-radius:var(--robin-radius-card);background:var(--robin-cream) url("../brand/assets/robin-reading.png") right .75rem top .75rem/5rem auto no-repeat;background-blend-mode:multiply;color:var(--robin-navy)}
+.student-portal .student-support .student-eyebrow,.admin-workspace .admin-sidebar-note>svg{display:none}
+.student-portal .student-support h3,.admin-workspace .admin-sidebar-note h3{margin:0 0 .35rem;font:600 1.2rem/1.1 var(--robin-font-display);letter-spacing:.005em;color:var(--robin-navy)}
+.student-portal .student-support p,.admin-workspace .admin-sidebar-note p{margin:0;color:var(--robin-ink-600);font-size:.8125rem;line-height:1.5}
+.student-portal .student-support button{margin-top:.75rem;color:var(--robin-navy);font-size:.8125rem;font-weight:600}
+
+/* Narrow screens: the sidebar becomes a navy strip of links under the top bar. */
 @media(max-width:1023px){
   .student-portal .student-layout,.admin-workspace .admin-layout{display:block}
-  .student-portal .student-sidebar,.admin-workspace .admin-sidebar{top:5.25rem;z-index:20;height:auto;margin:0;padding:.55rem 1rem;background:#0c213a}
+  .student-portal .student-sidebar,.admin-workspace .admin-sidebar{top:4rem;z-index:20;height:auto;padding:.5rem .75rem}
   .student-portal :is(.student-identity,.student-nav-caption,.student-support),.admin-workspace :is(.admin-team,.admin-nav-caption,.admin-sidebar-note){display:none}
-  .student-portal .student-nav-items,.admin-workspace .admin-global-nav{display:flex;gap:.3rem;overflow-x:auto;padding:0}
-  .student-portal .student-nav-item,.admin-workspace .admin-global-nav button{width:auto;flex-shrink:0;height:2.5rem;margin:0;padding:0 .8rem;font-size:.75rem}
-  .student-portal .student-main,.admin-workspace .admin-workarea{padding:1.2rem 1.2rem 6rem}
+  .student-portal .student-nav-items,.admin-workspace .admin-global-nav{display:flex;gap:.25rem;overflow-x:auto;padding:0}
+  .student-portal .student-nav-item,.admin-workspace .admin-global-nav button{width:auto;flex-shrink:0;height:2.5rem;padding:0 .8rem;font-size:.875rem}
+  .student-portal .student-nav-item.is-active,.admin-workspace .admin-global-nav button[aria-current]{box-shadow:inset 0 -3px var(--robin-orange)}
+  .student-portal .student-main,.admin-workspace .admin-workarea{padding:1.25rem 1.25rem 6rem}
+  .student-page-heading h1:not(.student-page-title),.admin-page-heading h1:not(.admin-page-title){font-size:2rem}
 }

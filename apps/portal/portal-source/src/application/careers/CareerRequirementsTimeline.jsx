@@ -44,10 +44,10 @@ export function CareerRequirementsTimeline({ careers = [], title = "Timeline de 
               return (
                 <div key={`${item.careerId}-${item.id}`} className="relative pl-8 py-3">
                   <span className="absolute -left-[17px] top-4 h-8 w-8 rounded-full grid place-items-center border-4 border-white"
-                    style={{ background: isEvent ? GOLD : NAVY, color: "white" }}>
+                    style={{ background: isEvent ? GOLD : NAVY, color: isEvent ? NAVY : "#FEFBE5" }}>
                     <Icon className="h-3.5 w-3.5" />
                   </span>
-                  <div className="rounded-xl border border-slate-100 bg-white px-4 py-3 transition hover:border-slate-300 hover:shadow-sm">
+                  <div className="rounded-xl border border-slate-100 bg-white px-4 py-3 transition hover:border-slate-300 hover:">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="text-sm font-semibold text-slate-900">{item.name}</div>

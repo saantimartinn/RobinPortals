@@ -1,0 +1,57 @@
+/* Project Robin brand (DESIGN.md): fonts, colour tokens and page base, shared
+ * by every app. Each app imports this file first.
+ *
+ * Fonts: the brand faces are Champion (titulares), Almoneda (subtítulos) and
+ * Theinhardt (texto). Until their web licences and files arrive, the "Robin *"
+ * families point to open substitutes (SIL OFL, see fonts/OFL-*.txt): Oswald,
+ * Bodoni Moda and Archivo. Swapping in the real faces only means changing the
+ * three src lines below. */
+@font-face{font-family:"Robin Display";src:url("./fonts/oswald-latin.woff2") format("woff2");font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:"Robin Subtitle";src:url("./fonts/bodonimoda-latin.woff2") format("woff2");font-weight:400 700;font-style:normal;font-display:swap}
+@font-face{font-family:"Robin Text";src:url("./fonts/archivo-latin.woff2") format("woff2");font-weight:400 700;font-style:normal;font-display:swap}
+
+:root{
+  /* Brand palette */
+  --robin-navy:#2D3A64;
+  --robin-orange:#ECB450;
+  --robin-cream:#FEFBE5;
+  /* Navy over cream (tailwind-preset.cjs `slate`) */
+  --robin-ink-50:#F6F3E0;
+  --robin-ink-100:#EDECDB;
+  --robin-ink-200:#DFDED2;
+  --robin-ink-300:#C3C5C1;
+  --robin-ink-400:#8B919E;
+  --robin-ink-500:#687088;
+  --robin-ink-600:#4E5979;
+  --robin-ink-700:#3C486D;
+  /* Orange over cream, fills only */
+  --robin-orange-50:#FCF2D3;
+  --robin-orange-100:#FAE9C0;
+  --robin-orange-200:#F6DBA2;
+  /* Cream over navy, for text and lines on navy surfaces */
+  --robin-on-navy:#FEFBE5;
+  --robin-on-navy-muted:#C9CBC4;
+  --robin-on-navy-line:#FEFBE526;
+  /* Functional status colours (not brand: only for state) */
+  --robin-success:#2F7D5B;
+  --robin-danger:#B4424F;
+  /* Type */
+  --robin-font-display:"Robin Display",Oswald,Impact,sans-serif;
+  --robin-font-subtitle:"Robin Subtitle","Bodoni Moda",Georgia,serif;
+  --robin-font-text:"Robin Text",Archivo,ui-sans-serif,system-ui,sans-serif;
+  /* Shape */
+  --robin-radius-control:.625rem;
+  --robin-radius-card:1rem;
+  --robin-radius-photo:1.5rem;
+  --robin-line:1px solid var(--robin-ink-200);
+  /* Stamp (sello) perforations for a cream block sitting on navy: navy half
+     dots along the four edges. Use as the first background layer. */
+  --robin-stamp-dot:radial-gradient(circle,var(--robin-navy) 3px,#0000 3.5px);
+  --robin-stamp-edge:var(--robin-stamp-dot) 0 -5px/10px 10px repeat-x,var(--robin-stamp-dot) 0 calc(100% + 5px)/10px 10px repeat-x,var(--robin-stamp-dot) -5px 0/10px 10px repeat-y,var(--robin-stamp-dot) calc(100% + 5px) 0/10px 10px repeat-y;
+}
+
+html{background:var(--robin-cream)}
+body{margin:0;background:var(--robin-cream);color:var(--robin-navy);font-family:var(--robin-font-text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::selection{background:var(--robin-orange);color:var(--robin-navy)}
+:focus-visible{outline:3px solid var(--robin-navy);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

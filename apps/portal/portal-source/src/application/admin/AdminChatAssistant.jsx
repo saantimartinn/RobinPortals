@@ -99,9 +99,9 @@ export function AdminChatAssistant({ user, activeClientId, clients, mascot }) {
 
   return (
     <div ref={panelRef} role="dialog" aria-label="Asistente del equipo Robin" className={`${panelClass} ${isFull ? "" : "admin-assistant-panel"}`}>
-      <div className="h-full w-full bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+      <div className="h-full w-full bg-white rounded-2xl border border-slate-200 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-4 py-3 flex items-center gap-3 text-white" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+        <div className="px-4 py-3 flex items-center gap-3 text-white" style={{ background: NAVY }}>
           <img src={mascot} alt="" className="h-9 w-9 rounded-full bg-white object-contain p-1" />
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold">Copiloto del equipo</div>
@@ -125,7 +125,7 @@ export function AdminChatAssistant({ user, activeClientId, clients, mascot }) {
         {/* Notas panel */}
         {notesOpen && (
           <div className="px-3 py-2 border-b border-slate-100 bg-amber-50/40 space-y-2">
-            <div className="text-[11px] uppercase tracking-wider font-semibold text-amber-800">Añadir notas de reunión</div>
+            <div className="text-[11px] font-semibold text-amber-800">Añadir notas de reunión</div>
             <select aria-label="Alumno destinatario de las notas" disabled={!!activeClientId} value={notesUserId} onChange={(e) => setNotesUserId(e.target.value)}
               className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs">
               <option value="">— Selecciona alumno —</option>

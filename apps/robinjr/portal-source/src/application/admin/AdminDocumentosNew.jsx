@@ -86,7 +86,7 @@ export function AdminDocumentosNew({ client }) {
             <input type="checkbox" checked={newRequired} onChange={(e) => setNewRequired(e.target.checked)} /> Obligatorio
           </label>
           <label className="block">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Plantilla (opcional)</span>
+            <span className="text-xs font-semibold text-slate-500 ">Plantilla (opcional)</span>
             <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-500 mt-1 cursor-pointer hover:bg-slate-100">
               {newTemplate ? `📎 ${newTemplate.name}` : "Selecciona un archivo…"}
               <input type="file" className="hidden" onChange={(e) => setNewTemplate(e.target.files?.[0] || null)} />

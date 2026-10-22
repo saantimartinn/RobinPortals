@@ -12,9 +12,9 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
   return (
     <div className="space-y-5">
       <Card>
-        <div className="relative h-24 rounded-t-2xl" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+        <div className="relative h-24 rounded-t-2xl" style={{ background: NAVY }}>
           <div className="absolute bottom-0 left-6 translate-y-1/2">
-            <div className="h-16 w-16 rounded-2xl border-4 border-white overflow-hidden shadow-lg bg-white grid place-items-center">
+            <div className="h-16 w-16 rounded-2xl border-4 border-white overflow-hidden bg-white grid place-items-center">
               {profilePhoto
                 ? <img src={profilePhoto} alt="" className="h-full w-full object-cover" />
                 : <span className="text-2xl font-bold" style={{ color: NAVY }}>{(clientName || "R").charAt(0).toUpperCase()}</span>}
@@ -29,35 +29,35 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
           </div>
         </div>
         <div className="pt-12 px-6 pb-2">
-          <div className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{clientName}</div>
+          <div className="text-xl font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{clientName}</div>
           <div className="text-sm text-slate-500">{user.email || user.username}</div>
         </div>
         {photoError && <div className="mx-6 mb-3 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{photoError}</div>}
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Nombre</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Nombre</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.nombre || "—"}</div>
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Apellidos</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Apellidos</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.apellidos || "—"}</div>
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Email</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Email</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.email || "—"}</div>
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Usuario</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Usuario</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.username || "—"}</div>
           </div>
           <div className="md:col-span-2">
-            <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Áreas de interés</div>
+            <div className="text-xs font-semibold text-slate-600 mb-2 ">Áreas de interés</div>
             <div className="flex flex-wrap gap-2">
               {intereses.length === 0
                 ? <span className="text-sm text-slate-400">Aún no has indicado intereses.</span>
                 : intereses.map((it) => (
                     <span key={it} className="rounded-full px-3 py-1.5 text-xs font-medium border"
-                      style={{ background: NAVY, color: "white", borderColor: NAVY }}>{it}</span>
+                      style={{ background: NAVY, color: "#FEFBE5", borderColor: NAVY }}>{it}</span>
                   ))}
             </div>
           </div>
@@ -131,7 +131,7 @@ export function LivedAbroadCard({ value, editable, onSaved, userId }) {
             {lived && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">País</div>
+                  <div className="text-xs font-semibold text-slate-600 mb-1.5 ">País</div>
                   <select value={country} onChange={(e) => setCountry(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm">
                     <option value="">Selecciona…</option>

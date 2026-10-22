@@ -8,17 +8,19 @@ import { GOLD, NAVY, NAVY_DARK } from "../theme.js";
 import { Btn } from "../ui.jsx";
 
 export function KpiCard({ icon: Icon, label, value, sub, tone = "navy" }) {
-  const bg = tone === "navy" ? `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` :
-             tone === "gold" ? `linear-gradient(135deg, ${GOLD}, #e8941a)` :
-             tone === "rose" ? "linear-gradient(135deg, #be123c, #e11d48)" :
-             "linear-gradient(135deg, #475569, #64748b)";
+  const bg = tone === "navy" ? NAVY :
+             tone === "gold" ? GOLD :
+             tone === "rose" ? "#B4424F" :
+             "#4E5979";
+  // Navy text on orange (cream on orange is unreadable); cream on every other tone.
+  const fg = tone === "gold" ? NAVY : "#FEFBE5";
   return (
-    <div className="rounded-2xl p-4 shadow-sm" style={{ background: bg }}>
-      <div className="flex items-center gap-2 text-white/80 text-[11px] uppercase tracking-wider font-semibold">
+    <div className="rounded-2xl p-4" style={{ background: bg, color: fg }}>
+      <div className="flex items-center gap-2 opacity-80 text-xs font-semibold">
         {Icon && <Icon className="h-3.5 w-3.5" />} {label}
       </div>
-      <div className="text-white text-2xl font-bold mt-1.5" style={{ fontFamily: "'Georgia', serif" }}>{value}</div>
-      {sub && <div className="text-white/70 text-[11px] mt-1 truncate">{sub}</div>}
+      <div className="text-2xl font-bold mt-1.5" style={{ fontFamily: "var(--robin-font-display)" }}>{value}</div>
+      {sub && <div className="opacity-80 text-xs mt-1 truncate">{sub}</div>}
     </div>
   );
 }
@@ -36,7 +38,7 @@ export function Row({ label, value, tone = "slate" }) {
 }
 
 function BirthdayConfetti() {
-  const colors = ["#f4be4f", "#29395f", "#e85d75", "#2bb6a8", "#7c5ce7"];
+  const colors = ["#ECB450", "#2D3A64", "#e85d75", "#2bb6a8", "#687088"];
   return (
     <div className="birthday-confetti" aria-hidden="true">
       {Array.from({ length: 48 }).map((_, index) => (
@@ -83,16 +85,16 @@ export function NotificationPopup() {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] grid place-items-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[60] grid place-items-center bg-black/50 p-4">
       {isBirthday && <BirthdayConfetti />}
       <motion.div initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
         className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="px-6 py-4 flex items-center gap-3 flex-shrink-0" style={{ background: isBirthday ? `linear-gradient(135deg, ${GOLD}, #e8941a)` : `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+        <div className="px-6 py-4 flex items-center gap-3 flex-shrink-0" style={{ background: isBirthday ? GOLD : NAVY }}>
           <div className="h-9 w-9 rounded-xl grid place-items-center bg-white/10 flex-shrink-0">
             {isBirthday ? <PartyPopper className="h-5 w-5 text-white" /> : isTerms ? <FileText className="h-5 w-5 text-white" /> : <Bell className="h-5 w-5 text-white" />}
           </div>
           <div className="min-w-0">
-            <div className="text-[11px] uppercase tracking-wider text-white/70 font-semibold">{isBirthday ? "¡Es tu cumpleaños!" : isTerms ? "Cambio de términos" : "Notificación"}</div>
+            <div className="text-[11px] text-white/70 font-semibold">{isBirthday ? "¡Es tu cumpleaños!" : isTerms ? "Cambio de términos" : "Notificación"}</div>
             <div className="text-white font-semibold truncate">{notification.title}</div>
           </div>
         </div>

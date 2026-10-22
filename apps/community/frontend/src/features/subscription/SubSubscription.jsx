@@ -66,7 +66,7 @@ function SubSubscription({ user, requests, onUserRefresh }) {
         <CardContent className="space-y-4">
           {Object.entries(grouped).map(([cat, items]) => (
             <div key={cat}>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{cat}</div>
+              <div className="text-xs font-semibold text-slate-500 mb-2">{cat}</div>
               <div className="grid sm:grid-cols-2 gap-2">
                 {items.map((s) => (
                   <div key={s.key} className="flex items-center gap-2 text-sm text-slate-700">

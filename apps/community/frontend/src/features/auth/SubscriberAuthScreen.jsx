@@ -19,7 +19,7 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
 
   return (
     <AuthShell>
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="p-6 space-y-4">
           {onBack && (
             <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
@@ -27,7 +27,7 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
             </button>
           )}
           <div>
-            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "'Georgia', serif" }}>
+            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "var(--robin-font-display)" }}>
               {tab === "login" && "Bienvenido de vuelta"}
               {tab === "signup" && "Crea tu cuenta"}
               {(tab === "forgot" || tab === "forgot-sent") && "Restablece tu contraseña"}
@@ -49,7 +49,7 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
               {[{ k: "login", l: "Iniciar sesión" }, { k: "signup", l: "Crear cuenta" }].map((t) => (
                 <button key={t.k} type="button" onClick={() => { setTab(t.k); setError(""); }}
                   className="flex-1 rounded-lg py-2 text-sm font-medium transition"
-                  style={tab === t.k ? { background: "white", color: NAVY, boxShadow: "0 1px 2px rgba(0,0,0,0.06)" } : { color: "#64748b" }}>
+                  style={tab === t.k ? { background: "#FEFBE5", color: NAVY, boxShadow: "0 1px 2px rgba(0,0,0,0.06)" } : { color: "#687088" }}>
                   {t.l}
                 </button>
               ))}
@@ -82,13 +82,13 @@ function SubscriberAuthScreen({ onLogin, onSignup, onBack }) {
               <Field label="Repite la contraseña" type="password" value={confirm} onChange={setConfirm} placeholder="••••••••" />
               <SelectField label="Tu ciudad" value={ciudad} onChange={setCiudad} options={ROBIN_CITIES} placeholder="Selecciona tu ciudad" />
               <div>
-                <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Código de descuento (opcional)</div>
+                <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Código de descuento (opcional)</div>
                 <div className="flex gap-2">
                   <input value={discountCode}
                     onChange={(e) => { setDiscountCode(e.target.value); setDiscountInfo(null); }}
                     onBlur={checkDiscount}
                     placeholder="Ej. BIENVENIDA"
-                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition uppercase" />
+                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition " />
                   <button type="button" onClick={checkDiscount} disabled={checkingCode || !discountCode.trim()}
                     className="rounded-xl px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50" style={{ background: NAVY }}>
                     {checkingCode ? <Loader2 className="h-4 w-4 animate-spin" /> : "Aplicar"}

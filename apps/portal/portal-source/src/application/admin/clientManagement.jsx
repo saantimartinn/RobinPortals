@@ -84,10 +84,10 @@ export function AssignClientModal({ adminEmail, list, loading, error, busyId, on
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4" style={{ background: "rgba(15,23,42,0.5)" }}>
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+      <div className="w-full max-w-2xl bg-white rounded-2xl border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
           <div>
-            <div className="text-base font-bold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>Asignar cliente</div>
+            <div className="text-base font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>Asignar cliente</div>
             <div className="text-xs text-slate-500">Selecciona un cliente para asignártelo (assigned_to = {adminEmail})</div>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>

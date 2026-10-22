@@ -84,7 +84,7 @@ function SubProfile({ user, onUserRefresh, setActive }) {
           right={
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <div className="text-xs font-semibold text-slate-700">{rdef.emoji} Nivel <span style={{ color: "#E08600" }}>{rdef.label}</span></div>
+                <div className="text-xs font-semibold text-slate-700">{rdef.emoji} Nivel <span style={{ color: "#ECB450" }}>{rdef.label}</span></div>
                 <div className="text-[11px] text-slate-400">{rlevel.nextLevel ? `Faltan ${rlevel.daysRemaining} ${rlevel.daysRemaining === 1 ? "día" : "días"} para ${rnext.label}` : "Nivel máximo"}</div>
               </div>
               <Btn size="sm" variant="secondary" onClick={() => setActive && setActive("beneficios")}>Ver beneficios</Btn>
@@ -92,7 +92,7 @@ function SubProfile({ user, onUserRefresh, setActive }) {
           } />
         <CardContent className="space-y-3">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl overflow-hidden border border-slate-200 grid place-items-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+            <div className="h-16 w-16 rounded-2xl overflow-hidden border border-slate-200 grid place-items-center flex-shrink-0" style={{ background: NAVY }}>
               {avatar ? <img src={avatar} alt="Foto de perfil" className="h-full w-full object-cover" /> : <span className="text-white font-bold text-lg">{(nombre || user.email || "R").charAt(0).toUpperCase()}</span>}
             </div>
             <div className="space-y-1">

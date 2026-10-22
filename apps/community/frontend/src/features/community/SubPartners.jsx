@@ -19,7 +19,7 @@ function SubPartners({ partners, loading }) {
             {cats.map((c) => (
               <button key={c} onClick={() => setCat(c)}
                 className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition"
-                style={cat === c ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+                style={cat === c ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
                 {c === "all" ? "Todos" : PARTNER_CATEGORY_LABELS[c]}
               </button>
             ))}
@@ -38,7 +38,7 @@ function SubPartners({ partners, loading }) {
                 {p.logo_url ? <img src={p.logo_url} alt={`Logo de ${p.name}`} loading="lazy" className="h-full w-full object-contain" /> : <ImageIcon className="h-8 w-8 text-slate-300" aria-hidden="true" />}
               </div>
               <div className="flex items-start justify-between gap-2">
-                <div className="font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{p.name}</div>
+                <div className="font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{p.name}</div>
                 <Badge tone="slate">{PARTNER_CATEGORY_LABELS[p.category] || p.category}</Badge>
               </div>
               {p.city && <div className="text-xs text-slate-400 flex items-center gap-1"><MapPin className="h-3 w-3" /> {p.city}</div>}

@@ -75,7 +75,7 @@ export function AdminPerfil({ client, onRefresh }) {
     "Arts & Liberal Arts": "Artes",
   };
   function compColor(v) {
-    return v >= 78 ? "#10b981" : v >= 58 ? "#F5A623" : "#94a3b8";
+    return v >= 78 ? "#10b981" : v >= 58 ? "#ECB450" : "#687088";
   }
   function fmtDate(x) {
     if (!x) return "";
@@ -137,7 +137,7 @@ export function AdminPerfil({ client, onRefresh }) {
                   const lbl = (opts.find((o) => o.value === v) || {}).label || v;
                   return (
                     <span key={v} className="rounded-full px-3 py-1.5 text-xs font-medium border"
-                      style={{ background: NAVY, color: "white", borderColor: NAVY }}>{lbl}</span>
+                      style={{ background: NAVY, color: "#FEFBE5", borderColor: NAVY }}>{lbl}</span>
                   );
                 })}
           </div>
@@ -278,7 +278,7 @@ export function AdminPerfil({ client, onRefresh }) {
             <CardContent className="space-y-4">
               {qBlocks.map((blk, bi) => (
                 <div key={bi}>
-                  <div className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: NAVY }}>{blk.title}</div>
+                  <div className="text-xs font-bold mb-2" style={{ color: NAVY }}>{blk.title}</div>
                   <div className="space-y-2">
                     {(blk.items || []).map((it, ii) => (
                       <div key={ii} className="text-sm">

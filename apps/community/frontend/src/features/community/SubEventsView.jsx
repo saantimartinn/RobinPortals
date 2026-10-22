@@ -32,7 +32,7 @@ function SubEventsView({ events, ciudad, onRefresh }) {
             {types.map((t) => (
               <button key={t} onClick={() => setFilter(t)}
                 className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition"
-                style={filter === t ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+                style={filter === t ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
                 {t === "all" ? "Todos" : (COMMUNITY_TYPE_LABELS[t] || {}).label || t}
               </button>
             ))}

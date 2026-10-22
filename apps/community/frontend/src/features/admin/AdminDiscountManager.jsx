@@ -75,7 +75,7 @@ function AdminDiscountManager({ codes = [], onChanged }) {
             <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-slate-900 tracking-wide">{c.code}</span>
+                  <span className="font-semibold text-slate-900 ">{c.code}</span>
                   <Badge tone="gold">-{c.percent_off}%</Badge>
                   {c.active ? <Badge tone="green">Activo</Badge> : <Badge tone="slate">Inactivo</Badge>}
                 </div>

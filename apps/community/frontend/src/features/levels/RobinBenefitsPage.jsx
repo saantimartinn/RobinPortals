@@ -14,14 +14,14 @@ function RobinBenefitsPage({ user, setActive }) {
   const nextDef = r.nextLevel ? robinLevelDef(r.nextLevel) : null;
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl p-5" style={{ background: `linear-gradient(135deg, ${NAVY_DARK}, ${NAVY})` }}>
+      <div className="rounded-2xl p-5" style={{ background: NAVY }}>
         <button onClick={() => setActive("home")} className="inline-flex items-center gap-1 text-white/70 hover:text-white text-xs font-semibold mb-2"><ChevronLeft className="h-4 w-4" /> Volver</button>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="text-4xl leading-none flex-shrink-0">{def.emoji}</div>
             <div className="min-w-0">
-              <div className="text-white/50 text-[11px] font-semibold uppercase tracking-widest">Tu Nivel Robin</div>
-              <div className="text-white text-xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>{def.label}</div>
+              <div className="text-white/50 text-[11px] font-semibold ">Tu Nivel Robin</div>
+              <div className="text-white text-xl font-bold" style={{ fontFamily: "var(--robin-font-display)" }}>{def.label}</div>
             </div>
           </div>
           <Btn size="sm" variant="secondary" onClick={() => setActive("acelerar")}><Sparkles className="h-3.5 w-3.5" /> Acelerar progreso</Btn>
@@ -41,19 +41,19 @@ function RobinBenefitsPage({ user, setActive }) {
         <CardContent className="space-y-4">
           {ROBIN_BENEFITS.map((g) => (
             <div key={g.group}>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{g.group}</div>
+              <div className="text-xs font-semibold text-slate-500 mb-2">{g.group}</div>
               <div className="grid sm:grid-cols-2 gap-2">
                 {g.items.map((b) => {
                   const locked = ROBIN_LEVEL_ORDER[b.level] > curIdx;
                   const lvlDef = robinLevelDef(b.level);
                   if (locked) return (
-                    <div key={b.key} className="rounded-xl border p-3 flex items-center justify-between gap-2" style={{ background: "#EEF3FC", borderColor: "#D7E1F4", opacity: 0.6 }}>
+                    <div key={b.key} className="rounded-xl border p-3 flex items-center justify-between gap-2" style={{ background: "#F6F3E0", borderColor: "#DFDED2", opacity: 0.6 }}>
                       <div className="flex items-center gap-2 min-w-0"><Lock className="h-4 w-4 flex-shrink-0 text-slate-400" /><span className="text-sm text-slate-600 truncate">{b.label}</span></div>
-                      <span className="text-[10px] font-semibold flex-shrink-0 rounded-full px-2 py-0.5 bg-white" style={{ color: NAVY, border: "1px solid #D7E1F4" }}>Disponible en {lvlDef.label}</span>
+                      <span className="text-[10px] font-semibold flex-shrink-0 rounded-full px-2 py-0.5 bg-white" style={{ color: NAVY, border: "1px solid #DFDED2" }}>Disponible en {lvlDef.label}</span>
                     </div>
                   );
                   return (
-                    <div key={b.key} className="rounded-xl p-3 flex items-center gap-2 text-white" style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+                    <div key={b.key} className="rounded-xl p-3 flex items-center gap-2 text-white" style={{ background: NAVY }}>
                       <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: GOLD }} />
                       <span className="text-sm font-medium truncate">{b.label}</span>
                     </div>

@@ -57,7 +57,7 @@ function SubSocial({ user, onActivity }) {
             {tabs.map(({ key, label, icon: Icon, n }) => (
               <button key={key} onClick={() => setTab(key)}
                 className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition"
-                style={tab === key ? { background: NAVY, color: "white" } : { background: "#f1f5f9", color: "#475569" }}>
+                style={tab === key ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
                 <Icon className="h-3.5 w-3.5" /> {label}
                 {n > 0 && <span className="ml-0.5 rounded-full bg-rose-500 text-white text-[10px] px-1.5 py-0.5 leading-none">{n}</span>}
               </button>
@@ -161,7 +161,7 @@ function SubSocial({ user, onActivity }) {
           <CardContent className="space-y-2">
             {convs.length === 0 && <div className="text-sm text-slate-400 px-1">No tienes conversaciones. Hazte amigo de alguien para empezar a chatear.</div>}
             {convs.map((c) => (
-              <button key={c.friend_id} onClick={() => setChat(c)} className="w-full text-left flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 hover:shadow-sm transition">
+              <button key={c.friend_id} onClick={() => setChat(c)} className="w-full text-left flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 hover: transition">
                 <div className="flex items-center gap-3 min-w-0"><SocialAvatar name={c.name} avatar_url={c.avatar_url} />
                   <div className="min-w-0"><div className="text-sm font-semibold text-slate-900 truncate">{c.name}</div>
                     <div className="text-xs text-slate-400 truncate">{c.last_body || "Sin mensajes todavía"}</div></div>

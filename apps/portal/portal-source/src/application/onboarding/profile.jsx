@@ -198,7 +198,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
         <div className="flex items-center gap-1.5">
           {Array.from({ length: totalScreens }).map((_, i) => (
             <div key={i} className="h-1.5 rounded-full flex-1 transition"
-              style={{ background: i <= screen ? NAVY : "#e2e8f0" }} />
+              style={{ background: i <= screen ? NAVY : "#EDECDB" }} />
           ))}
         </div>
 
@@ -206,7 +206,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
           <>
             <Field label="Correo electrónico" value={email} onChange={setEmail} placeholder="tu@correo.com" type="email" />
             <div>
-              <div className="text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Áreas de interés para tu carrera</div>
+              <div className="text-xs font-semibold text-slate-600 mb-2 ">Áreas de interés para tu carrera</div>
               <div className="text-xs text-slate-400 mb-3">{esMaestria ? "Selecciona al menos una: las áreas en las que te gustaría especializarte." : "Selecciona al menos una. Puedes elegir varias — adaptaremos el cuestionario a tus elecciones."}</div>
               <div className="grid grid-cols-2 gap-2">
                 {options.map((o) => {
@@ -214,9 +214,9 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
                   return (
                     <button key={o.value} type="button" onClick={() => toggle(o.value)}
                       className="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition text-left"
-                      style={on ? { background: NAVY, color: "white", borderColor: NAVY } : { background: "white", color: "#475569", borderColor: "#e2e8f0" }}>
+                      style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
                       <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"
-                        style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #cbd5e1" }}>
+                        style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
                         {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}
                       </span>
                       {o.label}
@@ -230,8 +230,8 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
 
         {screen > 0 && screen < academicScreen && curBlock && (
           <>
-            <div className="rounded-xl px-4 py-3" style={{ background: "#f1f4fb" }}>
-              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "'Georgia', serif" }}>{curBlock.title}</div>
+            <div className="rounded-xl px-4 py-3" style={{ background: "#F6F3E0" }}>
+              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "var(--robin-font-display)" }}>{curBlock.title}</div>
               <div className="text-xs text-slate-500 mt-0.5">
                 {esMaestria
                   ? "Estas respuestas ayudan a tu asesor a preparar tu candidatura al máster."
@@ -250,15 +250,15 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
 
         {screen === academicScreen && (
           <>
-            <div className="rounded-xl px-4 py-3" style={{ background: "#f1f4fb" }}>
-              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "'Georgia', serif" }}>Sistema y asignaturas</div>
+            <div className="rounded-xl px-4 py-3" style={{ background: "#F6F3E0" }}>
+              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "var(--robin-font-display)" }}>Sistema y asignaturas</div>
               <div className="text-xs text-slate-500 mt-0.5">
                 Selecciona el sistema que cursas y añade tus asignaturas actuales. Si el sistema utiliza niveles, podrás indicarlos en cada asignatura.
               </div>
             </div>
 
             <label className="block">
-              <div className="text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">Sistema académico</div>
+              <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Sistema académico</div>
               <select value={academicSystem} onChange={(event) => selectAcademicSystem(event.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition">
                 <option value="">Selecciona tu sistema académico…</option>
@@ -270,7 +270,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Asignaturas</div>
+                    <div className="text-xs font-semibold text-slate-600 ">Asignaturas</div>
                     <div className="text-xs text-slate-400 mt-1">Deja vacíos los huecos que no necesites.</div>
                   </div>
                   <Btn variant="secondary" size="sm" onClick={addAcademicSubject} disabled={academicSubjects.length >= MAX_ACADEMIC_SUBJECTS}>

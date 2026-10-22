@@ -6,7 +6,7 @@ function SocialAvatar({ name, avatar_url, size = 44 }) {
   const s = { width: size, height: size };
   if (avatar_url) return <img src={avatar_url} alt="" className="rounded-xl object-cover flex-shrink-0" style={s} />;
   return (
-    <div className="rounded-xl grid place-items-center text-white font-bold flex-shrink-0" style={{ ...s, background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+    <div className="rounded-xl grid place-items-center text-white font-bold flex-shrink-0" style={{ ...s, background: NAVY }}>
       {(name || "R").charAt(0).toUpperCase()}
     </div>
   );

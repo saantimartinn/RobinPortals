@@ -106,7 +106,7 @@ export function StudentPlanCalendar() {
             <div className="student-plan-layout">
               <section className="student-calendar" aria-label="Calendario mensual">
                 <div className="student-calendar-toolbar">
-                  <div><span className="student-calendar-eyebrow">CALENDARIO</span><h2>{monthLabel}</h2></div>
+                  <div><span className="student-calendar-eyebrow">Calendario</span><h2>{monthLabel}</h2></div>
                   <div className="student-calendar-controls">
                     <button type="button" onClick={goToToday} className="student-calendar-today">Hoy</button>
                     <button type="button" onClick={() => shiftMonth(-1)} aria-label="Mes anterior" className="student-calendar-arrow"><ChevronLeft size={17} /></button>
@@ -140,7 +140,7 @@ export function StudentPlanCalendar() {
               </section>
 
               <aside className="student-plan-agenda" aria-live="polite">
-                <div className="student-plan-agenda-heading"><span className="student-calendar-eyebrow">TU AGENDA</span><h3>{formatSelectedDate(selectedDate)}</h3></div>
+                <div className="student-plan-agenda-heading"><span className="student-calendar-eyebrow">Tu agenda</span><h3>{formatSelectedDate(selectedDate)}</h3></div>
                 {selectedItems.length === 0 ? (
                   <div className="student-plan-empty"><CalendarDays size={23} /><strong>Un día libre</strong><span>No tienes nada apuntado para esta fecha.</span></div>
                 ) : (

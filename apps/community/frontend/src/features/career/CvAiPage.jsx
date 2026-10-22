@@ -51,14 +51,14 @@ function CvAiPage({ onBack }) {
   }
 
   const canAnalyze = !!(cvText.trim() || cvFile);
-  const scoreTone = result && result.score != null ? (result.score >= 7.5 ? "#2E7D5B" : result.score >= 5 ? "#E08600" : "#C0392B") : NAVY;
+  const scoreTone = result && result.score != null ? (result.score >= 7.5 ? "#2E7D5B" : result.score >= 5 ? "#ECB450" : "#C0392B") : NAVY;
 
   return (
     <div className="space-y-5">
       <SubIntro title={pageTitle} subtitle="Crea o mejora tu CV con ayuda de inteligencia artificial." onBack={step > 1 && step < 5 ? () => setStep(step - 1) : onBack} />
       <Card>
         <CardContent className="space-y-4 py-5">
-          {step < 5 && <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Paso {step} de 4</div>}
+          {step < 5 && <div className="text-xs font-semibold text-slate-400">Paso {step} de 4</div>}
 
           {step === 1 && (
             <div className="space-y-3">
@@ -104,7 +104,7 @@ function CvAiPage({ onBack }) {
               <div className="text-sm font-semibold text-slate-800">Sube tu CV o pega el texto</div>
               <label onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={onDrop}
                 className="block cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition"
-                style={dragOver ? { borderColor: NAVY, background: "#EEF3FC" } : { borderColor: "#cbd5e1", background: "#f8fafc" }}>
+                style={dragOver ? { borderColor: NAVY, background: "#F6F3E0" } : { borderColor: "#DFDED2", background: "#FEFBE5" }}>
                 <UploadCloud className="h-6 w-6 mx-auto mb-1" style={{ color: NAVY }} />
                 <div className="text-sm text-slate-700 font-medium">{cvFile ? cvFile.name : "Arrastra tu CV aquí o haz clic para subir"}</div>
                 <div className="text-[11px] text-slate-400 mt-0.5">PDF o Word (.doc, .docx) · también .txt</div>
@@ -155,7 +155,7 @@ function CvAiPage({ onBack }) {
                   <div className="text-sm font-semibold text-slate-800 mb-1.5">Mejoras sugeridas</div>
                   <div className="space-y-1.5">
                     {result.improvements.map((x, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-slate-600"><Sparkles className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: "#E08600" }} /> <span>{x}</span></div>
+                      <div key={i} className="flex items-start gap-2 text-sm text-slate-600"><Sparkles className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: "#ECB450" }} /> <span>{x}</span></div>
                     ))}
                   </div>
                 </div>

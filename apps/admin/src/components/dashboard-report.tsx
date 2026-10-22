@@ -38,7 +38,7 @@ export function DashboardReport({ snapshot, contacts, leadStages, holded }: { sn
   const title = type === "facturacion" ? "Informe de facturación anual" : type === "embudo" ? "Informe del embudo de captación" : "Informe de nuevos leads y clientes";
 
   return <div className="page report-page">
-    <div className="title"><div><span>INFORME DETALLADO</span><h1>{title}</h1><p>Origen, criterio de cálculo y registros que componen el resultado.</p></div><button className="report-close" onClick={() => window.close()}>Cerrar pestaña</button></div>
+    <div className="title"><div><span>Informe detallado</span><h1>{title}</h1><p>Origen, criterio de cálculo y registros que componen el resultado.</p></div><button className="report-close" onClick={() => window.close()}>Cerrar pestaña</button></div>
 
     {type === "altas" && <>
       <section className="report-summary"><article><span>Leads</span><strong>{acquisition?.leads ?? leadsInRange.length}</strong><small>CRM actual más histórico validado</small></article><article><span>Clientes</span><strong>{acquisition?.newClients ?? clientsInRange.length}</strong><small>Conversiones CRM o firmas registradas</small></article><article><span>Periodo</span><strong>{periodLabel}</strong><small>{start ? `${start.toLocaleDateString("es-ES")} – ${today.toLocaleDateString("es-ES")}` : "Desde mayo de 2025"}</small></article></section>

@@ -31,14 +31,14 @@ export function TrafficTab({ data }: { data: WebData }) {
           {daily.length ? (
             <ResponsiveContainer width="100%" height={280}>
               <ComposedChart data={daily}>
-                <CartesianGrid vertical={false} stroke="#eef1f5" />
+                <CartesianGrid vertical={false} stroke="#F6F3E0" />
                 <XAxis dataKey="date" tickFormatter={dayLabel} axisLine={false} tickLine={false} fontSize={10} minTickGap={18} />
                 <YAxis yAxisId="s" axisLine={false} tickLine={false} fontSize={10} width={36} />
                 <YAxis yAxisId="l" orientation="right" axisLine={false} tickLine={false} fontSize={10} width={28} allowDecimals={false} />
                 <Tooltip labelFormatter={(d: any) => dayLabel(String(d))} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Area yAxisId="s" type="monotone" dataKey={ga4?.available ? "sessions" : "measured"} name={ga4?.available ? "Sesiones" : "Sesiones medidas"} stroke="#2f5a8a" fill="#dce7f3" strokeWidth={2} />
-                <Bar yAxisId="l" dataKey="leads" name="Contactos" fill="#d9a448" radius={[3, 3, 0, 0]} barSize={10} />
+                <Area yAxisId="s" type="monotone" dataKey={ga4?.available ? "sessions" : "measured"} name={ga4?.available ? "Sesiones" : "Sesiones medidas"} stroke="#4E5979" fill="#EDECDB" strokeWidth={2} />
+                <Bar yAxisId="l" dataKey="leads" name="Contactos" fill="#ECB450" radius={[3, 3, 0, 0]} barSize={10} />
               </ComposedChart>
             </ResponsiveContainer>
           ) : (

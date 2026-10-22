@@ -6,7 +6,7 @@ export function ClientAvatar({ nombre, apellidos, size = "md" }) {
   const sizes = { sm: "h-7 w-7 text-[11px]", md: "h-9 w-9 text-xs", lg: "h-12 w-12 text-base" };
   return (
     <div className={`${sizes[size]} rounded-xl grid place-items-center font-bold flex-shrink-0 text-white`}
-      style={{ background: `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+      style={{ background: NAVY }}>
       {initials}
     </div>
   );

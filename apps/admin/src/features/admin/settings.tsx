@@ -81,7 +81,7 @@ export function Configuration({ onAddAdmin, onRemoveAdmin, currentUser, portalAd
   }
   return (
     <div className="page">
-      <Title name="Configuración" sub="Gestiona los usuarios con acceso al portal." eyebrow="INICIO · VISTA GLOBAL">{isProAdmin && <Button onClick={() => setAdding(true)}><UserPlus />Añadir usuario</Button>}</Title>
+      <Title name="Configuración" sub="Gestiona los usuarios con acceso al portal." eyebrow="Inicio / Vista global">{isProAdmin && <Button onClick={() => setAdding(true)}><UserPlus />Añadir usuario</Button>}</Title>
       {!isProAdmin && <div className="sync-status"><ShieldCheck /><span>Tu perfil puede consultar los administradores y gestionar su propia cuenta. Solo los perfiles Pro pueden añadir usuarios, eliminarlos o configurar sus pestañas.</span></div>}
       {adding && (
         <form className="panel add-user-form" onSubmit={createUser}>

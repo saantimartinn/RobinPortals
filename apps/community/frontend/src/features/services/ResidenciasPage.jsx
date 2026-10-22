@@ -2,7 +2,7 @@
 import { Badge } from "../../shared/ui.jsx";
 import { Building2, ChevronRight, MapPin } from "lucide-react";
 import { ComingSoon } from "./ComingSoon.jsx";
-import { GOLD, NAVY, NAVY_DARK } from "../../shared/theme.js";
+import { GOLD, NAVY } from "../../shared/theme.js";
 import { RESIDENCE_PARTNERS } from "../../shared/constants.js";
 import React, { useState } from "react";
 import { SubIntro } from "./SubIntro.jsx";
@@ -23,14 +23,14 @@ function ResidenciasPage({ onBack }) {
       <div className="space-y-3">
         {RESIDENCE_PARTNERS.map((r) => (
           <button key={r.id} onClick={() => setSel(r.id)}
-            className="w-full text-left rounded-2xl border p-5 flex items-center gap-4 bg-white transition hover:shadow-md"
-            style={r.featured ? { borderColor: GOLD, boxShadow: `0 0 0 1px ${GOLD}` } : { borderColor: "#e2e8f0" }}>
-            <div className="h-14 w-14 rounded-xl grid place-items-center text-white flex-shrink-0" style={{ background: r.featured ? `linear-gradient(135deg, ${GOLD}, #E08600)` : `linear-gradient(135deg, ${NAVY}, ${NAVY_DARK})` }}>
+            className="w-full text-left rounded-2xl border p-5 flex items-center gap-4 bg-white transition hover:"
+            style={r.featured ? { borderColor: GOLD, boxShadow: `0 0 0 1px ${GOLD}` } : { borderColor: "#EDECDB" }}>
+            <div className="h-14 w-14 rounded-xl grid place-items-center flex-shrink-0" style={{ background: r.featured ? GOLD : NAVY, color: r.featured ? NAVY : "#FEFBE5" }}>
               <Building2 className="h-6 w-6" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <div className="text-base font-semibold text-slate-900" style={{ fontFamily: "'Georgia', serif" }}>{r.name}</div>
+                <div className="text-base font-semibold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{r.name}</div>
                 {r.featured && <Badge tone="gold">Destacado</Badge>}
               </div>
               <div className="text-sm text-slate-500 mt-0.5">{r.tagline}</div>

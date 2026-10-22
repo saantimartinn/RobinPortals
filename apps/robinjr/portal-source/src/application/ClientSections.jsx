@@ -76,7 +76,7 @@ export function PagosCliente() {
                 return (
                   <div key={p.id} className="student-payment-row rounded-xl border border-slate-100 bg-white px-4 py-3 flex items-center gap-4">
                     <div className="h-10 w-10 rounded-xl grid place-items-center flex-shrink-0"
-                      style={isPaid ? { background: "#10b981", color: "white" } : isUnlocked ? { background: GOLD, color: "white" } : { background: "#e2e8f0", color: "#94a3b8" }}>
+                      style={isPaid ? { background: "#10b981", color: "#FEFBE5" } : isUnlocked ? { background: GOLD, color: NAVY } : { background: "#EDECDB", color: "#687088" }}>
                       {isPaid ? <CheckCircle2 className="h-5 w-5" /> : isLocked ? <Shield className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -317,19 +317,19 @@ export function DocumentosCliente() {
             <div className="space-y-4">
               {pending.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Pendientes ({pending.length})</div>
+                  <div className="text-xs font-semibold text-slate-500 ">Pendientes ({pending.length})</div>
                   {pending.map(renderDoc)}
                 </div>
               )}
               {inReview.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">En revisión ({inReview.length})</div>
+                  <div className="text-xs font-semibold text-slate-500 ">En revisión ({inReview.length})</div>
                   {inReview.map(renderDoc)}
                 </div>
               )}
               {validated.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Validados ({validated.length})</div>
+                  <div className="text-xs font-semibold text-slate-500 ">Validados ({validated.length})</div>
                   {validated.map(renderDoc)}
                 </div>
               )}
