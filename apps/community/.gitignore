@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.netlify/
+.env
+.env.*
+!.env.example
+.DS_Store
+._*
+.fuse_hidden*
+*.log
+*.bak
+*.timestamp-*.mjs
+coverage/
+.maintenance/
+artifacts/

@@ -1,0 +1,179 @@
+# The Robin Plan: solo dist/ es público; el backend se empaqueta aparte.
+
+[build]
+  publish = "dist"
+  functions = "backend/functions"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+[dev]
+  command = "npm run dev:frontend"
+  targetPort = 5173
+  port = 8888
+  publish = "dist"
+  framework = "#custom"
+
+# ---------- Entrada: la raíz abre el portal ----------
+[[redirects]]
+  from = "/"
+  to = "/therobinplan/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/portal/*"
+  to = "/therobinplan/:splat"
+  status = 301
+  force = true
+
+# ---------- Autenticación (compartida por rol; aquí solo suscriptores) ----------
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth-login"
+  status = 200
+[[redirects]]
+  from = "/api/auth/sso"
+  to = "/.netlify/functions/auth-sso"
+  status = 200
+[[redirects]]
+  from = "/api/auth/verify-login"
+  to = "/.netlify/functions/auth-verify-login"
+  status = 200
+[[redirects]]
+  from = "/api/auth/logout"
+  to = "/.netlify/functions/auth-logout"
+  status = 200
+[[redirects]]
+  from = "/api/auth/change-password"
+  to = "/.netlify/functions/auth-change-password"
+  status = 200
+[[redirects]]
+  from = "/api/me"
+  to = "/.netlify/functions/me"
+  status = 200
+
+# ---------- Alta / perfil de suscriptor ----------
+[[redirects]]
+  from = "/api/subscriber/signup"
+  to = "/.netlify/functions/subscriber-signup"
+  status = 200
+[[redirects]]
+  from = "/api/subscriber/cv-ai"
+  to = "/.netlify/functions/subscriber-cv-ai"
+  status = 200
+[[redirects]]
+  from = "/api/subscriber/profile"
+  to = "/.netlify/functions/subscriber-profile-update"
+  status = 200
+
+# ---------- Suscripción (Stripe Billing) ----------
+[[redirects]]
+  from = "/api/subscription/checkout"
+  to = "/.netlify/functions/subscription-checkout"
+  status = 200
+[[redirects]]
+  from = "/api/subscription/plans"
+  to = "/.netlify/functions/subscription-plans"
+  status = 200
+[[redirects]]
+  from = "/api/subscription/portal"
+  to = "/.netlify/functions/subscription-portal"
+  status = 200
+[[redirects]]
+  from = "/api/subscription/discount"
+  to = "/.netlify/functions/discount-validate"
+  status = 200
+
+# ---------- Comunidad / social / retos ----------
+[[redirects]]
+  from = "/api/social"
+  to = "/.netlify/functions/social"
+  status = 200
+[[redirects]]
+  from = "/api/messages"
+  to = "/.netlify/functions/messages"
+  status = 200
+[[redirects]]
+  from = "/api/challenges"
+  to = "/.netlify/functions/challenges"
+  status = 200
+[[redirects]]
+  from = "/api/partners"
+  to = "/.netlify/functions/partners-list"
+  status = 200
+[[redirects]]
+  from = "/api/community/events"
+  to = "/.netlify/functions/community-events-list"
+  status = 200
+[[redirects]]
+  from = "/api/community/rsvp"
+  to = "/.netlify/functions/community-rsvp"
+  status = 200
+[[redirects]]
+  from = "/api/service-requests"
+  to = "/.netlify/functions/service-requests"
+  status = 200
+[[redirects]]
+  from = "/api/faqs"
+  to = "/.netlify/functions/faqs"
+  status = 200
+  force = true
+
+# ---------- Panel admin de suscriptores (role subscriber_admin) ----------
+[[redirects]]
+  from = "/api/sub-admin/data"
+  to = "/.netlify/functions/sub-admin-data"
+  status = 200
+[[redirects]]
+  from = "/api/sub-admin/mutate"
+  to = "/.netlify/functions/sub-admin-mutate"
+  status = 200
+[[redirects]]
+  from = "/api/sub-admin/partner-logo"
+  to = "/.netlify/functions/partner-logo-upload"
+  status = 200
+
+# ---------- Notificaciones ----------
+[[redirects]]
+  from = "/api/notifications/ack"
+  to = "/.netlify/functions/notifications-ack"
+  status = 200
+[[redirects]]
+  from = "/api/notifications"
+  to = "/.netlify/functions/notifications-list"
+  status = 200
+
+# ---------- Webhook de Stripe (suscripciones) ----------
+[[redirects]]
+  from = "/api/stripe/webhook"
+  to = "/.netlify/functions/stripe-webhook"
+  status = 200
+
+# ---------- Fallback del SPA ----------
+[[redirects]]
+  from = "/therobinplan/*"
+  to = "/therobinplan/index.html"
+  status = 200
+
+# ---------- Headers de seguridad ----------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/therobinplan/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Cache-Control = "no-store"
