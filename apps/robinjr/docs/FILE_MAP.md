@@ -24,7 +24,7 @@ El repo contiene la aplicación web principal, sus endpoints Netlify y el Worker
 | [src/application/AdminPortal.jsx](../portal-source/src/application/AdminPortal.jsx) | Composición admin; AdminWorkspace y admin-navigation resuelven secciones. admin-permissions.js es presentación; el backend vuelve a autorizar. |
 | [src/application/onboarding/](../portal-source/src/application/onboarding/) | OnboardingFlow coordina pasos de perfil, origen, DNI, contrato y pago; los formularios reutilizan onboarding-shared y questionnaire-fields. |
 | [src/application/admin/](../portal-source/src/application/admin/) | Subvistas administrativas de clientes, pagos, documentos, carreras, reservas, dashboard, progreso, notificaciones y perfil. |
-| [src/application/careers/](../portal-source/src/application/careers/) | Requisitos y timeline de carrera; toma sus datos de APIs de carrera. |
+| [src/application/careers/](../portal-source/src/application/careers/) | Componentes de presentación de carreras; el detalle de la tarjeta se muestra en un modal. `CareerRequirementsTimeline.jsx` es un módulo legado que ya no forma parte del flujo activo. |
 | [src/application/payments/](../portal-source/src/application/payments/) | Recibos y presentación de pagos; el backend y proveedor son fuente de verdad. |
 | [src/application/documents/](../portal-source/src/application/documents/) | Helpers de clasificación/formato documental. |
 | [src/application/CrossPortalNav.jsx](../portal-source/src/application/CrossPortalNav.jsx) | Puente de navegación hacia The Robin Plan, bajo /therobinplan/. |
@@ -38,9 +38,9 @@ Las rutas están configuradas en netlify.toml y se enumeran en [API_INVENTORY.md
 |---|---|---|
 | Identidad | auth-login, auth-logout, auth-change-password, me | auth.js, authorization.js, identity.js, admins.js |
 | Onboarding | onboarding-state/profile/origin/DNI/contract/checkout | validation.js, dni-upload.js, contract-pdf.js, onboarding-fulfill.js, onboarding-welcome.js |
-| Pagos | payments-checkout/verify/list y stripe-webhook | payment-attempts.js, payment-provider.js, payment-fulfill.js, revolut.js, payments.js |
+| Pagos | payments-checkout/verify/list y revolut-webhook | payment-attempts.js, payment-provider.js, payment-fulfill.js, revolut.js, payments.js |
 | Usuarios y administración | admin-dashboard, admin-clients-*, admin-payments-*, admin-documents-*, crm-convert | admin-dashboard.js, admin-supabase.js, admins.js y permisos |
-| Documentos/carrera | documents-*, careers-list, admin-careers-* | storage.js, document-drive.js, career-documents.js, career-requirements.js, career-suggestions.js |
+| Documentos/carrera | documents-*, careers-list, admin-careers-* | storage.js, document-drive.js, career-requirements.js, career-suggestions.js; documentos desligados de las fichas de carrera |
 | Operación | bookings-*, chat-ai, faqs, notifications-*, meet-*, integration-retry | booking-*.js, anthropic-chat.js, faq-*.js, email.js, Google adapters, observability.js |
 
 lib/http.js, validation.js y observability.js dan soporte transversal. supabase.js accede a la base de Platform y admin-supabase.js separa operaciones administrativas. shared contiene contratos que pueden importar varios lados; al cambiarlos hay que comprobar cliente, handlers y consumidores. supabase/migrations versiona esquema de este producto; secretos solo se usan en runtime de servidor.

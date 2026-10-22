@@ -98,6 +98,7 @@ for (const filename of files) {
 }
 
 function responsibility(file) {
+  if (file === 'application/careers/CareerRequirementsTimeline.jsx') return 'legacy module; not mounted in the active Robin Jr portal';
   if (file === 'app.jsx') return 'composition root and authentication screens';
   if (file === 'application/ApplicationPortals.jsx') return 'application client portal composition';
   if (file === 'application/AdminPortal.jsx') return 'advisor portal and application administration';

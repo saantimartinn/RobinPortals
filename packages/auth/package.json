@@ -1,0 +1,10 @@
+{
+  "name": "@robin/auth",
+  "version": "1.0.0",
+  "private": true,
+  "main": "cookies.cjs",
+  "exports": {
+    "./cookies": "./cookies.cjs",
+    "./http": "./http.cjs"
+  }
+}

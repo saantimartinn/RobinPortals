@@ -1,12 +1,20 @@
-# USERGUIDE — Robin Platform cliente
+# USERGUIDE — portal Robin Jr
 
-Guía técnica de incorporación al portal de aplicación y alumnos. Está organizada para seguir una petición entre el navegador, la sesión, los redirects, Netlify Functions, la lógica backend y los datos. También muestra dónde Robin Admin y Robin Subscriptions dependen de contratos de Platform.
+Guía técnica de incorporación al portal Robin Jr. Está organizada para seguir una petición entre el navegador, la sesión, los redirects, Netlify Functions, la lógica backend y los datos. También muestra dónde los sistemas vecinos dependen de contratos heredados de la plataforma.
+
+El alumno consulta su progreso en nueve fases, sus carreras asignadas como tarjetas, Mi plan,
+documentos, pagos y reservas. El admin gestiona alumnos, carreras (ficha con imagen,
+asignaturas y requisitos), deadlines de documentos, pagos y calendario. Una carrera no
+contiene documentos. Las cuotas son de 500 €, 500 € y 499,99 €; las llamadas usan eventos
+`RobinJr` de una hora en Google Calendar. La segunda cuota se habilita desde fase 6 y la
+última desde fase 9 Wrap up. Consulta [BOOKING_CONFIGURATION](docs/BOOKING_CONFIGURATION.md)
+para preparar la disponibilidad del calendario.
 
 > Empieza aquí si eres nuevo en el código. [READMELONG](READMELONG.md) ofrece la vista técnica extendida; esta guía es el índice de trabajo y enlaza los detalles por capa.
 
-## Papel de Robin Platform
+## Papel de Robin Jr
 
-Este repositorio implementa el portal cliente/alumno, los flujos de aplicación y onboarding, APIs de perfil y operaciones relacionadas, y la identidad de aplicación que consume Robin Admin y que puede validar Robin Subscriptions durante su SSO. El Worker de Cloudflare para las rutas públicas de los tres productos también está versionado aquí, bajo `infrastructure/cloudflare/`.
+Este repositorio implementa el portal cliente/alumno Robin Jr, su onboarding, perfil y operaciones relacionadas. También conserva infraestructura compartida de Project Robin, como el Worker de Cloudflare y contratos de identidad que consumen productos vecinos; esos flujos no cambian las reglas funcionales de Robin Jr.
 
 La UI principal está bajo `portal-source/src/`; el build de Netlify publica `deploy/portal`. Los entrypoints HTTP, lógica server-side, shared helpers, SQL y configuración tienen sus propios límites: la estructura actual está resumida en [ARCHITECTURE](docs/ARCHITECTURE.md) y el [FILE_MAP](docs/FILE_MAP.md). Revisa `netlify.toml` y `package.json` para el contrato vigente de build y dev.
 

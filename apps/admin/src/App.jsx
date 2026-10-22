@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { AdminApp } from "./components/admin-app";
 import { portalClient } from "./services/portal";
+import { loginUrl, ROBIN_LINKS } from "../../../packages/portal-nav/links.js";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -13,13 +14,13 @@ export default function App() {
       .then((sessionUser) => {
         if (!active) return;
         if (sessionUser.is_application_admin !== true) {
-          window.location.replace("https://project-robin.com/portal/");
+          window.location.replace(ROBIN_LINKS[2][0]);
           return;
         }
         setUser(sessionUser);
       })
       .catch(() => {
-        window.location.replace("https://project-robin.com/login?next=%2Fadmin");
+        window.location.replace(loginUrl("/admin"));
       })
       .finally(() => { if (active) setReady(true); });
     return () => { active = false; };
@@ -37,7 +38,7 @@ export default function App() {
             credentials: "same-origin",
           });
         } catch (_) {}
-        window.location.replace("https://project-robin.com/login");
+        window.location.replace(loginUrl());
       }}
     />
   );

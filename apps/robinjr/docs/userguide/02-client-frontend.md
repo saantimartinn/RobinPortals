@@ -23,7 +23,8 @@ El cliente envía credenciales same-origin y serializa JSON excepto `postForm`. 
 - `application/`: composición de shells admin y alumno, selección de portal y componentes cross-portal.
 - `application/onboarding/`: pasos modulares para perfil, DNI, origen, contrato, pagos y campos compartidos.
 - `application/admin/`: dashboard, detalle cliente, pagos, documentos, carreras, chat, notificaciones y funciones administrativas.
-- `application/careers/`: línea de requisitos de carrera y su presentación.
+- `application/careers/`: componentes de carrera; la vista activa muestra el detalle de la tarjeta en un diálogo. `CareerRequirementsTimeline.jsx` es legado y no se monta en el flujo Robin Jr.
+- `application/StudentPlanCalendar.jsx`: calendario del alumno que combina reservas confirmadas y deadlines documentales independientes.
 - `application/payments/`: pagos y recibos.
 - `application/documents/`: labels y reglas de documentos.
 - `shared/`: widgets comunes.

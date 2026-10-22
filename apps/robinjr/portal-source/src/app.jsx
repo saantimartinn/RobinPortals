@@ -1,5 +1,6 @@
 // Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useState } from "react";
+import { loginUrl } from "../../../../packages/portal-nav/links.js";
 import { AlertCircle, ArrowLeft, ChevronRight, GraduationCap, Loader2, Sparkles } from "lucide-react";
 import robinLogoTransparent from "./assets/robin-logo-transparent.png";
 
@@ -76,7 +77,7 @@ export default function PortalRobin() {
           setAuthState({ loading: false, user: null, needsOnboarding: false, onboardingStep: null });
           return;
         }
-        window.location.replace("https://project-robin.com/login?next=robinjr");
+        window.location.replace(loginUrl("robinjr"));
       }
     })();
   }, []);

@@ -7,9 +7,8 @@
  *
  * Respuesta: { advisor, slot_min, days: [ { date, slots: [{ start, label }] } ] }
  *
- * Config (env opcional):
- *   BOOKING_AVAIL_TITLE (default "RobinJr")
- *   BOOKING_SLOT_MIN    (default 60) · BOOKING_MAX_DAYS (default 14)
+ * Configuración opcional: BOOKING_MAX_DAYS (default 14). El título de disponibilidad
+ * RobinJr y los slots de 60 minutos son invariantes del producto.
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');

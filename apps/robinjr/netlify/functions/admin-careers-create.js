@@ -82,6 +82,8 @@ exports.handler = async (event) => {
     } else if (!previousTemplate?.image_path) {
       return json({ error: 'career_image_required' }, { statusCode: 400 });
     }
+    // required_docs es un campo heredado del schema. Se guarda vacío para que
+    // las carreras sigan siendo fichas académicas y no creen requisitos de documentos.
     const query = templateId
       ? sb.from('career_templates').update({ name, university, city, required_docs: [], details, image_path: imagePath }).eq('id', templateId)
       : sb.from('career_templates').insert({ name, university, city, required_docs: [], details, image_path: imagePath, created_by: adminEmail });

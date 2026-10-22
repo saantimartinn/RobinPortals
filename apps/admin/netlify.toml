@@ -2,8 +2,6 @@
 # Panel de administración de Robin (funciones serverless + Supabase)
 
 [build]
-  # Fuerza la raíz del repositorio y anula el antiguo directorio base guardado en Netlify.
-  base = "."
   publish = "dist"
   functions = "netlify/functions"
   # Publica solo el frontend generado; el código fuente queda fuera del directorio público.

@@ -1,4 +1,4 @@
-# Robin Platform — guía técnica extendida
+# Robin Jr — guía técnica extendida
 
 > **¿Primera vez en el código?** Empieza por la [USERGUIDE](USERGUIDE.md), un recorrido desde la sesión y la UI hasta Functions, datos, Cloudflare y los contratos con los repos vecinos.
 >
@@ -6,7 +6,7 @@
 
 ## Rol del repositorio
 
-Robin Platform contiene el portal de alumnos y la superficie administrativa del producto de aplicación, además del backend de Functions que sirve esas experiencias. Construye el frontend de `portal-source/` en `deploy/portal/`; las Netlify Functions y Edge Functions se empaquetan como runtime de servidor. La capa pública de `project-robin.com` está definida en `infrastructure/cloudflare/project-robin-router.js` y enruta por prefijos a tres proyectos Netlify distintos.
+Este repositorio es la base técnica del portal Robin Jr para alumnos y equipo administrativo, además del backend que sirve esas experiencias. Construye el frontend de `portal-source/` en `deploy/portal/`; las Netlify Functions y Edge Functions se empaquetan como runtime de servidor. Conserva infraestructura heredada del conjunto Project Robin, incluida la capa pública de `project-robin.com` definida en `infrastructure/cloudflare/project-robin-router.js`.
 
 Este repo participa como proveedor principal de identidad y datos de aplicación. Robin Admin comparte su login desde el dominio público; The Robin Plan implementa identidad de suscriptor y almacenamiento por separado, con un endpoint SSO validado contra Platform.
 
@@ -51,7 +51,15 @@ La asignación completa route → handler y handler → servicio está en [API_I
 2. Sin sesión, presenta login o el selector de portal en `/login`; con sesión, clasifica principal y rol.
 3. Un alumno nuevo entra al primer paso pendiente de `application/onboarding/`: origen, DNI, contrato, perfil o checkout.
 4. Cada paso llama endpoint de `/api/onboarding/*`; Functions accede a Supabase, firma URL de storage y usa proveedores según el paso.
-5. El shell del portal muestra estado, perfil, pagos, carreras, documentos, reservas y FAQs de acuerdo con los flags y permisos actuales.
+5. El shell Robin Jr muestra resumen, perfil, Mi camino, Mis carreras, Mi plan, documentos, pagos y reservas según el estado de la cuenta.
+
+### Reglas funcionales de Robin Jr
+
+- El progreso contiene nueve fases en este orden: Diagnóstico, Tus resultados, tres sesiones de mentoría con exalumnos, dos sesiones grupales, diagnóstico final con la profesora y Wrap up. `application-steps.js` es la lista visible que debe mantenerse alineada con el backend.
+- Mis carreras presenta tarjetas asignadas. El admin crea una ficha con nombre, imagen, descripción, asignaturas y requisitos y después la asigna al alumno. Al abrirla, el alumno ve el detalle en un popup. Los documentos y deadlines no pertenecen a una carrera.
+- Mi plan combina eventos próximos y deadlines documentales; las reservas se administran desde Google Calendar y no sustituyen los deadlines de documentos.
+- El plan cuesta 1.499,99 € en tres cuotas: 500 €, 500 € y 499,99 €. La cuota 2 se puede habilitar desde la fase 6 y la cuota 3 desde Wrap up (fase 9); la habilitación es una acción administrativa.
+- Para ofrecer huecos, el advisor crea eventos titulados exactamente `RobinJr` en su Google Calendar. Cada evento genera tramos consecutivos de 60 minutos; al reservar, el backend consulta de nuevo Calendar antes de crear la reunión.
 
 ## Flujo de administración
 

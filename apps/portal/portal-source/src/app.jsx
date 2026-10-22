@@ -1,5 +1,6 @@
 // Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useRef, useState } from "react";
+import { loginUrl, ROBIN_LINKS } from "../../../../packages/portal-nav/links.js";
 import { AlertCircle, ArrowLeft, ChevronRight, Loader2 } from "lucide-react";
 import robinLogoTransparent from "./assets/robin-logo-transparent.png";
 
@@ -64,7 +65,7 @@ export default function PortalRobin() {
       (async () => {
         try { await fetch("/therobinplan/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {}
         try { await apiLogout(); } catch (_) {}
-        window.location.replace("/login");
+        window.location.replace(loginUrl());
       })();
       return undefined;
     }
@@ -132,7 +133,7 @@ export default function PortalRobin() {
       (async () => {
         try {
           const result = await issueSsoTicket("robinjr");
-          window.location.replace("https://robinjr.netlify.app/portal/?sso_ticket=" + encodeURIComponent(result.ticket));
+          window.location.replace(ROBIN_LINKS[1][0] + "?sso_ticket=" + encodeURIComponent(result.ticket));
         } catch (_) {
           setEntryNotice("No se ha podido validar tu acceso a RobinJr.");
           window.history.replaceState({}, "", "/portal/");
@@ -157,7 +158,7 @@ export default function PortalRobin() {
         (async () => {
           try {
             const result = await issueSsoTicket("robinjr");
-            window.location.replace("https://robinjr.netlify.app/portal/?sso_ticket=" + encodeURIComponent(result.ticket));
+            window.location.replace(ROBIN_LINKS[1][0] + "?sso_ticket=" + encodeURIComponent(result.ticket));
           } catch (_) {
             setEntryNotice("No se ha podido validar tu acceso a RobinJr.");
           }

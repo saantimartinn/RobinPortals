@@ -45,6 +45,8 @@ function latamPlanWithPaidAmounts(planRows, existingRows) {
  * la cuota ya esté pagada.
  */
 async function ensurePayments(sb, user) {
+  // La primera cuota se ofrece al inicio. Las cuotas 2 y 3 permanecen
+  // bloqueadas hasta que un admin las habilite tras las fases 6 y 9.
   // Los datos internacionales pueden no venir en algunos read models. Se
   // completan aquí para aplicar de forma consistente precio y fiscalidad LATAM.
   let hasEuId = user.has_eu_id;
@@ -105,7 +107,7 @@ async function ensurePayments(sb, user) {
       out.push(ins);
     } else {
       // Importe personalizado por el asesor: no se recalcula nunca.
-      const isCustom = false; // Robin Jr has a fixed three-installment price.
+      const isCustom = false; // Robin Jr aplica importes fijos a las tres cuotas.
       if (c.installment === 1 && !user.pago_completed && existing_row.status === 'locked') {
         const { data: unlocked, error: unlockError } = await sb.from('payments')
           .update({ status: 'unlocked', unlocked_at: existing_row.unlocked_at || new Date().toISOString() })

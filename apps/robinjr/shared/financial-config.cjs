@@ -162,6 +162,8 @@ function generalPlan(totals, numCarreras, remainderToLast = false) {
 }
 
 function robinJrPlan() {
+  // La suma fija del programa es 1.499,99 €. Mantener las cuotas explícitas
+  // evita repartir céntimos de forma distinta en contratos, pagos y facturas.
   return [
     { installment: 1, amount: 500 },
     { installment: 2, amount: 500 },
@@ -213,8 +215,8 @@ function pricingVersionForNewUser(tipo) {
  * vigente, y los contratos nuevos quedan marcados con DELFT_PRICE_VERSION.
  */
 function applicationPlanForUser(user) {
-  // This repository is the Robin Jr portal: every program uses the same
-  // three fixed installments, regardless of legacy package metadata.
+  // Este repositorio sirve Robin Jr: los metadatos de paquetes heredados no
+  // alteran el plan vigente de tres cuotas para sus alumnos.
   return robinJrPlan();
 }
 

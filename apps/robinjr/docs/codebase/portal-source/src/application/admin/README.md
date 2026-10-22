@@ -12,10 +12,10 @@ Contenido mantenido de `portal-source/src/application/admin/`.
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
-| [`AdminCarrerasNew.jsx`](../../../../../../portal-source/src/application/admin/AdminCarrerasNew.jsx) | Módulo frontend de AdminCarrerasNew. | `../../theme.js`<br>`../../ui.jsx`<br>`../documents/document-utils.js`<br>`../careers/CareerRequirementsTimeline.jsx`<br>`../../api.js` | Al cambiar esa parte de la experiencia React. |
+| [`AdminCarrerasNew.jsx`](../../../../../../portal-source/src/application/admin/AdminCarrerasNew.jsx) | Módulo frontend de AdminCarrerasNew. | `../../ui.jsx`<br>`../../api.js` | Al cambiar esa parte de la experiencia React. |
 | [`AdminChatAssistant.jsx`](../../../../../../portal-source/src/application/admin/AdminChatAssistant.jsx) | Módulo frontend de AdminChatAssistant. | `../../ui.jsx`<br>`../../theme.js`<br>`../../api.js` | Al cambiar esa parte de la experiencia React. |
 | [`AdminDocumentosNew.jsx`](../../../../../../portal-source/src/application/admin/AdminDocumentosNew.jsx) | Módulo frontend de AdminDocumentosNew. | `../../ui.jsx`<br>`../documents/document-utils.js`<br>`../../api.js` | Al cambiar esa parte de la experiencia React. |
-| [`AdminPagos.jsx`](../../../../../../portal-source/src/application/admin/AdminPagos.jsx) | Módulo frontend de AdminPagos. | `../../theme.js`<br>`../../ui.jsx`<br>`../payments/payment-utils.jsx`<br>`../payments/InvoiceReceipt.jsx`<br>`../../api.js`<br>`../../../../shared/financial-config.cjs` | Al cambiar esa parte de la experiencia React. |
+| [`AdminPagos.jsx`](../../../../../../portal-source/src/application/admin/AdminPagos.jsx) | Módulo frontend de AdminPagos. | `../../theme.js`<br>`../../ui.jsx`<br>`../payments/payment-utils.jsx`<br>`../payments/InvoiceReceipt.jsx`<br>`../../api.js` | Al cambiar esa parte de la experiencia React. |
 | [`AdminReservas.jsx`](../../../../../../portal-source/src/application/admin/AdminReservas.jsx) | Módulo frontend de AdminReservas. | `../../theme.js`<br>`../../ui.jsx`<br>`../../api.js` | Al cambiar esa parte de la experiencia React. |
 | [`ClientAvatar.jsx`](../../../../../../portal-source/src/application/admin/ClientAvatar.jsx) | Módulo frontend de ClientAvatar. | `../../theme.js` | Al cambiar esa parte de la experiencia React. |
 | [`academic.jsx`](../../../../../../portal-source/src/application/admin/academic.jsx) | Módulo frontend de academic. | `../../ui.jsx`<br>`../../../../shared/academic-systems.cjs` | Al cambiar esa parte de la experiencia React. |

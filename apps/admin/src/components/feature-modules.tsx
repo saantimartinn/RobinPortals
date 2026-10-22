@@ -4,6 +4,7 @@ import { AlertTriangle, ShieldCheck } from "lucide-react";
 import type { FeatureModuleProps } from "@/features/admin/feature-shared";
 import { DeveloperDatabasePage } from "@/features/admin/feature-shared";
 import { ExternalAppRedirect } from "@/components/external-app-redirect";
+import { loginUrl, ROBIN_LINKS } from "../../../../packages/portal-nav/links.js";
 
 const LeadInbox = lazy(() => import("@/features/admin/lead-inbox").then((module) => ({ default: module.LeadInbox })));
 const Crm = lazy(() => import("@/features/admin/leads").then((module) => ({ default: module.Crm })));
@@ -25,8 +26,8 @@ export function FeatureModule(props: FeatureModuleProps) {
   if (path === "/analitica-global" || path === "/pagos") return renderFeature(<GlobalAnalytics contacts={props.contacts} leadStages={props.leadStages} snapshot={props.portalSnapshot} connected={props.portalConnected} />);
   if (path === "/configuracion") return renderFeature(<Configuration {...props} />);
   if (path === "/base-datos" || path === "/crm/base-datos") return props.isDeveloperAdmin ? <DeveloperDatabasePage /> : <div className="page"><div className="empty"><ShieldCheck /><h2>Acceso restringido</h2></div></div>;
-  if (path === "/alumnos" || path.startsWith("/alumnos/")) return <ExternalAppRedirect href="https://project-robin.com/login" name="Portal del Alumno" />;
-  if (path === "/the-robin-plan" || path.startsWith("/the-robin-plan/")) return <ExternalAppRedirect href="https://project-robin.com/therobinplan/" name="The Robin Plan" />;
+  if (path === "/alumnos" || path.startsWith("/alumnos/")) return <ExternalAppRedirect href={loginUrl()} name="Portal del Alumno" />;
+  if (path === "/the-robin-plan" || path.startsWith("/the-robin-plan/")) return <ExternalAppRedirect href={ROBIN_LINKS[3][0]} name="The Robin Plan" />;
   if (path.startsWith("/crm")) return renderFeature(<Crm {...props} />);
   if (path.startsWith("/analiticas")) return renderFeature(<PersonalAnalytics path={path} currentUser={props.currentUser} contacts={props.contacts} leadStages={props.leadStages} snapshot={props.portalSnapshot} isDeveloperAdmin={props.isDeveloperAdmin} />);
   if (path.startsWith("/campanas")) return renderFeature(<Campaigns currentUser={props.currentUser} notify={props.notify} />);

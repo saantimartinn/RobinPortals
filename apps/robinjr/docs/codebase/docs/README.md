@@ -30,6 +30,7 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`COMPONENT_MAP.md`](../../COMPONENT_MAP.md) | Documenta: Frontend component map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`CONFIGURATION_MODEL.md`](../../CONFIGURATION_MODEL.md) | Documenta: Configuration and content model. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`DATABASE_CURRENT.md`](../../DATABASE_CURRENT.md) | Documenta: Datos usados por la plataforma. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`DATAFLOW.md`](../../DATAFLOW.md) | Documenta: Dataflow — Robin Platform cliente. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`ENVIRONMENT.md`](../../ENVIRONMENT.md) | Documenta: Environment configuration. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`ERROR_HANDLING.md`](../../ERROR_HANDLING.md) | Documenta: Error-handling policy. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`FILE_INDEX.generated.md`](../../FILE_INDEX.generated.md) | Documenta: File map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |

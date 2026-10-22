@@ -49,7 +49,7 @@ Reglas de dominio, autorización, validación y adaptadores usados por las Netli
 | [`payment-attempts.js`](../../../lib/payment-attempts.js) | Servicio backend compartido para payment attempts. | — | Al cambiar lógica backend compartida o una integración. |
 | [`payment-fulfill.js`](../../../lib/payment-fulfill.js) | Servicio backend compartido para payment fulfill. | `./payments`<br>`./integration-sync`<br>`./onboarding-fulfill` | Al cambiar lógica backend compartida o una integración. |
 | [`payment-provider.js`](../../../lib/payment-provider.js) | Servicio backend compartido para payment provider. | `./revolut` | Al cambiar lógica backend compartida o una integración. |
-| [`payments.js`](../../../lib/payments.js) | Lógica común para calcular las cuotas según tipo y num_carreras. Devuelve [{ installment, amount }, ...] con nº variable de cuotas: | `../shared/financial-config.cjs` | Al cambiar lógica backend compartida o una integración. |
+| [`payments.js`](../../../lib/payments.js) | Robin Jr usa dos cuotas de 500 € y una última de 499,99 €. Los pagos extra conservan su concepto, importe y vencimiento propios. | `../shared/financial-config.cjs` | Al cambiar lógica backend compartida o una integración. |
 | [`privacy.js`](../../../lib/privacy.js) | Servicio backend compartido para privacy. | — | Al cambiar lógica backend compartida o una integración. |
 | [`revolut.js`](../../../lib/revolut.js) | Revolut Merchant API adapter for the hosted checkout flow. | `./payment-fulfill` | Al cambiar lógica backend compartida o una integración. |
 | [`sandbox-mode.js`](../../../lib/sandbox-mode.js) | Servicio backend compartido para sandbox mode. | — | Al cambiar lógica backend compartida o una integración. |

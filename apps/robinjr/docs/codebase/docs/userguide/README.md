@@ -18,6 +18,7 @@ Contenido mantenido de `docs/userguide/`.
 | [`04-api-functions-and-services.md`](../../../userguide/04-api-functions-and-services.md) | Documenta: 04 · API, Functions y servicios. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`05-data-integrations-security.md`](../../../userguide/05-data-integrations-security.md) | Documenta: 05 · Base de datos, integraciones y seguridad. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`06-cloudflare-and-cross-repo.md`](../../../userguide/06-cloudflare-and-cross-repo.md) | Documenta: 06 · Cloudflare y contratos entre repos. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`07-source-file-reference.md`](../../../userguide/07-source-file-reference.md) | Documenta: 07 · Referencia por archivo y navegación del código. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 
 ---
 

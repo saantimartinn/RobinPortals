@@ -1,8 +1,17 @@
-# Robin Platform
+# Robin Jr — portal de alumnos y administración
 
-Portal web de Project Robin desplegado en Netlify. El frontend React/Vite se publica
-en `/portal/`; la API del mismo origen se ejecuta en Netlify Functions y accede a los
-proveedores externos únicamente desde backend.
+Portal de Robin Jr para alumnos y equipo administrativo, basado en la plataforma de
+Project Robin. El frontend React/Vite se publica en `/portal/`; la API del mismo origen
+se ejecuta en Netlify Functions y accede a proveedores externos únicamente desde backend.
+La experiencia incluye perfil y progreso del alumno, carreras asignadas como tarjetas,
+documentos con fechas límite, reservas, pagos y herramientas de gestión para admins.
+
+Las reglas principales del programa son nueve fases (Diagnóstico, Tus resultados, tres
+mentorías con exalumnos, dos sesiones grupales, diagnóstico final con la profesora y Wrap
+up), reservas de una hora sobre eventos `RobinJr` del calendario del advisor y tres pagos
+de 500 €, 500 € y 499,99 €. Las carreras no contienen documentos: el admin crea una ficha
+con imagen, asignaturas y requisitos, y la asigna al alumno; los documentos y sus deadlines
+se gestionan aparte.
 
 ## Desarrollo local
 

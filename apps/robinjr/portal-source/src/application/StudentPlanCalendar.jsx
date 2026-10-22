@@ -1,4 +1,5 @@
-// Student plan view combines booked calls with dated career requirements.
+// Mi plan reúne reservas confirmadas y deadlines de documentos; las carreras
+// no generan eventos ni requisitos documentales en este calendario.
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, FileText, Loader2, MessageCircle } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "../ui.jsx";

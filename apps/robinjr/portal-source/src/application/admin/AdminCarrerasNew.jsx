@@ -59,6 +59,8 @@ export function AdminCarrerasNew({ client }) {
     if (!cName.trim() || (!photoFile && !editingTemplate?.image_path)) return;
     setBusy(true); setError("");
     try {
+      // La ficha contiene información académica e imagen; los documentos se
+      // configuran desde la sección de documentos del cliente.
       const response = await adminCareersCreate({
         id: editingTemplate?.id,
         name: cName.trim(),

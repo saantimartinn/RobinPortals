@@ -1,5 +1,7 @@
 // Server-side booking config helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const DEFAULT_BOOKING_CONFIG = Object.freeze({
+  // Estos dos valores forman parte del flujo Robin Jr; solo el horizonte
+  // consultado se puede ajustar por entorno.
   availabilityTitle: 'RobinJr',
   maxDays: 14,
   slotMin: 60,

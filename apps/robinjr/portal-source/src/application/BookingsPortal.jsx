@@ -18,6 +18,8 @@ export function Reservas() {
   const [avLoading, setAvLoading] = useState(true);
   const [advisorName, setAdvisorName] = useState("");
   const [calendarConnected, setCalendarConnected] = useState(true);
+  // El servidor devuelve la duración canónica para que la creación de reserva
+  // use el mismo tamaño de hueco que calculó al leer Google Calendar.
   const [slotMin, setSlotMin] = useState(60);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
