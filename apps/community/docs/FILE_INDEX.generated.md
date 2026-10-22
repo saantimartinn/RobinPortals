@@ -93,8 +93,6 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/features/admin/SUB_REQ_STATUS.js](../frontend/src/features/admin/SUB_REQ_STATUS.js) | Módulo frontend: SUB_REQ_STATUS | — |
 | [frontend/src/features/admin/SubscriberAdmin.jsx](../frontend/src/features/admin/SubscriberAdmin.jsx) | Módulo frontend: SubscriberAdmin | SubscriberAdmin, load, refreshAdminData |
 | [frontend/src/features/admin/toLocalInput.js](../frontend/src/features/admin/toLocalInput.js) | Módulo frontend: toLocalInput | pad, toLocalInput |
-| [frontend/src/features/auth/auth-shell.css](../frontend/src/features/auth/auth-shell.css) | Módulo frontend: auth-shell.css | — |
-| [frontend/src/features/auth/AuthShell.jsx](../frontend/src/features/auth/AuthShell.jsx) | Módulo frontend: AuthShell | AuthShell |
 | [frontend/src/features/career/CvAiPage.jsx](../frontend/src/features/career/CvAiPage.jsx) | Módulo frontend: CvAiPage | CvAiPage, onDrop, onFileInput, readFile, reset, run |
 | [frontend/src/features/career/cvBuildHtml.jsx](../frontend/src/features/career/cvBuildHtml.jsx) | Módulo frontend: cvBuildHtml | cvBuildHtml, sec |
 | [frontend/src/features/career/CvChoice.jsx](../frontend/src/features/career/CvChoice.jsx) | Módulo frontend: CvChoice | CvChoice |
