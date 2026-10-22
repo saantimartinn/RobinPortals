@@ -1,6 +1,6 @@
 // Portal view or navigation module for admin workspace; the application shell owns session state.
 import React, { useEffect, useRef, useState } from "react";
-import { LayoutDashboard, Users, Bell, Shield, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap, Database } from "lucide-react";
+import { LayoutDashboard, Users, Bell, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap, Database } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";
 import "./admin-portal.css";
 
@@ -22,7 +22,15 @@ const GLOBAL_TABS = [
 ];
 const fullName = c => `${c.nombre || ""} ${c.apellidos || ""}`.trim() || c.email || c.username || "Alumno";
 
-export function AdminWorkspace({ active, client, clients, loading, error, onNavigate, onSwitchClient, isDeveloper = false, children }) {
+// Signed-in admin, shown in the sidebar stamp as in the admin app (photo or initials, name, role).
+function adminName(user) {
+  if (user?.nombre) return user.nombre;
+  const key = String(user?.email || user?.username || "").split("@")[0];
+  return key ? key.charAt(0).toUpperCase() + key.slice(1) : "Administrador";
+}
+
+export function AdminWorkspace({ user, active, client, clients, loading, error, onNavigate, onSwitchClient, isDeveloper = false, children }) {
+  const name = adminName(user);
   const globalTabs = isDeveloper ? [...GLOBAL_TABS, { key: "base-datos", label: "Base de datos", icon: Database }] : GLOBAL_TABS;
   const [pickerOpen, setPickerOpen] = useState(false);
   const switchRef = useRef(null);
@@ -37,7 +45,7 @@ export function AdminWorkspace({ active, client, clients, loading, error, onNavi
     <a className="admin-skip" href="#admin-content">Saltar al contenido</a>
     <div className="admin-layout">
       <aside className="admin-sidebar">
-        <div className="admin-team"><span className="admin-team-icon"><Shield size={21} /></span><div><strong>Equipo Robin</strong><span>Administración</span></div></div>
+        <div className="admin-team"><span className="admin-team-icon">{user?.avatar_url ? <img src={user.avatar_url} alt="" /> : name.slice(0, 2).toUpperCase()}</span><div><strong>{name}</strong><span>Administración</span></div></div>
         <p className="admin-eyebrow admin-nav-caption">Vista general</p>
         <nav className="admin-global-nav" aria-label="Administración">
           {globalTabs.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key || (key === "clientes" && clientPage) ? "page" : undefined}><Icon size={19} /><span>{key === "clientes" && isDeveloper ? "Todos los clientes" : label}</span>{key === "clientes" && !loading && !error && <small>{clients.length}</small>}</button>)}

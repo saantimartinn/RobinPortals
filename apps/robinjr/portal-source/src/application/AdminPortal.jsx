@@ -213,7 +213,7 @@ export function AdminPortal({ user }) {
 
   return (
     <>
-      <AdminWorkspace active={active} client={selectedClient} clients={data.clients || []} isDeveloper={isDeveloper}
+      <AdminWorkspace user={user} active={active} client={selectedClient} clients={data.clients || []} isDeveloper={isDeveloper}
         loading={loadingClients} error={loadError} onNavigate={navigate} onSwitchClient={switchClient}>
 
           <main key={active + (selectedClient?.id || "list")}
