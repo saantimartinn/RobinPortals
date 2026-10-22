@@ -13,6 +13,7 @@ import { CANVAS } from "./theme.js";
 import { reportClientError } from "./client-utils.js";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
+import { ONBOARDING_ORDER, OnboardingNavContext } from "./application/onboarding/onboarding-nav.js";
 import { AdminPortal } from "./application/AdminPortal.jsx";
 import {
   OnboardingContract,
@@ -47,6 +48,8 @@ export default function PortalRobin() {
     needsOnboarding: false,
     onboardingStep: null,
   });
+  // A completed onboarding step the user went back to (null: the next pending step).
+  const [onboardingOverride, setOnboardingOverride] = useState(null);
   const [active, setActive] = useState("estado");
   const [subscriptionAccess, setSubscriptionAccess] = useState(false);
   const [checkingSubscriptionAccess, setCheckingSubscriptionAccess] = useState(false);
@@ -262,12 +265,23 @@ export default function PortalRobin() {
     </main>
   </>;
 
-  const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone: refreshState };
-  if (authState.needsOnboarding && authState.onboardingStep === "origin") return <OnboardingOrigin {...onboardingProps} />;
-  if (authState.needsOnboarding && authState.onboardingStep === "dni") return <OnboardingDNI {...onboardingProps} />;
-  if (authState.needsOnboarding && authState.onboardingStep === "contract") return <OnboardingContract {...onboardingProps} />;
-  if (authState.needsOnboarding && authState.onboardingStep === "payment") return <OnboardingPayment {...onboardingProps} />;
-  if (authState.needsOnboarding && authState.onboardingStep === "profile") return <OnboardingProfile {...onboardingProps} />;
+  if (authState.needsOnboarding) {
+    // The server says which step is next; the user may go back to any earlier one.
+    const furthest = ONBOARDING_ORDER.indexOf(authState.onboardingStep);
+    const overrideIndex = ONBOARDING_ORDER.indexOf(onboardingOverride);
+    const step = overrideIndex >= 0 && overrideIndex < furthest ? onboardingOverride : authState.onboardingStep;
+    const index = ONBOARDING_ORDER.indexOf(step);
+    const nav = {
+      furthest,
+      goTo: (key) => setOnboardingOverride(ONBOARDING_ORDER.indexOf(key) < furthest ? key : null),
+      goBack: index > 0 ? () => setOnboardingOverride(ONBOARDING_ORDER[index - 1]) : null,
+    };
+    // After redoing an earlier step, continue with the one right after it.
+    const onDone = async () => { await refreshState(); setOnboardingOverride(ONBOARDING_ORDER[index + 1] || null); };
+    const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone };
+    const Step = { origin: OnboardingOrigin, dni: OnboardingDNI, contract: OnboardingContract, profile: OnboardingProfile, payment: OnboardingPayment }[step];
+    if (Step) return <OnboardingNavContext.Provider value={nav}><Step key={step} {...onboardingProps} /></OnboardingNavContext.Provider>;
+  }
 
   const user = authState.user;
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();
