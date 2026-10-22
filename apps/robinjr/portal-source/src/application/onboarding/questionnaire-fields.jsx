@@ -26,19 +26,19 @@ export function qFmtSlider(def, val) {
 
 export function QuestionField({ def, value, onChange }) {
   return (
-    <div>
-      <div className="text-[13px] font-semibold text-slate-700 mb-2">
+    <div className="q-field">
+      <div className="q-label text-[13px] font-semibold text-slate-700 mb-2">
         {def.q}
         {def.optional && <span className="text-slate-400 font-normal"> (opcional)</span>}
         {def.type === "multi" && def.max && <span className="text-slate-400 font-normal"> · máx. {def.max}</span>}
       </div>
       {def.type === "text" && (
         <input type="text" value={value || ""} onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
+          className="q-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
       )}
       {def.type === "textarea" && (
         <textarea rows={3} value={value || ""} onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
+          className="q-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
       )}
       {def.type === "slider" && (
         <QSlider value={value} min={def.min} max={def.max} step={def.step}
@@ -54,7 +54,7 @@ export function QuestionField({ def, value, onChange }) {
 function QSlider({ value, min, max, step, left, right, suffix, onChange }) {
   const v = value == null ? min : value;
   return (
-    <div>
+    <div className="q-slider">
       <input type="range" min={min} max={max} step={step} value={v}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full" style={{ accentColor: NAVY }} />
@@ -78,14 +78,14 @@ function QChoiceGrid({ options, value, multi, max, onChange }) {
     }
   }
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="q-choices grid grid-cols-2 gap-2">
       {(options || []).map((o) => {
         const ov = typeof o === "string" ? o : o.value;
         const ol = typeof o === "string" ? o : o.label;
         const on = multi ? arr.includes(ov) : value === ov;
         return (
           <button key={ov} type="button" onClick={() => pick(ov)}
-            className="flex items-center gap-2 rounded-xl border px-3 py-2 text-[13px] font-medium text-left transition"
+            className="q-choice flex items-center gap-2 rounded-xl border px-3 py-2 text-[13px] font-medium text-left transition"
             style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
             <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"
               style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>

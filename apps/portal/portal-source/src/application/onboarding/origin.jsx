@@ -1,10 +1,20 @@
 // Onboarding step or helper for origin; OnboardingFlow owns the step sequence.
 import { useState } from "react";
-import { FileText, CheckCircle2, ChevronRight, MapPin, Loader2, AlertCircle, ChevronLeft, GraduationCap } from "lucide-react";
+import { FileText, CheckCircle2, ChevronRight, Earth, Loader2, AlertCircle, ChevronLeft, GraduationCap } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";
 import { Btn, Field } from "../../ui.jsx";
 import { originSave } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
+
+// Spanish flag (rojo, amarillo, rojo in 1:2:1 bands) for the "España" choice.
+function SpainFlag({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 30 20" aria-hidden="true">
+      <rect width="30" height="20" rx="2" fill="#AA151B" />
+      <rect y="5" width="30" height="10" fill="#F1BF00" />
+    </svg>
+  );
+}
 
 export function OnboardingOrigin({ user, onLogout, onDone }) {
   const [origin, setOrigin] = useState(user.origin || "");
@@ -53,13 +63,13 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
   }
   function back() { setError(""); setScreen((s) => Math.max(0, s - 1)); }
 
-  const Choice = ({ active, onClick, title, desc, icon: Ic }) => (
+  const Choice = ({ active, onClick, title, desc, icon: Ic, flag = false }) => (
     <button type="button" onClick={onClick}
-      className="flex items-start gap-3 rounded-xl border px-4 py-3.5 text-left transition w-full"
+      className="q-choice flex items-start gap-3 rounded-xl border px-4 py-3.5 text-left transition w-full"
       style={active ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
-      <span className="h-9 w-9 rounded-lg grid place-items-center flex-shrink-0"
-        style={active ? { background: GOLD } : { background: "#F6F3E0" }}>
-        {Ic && <Ic className="h-4 w-4" style={{ color: active ? NAVY : "#687088" }} />}
+      <span className="h-12 w-12 rounded-lg grid place-items-center flex-shrink-0"
+        style={flag ? undefined : active ? { background: GOLD } : { background: "#F6F3E0" }}>
+        {Ic && <Ic className={flag ? "h-8 w-12" : "h-7 w-7"} style={flag ? undefined : { color: NAVY }} strokeWidth={flag ? undefined : 1.75} />}
       </span>
       <span className="min-w-0">
         <span className="block font-semibold text-sm">{title}</span>
@@ -73,23 +83,24 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
     : "Solicitud internacional · " + screen + " de 3";
 
   return (
-    <OnboardingShell user={user} title="Bienvenido a Robin" subtitle={subtitle} stepNumber={1} totalSteps={5} onLogout={onLogout}>
-      <div className="space-y-5">
+    <OnboardingShell user={user} title="Bienvenido a Robin" subtitle={subtitle} stepNumber={1} totalSteps={5} onLogout={onLogout} fullscreen>
+      <div className="onboarding-question-flow" onKeyDown={(event) => { if (event.key === "Enter" && event.target.tagName === "INPUT" && !busy) { event.preventDefault(); next(); } }}>
+        <div className="onboarding-question-body">
         {screen === 0 && (
           <>
-            <div className="text-sm text-slate-500">¿Desde dónde realizas tu solicitud de acceso a la universidad?</div>
+            <h2 className="onboarding-q-title">¿Desde dónde realizas tu solicitud de acceso a la universidad?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={origin === "espana"} onClick={() => { setOrigin("espana"); setError(""); }}
-                title="España" desc="Resido en España y solicito plaza desde aquí." icon={MapPin} />
+                title="España" desc="Resido en España y solicito plaza desde aquí." icon={SpainFlag} flag />
               <Choice active={origin === "otros"} onClick={() => { setOrigin("otros"); setError(""); }}
-                title="Otro país" desc="Solicito desde fuera de España (estudiante internacional)." icon={MapPin} />
+                title="Otro país" desc="Solicito desde fuera de España (estudiante internacional)." icon={Earth} />
             </div>
           </>
         )}
 
         {screen === 1 && (
           <>
-            <div className="text-sm text-slate-500">¿A qué tipo de programa universitario vas a aplicar?</div>
+            <h2 className="onboarding-q-title">¿A qué tipo de programa universitario vas a aplicar?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={level === "grado"} onClick={() => { setLevel("grado"); setError(""); }}
                 title="Grado" desc="Estudios universitarios de grado (Bachelor's)." icon={GraduationCap} />
@@ -101,14 +112,14 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
 
         {screen === 2 && (
           <>
-            <div className="text-sm text-slate-500">¿Desde qué país realizas tu solicitud?</div>
+            <h2 className="onboarding-q-title">¿Desde qué país realizas tu solicitud?</h2>
             <Field label="País" value={pais} onChange={setPais} placeholder="Ej. México, Colombia, Argentina…" />
           </>
         )}
 
         {screen === 3 && (
           <>
-            <div className="text-sm text-slate-500">¿Posees un documento de identidad europeo (DNI o NIE de un país de la UE)?</div>
+            <h2 className="onboarding-q-title">¿Posees un documento de identidad europeo (DNI o NIE de un país de la UE)?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={hasEu === true} onClick={() => { setHasEu(true); setError(""); }}
                 title="Sí" desc="Dispongo de un documento de identidad europeo." icon={CheckCircle2} />
@@ -118,18 +129,18 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
           </>
         )}
 
+        </div>
+
         {error && (
           <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{error}</span>
           </div>
         )}
 
-        <div className="flex items-center gap-3">
-          {screen > 0 && (
-            <Btn variant="secondary" onClick={back} disabled={busy}>
-              <ChevronLeft className="h-4 w-4" /> Atrás
-            </Btn>
-          )}
+        <div className="onboarding-question-nav flex items-center gap-3">
+          <Btn variant="secondary" onClick={back} disabled={busy || screen === 0}>
+            <ChevronLeft className="h-4 w-4" /> Atrás
+          </Btn>
           <Btn className="flex-1" size="lg" onClick={next} disabled={busy}>
             {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</>
               : isLast ? <>Continuar <ChevronRight className="h-4 w-4" /></>
