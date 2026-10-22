@@ -13,6 +13,8 @@ export const FUNCTIONS_DIR = resolve(OUTPUT, 'functions');
 export const APPS = [
   {
     id: 'portal',
+    // Netlify project it ran on by itself; its variables are the app's .env (site/pull-env.mjs).
+    netlifySiteId: 'e28febdb-26c4-4264-a9bd-9858b562dc43',
     dir: 'apps/portal',
     functions: 'netlify/functions',
     frontend: 'apps/portal/portal-source',
@@ -22,6 +24,7 @@ export const APPS = [
   },
   {
     id: 'robinjr',
+    netlifySiteId: '0873149b-6ef4-47d6-9fad-4de7243bfe0a',
     dir: 'apps/robinjr',
     functions: 'netlify/functions',
     frontend: 'apps/robinjr/portal-source',
@@ -31,6 +34,7 @@ export const APPS = [
   },
   {
     id: 'community',
+    netlifySiteId: 'ae198802-1921-4f91-91f5-4d1b89d83fa8',
     dir: 'apps/community',
     functions: 'backend/functions',
     frontend: 'apps/community/frontend',
@@ -43,6 +47,7 @@ export const APPS = [
   },
   {
     id: 'admin',
+    netlifySiteId: '06508750-9757-47da-88a8-e177a5894e8f',
     dir: 'apps/admin',
     functions: 'netlify/functions',
     frontend: 'apps/admin',

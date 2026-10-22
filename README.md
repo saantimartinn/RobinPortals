@@ -22,5 +22,6 @@ Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro
 | `npm run site:config` | Regenera `netlify.toml` a partir de `apps/*/netlify.toml` |
 | `npm run site:build` | Compila el sitio en `site/.output` |
 | `npm run site:env` | Regenera `./.env` a partir de `apps/*/.env` |
+| `npm run site:pull-env` | Copia a `apps/*/.env` las variables de cada proyecto de Netlify (solo lectura) |
 
 `netlify.toml` de la raíz es generado: cada app sigue definiendo sus rutas en su propio `netlify.toml`, y `site/generate-config.mjs` las monta bajo su ruta y renombra sus funciones con el prefijo de la app.

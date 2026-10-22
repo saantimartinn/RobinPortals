@@ -8,6 +8,7 @@
     "site:config": "node site/generate-config.mjs",
     "site:build": "node site/build.mjs",
     "site:env": "node site/env.mjs",
+    "site:pull-env": "node site/pull-env.mjs",
     "test": "node site/test-all.mjs"
   },
   "devDependencies": {

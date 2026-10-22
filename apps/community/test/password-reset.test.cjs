@@ -19,8 +19,8 @@ function loadModule(relativePath, mocks) {
 }
 
 test('password reset token expires and becomes invalid after changing the password', () => {
-  const previous = process.env.COMMUNITY_JWT_SECRET;
-  process.env.COMMUNITY_JWT_SECRET = 'test-only-password-reset-secret-with-enough-entropy';
+  const previous = process.env.JWT_SECRET;
+  process.env.JWT_SECRET = 'test-only-password-reset-secret-with-enough-entropy';
   try {
     const auth = require('../backend/lib/auth');
     const firstHash = auth.hashPassword('initial-password');
@@ -31,8 +31,8 @@ test('password reset token expires and becomes invalid after changing the passwo
     assert.equal(auth.isCurrentPasswordResetToken(payload, auth.hashPassword('new-password')), false);
     assert.equal(auth.verifyPasswordResetToken(token + 'tampered'), null);
   } finally {
-    if (previous === undefined) delete process.env.COMMUNITY_JWT_SECRET;
-    else process.env.COMMUNITY_JWT_SECRET = previous;
+    if (previous === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = previous;
   }
 });
 
@@ -65,8 +65,8 @@ test('reset link always returns to The Robin Plan and contains the signed token'
 });
 
 test('a valid reset request replaces the hash without exposing the password', async () => {
-  const previous = process.env.COMMUNITY_JWT_SECRET;
-  process.env.COMMUNITY_JWT_SECRET = 'test-only-password-reset-secret-with-enough-entropy';
+  const previous = process.env.JWT_SECRET;
+  process.env.JWT_SECRET = 'test-only-password-reset-secret-with-enough-entropy';
   try {
     const auth = require('../backend/lib/auth');
     const oldHash = auth.hashPassword('initial-password');
@@ -90,7 +90,7 @@ test('a valid reset request replaces the hash without exposing the password', as
     assert.equal(auth.verifyPassword('a-new-secure-password', savedHash), true);
     assert.equal(savedHash.includes('a-new-secure-password'), false);
   } finally {
-    if (previous === undefined) delete process.env.COMMUNITY_JWT_SECRET;
-    else process.env.COMMUNITY_JWT_SECRET = previous;
+    if (previous === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = previous;
   }
 });

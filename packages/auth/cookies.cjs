@@ -1,5 +1,7 @@
 'use strict';
 
+const { siteUrl } = require('./site.cjs');
+
 /** Cookie operations shared by Netlify Function auth handlers. Parsers and
  * serializers are injected so each app can use the cookie version it ships. */
 function createCookieHelpers({ parse, serialize }) {
@@ -14,7 +16,8 @@ function createCookieHelpers({ parse, serialize }) {
     return cookies[name] || null;
   }
 
-  function build(name, token, { clear = false, maxAge, secure = true } = {}) {
+  // Browsers drop Secure cookies on plain-http sites such as the local one.
+  function build(name, token, { clear = false, maxAge, secure = !siteUrl().startsWith('http://') } = {}) {
     return serialize(name, clear ? '' : token, {
       httpOnly: true,
       secure,

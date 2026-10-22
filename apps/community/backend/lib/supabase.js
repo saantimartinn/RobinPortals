@@ -8,10 +8,10 @@ const { createClient } = require('@supabase/supabase-js');
 let _client = null;
 function getSupabase() {
   if (_client) return _client;
-  const url = process.env.COMMUNITY_SUPABASE_URL;
-  const key = process.env.COMMUNITY_SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
-    throw new Error('COMMUNITY_SUPABASE_URL o COMMUNITY_SUPABASE_SERVICE_ROLE_KEY no estan configuradas');
+    throw new Error('SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no estan configuradas');
   }
   _client = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },

@@ -1,77 +1,35 @@
 // Builds the environment of the shared Robin site from each app's .env.
-// Variables whose value differs between apps keep the portal/admin value under
-// the plain name; the other apps read their own value under a prefix (see
-// SCOPED). Any new conflict that is not listed here stops the generation.
+// Every app keeps its own variables: APP__NAME in the site environment
+// (PORTAL__SUPABASE_URL, ROBINJR__SUPABASE_URL, …), which site/app-env.cjs
+// shows to that app's functions as plain NAME. Only the site-level variables
+// below are shared, and they replace the app value of the same name.
 // Usage: node site/env.mjs [--public-url URL] [--site-url URL]   (writes ./.env)
-import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { APPS, ROOT } from './apps.mjs';
+import { readEnvFile, writeEnvFile } from './dotenv.mjs';
 
-export const SCOPED = {
-  robinjr: {
-    SUPABASE_URL: 'JR_SUPABASE_URL',
-    SUPABASE_SERVICE_ROLE_KEY: 'JR_SUPABASE_SERVICE_ROLE_KEY',
-    REVOLUT_API_BASE: 'JR_REVOLUT_API_BASE',
-    REVOLUT_MERCHANT_SECRET_KEY: 'JR_REVOLUT_MERCHANT_SECRET_KEY',
-    REVOLUT_WEBHOOK_SIGNING_SECRET: 'JR_REVOLUT_WEBHOOK_SIGNING_SECRET',
-  },
-  community: {
-    SUPABASE_URL: 'COMMUNITY_SUPABASE_URL',
-    SUPABASE_SERVICE_ROLE_KEY: 'COMMUNITY_SUPABASE_SERVICE_ROLE_KEY',
-    JWT_SECRET: 'COMMUNITY_JWT_SECRET',
-    STRIPE_WEBHOOK_SECRET: 'COMMUNITY_STRIPE_WEBHOOK_SECRET',
-  },
-  admin: {
-    DEFAULT_PASSWORD: 'ADMIN_DEFAULT_PASSWORD',
-  },
-};
+const { prefix, APP_IDS } = createRequire(import.meta.url)('./app-env.cjs');
 
-// Set per site (Netlify injects some of them), never copied from an app.
-const SITE_MANAGED = new Set(['URL', 'CONTEXT', 'DEPLOY_URL', 'DEPLOY_PRIME_URL', 'ALLOWED_ORIGINS', 'PUBLIC_BASE_URL', 'ROBIN_SITE_URL']);
-// Portal and admin share most values, so they go first and own the plain names.
-const ORDER = ['portal', 'admin', 'robinjr', 'community'];
+// Set per site (Netlify injects some of them), never taken from an app.
+export const SITE_MANAGED = ['URL', 'CONTEXT', 'DEPLOY_URL', 'DEPLOY_PRIME_URL', 'ALLOWED_ORIGINS', 'PUBLIC_BASE_URL', 'ROBIN_SITE_URL'];
 
-export function readEnvFile(path) {
-  if (!existsSync(path)) return {};
+export function scopedAppEnvs() {
+  const missing = APPS.map((app) => app.id).filter((id) => !APP_IDS.includes(id));
+  if (missing.length) throw new Error(`Añade ${missing.join(', ')} a APP_IDS en site/app-env.cjs`);
   const values = {};
-  for (const line of readFileSync(path, 'utf8').split(/\r?\n/)) {
-    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (!match) continue;
-    let value = match[2].trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
-    values[match[1]] = value;
-  }
-  return values;
-}
-
-export function mergeAppEnvs() {
-  const merged = {};
-  const source = {};
-  const masked = [];
-  const conflicts = [];
-  for (const id of ORDER) {
-    const app = APPS.find((candidate) => candidate.id === id);
-    for (const [key, value] of Object.entries(readEnvFile(resolve(ROOT, app.dir, '.env')))) {
-      if (!value || SITE_MANAGED.has(key)) continue;
-      if (value.includes('****')) {
-        masked.push(`${id}.${key}`);
-        continue;
-      }
-      const name = SCOPED[id]?.[key] || key;
-      if (name in merged && merged[name] !== value) {
-        conflicts.push(`${name}: ${source[name]} y ${id} tienen valores distintos`);
-        continue;
-      }
-      merged[name] = value;
-      source[name] = source[name] || id;
+  const counts = {};
+  for (const app of APPS) {
+    const env = readEnvFile(resolve(ROOT, app.dir, '.env'));
+    counts[app.id] = 0;
+    for (const [key, value] of Object.entries(env)) {
+      if (SITE_MANAGED.includes(key)) continue;
+      values[`${prefix(app.id)}${key}`] = value;
+      counts[app.id] += 1;
     }
   }
-  return { merged, masked, conflicts };
-}
-
-function quote(value) {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, '\\n')}"`;
+  return { values, counts };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -81,23 +39,10 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   };
   const publicUrl = arg('--public-url', 'http://localhost:8888');
   const siteUrl = arg('--site-url', 'http://localhost:8889');
-  const { merged, masked, conflicts } = mergeAppEnvs();
-  if (conflicts.length) {
-    console.error('Variables con valores distintos entre apps; añádelas a SCOPED en site/env.mjs:');
-    for (const line of conflicts) console.error(`  ${line}`);
-    process.exit(1);
-  }
-  merged.PUBLIC_BASE_URL = publicUrl;
-  merged.ROBIN_SITE_URL = siteUrl;
-  merged.ALLOWED_ORIGINS = [publicUrl, siteUrl, publicUrl.replace('localhost', '127.0.0.1'), siteUrl.replace('localhost', '127.0.0.1')].join(',');
-  const lines = [
-    '# Generated by site/env.mjs from apps/*/.env. Real credentials: never commit this file.',
-    ...Object.keys(merged).sort().map((key) => `${key}=${quote(merged[key])}`),
-    '',
-  ];
-  const output = resolve(ROOT, '.env');
-  writeFileSync(output, lines.join('\n'), { mode: 0o600 });
-  chmodSync(output, 0o600);
-  console.log(`[env] ${Object.keys(merged).length} variables -> .env`);
-  if (masked.length) console.log(`[env] sin valor real (enmascaradas en Netlify), no se cargan: ${masked.join(', ')}`);
+  const { values, counts } = scopedAppEnvs();
+  values.PUBLIC_BASE_URL = publicUrl;
+  values.ROBIN_SITE_URL = siteUrl;
+  values.ALLOWED_ORIGINS = [publicUrl, siteUrl, publicUrl.replace('localhost', '127.0.0.1'), siteUrl.replace('localhost', '127.0.0.1')].join(',');
+  writeEnvFile(resolve(ROOT, '.env'), values, ['Generated by site/env.mjs from apps/*/.env. Real credentials: never commit this file.']);
+  console.log(`[env] .env: ${Object.entries(counts).map(([id, count]) => `${id} ${count}`).join(', ')} variables + 3 del sitio`);
 }

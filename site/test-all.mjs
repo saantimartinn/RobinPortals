@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { APPS, ROOT } from './apps.mjs';
 
 let failed = false;
-for (const app of APPS) {
+for (const app of [{ id: 'site', dir: 'site' }, ...APPS]) {
   const cwd = resolve(ROOT, app.dir);
   const dir = ['test', 'tests'].find((name) => existsSync(resolve(cwd, name)));
   if (!dir) continue;
