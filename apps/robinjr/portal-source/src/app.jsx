@@ -1,13 +1,11 @@
 // Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useState } from "react";
 import { loginUrl } from "../../../../packages/portal-nav/links.js";
-import { AlertCircle, ArrowLeft, ChevronRight, GraduationCap, Loader2, Sparkles } from "lucide-react";
-import robinLogoTransparent from "./assets/robin-logo-transparent.png";
+import { Loader2 } from "lucide-react";
 
 import { isAdminUser } from "./session.js";
 import { canAdminSee, firstAllowedAdminUrl } from "./admin-permissions.js";
-import { CANVAS, NAVY, NAVY_DARK } from "./theme.js";
-import { Btn, Field } from "./ui.jsx";
+import { CANVAS } from "./theme.js";
 import { reportClientError } from "./client-utils.js";
 import { AdminPortal } from "./application/AdminPortal.jsx";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
@@ -169,150 +167,5 @@ export default function PortalRobin() {
         onUserRefresh={refreshUser}
       />
     </>
-  );
-}
-
-function AuthShell({ children }) {
-  return (
-    <div className="min-h-screen flex bg-white" style={{ fontFamily: "var(--robin-font-text)" }}>
-      <div
-        className="hidden lg:flex flex-col justify-between w-[min(39vw,480px)] flex-shrink-0 px-11 py-11 relative overflow-hidden"
-        style={{ background: NAVY }}
-      >
-        <div className="absolute inset-0 opacity-5">
-          {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="absolute rounded-full border border-white"
-              style={{ width: (index + 1) * 180, height: (index + 1) * 180, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
-            />
-          ))}
-        </div>
-        <div className="relative flex items-center gap-3" aria-label="Robin">
-          <img src={robinLogoTransparent} alt="Robin" className="h-[94px] w-28 object-contain" />
-        </div>
-        <div className="relative">
-          <div className="text-[clamp(36px,3.6vw,46px)] font-bold text-white mb-5 tracking-[-.03em]" style={{ fontFamily: "var(--robin-font-display)", lineHeight: 1.1 }}>
-            Tu futuro<br />empieza aquí.
-          </div>
-          <div className="max-w-[300px] text-[13px] text-white/60 leading-relaxed">
-            Project Robin te acompaña en cada paso del proceso de admisión a las mejores universidades.
-          </div>
-        </div>
-        <div className="relative text-white/30 text-xs">
-          <a
-            href="/admin"
-            className="transition-colors hover:text-white/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/70"
-          >
-            © Project Robin · Portal de Cliente
-          </a>
-        </div>
-      </div>
-      <div className="flex-1 flex flex-col items-center justify-center px-7 py-12">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8 text-[#2D3A64]">
-            <img src={robinLogoTransparent} alt="Robin" className="h-20 w-24 rounded-2xl bg-[#2D3A64] p-2 object-contain" />
-          </div>
-          {children}
-          <div className="mt-8 text-center text-xs text-[#2D3A64]/40 lg:hidden">
-            <a
-              href="/admin"
-              className="transition-colors hover:text-[#2D3A64]/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#2D3A64]/70"
-            >
-              © Project Robin · Portal de Cliente
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PortalSelector({ onSelectPortal }) {
-  const choices = [
-    {
-      title: "Portal de aplicación",
-      description: "Tu proceso de admisión, documentación y seguimiento personalizado.",
-      icon: GraduationCap,
-      onClick: onSelectPortal,
-    },
-    {
-      title: "The Robin Plan",
-      description: "Tu suscripción, ventajas y servicios para tu vida internacional.",
-      icon: Sparkles,
-      onClick: () => { window.location.assign("/therobinplan/"); },
-    },
-  ];
-
-  return (
-    <AuthShell>
-      <div className="space-y-7">
-        <div>
-          <div className="text-2xl font-bold text-slate-900 mb-2">¿A qué portal quieres acceder?</div>
-          <div className="text-sm text-slate-500">Elige el espacio que quieres gestionar.</div>
-        </div>
-        <div className="grid gap-3">
-          {choices.map(({ title, description, icon: Icon, onClick }) => (
-            <button key={title} type="button" onClick={onClick} className="group w-full flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-slate-300 hover: focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/40">
-              <span className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-200"><Icon className="h-5 w-5" /></span>
-              <span className="min-w-0 flex-1">
-                <strong className="block text-base text-slate-900">{title}</strong>
-                <span className="mt-1 block text-xs leading-relaxed text-slate-500">{description}</span>
-              </span>
-              <ChevronRight className="h-5 w-5 flex-shrink-0 text-slate-400 transition group-hover:translate-x-1" />
-            </button>
-          ))}
-        </div>
-      </div>
-    </AuthShell>
-  );
-}
-
-function LoginScreen({ onLogin, onBack }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function submit() {
-    if (!email || !password) return;
-    setLoading(true);
-    setError("");
-    try {
-      await onLogin(email, password);
-    } catch (submitError) {
-      setError(submitError.status === 401 ? "Usuario o contraseña incorrectos." : submitError.message || "No hemos podido iniciar sesión.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <AuthShell>
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        <div className="p-7 sm:p-8 space-y-5">
-          <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
-            <ArrowLeft className="h-4 w-4" /> Cambiar de portal
-          </button>
-          <div>
-            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "var(--robin-font-display)" }}>Bienvenido de vuelta</div>
-            <div className="text-sm text-slate-500">Accede a tu portal personalizado</div>
-          </div>
-          <Field label="Usuario o correo" value={email} onChange={setEmail} placeholder="tu@correo.com" />
-          <Field label="Contraseña" type="password" value={password} onChange={setPassword} placeholder="••••••••" />
-          {error && (
-            <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /><span>{error}</span>
-            </div>
-          )}
-          <Btn onClick={submit} disabled={!email || !password || loading} className="w-full" size="lg">
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : <>Entrar <ChevronRight className="h-4 w-4" /></>}
-          </Btn>
-          <div className="text-xs text-slate-400 text-center">
-            Si acabas de unirte, tu usuario es el número de ID que te enviamos.
-          </div>
-        </div>
-      </div>
-    </AuthShell>
   );
 }

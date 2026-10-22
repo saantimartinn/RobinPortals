@@ -1,10 +1,12 @@
 // Tailwind preset with the Project Robin brand (DESIGN.md). The apps keep
 // their existing class names: the neutral and accent scales they use are
 // remapped onto the three brand colours, so `slate-*` becomes navy mixed into
-// cream, `amber-*` becomes the brand orange and `white` becomes the brand cream.
+// cream, `amber-*` becomes the brand orange and `white` becomes paper, the
+// near-white surface that sits on the cream page.
 const navy = '#2D3A64';
 const orange = '#ECB450';
 const cream = '#FEFBE5';
+const paper = '#FFFDF5'; // surfaces on the cream page (brand.css --robin-paper)
 
 // Navy over cream. 400 is >= 3:1 on cream (icons, placeholders); 500 and up are
 // >= 4.5:1 (text).
@@ -45,13 +47,14 @@ module.exports = {
         navy,
         orange: accent,
         cream,
+        paper,
         slate: ink,
         gray: ink,
         sky: ink,
         blue: ink,
         amber: accent,
         yellow: accent,
-        white: cream,
+        white: paper,
         black: navy,
       },
       fontFamily: {

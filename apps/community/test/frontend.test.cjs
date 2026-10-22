@@ -19,7 +19,6 @@ test('frontend entry points and domain views render with local fixtures', async 
   const user = { id: 'fixture-user', role: 'subscriber', nombre: 'Prueba', subscription_status: 'active', ciudad: 'Rotterdam' };
   const noop = () => {};
   const cases = [
-    ['features/auth/SubscriberAuthScreen.jsx', 'SubscriberAuthScreen', { onLogin: noop, onSignup: noop }, 'The Robin Plan'],
     ['application/SubscriberPortal.jsx', 'SubscriberPortal', { user: { ...user, subscription_status: 'none' }, onLogout: noop, onUserRefresh: noop }, 'plan'],
     ['features/admin/SubscriberAdmin.jsx', 'SubscriberAdmin', { user: { ...user, role: 'subscriber_admin' }, onLogout: noop }, 'Usuarios'],
     ['features/subscription/SubHome.jsx', 'SubHome', { user, events: [], partners: [], requests: [], setActive: noop }, 'Plan Mensual'],

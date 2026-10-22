@@ -7,6 +7,7 @@ colors:
   navy: "#2D3A64"    # Azul marino: color base; tono oscuro de la paleta
   orange: "#ECB450"  # Naranja intenso: acento; energía, optimismo y cercanía
   cream: "#FEFBE5"   # Amarillo claro: tono claro de la paleta
+  paper: "#FFFDF5"   # amarillo claro casi blanco: superficies sobre el fondo (tarjetas, gráficos, campos, barra superior)
   # Derivados para los portales: azul marino mezclado sobre amarillo claro
   ink-50: "#F6F3E0"   # fondos suaves, filas, estados hover
   ink-100: "#EDECDB"
@@ -46,17 +47,22 @@ rounded:
 components:
   top-bar:
     height: 4.75rem
-    backgroundColor: "{colors.cream}"
+    backgroundColor: "{colors.paper}"
     borderColor: "{colors.ink-200}"
     activeMarker: "4px {colors.orange}"
   sidebar:
-    width: 15rem
+    width: 16.5rem
     backgroundColor: "{colors.navy}"
     textColor: "{colors.on-navy-muted}"
     activeMarker: "inset 4px 0 {colors.orange}"
   identity-stamp:
-    backgroundColor: "{colors.cream}"
+    backgroundColor: "{colors.paper}"
     edge: perforated
+    shape: apaisado, mismo tamaño en todos los portales
+  stage-art:
+    robinjr: packages/brand/assets/robin-jr.svg
+    portal: packages/brand/assets/robin-student.svg
+    community: packages/brand/assets/robin-community.svg
 ---
 
 ## Overview
@@ -182,15 +188,21 @@ Portal del alumno, RobinJr, Robin Community y admin (no la web, que es un proyec
   - `packages/portal-nav/robin-shell.css`: menú lateral, títulos y superficies de los portales.
   - `apps/admin/src/styles/brand-shell.css`: lo mismo para el admin.
 - **Fondo y superficies:**
-  - Página en amarillo claro. Tarjetas planas en amarillo claro con línea `ink-200`, sin sombras ni degradados.
+  - Página en amarillo claro. Tarjetas, gráficos, campos y barra superior en `paper` (amarillo claro casi blanco) con línea `ink-200`, sin sombras ni degradados, para que se separen del fondo.
   - Solo flotan, con sombra, los elementos que se superponen: avisos, modales, chat y desplegables.
 - **Barra superior:**
   - Amarillo claro, con el logo tipográfico y el nombre del espacio en la letra de subtítulos.
   - La pestaña activa se marca con una barra naranja debajo.
 - **Menú lateral:**
-  - Azul marino con texto amarillo claro. La opción activa lleva fondo translúcido y una barra naranja a la izquierda.
-  - Quién ha entrado se muestra como un **sello** (borde dentado, elemento de viaje de la marca).
-  - Al pie, una nota con Robin leyendo (`packages/brand/assets/robin-reading.png`).
+  - Azul marino con texto amarillo claro, 16.5rem de ancho y sin scroll: en menús largos las filas se compactan y la nota del pie se oculta.
+  - La opción activa lleva fondo translúcido y una barra naranja a la izquierda.
+  - Quién ha entrado se muestra como un **sello** apaisado (borde dentado, elemento de viaje de la marca) con su foto o iniciales, nombre y papel. En el admin también; no se muestra el espacio en el que está.
+  - Al pie, una nota con el Robin de la etapa centrado.
+- **Robin de cada etapa:** la misma serie de ilustraciones (línea azul marino, pecho naranja) marca cada portal en la nota del menú y junto a su pestaña en la barra superior, en el admin y en los portales.
+  - Robin Jr: Robin saliendo del huevo.
+  - Portal del alumno: Robin con birrete en su monopatín.
+  - Robin Community: Robin, ya mayor, poniéndose un bigote de pega.
+- **Login común:** una postal. A la izquierda, el mensaje (saludo y los tres espacios a los que da acceso, cada uno con su Robin); a la derecha, la dirección (los campos como líneas) y un sello naranja con Robin y las coordenadas de Ámsterdam, el primer destino.
 - **Tipografía:**
   - Títulos de página en display a 2.5rem. Rótulos sobre el título en subtítulo, en minúscula inicial.
   - No se usan rótulos en mayúsculas espaciadas.

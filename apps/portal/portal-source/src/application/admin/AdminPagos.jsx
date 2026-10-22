@@ -125,7 +125,7 @@ export function AdminPagos({ client }) {
                   <button key={n} onClick={() => setCarreras(n)}
                     disabled={busyId === "carreras"}
                     className="rounded-xl border px-3 py-3 text-sm text-left transition disabled:opacity-50"
-                    style={sel ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
+                    style={sel ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
                     <div className="font-bold">{n} {n === 1 ? "carrera" : "carreras"}</div>
                     <div className={`text-xs ${sel ? "text-white/70" : "text-slate-400"}`}>{prices[n]} · total</div>
                   </button>

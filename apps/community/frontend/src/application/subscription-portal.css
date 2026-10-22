@@ -14,15 +14,15 @@
 .student-portal button { transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
 .student-portal button:disabled { cursor: not-allowed; }
 .student-portal [hidden] { display: none !important; }
-.student-skip { position: fixed; left: 16px; top: -80px; z-index: 100; padding: 12px 18px; background: #FEFBE5; border-radius: 12px; }
+.student-skip { position: fixed; left: 16px; top: -80px; z-index: 100; padding: 12px 18px; background: #FFFDF5; border-radius: 12px; }
 .student-skip:focus { top: 12px; }
-.student-header { height: 84px; padding: 0 max(28px, calc((100vw - 1376px) / 2)); display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #FEFBE5; border-bottom: 1px solid #EDECDB; position: sticky; top: 0; z-index: 30; }
+.student-header { height: 84px; padding: 0 max(28px, calc((100vw - 1376px) / 2)); display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #FFFDF5; border-bottom: 1px solid #EDECDB; position: sticky; top: 0; z-index: 30; }
 .student-brand { display: flex; align-items: center; gap: 28px; background: transparent; border: 0; padding: 0; text-align: left; }
 .student-brand img { width: 96px; height: 50px; object-fit: contain; }
 .student-brand > span { border-left: 1px solid #EDECDB; padding-left: 28px; color: #687088; font-size: 12px; }
 .student-header-account { display: flex; align-items: center; gap: 24px; }
 .student-header-name { font-weight: 600; font-size: 13px; }
-.student-signout { display: flex; align-items: center; gap: 8px; color: #4E5979; border: 1px solid #DFDED2; border-radius: 999px; padding: 10px 16px; background: #FEFBE5; font-size: 12px; font-weight: 600; }
+.student-signout { display: flex; align-items: center; gap: 8px; color: #4E5979; border: 1px solid #DFDED2; border-radius: 999px; padding: 10px 16px; background: #FFFDF5; font-size: 12px; font-weight: 600; }
 .student-signout:hover { background: #F6F3E0; }
 .student-layout { max-width: 1376px; margin: 0 auto; padding: 36px 28px 80px; display: grid; grid-template-columns: 226px minmax(0, 1fr); gap: 48px; align-items: start; }
 .student-sidebar { position: sticky; top: 120px; }
@@ -39,7 +39,7 @@
 .student-nav-item.is-active { background: var(--student-navy); color: #FEFBE5; }
 .student-nav-item svg { flex-shrink: 0; stroke-width: 1.8; }
 .student-nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--student-gold); margin-left: auto; }
-.student-support { margin-top: 18px; border: 1px solid #EDECDB; border-radius: 14px; padding: 16px; background: #FEFBE5; }
+.student-support { margin-top: 18px; border: 1px solid #EDECDB; border-radius: 14px; padding: 16px; background: #FFFDF5; }
 .student-eyebrow { display: block; font-size: 10px; font-weight: 750; letter-spacing:0; line-height: 1.6; }
 .student-support .student-eyebrow { color: #687088; font-size: 9px; }
 .student-support h3 { font-size: 16px; font-weight: 700; line-height: 1.4; margin: 10px 0; letter-spacing: -.03em; }
@@ -58,7 +58,7 @@
 .student-step-pill { width: fit-content; display: flex; align-items: center; gap: 7px; color: #ECB450; font-size: 9px; letter-spacing:0; font-weight: 700; padding: 6px 10px; background: #FEFBE50c; border: 1px solid #FEFBE519; border-radius: 999px; margin-bottom: 18px; }
 .student-step-pill > span { width: 5px; height: 5px; background: var(--student-gold); border-radius: 50%; }
 .student-quick-actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-.student-quick-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 22px; border: 1px solid #EDECDB; border-radius: 18px; background: #FEFBE5; min-width: 0; }
+.student-quick-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 22px; border: 1px solid #EDECDB; border-radius: 18px; background: #FFFDF5; min-width: 0; }
 .student-quick-action:hover { border-color: #C3C5C1; transform: translateY(-2px); }
 .student-quick-icon { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 11px; background: #F6F3E0; margin-bottom: 16px; }
 .student-quick-action:nth-child(2) .student-quick-icon { background: #FCF2D3; }
@@ -73,40 +73,40 @@
 .student-portal .ui-card-header .text-xs { white-space: normal; line-height: 1.6; margin-top: 4px; color: #687088; }
 .student-portal .ui-card-content { padding: 22px 26px; }
 .student-roadmap-step { border: 0 !important; padding: 14px 12px !important; }
-.student-roadmap-step.is-current { background: #FEFBE5 !important; }
+.student-roadmap-step.is-current { background: #FFFDF5 !important; }
 .student-roadmap-step .text-xs { line-height: 1.6; color: #687088; }
 .student-roadmap-step .text-sm { line-height: 1.5; }
 .student-current-label { color: #2D3A64; background: #ECB450; border-radius: 999px; padding: 5px 10px; font-size: 9px; font-weight: 700; white-space: nowrap; }
 .student-footer { display: flex; justify-content: space-between; gap: 16px; padding-top: 20px; border-top: 1px solid #EDECDB; color: #687088; font-size: 10px; margin-top: 32px; }
 .student-footer span:first-child { letter-spacing:0; font-weight: 700; }
 .student-chat-launcher { position: fixed; z-index: 40; bottom: 25px; right: 28px; display: flex; gap: 13px; align-items: center; background: transparent; border: 0; padding: 0; }
-.student-chat-label { padding: 11px 16px; background: #FEFBE5; border: 1px solid #EDECDB; border-radius: 14px; box-shadow: 0 4px 24px #2D3A640d; text-align: right; opacity: 0; transform: translateX(6px); transition: opacity .18s ease, transform .18s ease; pointer-events: none; }
+.student-chat-label { padding: 11px 16px; background: #FFFDF5; border: 1px solid #EDECDB; border-radius: 14px; box-shadow: 0 4px 24px #2D3A640d; text-align: right; opacity: 0; transform: translateX(6px); transition: opacity .18s ease, transform .18s ease; pointer-events: none; }
 .student-chat-launcher:hover .student-chat-label, .student-chat-launcher:focus-visible .student-chat-label { opacity: 1; transform: translateX(0); }
 .student-chat-label strong { display: block; font-size: 11px; font-weight: 700; }
 .student-chat-label > span { display: block; font-size: 10px; margin-top: 3px; color: #687088; }
-.student-chat-mascot { display: block; position: relative; width: 70px; height: 70px; border: 3px solid var(--student-gold); border-radius: 50%; background: #FEFBE5; padding: 8px; box-shadow: 0 8px 28px #2D3A6429; }
+.student-chat-mascot { display: block; position: relative; width: 70px; height: 70px; border: 3px solid var(--student-gold); border-radius: 50%; background: #FFFDF5; padding: 8px; box-shadow: 0 8px 28px #2D3A6429; }
 .student-chat-mascot > img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 .student-chat-launcher:hover .student-chat-mascot { transform: translateY(-3px); }
 .student-chat-spark { position: absolute; right: -1px; bottom: -1px; width: 23px; height: 23px; background: var(--student-navy); color: var(--student-gold); border: 2px solid #FEFBE5; display: grid; place-items: center; border-radius: 50%; }
 .student-chat-scrim { position: fixed; inset: 0; z-index: 49; background: #2D3A6429; }
-.student-chat-panel { position: fixed; z-index: 50; bottom: 24px; right: 24px; width: 430px; height: min(690px, calc(100dvh - 48px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 1px solid #EDECDB; box-shadow: 0 20px 80px #2D3A643d; background: #FEFBE5; }
+.student-chat-panel { position: fixed; z-index: 50; bottom: 24px; right: 24px; width: 430px; height: min(690px, calc(100dvh - 48px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 1px solid #EDECDB; box-shadow: 0 20px 80px #2D3A643d; background: #FFFDF5; }
 .student-chat-header { padding: 18px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #F6F3E0; flex-shrink: 0; }
-.student-chat-header > img { height: 44px; width: 44px; object-fit: contain; border-radius: 50%; background: #FEFBE5; border: 1px solid #F6F3E0; padding: 3px; }
+.student-chat-header > img { height: 44px; width: 44px; object-fit: contain; border-radius: 50%; background: #FFFDF5; border: 1px solid #F6F3E0; padding: 3px; }
 .student-chat-header > div { min-width: 0; flex: 1; }
 .student-chat-header h2 { font-size: 14px; font-weight: 750; letter-spacing: -.02em; }
 .student-chat-header p { font-size: 9px; color: #687088; margin: 5px 0 0; }
 .student-chat-header p span { display: inline-block; width: 5px; height: 5px; background: #4a9f87; border-radius: 50%; margin-right: 5px; }
 .student-chat-header > button { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #F6F3E0; flex-shrink: 0; }
 .student-chat-body { display: flex; flex-direction: column; min-height: 0; flex: 1; }
-.student-chat-messages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 22px 18px; background: #FEFBE5; }
+.student-chat-messages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 22px 18px; background: #FFFDF5; }
 .student-chat-messages > * + * { margin-top: 16px; }
 .student-chat-welcome { padding: 15px 8px; text-align: center; }
-.student-chat-welcome > img { height: 110px; width: 110px; object-fit: contain; border-radius: 50%; background: #FEFBE5; padding: 10px; margin: 0 auto 20px; }
+.student-chat-welcome > img { height: 110px; width: 110px; object-fit: contain; border-radius: 50%; background: #FFFDF5; padding: 10px; margin: 0 auto 20px; }
 .student-chat-welcome .student-eyebrow { font-size: 8px; color: #687088; }
 .student-chat-welcome h3 { margin: 10px 0; font-size: 23px; font-weight: 750; letter-spacing: -.04em; }
 .student-chat-welcome p { font-size: 12px; color: #687088; line-height: 1.8; max-width: 270px; margin: 0 auto; }
 .student-chat-welcome > div { display: grid; gap: 9px; margin-top: 25px; }
-.student-chat-welcome button { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; font-size: 11px; text-align: left; border: 1px solid #EDECDB; border-radius: 11px; background: #FEFBE5; }
+.student-chat-welcome button { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; font-size: 11px; text-align: left; border: 1px solid #EDECDB; border-radius: 11px; background: #FFFDF5; }
 .student-chat-welcome button:hover { border-color: #C3C5C1; }
 .student-chat-compose { display: flex; align-items: end; gap: 10px; padding: 12px 14px; margin: 14px 16px 0; border: 1px solid #DFDED2; border-radius: 16px; }
 .student-chat-compose:focus-within { border-color: #687088; box-shadow: 0 0 0 3px #2D3A6406; }

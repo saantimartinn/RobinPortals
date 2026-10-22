@@ -100,12 +100,6 @@ const sideMenus: Record<string, NavItem[]> = {
   ],
 };
 
-const areaNames: Record<string, string> = {
-  home: "Inicio global",
-  crm: "CRM personal",
-  analytics: "Otras métricas",
-};
-
 function getArea(path: string) {
   if (path.startsWith("/crm")) return "crm";
   if (path.startsWith("/analiticas") || path.startsWith("/campanas") || path.startsWith("/web")) return "analytics";
@@ -336,11 +330,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
           <div><small>Admin</small></div>
           <button onClick={() => setOpen(false)} aria-label="Cerrar menú"><X /></button>
         </div>
-        <div className="context-title">
-          <small>Espacio actual</small>
-          <strong>{areaNames[area]}</strong>
-          {area !== "home" && <span>Vista de {currentUser}</span>}
-        </div>
+        <div className="context-title"><i className={authUser.avatar_url ? "has-photo" : ""}>{authUser.avatar_url ? <img src={authUser.avatar_url} alt="" /> : initials}</i><div><strong>{currentUser}</strong><small>Administración</small></div></div>
         <nav>
           {sideMenus[area].filter(([, , , permission]) => canSee(permission)).map(([href, label, Icon]) => (
             <a href={adminPath(href)} key={href} className={isSideItemActive(path, href) ? "active" : ""} onClick={(event) => {
@@ -353,7 +343,6 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
             </a>
           ))}
         </nav>
-        <div className="profile"><i className={authUser.avatar_url ? "has-photo" : ""}>{authUser.avatar_url ? <img src={authUser.avatar_url} alt="" /> : initials}</i><div><strong>{currentUser}</strong><small>Administración</small></div></div>
       </aside>
 
       {open && <button className="scrim" onClick={() => setOpen(false)} aria-label="Cerrar menú" />}

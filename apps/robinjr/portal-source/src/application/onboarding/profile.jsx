@@ -214,7 +214,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
                   return (
                     <button key={o.value} type="button" onClick={() => toggle(o.value)}
                       className="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition text-left"
-                      style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
+                      style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
                       <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"
                         style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
                         {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}

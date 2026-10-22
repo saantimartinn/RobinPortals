@@ -50,11 +50,11 @@ export function AdminEstadoFases({ client, onChangedPhase }) {
             return (
               <button key={p.key} onClick={() => setP(p.key)} disabled={busy}
                 className="w-full flex items-center gap-4 rounded-xl border px-4 py-3 text-left transition"
-                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#F6F3E0", background: "#FEFBE5" }}>
+                style={act ? { borderColor: NAVY, background: SOFT } : { borderColor: "#F6F3E0", background: "#FFFDF5" }}>
                 <div className="h-8 w-8 rounded-full flex-shrink-0 grid place-items-center font-bold text-sm border-2"
                   style={done ? { background: "#10b981", borderColor: "#10b981", color: "#FEFBE5" }
                     : act ? { background: GOLD, borderColor: GOLD, color: NAVY }
-                    : { background: "#FEFBE5", borderColor: "#EDECDB", color: "#687088" }}>
+                    : { background: "#FFFDF5", borderColor: "#EDECDB", color: "#687088" }}>
                   {done ? <CheckCircle2 className="h-4 w-4" /> : p.key}
                 </div>
                 <div className="flex-1 min-w-0">

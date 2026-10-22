@@ -14,9 +14,9 @@
 .student-portal button { transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
 .student-portal button:disabled { cursor: not-allowed; }
 .student-portal [hidden] { display: none !important; }
-.student-skip { position: fixed; left: 16px; top: -80px; z-index: 100; padding: 12px 18px; background: #FEFBE5; border-radius: 12px; }
+.student-skip { position: fixed; left: 16px; top: -80px; z-index: 100; padding: 12px 18px; background: #FFFDF5; border-radius: 12px; }
 .student-skip:focus { top: 12px; }
-.student-header { height: 84px; padding: 0 max(28px, calc((100vw - 1376px) / 2)); display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #FEFBE5; border-bottom: 1px solid #EDECDB; position: sticky; top: 0; z-index: 30; }
+.student-header { height: 84px; padding: 0 max(28px, calc((100vw - 1376px) / 2)); display: flex; align-items: center; justify-content: space-between; gap: 20px; background: #FFFDF5; border-bottom: 1px solid #EDECDB; position: sticky; top: 0; z-index: 30; }
 .student-brand { display: flex; align-items: center; gap: 28px; background: transparent; border: 0; padding: 0; text-align: left; }
 .student-brand img { width: 96px; height: 50px; object-fit: contain; }
 .student-brand > span { border-left: 1px solid #EDECDB; padding-left: 28px; color: #687088; font-size: 12px; }
@@ -24,10 +24,10 @@
 .student-brand img.student-brand-hatch { width: 50px; height: 50px; }
 .student-header-account { display: flex; align-items: center; gap: 24px; }
 .student-header-name { font-weight: 600; font-size: 13px; }
-.student-signout { display: flex; align-items: center; gap: 8px; color: #4E5979; border: 1px solid #DFDED2; border-radius: 999px; padding: 10px 16px; background: #FEFBE5; font-size: 12px; font-weight: 600; }
+.student-signout { display: flex; align-items: center; gap: 8px; color: #4E5979; border: 1px solid #DFDED2; border-radius: 999px; padding: 10px 16px; background: #FFFDF5; font-size: 12px; font-weight: 600; }
 .student-signout:hover { background: #F6F3E0; }
 .student-layout { max-width: 1376px; margin: 0 auto; padding: 36px 28px 80px; display: grid; grid-template-columns: 226px minmax(0, 1fr); gap: 48px; align-items: start; }
-.student-sidebar { position: sticky; top: 94px; padding: 12px; border: 1px solid #EDECDB; border-radius: 20px; background: #FEFBE5; }
+.student-sidebar { position: sticky; top: 94px; padding: 12px; border: 1px solid #EDECDB; border-radius: 20px; background: #FFFDF5; }
 .student-identity { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 16px 14px; background: var(--student-navy); color: #FEFBE5; border-radius: 14px; }
 .student-avatar { width: 46px; height: 46px; flex: 0 0 46px; background: #FEFBE518; color: #FEFBE5; border: 1px solid #FEFBE535; display: grid; place-items: center; border-radius: 50%; font-size: 18px; font-weight: 700; overflow: hidden; }
 .student-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -41,14 +41,14 @@
 .student-nav-item.is-active { background: var(--student-navy); color: #FEFBE5; }
 .student-nav-item svg { flex-shrink: 0; stroke-width: 1.8; }
 .student-nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--student-gold); margin-left: auto; }
-.student-support { margin-top: 18px; border: 1px solid #EDECDB; border-radius: 14px; padding: 16px; background: #FEFBE5; }
+.student-support { margin-top: 18px; border: 1px solid #EDECDB; border-radius: 14px; padding: 16px; background: #FFFDF5; }
 .student-eyebrow { display: block; font-size: 10px; font-weight: 750; letter-spacing:0; line-height: 1.6; }
 .student-support .student-eyebrow { color: #687088; font-size: 9px; }
 .student-support h3 { font-size: 16px; font-weight: 700; line-height: 1.4; margin: 10px 0; letter-spacing: -.03em; }
 .student-support p { font-size: 12px; color: #687088; line-height: 1.7; }
 .student-support button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; font-size: 11px; font-weight: 700; margin-top: 18px; text-align: left; }
 .student-career-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
-.student-career-card { display: flex; flex-direction: column; min-width: 0; min-height: 218px; padding: 18px; border: 1px solid #EDECDB; border-radius: 18px; background: #FEFBE5; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.student-career-card { display: flex; flex-direction: column; min-width: 0; min-height: 218px; padding: 18px; border: 1px solid #EDECDB; border-radius: 18px; background: #FFFDF5; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
 .student-career-card:hover { border-color: #C3C5C1; transform: translateY(-2px); }
 .student-career-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .student-career-icon { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 13px; background: #F6F3E0; color: var(--student-navy); }
@@ -63,7 +63,7 @@
 .student-career-entry:focus-visible { outline: 3px solid #687088; outline-offset: 3px; }
 .student-career-expand-label { color: #687088; font-size: 10px; font-weight: 700; }
 .student-career-modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px; background: rgba(20,29,46,.58); }
-.student-career-modal { position: relative; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); width: min(760px,100%); max-height: min(760px,calc(100dvh - 48px)); overflow: auto; border: 1px solid #FEFBE5aa; border-radius: 22px; background: #FEFBE5; box-shadow: 0 28px 90px #2D3A6445; animation: student-career-modal-in .18s ease-out; }
+.student-career-modal { position: relative; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); width: min(760px,100%); max-height: min(760px,calc(100dvh - 48px)); overflow: auto; border: 1px solid #FEFBE5aa; border-radius: 22px; background: #FFFDF5; box-shadow: 0 28px 90px #2D3A6445; animation: student-career-modal-in .18s ease-out; }
 .student-career-modal-close { position: absolute; z-index: 1; top: 13px; right: 13px; display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #EDECDB; border-radius: 50%; background: #FEFBE5ed; color: #2D3A64; box-shadow: 0 3px 12px #2D3A6415; cursor: pointer; }
 .student-career-modal-close:focus-visible { outline: 3px solid #687088; outline-offset: 2px; }
 .student-career-modal-photo { display: block; width: 100%; height: 100%; min-height: 360px; max-height: 600px; object-fit: cover; background: #F6F3E0; }
@@ -86,14 +86,14 @@
 .student-career-photo-card > .student-career-card-bottom { margin-top: auto; margin-bottom: 15px; }
 .admin-career-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .admin-career-card { min-height: 255px; }
-.admin-career-card.is-assigned { border-color: #DFDED2; background: #FEFBE5; }
+.admin-career-card.is-assigned { border-color: #DFDED2; background: #FFFDF5; }
 .admin-career-status { color: #687088; font-size: 10px; font-weight: 700; }
 .admin-career-status.is-assigned { color: #34745c; }
 .admin-career-counts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
 .admin-career-counts span { padding: 5px 8px; border-radius: 999px; background: #F6F3E0; color: #687088; font-size: 10px; font-weight: 600; }
 .admin-career-card-actions { display: flex; align-items: center; gap: 7px; margin-top: auto; padding-top: 15px; }
 .admin-career-card-actions > button { min-height: 34px; padding: 7px 10px; font-size: 11px; }
-.admin-career-delete { display: grid; place-items: center; width: 34px; height: 34px; margin-left: auto; border: 1px solid #EDECDB; border-radius: 10px; background: #FEFBE5; color: #687088; }
+.admin-career-delete { display: grid; place-items: center; width: 34px; height: 34px; margin-left: auto; border: 1px solid #EDECDB; border-radius: 10px; background: #FFFDF5; color: #687088; }
 .admin-career-delete:hover:not(:disabled) { border-color: #f1cbd0; color: #bd5361; background: #fff8f8; }
 .admin-career-delete:disabled { opacity: .5; }
 .admin-career-photo-card { min-height: 440px; }
@@ -107,13 +107,13 @@
 .admin-career-detail-line strong { color: #4E5979; font-size: 10px; }
 .admin-career-photo-card > .admin-career-card-actions { margin-top: auto; margin-bottom: 15px; }
 .admin-career-editor-grid { display: grid; grid-template-columns: minmax(210px,.7fr) minmax(0,1.3fr); gap: 20px; align-items: start; }
-.admin-career-photo-upload { position: relative; display: grid; place-items: center; min-height: 220px; overflow: hidden; border: 1px dashed #DFDED2; border-radius: 16px; background: #FEFBE5; color: #687088; cursor: pointer; text-align: center; }
+.admin-career-photo-upload { position: relative; display: grid; place-items: center; min-height: 220px; overflow: hidden; border: 1px dashed #DFDED2; border-radius: 16px; background: #FFFDF5; color: #687088; cursor: pointer; text-align: center; }
 .admin-career-photo-upload > span:first-child { display: grid; justify-items: center; gap: 9px; padding: 20px; }
 .admin-career-photo-upload > span:first-child b { color: #4E5979; font-size: 12px; }
 .admin-career-photo-upload > span:first-child small { color: #687088; font-size: 10px; }
 .admin-career-photo-upload > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .admin-career-photo-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-.admin-career-photo-change { position: absolute; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid #FEFBE5aa; border-radius: 999px; background: #FEFBE5; color: #3C486D; font-size: 10px; font-weight: 700; }
+.admin-career-photo-change { position: absolute; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid #FEFBE5aa; border-radius: 999px; background: #FFFDF5; color: #3C486D; font-size: 10px; font-weight: 700; }
 .admin-career-fields { display: grid; gap: 13px; }
 .student-plan-layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(260px,.8fr); gap: 24px; }
 .student-calendar { min-width: 0; }
@@ -121,16 +121,16 @@
 .student-calendar-eyebrow { color: #687088; font-size: 9px; font-weight: 750; letter-spacing:0; }
 .student-calendar-toolbar h2 { margin: 3px 0 0; color: #2D3A64; font-size: 20px; font-weight: 750; text-transform: capitalize; }
 .student-calendar-controls { display: flex; align-items: center; gap: 6px; }
-.student-calendar-today, .student-calendar-arrow { display: grid; place-items: center; min-width: 34px; height: 34px; border: 1px solid #EDECDB; border-radius: 10px; background: #FEFBE5; color: #4E5979; font-size: 11px; font-weight: 650; }
+.student-calendar-today, .student-calendar-arrow { display: grid; place-items: center; min-width: 34px; height: 34px; border: 1px solid #EDECDB; border-radius: 10px; background: #FFFDF5; color: #4E5979; font-size: 11px; font-weight: 650; }
 .student-calendar-today { padding: 0 10px; }
 .student-calendar-arrow { width: 34px; }
-.student-calendar-today:hover, .student-calendar-arrow:hover { border-color: #C3C5C1; color: var(--student-navy); background: #FEFBE5; }
+.student-calendar-today:hover, .student-calendar-arrow:hover { border-color: #C3C5C1; color: var(--student-navy); background: #FFFDF5; }
 .student-calendar-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); border-top: 1px solid #F6F3E0; border-left: 1px solid #F6F3E0; border-radius: 12px; overflow: hidden; }
 .student-calendar-weekday { display: grid; place-items: center; min-height: 34px; border-right: 1px solid #F6F3E0; border-bottom: 1px solid #F6F3E0; color: #687088; font-size: 10px; font-weight: 700; }
-.student-calendar-day { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 7px; min-width: 0; min-height: 66px; padding: 9px 2px 5px; border: 0; border-right: 1px solid #F6F3E0; border-bottom: 1px solid #F6F3E0; background: #FEFBE5; color: #2D3A64; }
-.student-calendar-day:hover { background: #FEFBE5; }
-.student-calendar-day.is-outside { color: #C3C5C1; background: #FEFBE5; }
-.student-calendar-day.is-selected { position: relative; z-index: 1; box-shadow: inset 0 0 0 2px var(--student-navy); background: #FEFBE5; }
+.student-calendar-day { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 7px; min-width: 0; min-height: 66px; padding: 9px 2px 5px; border: 0; border-right: 1px solid #F6F3E0; border-bottom: 1px solid #F6F3E0; background: #FFFDF5; color: #2D3A64; }
+.student-calendar-day:hover { background: #FFFDF5; }
+.student-calendar-day.is-outside { color: #C3C5C1; background: #FFFDF5; }
+.student-calendar-day.is-selected { position: relative; z-index: 1; box-shadow: inset 0 0 0 2px var(--student-navy); background: #FFFDF5; }
 .student-calendar-day.is-today .student-calendar-day-number { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--student-navy); color: #FEFBE5; }
 .student-calendar-day.is-selected.is-today .student-calendar-day-number { background: var(--student-gold); color: var(--student-navy); }
 .student-calendar-day-number { min-height: 25px; font-size: 11px; line-height: 25px; }
@@ -140,7 +140,7 @@
 .student-calendar-dots i.is-call, .student-calendar-legend i.is-call { background: #687088; }
 .student-calendar-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
 .student-calendar-legend span { display: flex; align-items: center; gap: 6px; color: #687088; font-size: 10px; }
-.student-plan-agenda { min-width: 0; padding: 18px; border: 1px solid #EDECDB; border-radius: 16px; background: #FEFBE5; }
+.student-plan-agenda { min-width: 0; padding: 18px; border: 1px solid #EDECDB; border-radius: 16px; background: #FFFDF5; }
 .student-plan-agenda-heading { padding-bottom: 14px; border-bottom: 1px solid #EDECDB; }
 .student-plan-agenda-heading h3 { margin: 5px 0 0; color: #2D3A64; font-size: 14px; font-weight: 700; line-height: 1.5; text-transform: capitalize; }
 .student-plan-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 38px 10px; color: #687088; text-align: center; }
@@ -148,7 +148,7 @@
 .student-plan-empty strong { color: #4E5979; font-size: 12px; }
 .student-plan-empty span { max-width: 190px; font-size: 11px; line-height: 1.6; }
 .student-plan-items { display: grid; gap: 10px; padding-top: 14px; }
-.student-plan-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid #EDECDB; border-radius: 12px; background: #FEFBE5; }
+.student-plan-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid #EDECDB; border-radius: 12px; background: #FFFDF5; }
 .student-plan-item-icon { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 10px; background: #F6F3E0; color: #687088; }
 .student-plan-item.is-document .student-plan-item-icon { background: #eaf4ef; color: #498165; }
 .student-plan-item.is-event .student-plan-item-icon { background: #FCF2D3; color: #2D3A64; }
@@ -167,7 +167,7 @@
 .student-step-pill { width: fit-content; display: flex; align-items: center; gap: 7px; color: #ECB450; font-size: 9px; letter-spacing:0; font-weight: 700; padding: 6px 10px; background: #FEFBE50c; border: 1px solid #FEFBE519; border-radius: 999px; margin-bottom: 18px; }
 .student-step-pill > span { width: 5px; height: 5px; background: var(--student-gold); border-radius: 50%; }
 .student-quick-actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-.student-quick-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 22px; border: 1px solid #EDECDB; border-radius: 18px; background: #FEFBE5; min-width: 0; }
+.student-quick-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 22px; border: 1px solid #EDECDB; border-radius: 18px; background: #FFFDF5; min-width: 0; }
 .student-quick-action:hover { border-color: #C3C5C1; transform: translateY(-2px); }
 .student-quick-icon { width: 37px; height: 37px; display: grid; place-items: center; border-radius: 11px; background: #F6F3E0; margin-bottom: 16px; }
 .student-quick-action:nth-child(2) .student-quick-icon { background: #FCF2D3; }
@@ -182,40 +182,40 @@
 .student-portal .ui-card-header .text-xs { white-space: normal; line-height: 1.6; margin-top: 4px; color: #687088; }
 .student-portal .ui-card-content { padding: 22px 26px; }
 .student-roadmap-step { border: 0 !important; padding: 14px 12px !important; }
-.student-roadmap-step.is-current { background: #FEFBE5 !important; }
+.student-roadmap-step.is-current { background: #FFFDF5 !important; }
 .student-roadmap-step .text-xs { line-height: 1.6; color: #687088; }
 .student-roadmap-step .text-sm { line-height: 1.5; }
 .student-current-label { color: #2D3A64; background: #ECB450; border-radius: 999px; padding: 5px 10px; font-size: 9px; font-weight: 700; white-space: nowrap; }
 .student-footer { display: flex; justify-content: space-between; gap: 16px; padding-top: 20px; border-top: 1px solid #EDECDB; color: #687088; font-size: 10px; margin-top: 32px; }
 .student-footer span:first-child { letter-spacing:0; font-weight: 700; }
 .student-chat-launcher { position: fixed; z-index: 40; bottom: 25px; right: 28px; display: flex; gap: 13px; align-items: center; background: transparent; border: 0; padding: 0; }
-.student-chat-label { padding: 11px 16px; background: #FEFBE5; border: 1px solid #EDECDB; border-radius: 14px; box-shadow: 0 4px 24px #2D3A640d; text-align: right; opacity: 0; transform: translateX(6px); transition: opacity .18s ease, transform .18s ease; pointer-events: none; }
+.student-chat-label { padding: 11px 16px; background: #FFFDF5; border: 1px solid #EDECDB; border-radius: 14px; box-shadow: 0 4px 24px #2D3A640d; text-align: right; opacity: 0; transform: translateX(6px); transition: opacity .18s ease, transform .18s ease; pointer-events: none; }
 .student-chat-launcher:hover .student-chat-label, .student-chat-launcher:focus-visible .student-chat-label { opacity: 1; transform: translateX(0); }
 .student-chat-label strong { display: block; font-size: 11px; font-weight: 700; }
 .student-chat-label > span { display: block; font-size: 10px; margin-top: 3px; color: #687088; }
-.student-chat-mascot { display: block; position: relative; width: 70px; height: 70px; border: 3px solid var(--student-gold); border-radius: 50%; background: #FEFBE5; padding: 8px; box-shadow: 0 8px 28px #2D3A6429; }
+.student-chat-mascot { display: block; position: relative; width: 70px; height: 70px; border: 3px solid var(--student-gold); border-radius: 50%; background: #FFFDF5; padding: 8px; box-shadow: 0 8px 28px #2D3A6429; }
 .student-chat-mascot > img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 .student-chat-launcher:hover .student-chat-mascot { transform: translateY(-3px); }
 .student-chat-spark { position: absolute; right: -1px; bottom: -1px; width: 23px; height: 23px; background: var(--student-navy); color: var(--student-gold); border: 2px solid #FEFBE5; display: grid; place-items: center; border-radius: 50%; }
 .student-chat-scrim { position: fixed; inset: 0; z-index: 49; background: #2D3A6429; }
-.student-chat-panel { position: fixed; z-index: 50; bottom: 24px; right: 24px; width: 430px; height: min(690px, calc(100dvh - 48px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 1px solid #EDECDB; box-shadow: 0 20px 80px #2D3A643d; background: #FEFBE5; }
+.student-chat-panel { position: fixed; z-index: 50; bottom: 24px; right: 24px; width: 430px; height: min(690px, calc(100dvh - 48px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 1px solid #EDECDB; box-shadow: 0 20px 80px #2D3A643d; background: #FFFDF5; }
 .student-chat-header { padding: 18px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #F6F3E0; flex-shrink: 0; }
-.student-chat-header > img { height: 44px; width: 44px; object-fit: contain; border-radius: 50%; background: #FEFBE5; border: 1px solid #F6F3E0; padding: 3px; }
+.student-chat-header > img { height: 44px; width: 44px; object-fit: contain; border-radius: 50%; background: #FFFDF5; border: 1px solid #F6F3E0; padding: 3px; }
 .student-chat-header > div { min-width: 0; flex: 1; }
 .student-chat-header h2 { font-size: 14px; font-weight: 750; letter-spacing: -.02em; }
 .student-chat-header p { font-size: 9px; color: #687088; margin: 5px 0 0; }
 .student-chat-header p span { display: inline-block; width: 5px; height: 5px; background: #4a9f87; border-radius: 50%; margin-right: 5px; }
 .student-chat-header > button { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #F6F3E0; flex-shrink: 0; }
 .student-chat-body { display: flex; flex-direction: column; min-height: 0; flex: 1; }
-.student-chat-messages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 22px 18px; background: #FEFBE5; }
+.student-chat-messages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 22px 18px; background: #FFFDF5; }
 .student-chat-messages > * + * { margin-top: 16px; }
 .student-chat-welcome { padding: 15px 8px; text-align: center; }
-.student-chat-welcome > img { height: 110px; width: 110px; object-fit: contain; border-radius: 50%; background: #FEFBE5; padding: 10px; margin: 0 auto 20px; }
+.student-chat-welcome > img { height: 110px; width: 110px; object-fit: contain; border-radius: 50%; background: #FFFDF5; padding: 10px; margin: 0 auto 20px; }
 .student-chat-welcome .student-eyebrow { font-size: 8px; color: #687088; }
 .student-chat-welcome h3 { margin: 10px 0; font-size: 23px; font-weight: 750; letter-spacing: -.04em; }
 .student-chat-welcome p { font-size: 12px; color: #687088; line-height: 1.8; max-width: 270px; margin: 0 auto; }
 .student-chat-welcome > div { display: grid; gap: 9px; margin-top: 25px; }
-.student-chat-welcome button { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; font-size: 11px; text-align: left; border: 1px solid #EDECDB; border-radius: 11px; background: #FEFBE5; }
+.student-chat-welcome button { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px; font-size: 11px; text-align: left; border: 1px solid #EDECDB; border-radius: 11px; background: #FFFDF5; }
 .student-chat-welcome button:hover { border-color: #C3C5C1; }
 .student-chat-compose { display: flex; align-items: end; gap: 10px; padding: 12px 14px; margin: 14px 16px 0; border: 1px solid #DFDED2; border-radius: 16px; }
 .student-chat-compose:focus-within { border-color: #687088; box-shadow: 0 0 0 3px #2D3A6406; }

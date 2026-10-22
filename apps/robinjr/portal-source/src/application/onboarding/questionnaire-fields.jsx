@@ -86,7 +86,7 @@ function QChoiceGrid({ options, value, multi, max, onChange }) {
         return (
           <button key={ov} type="button" onClick={() => pick(ov)}
             className="flex items-center gap-2 rounded-xl border px-3 py-2 text-[13px] font-medium text-left transition"
-            style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FEFBE5", color: "#4E5979", borderColor: "#EDECDB" }}>
+            style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
             <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"
               style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
               {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}

@@ -95,13 +95,13 @@ export function AdminNotificaciones({ adminId, clients }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button type="button" onClick={() => setType("info")}
                 className="text-left rounded-xl border px-4 py-3 transition"
-                style={type === "info" ? { borderColor: NAVY, background: "#FEFBE5" } : { borderColor: "#EDECDB" }}>
+                style={type === "info" ? { borderColor: NAVY, background: "#FFFDF5" } : { borderColor: "#EDECDB" }}>
                 <div className="flex items-center gap-2 font-semibold text-sm text-slate-800"><Bell className="h-4 w-4" style={{ color: NAVY }} /> Informativa</div>
                 <div className="text-xs text-slate-500 mt-1">El cliente solo la lee y confirma. Se muestra una vez.</div>
               </button>
               <button type="button" onClick={() => setType("terms")}
                 className="text-left rounded-xl border px-4 py-3 transition"
-                style={type === "terms" ? { borderColor: NAVY, background: "#FEFBE5" } : { borderColor: "#EDECDB" }}>
+                style={type === "terms" ? { borderColor: NAVY, background: "#FFFDF5" } : { borderColor: "#EDECDB" }}>
                 <div className="flex items-center gap-2 font-semibold text-sm text-slate-800"><FileText className="h-4 w-4" style={{ color: NAVY }} /> Cambio de términos</div>
                 <div className="text-xs text-slate-500 mt-1">Implica un cambio en los términos del contrato. El cliente debe aceptarlo y recibe email de confirmación.</div>
               </button>

@@ -1,12 +1,15 @@
 // Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useRef, useState } from "react";
 import { loginUrl, ROBIN_LINKS } from "../../../../packages/portal-nav/links.js";
-import { AlertCircle, ArrowLeft, ChevronRight, Loader2 } from "lucide-react";
-import robinLogoTransparent from "./assets/robin-logo-transparent.png";
+import { AlertCircle, Loader2 } from "lucide-react";
+import robinWordmark from "./assets/robin-wordmark.png";
+import robinJrArt from "../../../../packages/brand/assets/robin-jr.svg";
+import robinStudentArt from "../../../../packages/brand/assets/robin-student.svg";
+import robinCommunityArt from "../../../../packages/brand/assets/robin-community.svg";
+import "./login.css";
 
 import { isAdminUser } from "./session.js";
-import { CANVAS, NAVY, NAVY_DARK } from "./theme.js";
-import { Btn, Field } from "./ui.jsx";
+import { CANVAS } from "./theme.js";
 import { reportClientError } from "./client-utils.js";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
@@ -246,7 +249,7 @@ export default function PortalRobin() {
     );
   }
 
-  if (!authState.user) return <LoginScreen onLogin={handleLogin} onBack={() => window.location.assign("/login")} />;
+  if (!authState.user) return <LoginScreen onLogin={handleLogin} />;
   if (isAdminUser(authState.user)) return <>
     <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <AdminPortal user={authState.user} />
@@ -282,69 +285,22 @@ export default function PortalRobin() {
   );
 }
 
-function AuthShell({ children }) {
-  return (
-    <div className="min-h-screen flex bg-white" style={{ fontFamily: "var(--robin-font-text)" }}>
-      <div
-        className="hidden lg:flex flex-col justify-between w-[min(39vw,480px)] flex-shrink-0 px-11 py-11 relative overflow-hidden"
-        style={{ background: NAVY }}
-      >
-        <div className="absolute inset-0 opacity-5">
-          {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="absolute rounded-full border border-white"
-              style={{ width: (index + 1) * 180, height: (index + 1) * 180, top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
-            />
-          ))}
-        </div>
-        <div className="relative flex items-center gap-3" aria-label="Robin">
-          <img src={robinLogoTransparent} alt="Robin" className="h-[94px] w-28 object-contain" />
-        </div>
-        <div className="relative">
-          <div className="text-[clamp(36px,3.6vw,46px)] font-bold text-white mb-5 tracking-[-.03em]" style={{ fontFamily: "var(--robin-font-display)", lineHeight: 1.1 }}>
-            Tu futuro<br />empieza aquí.
-          </div>
-          <div className="max-w-[300px] text-[13px] text-white/60 leading-relaxed">
-            Project Robin te acompaña en cada paso del proceso de admisión a las mejores universidades.
-          </div>
-        </div>
-        <div className="relative text-white/30 text-xs">
-          <a
-            href="/admin"
-            className="transition-colors hover:text-white/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-white/70"
-          >
-            © Project Robin · Portal de Cliente
-          </a>
-        </div>
-      </div>
-      <div className="flex-1 flex flex-col items-center justify-center px-7 py-12">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8 text-[#2D3A64]">
-            <img src={robinLogoTransparent} alt="Robin" className="h-20 w-24 rounded-2xl bg-[#2D3A64] p-2 object-contain" />
-          </div>
-          {children}
-          <div className="mt-8 text-center text-xs text-[#2D3A64]/40 lg:hidden">
-            <a
-              href="/admin"
-              className="transition-colors hover:text-[#2D3A64]/70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#2D3A64]/70"
-            >
-              © Project Robin · Portal de Cliente
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// The common login as a postcard (DESIGN.md, elementos visuales): the message
+// side says what this sign-in opens, the address side holds the form and a stamp.
+const STAGES = [
+  [robinJrArt, "Robin Jr", "Para descubrir qué quieres estudiar."],
+  [robinStudentArt, "Portal del alumno", "Tu admisión, paso a paso."],
+  [robinCommunityArt, "Robin Community", "Tu vida fuera, con la comunidad."],
+];
 
-function LoginScreen({ onLogin, onBack }) {
+function LoginScreen({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function submit() {
+  async function submit(event) {
+    event.preventDefault();
     if (!email || !password) return;
     setLoading(true);
     setError("");
@@ -362,31 +318,38 @@ function LoginScreen({ onLogin, onBack }) {
   }
 
   return (
-    <AuthShell>
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        <div className="p-7 sm:p-8 space-y-5">
-          <button type="button" onClick={onBack} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-slate-800">
-            <ArrowLeft className="h-4 w-4" /> Volver al portal
+    <main className="robin-login">
+      <img className="robin-login-wordmark" src={robinWordmark} alt="Robin" />
+      <div className="robin-postcard">
+        <section className="robin-postcard-message" aria-labelledby="robin-login-title">
+          <h1 id="robin-login-title">Hola de nuevo.</h1>
+          <p className="robin-postcard-lead">Con este acceso entras a tu espacio en Robin, estés en la etapa que estés.</p>
+          <ul className="robin-postcard-stages">
+            {STAGES.map(([art, name, line]) => (
+              <li key={name}><img src={art} alt="" /><span><strong>{name}</strong>{line}</span></li>
+            ))}
+          </ul>
+        </section>
+        <form className="robin-postcard-address" onSubmit={submit} noValidate>
+          <div className="robin-postcard-stamp" aria-hidden="true">
+            <img src={robinStudentArt} alt="" />
+            <span>52°22′N 4°54′E</span>
+          </div>
+          <label className="robin-postcard-line">
+            <span>Usuario o correo</span>
+            <input type="text" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" />
+          </label>
+          <label className="robin-postcard-line">
+            <span>Contraseña</span>
+            <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          </label>
+          {error && <p className="robin-postcard-error" role="alert"><AlertCircle className="h-4 w-4 flex-shrink-0" />{error}</p>}
+          <button className="robin-postcard-submit" type="submit" disabled={!email || !password || loading}>
+            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : "Entrar"}
           </button>
-          <div>
-            <div className="text-xl font-bold text-slate-900 mb-1" style={{ fontFamily: "var(--robin-font-display)" }}>Bienvenido de vuelta</div>
-            <div className="text-sm text-slate-500">Accede a tu portal personalizado</div>
-          </div>
-          <Field label="Usuario o correo" value={email} onChange={setEmail} placeholder="tu@correo.com" />
-          <Field label="Contraseña" type="password" value={password} onChange={setPassword} placeholder="••••••••" />
-          {error && (
-            <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /><span>{error}</span>
-            </div>
-          )}
-          <Btn onClick={submit} disabled={!email || !password || loading} className="w-full" size="lg">
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : <>Entrar <ChevronRight className="h-4 w-4" /></>}
-          </Btn>
-          <div className="text-xs text-slate-400 text-center">
-            Si acabas de unirte, tu usuario es el número de ID que te enviamos.
-          </div>
-        </div>
+          <p className="robin-postcard-hint">Si acabas de unirte, tu usuario es el número de ID que te enviamos.</p>
+        </form>
       </div>
-    </AuthShell>
+    </main>
   );
 }
