@@ -1,5 +1,5 @@
 // Admin interface component for admin path; composed by the shell or a feature module.
+// The admin is always served under /admin of the shared Robin site.
 export function adminPath(path: string) {
-  if (typeof window === "undefined" || !/(^|\.)project-robin\.com$/i.test(window.location.hostname)) return path;
   return `/admin${path === "/" ? "" : path}`;
 }
