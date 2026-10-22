@@ -8,6 +8,8 @@ const apiFetch = (input: RequestInfo | URL, init?: RequestInit) =>
 export type EditableMetricRecord = { id: string; label: string; value: string; detail: string; group?: string };
 export type CrmEmailDraft = { subject: string; body: string; recipientIds: string[]; campaignFilter: string };
 export type CrmEmailTemplate = { id: string; name: string; subject: string; body: string; updatedAt?: string };
+// Consultation booked on the website (hello@ calendar), matched to leads by email.
+export type WebBooking = { eventId: string; start: string; end?: string; emails: string[]; name?: string | null; meetUrl?: string | null };
 export type LeadTeamNote = { id: string; leadId: string; body: string; authorName: string; createdAt: string };
 export type LeadCall = { id: string; leadId: string; durationMinutes: number; notes: string; authorName: string; occurredAt: string };
 export type FutureAcademicYear = "2027-28" | "2028-29";
@@ -132,8 +134,11 @@ function toContact(row: Record<string, any>): Contact {
   const campaign = [payloadCampaign, storedCampaign].find((value) => value && !value.startsWith("meta-ad:") && !isNotionUrl(value)) || "Pendiente de identificar";
   const comment = row.comment || row.body_text || row.summary || formNotes || remainingFormDetails || "";
   const countryField = fieldValue(fields, /(^|_)(pais|country)($|_)/);
-  const country = countryFromComment(sourceComment) === "Otros" ? countryFromComment(`País: ${countryField}`) : countryFromComment(sourceComment);
-  return { id: row.id, displayId: row.display_id || undefined, name, initials: name.split(/\s+/).slice(0, 2).map((part: string) => part[0] || "").join("").toUpperCase(), email: row.email || fieldValue(fields, /^e?mail$/, /^correo/) || "", phone: row.phone || fieldValue(fields, /phone/, /telefono/, /movil/) || "", country, university: row.school_name || "", course, interest, comment, contactAt: row.contact_at || undefined, contactRole: row.contact_role || undefined, product: "Aplicación", status: statusFor(stage), source: sourceFor(row), campaign, owner: row.owner_names?.[0] || "", probability: Number(row.heat || 0), nextAction: "", lastContact: row.contact_at || "—", value: 0, tags: [], databaseFields: databaseFieldValues(row), formName, category: category as LeadCategory | undefined, heat: Number(row.heat ?? 50), notes: comment, stage, lostAt: row.lost_at || undefined, lostReason: row.source_payload?.lost_reason || undefined, lostReasonDetail: row.source_payload?.lost_reason_detail || undefined, createdAt: row.source_created_at || row.created_at || undefined, clientAt: row.inside_at || undefined, meetingAt: row.source_payload?.meeting_start || undefined };
+  const commentCountry = countryFromComment(sourceComment) === "Otros" ? countryFromComment(`País: ${countryField}`) : countryFromComment(sourceComment);
+  // Website forms only tag Portugal pages; otherwise the form language tells the market.
+  const webLang = row.source_payload?.source === "website" ? String(row.source_payload?.lang || "").toLowerCase() : "";
+  const country = commentCountry !== "Otros" ? commentCountry : webLang === "es" ? "España" : webLang === "pt" ? "Portugal" : "Otros";
+  return { id: row.id, displayId: row.display_id || undefined, name, initials: name.split(/\s+/).slice(0, 2).map((part: string) => part[0] || "").join("").toUpperCase(), email: row.email || fieldValue(fields, /^e?mail$/, /^correo/) || "", phone: row.phone || fieldValue(fields, /phone/, /telefono/, /movil/) || "", country, university: row.school_name || "", course, interest, comment, contactAt: row.contact_at || undefined, contactRole: row.contact_role || undefined, product: "Aplicación", status: statusFor(stage), source: sourceFor(row), campaign, owner: row.owner_names?.[0] || "", probability: Number(row.heat || 0), nextAction: "", lastContact: row.contact_at || "—", value: 0, tags: [], databaseFields: databaseFieldValues(row), formName, category: category as LeadCategory | undefined, heat: Number(row.heat ?? 50), notes: comment, stage, lostAt: row.lost_at || undefined, lostReason: row.source_payload?.lost_reason || undefined, lostReasonDetail: row.source_payload?.lost_reason_detail || undefined, createdAt: row.source_created_at || row.created_at || undefined, clientAt: row.inside_at || undefined };
 }
 
 export const adminDataClient = {
@@ -166,6 +171,11 @@ export const adminDataClient = {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.detail || "No se pudo guardar la nota del equipo");
     return payload.note;
+  },
+  async listBookings(): Promise<WebBooking[]> {
+    const response = await apiFetch("/api/admin/crm/bookings", { credentials: "include" });
+    if (!response.ok) throw new Error("No se pudieron cargar las reservas de consulta");
+    return (await response.json()).bookings || [];
   },
   async listLeads(): Promise<Contact[]> {
     const response = await apiFetch("/api/admin/crm/leads", { credentials: "include" });

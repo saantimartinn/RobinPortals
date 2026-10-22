@@ -11,6 +11,7 @@
  *   - createMeetEvent({...})               -> crea evento Calendar con enlace Meet
  *   - deleteCalendarEvent(advisorEmail, eventId) -> elimina un evento creado
  *   - listTranscriptEntries(advisorEmail, transcriptName) -> texto de la transcripción (Meet REST API)
+ *   - listWebBookings(timeMin, timeMax)    -> reservas de consulta hechas en la web (calendario de hello@)
  *
  * Diseño best-effort: si Google falla, se lanza error controlado y el caller decide.
  * No usa googleapis; fetch nativo de Node 18+.
@@ -21,16 +22,24 @@ const OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const CAL_API = 'https://www.googleapis.com/calendar/v3';
 const MEET_API = 'https://meet.googleapis.com/v2';
 
+// La web crea cada reserva de consulta en el calendario de hello@ (no es un asesor).
+const BOOKING_CALENDAR = 'hello@project-robin.com';
+
 // cache de access tokens por asesor: { [email]: { token, exp } }
 const _cache = {};
 
+function calendarRefreshToken(email) {
+  if (email === BOOKING_CALENDAR) return String(process.env.GOOGLE_REFRESH_TOKEN_HELLO || '').trim() || null;
+  return refreshTokenFor(email);
+}
+
 function isConfigured(advisorEmail) {
-  return !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && refreshTokenFor(advisorEmail));
+  return !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && calendarRefreshToken(String(advisorEmail || '').toLowerCase()));
 }
 
 async function getAccessToken(advisorEmail) {
   const key = String(advisorEmail || '').toLowerCase();
-  const refresh = refreshTokenFor(key);
+  const refresh = calendarRefreshToken(key);
   if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !refresh) {
     throw new Error('google_calendar_not_configured:' + key);
   }
@@ -113,6 +122,47 @@ async function listEvents(advisorEmail, timeMinIso, timeMaxIso) {
         allDay: !!(ev.start && ev.start.date && !ev.start.dateTime),
         transparency: ev.transparency || 'opaque',
         status: ev.status || 'confirmed',
+      });
+    });
+    pageToken = data.nextPageToken || '';
+  } while (pageToken);
+  return items;
+}
+
+/**
+ * Reservas de consulta hechas en la web: eventos del calendario de hello@ que la
+ * web marca con extendedProperties.private.source = 'project-robin-web'.
+ * @returns {Promise<Array<{eventId,start,end,emails:string[],name,meetUrl}>>}
+ */
+const guests = (ev) => (ev.attendees || []).filter((a) => a.email && !String(a.email).toLowerCase().endsWith('@project-robin.com'));
+
+async function listWebBookings(timeMinIso, timeMaxIso) {
+  const token = await getAccessToken(BOOKING_CALENDAR);
+  const base = new URLSearchParams({
+    timeMin: timeMinIso,
+    timeMax: timeMaxIso,
+    singleEvents: 'true',
+    orderBy: 'startTime',
+    maxResults: '2500',
+    privateExtendedProperty: 'source=project-robin-web',
+  });
+  let pageToken = '';
+  const items = [];
+  do {
+    const url = `${CAL_API}/calendars/primary/events?${base.toString()}` + (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+    const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error('google_events_list_error: ' + JSON.stringify(data).slice(0, 400));
+    (data.items || []).forEach((ev) => {
+      const start = ev.start && ev.start.dateTime;
+      if (ev.status === 'cancelled' || !start) return;
+      items.push({
+        eventId: ev.id,
+        start,
+        end: ev.end && ev.end.dateTime,
+        emails: guests(ev).map((a) => String(a.email).toLowerCase()),
+        name: (guests(ev)[0] || {}).displayName || null,
+        meetUrl: ev.hangoutLink || null,
       });
     });
     pageToken = data.nextPageToken || '';
@@ -279,6 +329,7 @@ module.exports = {
   getAccessToken,
   freeBusy,
   listEvents,
+  listWebBookings,
   createMeetEvent,
   deleteCalendarEvent,
   listTranscriptEntries,
