@@ -43,7 +43,6 @@ de los dos portales; no se comparte el secreto JWT entre despliegues.
 |---|---|
 | `frontend/src/api/` | Fachada API del navegador con cookies same-origin y funciones por endpoint. |
 | `frontend/src/application/` | Root shell, portal subscriber, navigation y selector de plan. |
-| `frontend/src/features/auth/` | Login/signup/reset y hook para estado/submit de autenticación. |
 | `frontend/src/features/subscription/`, `profile/`, `career/`, `services/`, `levels/`, `community/` | Pantallas agrupadas por dominios del producto. |
 | `frontend/src/features/admin/` | Admin de usuarios, catálogo, contenido, mensajes, eventos y database console. |
 | `frontend/src/shared/`, `assets/`, `public/` | Primitives, tema/session helpers, logos y recursos. |
