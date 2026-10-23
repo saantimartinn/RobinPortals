@@ -9,7 +9,7 @@ import contractContent from "../../../../shared/contract-content.cjs";
 import financialConfig from "../../../../shared/financial-config.cjs";
 
 const { contractVariant: selectContractVariant } = contractContent;
-const { usesInternational2700Plan } = financialConfig;
+const { pricingVersionForNewUser, usesInternational2700Plan } = financialConfig;
 
 export function OnboardingContract({ user, onLogout, onDone }) {
   const today = new Date();
@@ -37,7 +37,10 @@ export function OnboardingContract({ user, onLogout, onDone }) {
   const alumnoDni = user.dni_numero || "—";
   const alumnoDireccion = user.direccion || "—";
 
-  const contractVariant = selectContractVariant(tipo, contrato2700, user.pricing_version);
+  const pricingVersion = user.contract_signed
+    ? user.pricing_version
+    : pricingVersionForNewUser(tipo);
+  const contractVariant = selectContractVariant(tipo, contrato2700, pricingVersion);
 
   const [nombreCliente, setNombreCliente] = useState("");
   const [dniCliente, setDniCliente] = useState("");

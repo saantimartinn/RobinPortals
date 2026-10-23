@@ -8,7 +8,7 @@ const { passwordPolicy } = require('../../shared/password-policy.cjs');
 const { createOperationLogger, errorCode } = require('../../lib/observability');
 const { sendAccountAccessEmail } = require('../../lib/account-access-email');
 const { TRIGGER_STATUS, ensureDriveFolder, logEvent, mapResponsableToAdminEmail, normalizeTipo, parsePayload } = require('../../lib/notion');
-const { pricingVersionForNewUser } = require('../../shared/financial-config.cjs');
+const { contractPricingVersion, pricingVersionForNewUser } = require('../../shared/financial-config.cjs');
 
 exports.handler = async (event) => {
   const log = createOperationLogger(event, {
@@ -90,7 +90,7 @@ exports.handler = async (event) => {
     // Idempotencia: si ya existe el cliente, actualiza assigned_to y notion_page_id si vienen.
     const { data: existing } = await sb
       .from('users')
-      .select('id, username, assigned_to, pago_completed')
+      .select('id, username, assigned_to, pago_completed, tipo, contract_signed, contract_data')
       .eq('lead_id', String(lead_id))
       .maybeSingle();
     if (existing) {
@@ -98,6 +98,18 @@ exports.handler = async (event) => {
       if (assignedEmail && existing.assigned_to !== assignedEmail) patch.assigned_to = assignedEmail;
       if (notion_page_id) patch.notion_page_id = notion_page_id;
       if (tipo) patch.tipo = normalizedTipo;
+      // Reprocesar un lead sin contrato firmado siempre lo deja en la tarifa vigente.
+      // Los datos de contratos firmados se conservan tal cual.
+      if (!existing.contract_signed) {
+        const effectiveTipo = tipo ? normalizedTipo : normalizeTipo(existing.tipo);
+        const pricingVersion = pricingVersionForNewUser(effectiveTipo);
+        if (pricingVersion && contractPricingVersion(existing.contract_data) !== pricingVersion) {
+          const previousContractData = existing.contract_data && typeof existing.contract_data === 'object'
+            ? existing.contract_data
+            : {};
+          patch.contract_data = { ...previousContractData, pricing_version: pricingVersion };
+        }
+      }
       // 1er pago marcado como pagado (p.ej. por transferencia) desde Notion:
       // se salda la primera cuota y se salta el paso de pago del onboarding.
       if (primer_pago_pagado && !existing.pago_completed) {

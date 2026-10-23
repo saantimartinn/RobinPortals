@@ -14,8 +14,8 @@ const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = req
 const { sendEmail } = require('../../lib/email');
 const { buildContractPdf } = require('../../lib/contract-pdf');
 const {
-  DELFT_PRICE_VERSION,
   contractPricingVersion,
+  pricingVersionForNewUser,
   usesInternational2700Plan,
 } = require('../../shared/financial-config.cjs');
 const storage = require('../../lib/storage');
@@ -101,7 +101,7 @@ exports.handler = async (event) => {
     const esPasaporte = esOtros && u.has_eu_id === false;
     const signatureMime = (/^data:([^;,]+)/.exec(String(signature_content)) || [])[1] || 'image/png';
     const existingPricingVersion = contractPricingVersion(u.contract_data);
-    const pricingVersion = existingPricingVersion || (tipo === 'delft' ? DELFT_PRICE_VERSION : null);
+    const pricingVersion = pricingVersionForNewUser(tipo) || existingPricingVersion;
     const uploadedSignature = isolatedSandbox
       ? { path: null }
       : await storage.uploadDataUrl(sb, signature_content, {

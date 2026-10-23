@@ -65,10 +65,12 @@ test('cada categoría mantiene sus servicios e importes propios', () => {
   assert.doesNotMatch(contractText('mentoria'), /El pago del Pack Llegada/);
 });
 
-test('el contrato General conserva precios históricos solo para clientes existentes', () => {
+test('un contrato General sin versión usa tarifa vigente y la histórica requiere marca explícita', () => {
   const text = (variant) => variant.blocks.flatMap((block) => [block.text, ...(block.items || [])]).filter(Boolean).join('\n');
-  const historical = text(contractVariant('general', false, null));
+  const currentByDefault = text(contractVariant('general', false, null));
+  const historical = text(contractVariant('general', false, 'general-1700-2000-2100-v1'));
   const current = text(contractVariant('general', false, GENERAL_PRICE_VERSION));
+  assert.match(currentByDefault, /Aplicación a 1 grado: 1\.999 €/);
   assert.match(historical, /Aplicación a 1 grado: 1\.700 €/);
   assert.match(historical, /Un tercio \(1\/3\) del total al inicio/);
   assert.match(current, /Aplicación a 1 grado: 1\.999 €/);

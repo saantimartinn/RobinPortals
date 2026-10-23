@@ -2,6 +2,7 @@
 const CURRENCY = 'EUR';
 const DELFT_PRICE_VERSION = 'delft-2999-v1';
 const GENERAL_PRICE_VERSION = 'general-1999-2399-2499-v1';
+const GENERAL_HISTORICAL_PRICE_VERSION = 'general-1700-2000-2100-v1';
 
 const APPLICATION_TOTALS = Object.freeze({
   general: Object.freeze({ 1: 1999, 2: 2399, 3: 2499 }),
@@ -198,17 +199,14 @@ function pricingVersionForNewUser(tipo) {
   return null;
 }
 
-/**
- * Conserva el plan histórico de Delft en contratos ya firmados antes del
- * cambio a 2.999 €. Los clientes sin contrato firmado usan siempre el precio
- * vigente, y los contratos nuevos quedan marcados con DELFT_PRICE_VERSION.
- */
+/** Los perfiles sin contrato firmado siempre reciben las tarifas vigentes. */
 function applicationPlanForUser(user) {
   const source = user || {};
   const key = String(source.tipo || 'general').toLowerCase();
   const pricingVersion = contractPricingVersion(source.contract_data);
   const isInternational = usesInternational2700Plan(source);
-  if (key === 'general' && !isInternational && pricingVersion !== GENERAL_PRICE_VERSION) {
+  // Conserva el plan histórico únicamente para expedientes ya firmados.
+  if (source.contract_signed && key === 'general' && !isInternational && pricingVersion !== GENERAL_PRICE_VERSION) {
     return generalPlan(HISTORICAL_GENERAL_TOTALS, source.num_carreras);
   }
   if (key === 'delft' && source.contract_signed && pricingVersion !== DELFT_PRICE_VERSION) {
@@ -226,6 +224,7 @@ module.exports = {
   CURRENCY,
   DELFT_PRICE_VERSION,
   GENERAL_PRICE_VERSION,
+  GENERAL_HISTORICAL_PRICE_VERSION,
   HISTORICAL_GENERAL_TOTALS,
   FISCAL,
   EU_COUNTRIES,

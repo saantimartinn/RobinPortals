@@ -3,7 +3,7 @@
  * Fuente única para la vista previa del onboarding y el PDF firmado.
  */
 
-const { GENERAL_PRICE_VERSION } = require('./financial-config.cjs');
+const { GENERAL_HISTORICAL_PRICE_VERSION } = require('./financial-config.cjs');
 
 const PRIVACY_EMAIL = 'hello@project-robin.com';
 
@@ -367,7 +367,7 @@ function variantKey(tipo, usesInternational2700) {
 
 function contractVariant(tipo, usesInternational2700, pricingVersion) {
   const key = variantKey(tipo, usesInternational2700);
-  if (key === 'general' && pricingVersion !== GENERAL_PRICE_VERSION) return GENERAL_HISTORICAL;
+  if (key === 'general' && pricingVersion === GENERAL_HISTORICAL_PRICE_VERSION) return GENERAL_HISTORICAL;
   return VARIANTS[key] || VARIANTS.general;
 }
 
