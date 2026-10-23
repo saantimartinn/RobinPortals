@@ -9,6 +9,7 @@ export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 export const OUTPUT = resolve(ROOT, 'site/.output');
 export const PUBLIC_DIR = resolve(OUTPUT, 'public');
 export const FUNCTIONS_DIR = resolve(OUTPUT, 'functions');
+export const EDGE_FUNCTIONS_DIR = resolve(OUTPUT, 'edge-functions');
 
 export const APPS = [
   {
