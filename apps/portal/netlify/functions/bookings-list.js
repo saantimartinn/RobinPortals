@@ -28,7 +28,7 @@ exports.handler = async (event) => {
 
     const { data, error } = await sb
       .from('bookings')
-      .select('id, user_id, admin_email, topic, start_at, duration_min, meet_join_url, meet_code, calendar_event_id, status, created_at, cancelled_at')
+      .select('id, user_id, admin_email, topic, start_at, duration_min, meet_join_url, meet_code, calendar_event_id, status, created_at, cancelled_at, cancellation_requested_at')
       .eq('user_id', targetUserId)
       .order('start_at', { ascending: true });
 

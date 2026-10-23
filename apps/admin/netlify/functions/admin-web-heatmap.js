@@ -1,8 +1,7 @@
 /**
  * GET /api/admin/web/heatmap?pages=1&from&to              → páginas con clics (selector)
  * GET /api/admin/web/heatmap?path=/destinos/&device=mobile&from&to → clics y scroll de esa página
- * El panel abre la página real (WEB_PUBLIC_URL + path + ?robin_heatmap=1) en un iframe y le
- * pasa estos datos; la web pinta el mapa encima de sí misma.
+ * El panel abre la página real en un iframe y pinta el mapa por encima.
  */
 const { getAdminSupabase } = require('../../lib/admin-supabase');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
@@ -25,11 +24,21 @@ exports.handler = async (event) => {
       return json({ range, siteUrl, pages: data || [] });
     }
     const path = String(q.path || '/').slice(0, 300);
-    if (!path.startsWith('/')) return json({ error: 'path_invalido' }, { statusCode: 400 });
+    if (!path.startsWith('/') || path.startsWith('//')) return json({ error: 'path_invalido' }, { statusCode: 400 });
     const device = ['mobile', 'tablet', 'desktop'].includes(q.device) ? q.device : 'desktop';
     const { data, error } = await sb.rpc('web_heatmap', { p_path: path, p_device: device, p_from: fromTs, p_to: toTs });
     if (error) throw error;
-    return json({ range, siteUrl, ...data });
+    // The historic RPC omits the document height. Recent click events record
+    // it as `ph`, so the panel can size its own overlay without a script on
+    // the public website.
+    const { data: samples, error: sampleError } = await sb.from('web_events')
+      .select('data').eq('type', 'click').eq('path', path).eq('device', device)
+      .gte('event_at', fromTs).lt('event_at', toTs)
+      .order('event_at', { ascending: false }).limit(150);
+    if (sampleError) console.warn('heatmap height sample unavailable', sampleError.code);
+    const heights = (samples || []).map((row) => Number(row.data?.ph))
+      .filter((height) => Number.isFinite(height) && height >= 1000 && height <= 40000);
+    return json({ range, siteUrl, ...data, page_height: heights.length ? Math.max(...heights) : null });
   } catch (error) {
     return serverError(error, 'admin.web_heatmap');
   }

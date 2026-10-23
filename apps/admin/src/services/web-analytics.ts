@@ -16,6 +16,7 @@ export type HeatmapData = {
   siteUrl: string;
   views: number;
   total_clicks: number;
+  page_height?: number | null;
   clicks: { sel?: string; rx?: number; ry?: number; x?: number; y?: number; pw?: number; n: number }[];
   top_elements: { label: string; clicks: number }[];
   scroll: { depth: number; pct: number }[];

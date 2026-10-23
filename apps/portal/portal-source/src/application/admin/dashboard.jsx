@@ -5,7 +5,7 @@ import { GOLD, NAVY } from "../../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader, Divider } from "../../ui.jsx";
 import { APP_PHASE_LABELS } from "../documents/document-utils.js";
 import { KpiCard, Row } from "../../shared/PortalWidgets.jsx";
-import { adminDashboard, adminTaskCreate } from "../../api.js";
+import { adminDashboard, adminTaskCreate, bookingsCancel } from "../../api.js";
 import { dashboardAlerts, dashboardClientMetrics, dashboardFinancialSummary, dashboardPhaseMetrics } from "./dashboard-utils.js";
 
 export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) {
@@ -18,6 +18,7 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
   const [taskBusy, setTaskBusy] = useState(false);
   const [taskComposerOpen, setTaskComposerOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [bookingBusyId, setBookingBusyId] = useState(null);
 
   useEffect(() => {
     let cancel = false;
@@ -35,6 +36,13 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
     return () => { cancel = true; };
   }, [refreshKey, adminId]);
 
+  useEffect(() => {
+    const refresh = () => setRefreshKey((key) => key + 1);
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", refresh); };
+  }, []);
+
   const clients   = (data && data.clients)   || [];
   const payments  = (data && data.payments)  || [];
   const documents = (data && data.documents) || [];
@@ -44,9 +52,9 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
   const onboardingClients = clients.filter((c) => c.requires_onboarding);
   const upcomingBookings = useMemo(() => {
     const arr = (data && data.bookings) || [];
-    const now = Date.now() - 30 * 60_000; // tolerancia 30 min hacia atrás
-    return arr.filter((b) => b.status !== "cancelled" && new Date(b.start_at).getTime() >= now)
-      .sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
+    const now = Date.now();
+    return arr.filter((b) => b.status === "scheduled" && new Date(b.start_at).getTime() >= now)
+      .sort((a, b) => Number(Boolean(b.cancellation_requested_at)) - Number(Boolean(a.cancellation_requested_at)) || new Date(a.start_at) - new Date(b.start_at));
   }, [data]);
 
   const phaseMetrics = useMemo(() => dashboardPhaseMetrics(clients), [clients]);
@@ -69,6 +77,18 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
       alert("Error creando tarea: " + (e.message || ""));
     } finally {
       setTaskBusy(false);
+    }
+  }
+  async function decideCancellation(booking, action) {
+    if (action === "approve" && !window.confirm("¿Aprobar la cancelación? Se eliminará el evento de Google Calendar y se avisará a los invitados.")) return;
+    setBookingBusyId(booking.id); setError("");
+    try {
+      await bookingsCancel(booking.id, action);
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e.message || "No se pudo actualizar la llamada.");
+    } finally {
+      setBookingBusyId(null);
     }
   }
   if (loading && !data) {
@@ -238,7 +258,7 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
       {/* ───── PRÓXIMAS LLAMADAS ───── */}
       {/* Bookings dashboard card v1 */}
       <Card>
-        <CardHeader title="Próximas llamadas" icon={Calendar} subtitle={`${upcomingBookings.length} reserva(s) con tus alumnos`} />
+        <CardHeader title="Próximas llamadas" icon={Calendar} subtitle={`${upcomingBookings.length} reserva(s) · ${upcomingBookings.filter((b) => b.cancellation_requested_at).length} solicitud(es) de cancelación`} />
         <CardContent className="space-y-2">
           {upcomingBookings.length === 0 && (
             <div className="text-xs text-slate-500">Ningún alumno tuyo ha reservado llamada todavía.</div>
@@ -247,17 +267,26 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
             const cl = clients.find((c) => c.id === b.user_id);
             const when = new Date(b.start_at);
             return (
-              <button key={b.id} onClick={() => cl && onOpenClient && onOpenClient(cl)}
+              <div key={b.id}
                 className="w-full text-left flex items-center justify-between gap-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-white px-3 py-2.5 transition">
-                <div className="min-w-0 flex-1">
+                <button type="button" onClick={() => { if (cl && onOpenClient) { onOpenClient(cl); onGotoTab?.("reservas"); } }} className="min-w-0 flex-1 text-left">
                   <div className="text-sm font-semibold text-slate-800 truncate">
                     {cl ? `${cl.nombre || ""} ${cl.apellidos || ""}`.trim() : (b.topic || "Alumno")}
                   </div>
                   <div className="text-[11px] text-slate-500 truncate">
                     {new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "2-digit", month: "long" }).format(when)} · {new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(when)} · {b.duration_min} min
                   </div>
-                </div>
+                </button>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {b.cancellation_requested_at && (
+                    <>
+                      <Badge tone="amber">Solicita cancelar</Badge>
+                      <button type="button" disabled={bookingBusyId === b.id} onClick={() => decideCancellation(b, "approve")}
+                        className="text-xs font-semibold text-emerald-700 underline disabled:opacity-50">Aprobar</button>
+                      <button type="button" disabled={bookingBusyId === b.id} onClick={() => decideCancellation(b, "reject")}
+                        className="text-xs font-semibold text-slate-600 underline disabled:opacity-50">Rechazar</button>
+                    </>
+                  )}
                   {b.meet_join_url && (
                     <a href={b.meet_join_url} target="_blank" rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
@@ -265,9 +294,9 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
                       Entrar
                     </a>
                   )}
-                  <Badge tone="green">Confirmada</Badge>
+                  {!b.cancellation_requested_at && <Badge tone="green">Confirmada</Badge>}
                 </div>
-              </button>
+              </div>
             );
           })}
         </CardContent>

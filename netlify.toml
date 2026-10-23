@@ -325,6 +325,11 @@ to = "/.netlify/functions/portal-bookings-availability"
 status = 200
 
 [[redirects]]
+from = "/portal/api/bookings/cancel"
+to = "/.netlify/functions/portal-bookings-cancel"
+status = 200
+
+[[redirects]]
 from = "/portal/api/bookings/create"
 to = "/.netlify/functions/portal-bookings-create"
 status = 200

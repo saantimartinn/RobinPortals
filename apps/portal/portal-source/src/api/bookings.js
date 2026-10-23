@@ -9,6 +9,9 @@ export async function bookingsList(userId) {
 export async function bookingsCreate(payload) {
   return api.post("/api/bookings/create", payload);
 }
+export async function bookingsCancel(bookingId, action) {
+  return api.post("/api/bookings/cancel", { booking_id: bookingId, action });
+}
 export async function bookingsAvailability(params) {
   const p = params || {};
   const qs = new URLSearchParams();
@@ -17,4 +20,3 @@ export async function bookingsAvailability(params) {
   const s = qs.toString();
   return api.get("/api/bookings/availability" + (s ? ("?" + s) : ""));
 }
-

@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 import { NAVY } from "../../theme.js";
 import { Badge, Card, CardContent, CardHeader } from "../../ui.jsx";
-import { bookingsList } from "../../api.js";
+import { bookingsList, bookingsCancel } from "../../api.js";
 
 export function AdminReservas({ client }) {
   /* AdminReservas v2 — lee bookings reales de la API (filtradas por user_id del cliente) */
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [busyId, setBusyId] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let cancel = false;
@@ -25,9 +27,24 @@ export function AdminReservas({ client }) {
       }
     })();
     return () => { cancel = true; };
-  }, [client.id]);
+  }, [client.id, refreshKey]);
 
-  const upcoming = bookings.filter((b) => b.status !== "cancelled" && new Date(b.start_at) >= new Date(Date.now() - 60 * 60_000))
+  async function changeBooking(booking, action) {
+    if (action !== "reject" && !window.confirm(action === "approve"
+      ? "¿Aprobar la cancelación? Se eliminará el evento de Google Calendar y se avisará a los invitados."
+      : "¿Cancelar esta llamada? Se eliminará el evento de Google Calendar y se avisará a los invitados.")) return;
+    setError(""); setBusyId(booking.id);
+    try {
+      await bookingsCancel(booking.id, action);
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e.message || "No se pudo actualizar la llamada.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  const upcoming = bookings.filter((b) => b.status === "scheduled" && new Date(b.start_at).getTime() > Date.now())
     .sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
   const past = bookings.filter((b) => new Date(b.start_at) < new Date(Date.now() - 60 * 60_000))
     .sort((a, b) => new Date(b.start_at) - new Date(a.start_at));
@@ -51,13 +68,25 @@ export function AdminReservas({ client }) {
                 <div className="text-xs text-slate-400 truncate">{b.topic} · {b.duration_min} min</div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {b.cancellation_requested_at ? (
+                  <>
+                    <Badge tone="amber">Solicita cancelar</Badge>
+                    <button type="button" disabled={busyId === b.id} onClick={() => changeBooking(b, "approve")}
+                      className="text-xs font-semibold text-emerald-700 underline disabled:opacity-50">Aprobar</button>
+                    <button type="button" disabled={busyId === b.id} onClick={() => changeBooking(b, "reject")}
+                      className="text-xs font-semibold text-slate-600 underline disabled:opacity-50">Rechazar</button>
+                  </>
+                ) : (
+                  <button type="button" disabled={busyId === b.id} onClick={() => changeBooking(b, "cancel")}
+                    className="text-xs font-semibold text-rose-700 underline disabled:opacity-50">Cancelar llamada</button>
+                )}
                 {b.meet_join_url && (
                   <a href={b.meet_join_url} target="_blank" rel="noopener noreferrer"
                     className="text-xs font-semibold underline" style={{ color: NAVY }}>
                     Entrar a Meet
                   </a>
                 )}
-                <Badge tone="green">Confirmada</Badge>
+                {!b.cancellation_requested_at && <Badge tone="green">Confirmada</Badge>}
               </div>
             </div>
           ))}

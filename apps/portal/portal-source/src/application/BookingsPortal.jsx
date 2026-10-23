@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import { Calendar, CheckCircle2, Loader2 } from "lucide-react";
 import { NAVY } from "../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
-import { bookingsList, bookingsCreate, bookingsAvailability } from "../api.js";
+import { bookingsList, bookingsCreate, bookingsCancel, bookingsAvailability } from "../api.js";
 
 export function Reservas() {
   const [serverBookings, setServerBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [cancellingId, setCancellingId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [lastCreated, setLastCreated] = useState(null);
 
@@ -77,7 +78,20 @@ export function Reservas() {
     }
   }
 
-  const upcoming = serverBookings.filter((b) => b.status !== "cancelled")
+  async function requestCancellation(booking) {
+    if (!window.confirm("¿Solicitar la cancelación de esta llamada? Seguirá confirmada hasta que tu asesor la apruebe.")) return;
+    setError(""); setCancellingId(booking.id);
+    try {
+      await bookingsCancel(booking.id, "request");
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e.message || "No se pudo enviar la solicitud.");
+    } finally {
+      setCancellingId(null);
+    }
+  }
+
+  const upcoming = serverBookings.filter((b) => b.status === "scheduled" && new Date(b.start_at).getTime() > Date.now())
     .sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
   const dayObj = avDays.find((d) => d.date === selectedDate) || null;
   const daySlots = dayObj ? (dayObj.slots || []) : [];
@@ -182,6 +196,7 @@ export function Reservas() {
       <Card>
         <CardHeader title="Llamadas confirmadas" subtitle={`${upcoming.length} reserva(s)`} icon={Calendar} />
         <CardContent className="space-y-2">
+          {error && <div className="text-xs text-rose-700">{error}</div>}
           {loading && <div className="text-xs text-slate-500">Cargando…</div>}
           {!loading && upcoming.length === 0 && (
             <div className="text-xs text-slate-500">Aún no tienes llamadas reservadas.</div>
@@ -195,13 +210,22 @@ export function Reservas() {
                 <div className="text-xs text-slate-400 truncate">{b.topic} · {b.duration_min} min</div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {b.cancellation_requested_at ? (
+                  <Badge tone="amber">Cancelación solicitada</Badge>
+                ) : (
+                  <button type="button" disabled={cancellingId === b.id}
+                    onClick={() => requestCancellation(b)}
+                    className="text-xs font-semibold text-rose-700 underline disabled:opacity-50">
+                    {cancellingId === b.id ? "Enviando…" : "Solicitar cancelación"}
+                  </button>
+                )}
                 {b.meet_join_url && (
                   <a href={b.meet_join_url} target="_blank" rel="noopener noreferrer"
                     className="text-xs font-semibold underline" style={{ color: NAVY }}>
                     Entrar
                   </a>
                 )}
-                <Badge tone="green">Confirmada</Badge>
+                {!b.cancellation_requested_at && <Badge tone="green">Confirmada</Badge>}
               </div>
             </div>
           ))}
