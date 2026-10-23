@@ -3,7 +3,7 @@
 // other path is the public website. Paths are passed through unchanged.
 // Replaces apps/portal/infrastructure/cloudflare/project-robin-router.js, which
 // split the apps across four sites and rewrote their paths.
-const APPS_ORIGIN = "https://robin-portals.netlify.app";
+const APPS_ORIGIN = "https://robinportals.netlify.app";
 
 const APPS_PATH = /^\/(portal|robinjr|therobinplan|admin)(\/|$)|^\/login\/?$|^\/api\/(admin|internal)(\/|$)/;
 
