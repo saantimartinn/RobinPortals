@@ -2,12 +2,11 @@
 # change the app's own netlify.toml (or site/apps.mjs) and run `npm run site:config`.
 
 [build]
-command = "node site/build.mjs --install --embed-env"
+command = "node site/build.mjs --install"
 publish = "site/.output/public"
 
 [build.environment]
 NODE_VERSION = "22"
-SECRETS_SCAN_OMIT_PATHS = "site/.output/app-env.values.cjs,.netlify/functions,.netlify/functions-internal"
 
 [dev]
 framework = "#static"

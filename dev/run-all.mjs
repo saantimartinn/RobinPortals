@@ -20,12 +20,16 @@ function stop(signal = 'SIGTERM') {
 process.on('SIGINT', () => stop('SIGINT'));
 process.on('SIGTERM', () => stop('SIGTERM'));
 
-function start(name, command, args, { cwd = root, env = {} } = {}) {
+// onLine(line) is called with every output line of the child.
+function start(name, command, args, { cwd = root, env = {}, onLine = () => {} } = {}) {
   const child = spawn(command, args, { cwd, env: { ...process.env, BROWSER: 'none', ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
   children.push(child);
   for (const stream of [child.stdout, child.stderr]) {
     stream.on('data', (chunk) => {
-      for (const line of chunk.toString().split(/\r?\n/).filter(Boolean)) process.stdout.write(`[${name}] ${line}\n`);
+      for (const line of chunk.toString().split(/\r?\n/).filter(Boolean)) {
+        process.stdout.write(`[${name}] ${line}\n`);
+        onLine(line);
+      }
     });
   }
   child.on('exit', (code, signal) => {
@@ -45,8 +49,16 @@ for (const step of [
 start('proxy', process.execPath, ['dev/proxy.mjs'], {
   env: { ROBIN_PROXY_PORT: String(PROXY_PORT), ROBIN_APPS_PORT: String(APPS_PORT) },
 });
-start('build', process.execPath, ['site/build.mjs', '--watch']);
-start('apps', 'netlify', ['dev', '--offline', '--port', String(APPS_PORT), '--no-open']);
+// netlify dev starts once the local function wrappers are written: it must not see the
+// ones a production build may have left (see writeFunctionWrappers in site/build.mjs).
+let appsStarted = false;
+start('build', process.execPath, ['site/build.mjs', '--watch'], {
+  onLine(line) {
+    if (appsStarted || !line.includes('functions written')) return;
+    appsStarted = true;
+    start('apps', 'netlify', ['dev', '--offline', '--port', String(APPS_PORT), '--no-open']);
+  },
+});
 
 
 console.log(`\nRobin en local: ${publicUrl}  (/portal, /robinjr, /therobinplan, /admin)\n`);

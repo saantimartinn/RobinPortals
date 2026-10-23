@@ -29,7 +29,7 @@ Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro
 
 ## Producción
 
-- **Build:** `node site/build.mjs --install --embed-env` (lo fija `netlify.toml`). Netlify da a las funciones como mucho 4 KB de variables y las cuatro apps necesitan unos 10 KB, así que las variables de cada app (`PORTAL__…`, `ROBINJR__…`, `COMMUNITY__…`, `ADMIN__…`) van en Netlify **solo para el build** y el build las embebe en los paquetes de funciones (`site/app-env.cjs` las lee). En las funciones solo quedan `PUBLIC_BASE_URL`, `ROBIN_SITE_URL` y `ALLOWED_ORIGINS`.
-- **Variables:** `npm run site:netlify-env -- --site-url …` genera el fichero para `netlify api createEnvVars`, con `JWT_SECRET` nuevos, y lista los secretos que hay que poner a mano porque Netlify no deja leer su valor de producción.
+- **Build:** `node site/build.mjs --install` (lo fija `netlify.toml`). Las funciones de las apps tienen el formato clásico (`exports.handler`), pero se publican como funciones modernas de Netlify mediante un adaptador (`serve` en `site/app-env.cjs`): las clásicas solo admiten 4 KB de variables y las cuatro apps necesitan unos 10 KB. En local (`npm run dev`) se generan como clásicas: `netlify dev` las ejecuta sin empaquetar.
+- **Variables:** cada app con su prefijo (`PORTAL__…`, `ROBINJR__…`, `COMMUNITY__…`, `ADMIN__…`) más `PUBLIC_BASE_URL`, `ROBIN_SITE_URL` y `ALLOWED_ORIGINS`. `npm run site:netlify-env -- --site-url …` genera el fichero para `netlify api createEnvVars`, con `JWT_SECRET` nuevos, y lista los secretos que hay que poner a mano porque Netlify no deja leer su valor de producción.
 - **Tareas programadas:** no hacen nada hasta que el sitio tenga `ROBIN_RUN_SCHEDULED=true` (`site/app-env.cjs`). Se activa el día del cambio, a la vez que se apagan los sitios antiguos, para no duplicar envíos como las felicitaciones de cumpleaños.
 - **Enrutado:** `infra/cloudflare/project-robin-router.js` (Worker de project-robin.com).
