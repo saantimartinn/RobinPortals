@@ -139,6 +139,10 @@
 .web-analytics .wa-heat-stage { padding: .6rem; overflow: auto; max-height: calc(100vh - 9rem); background: #FFFDF5; }
 .web-analytics .wa-heat-scaler { position: relative; margin: 0 auto; overflow: hidden; border-radius: .5rem; box-shadow: 0 6px 24px #2D3A6414; background: #FFFDF5; }
 .web-analytics .wa-heat-scaler iframe { border: 0; display: block; transform-origin: 0 0; background: #FFFDF5; }
+.web-analytics .wa-heat-overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.web-analytics .wa-heat-dot { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, #f33b30 0%, #ff9a27 35%, #ffe069 58%, transparent 75%); mix-blend-mode: multiply; }
+.web-analytics .wa-heat-scroll { position: absolute; left: 0; right: 0; border-bottom: 1px solid #e74b3a55; }
+.web-analytics .wa-heat-scroll span { position: sticky; left: 0; display: inline-block; margin: .2rem; padding: .1rem .35rem; border-radius: .25rem; background: #fffdf5cc; color: #763025; font-size: .55rem; font-weight: 700; }
 
 @media (max-width: 1100px) {
   .web-analytics .wa-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }

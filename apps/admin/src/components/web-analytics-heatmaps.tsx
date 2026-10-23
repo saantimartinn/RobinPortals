@@ -1,5 +1,5 @@
 // Admin interface component for web analytics heatmaps; composed by the shell or a feature module.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Flame, Gauge, Globe, Monitor, Smartphone } from "lucide-react";
 import { webAnalyticsClient } from "@/services/web-analytics";
 import type { HeatmapData } from "@/services/web-analytics";
@@ -17,13 +17,9 @@ export function HeatmapsTab({ from, to }: { from: string; to: string }) {
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [mode, setMode] = useState<"clicks" | "scroll">("clicks");
   const [heat, setHeat] = useState<HeatmapData | null>(null);
-  const [frameH, setFrameH] = useState(2000);
   const [err, setErr] = useState("");
   const [boxW, setBoxW] = useState(900);
-  const frame = useRef<HTMLIFrameElement>(null);
   const box = useRef<HTMLDivElement>(null);
-  const siteOrigin = useRef("");
-  siteOrigin.current = siteUrl ? new URL(siteUrl).origin : "";
 
   useEffect(() => {
     webAnalyticsClient
@@ -39,28 +35,19 @@ export function HeatmapsTab({ from, to }: { from: string; to: string }) {
   }, [from, to]);
 
   useEffect(() => {
+    let cancelled = false;
     setErr("");
     setHeat(null);
     webAnalyticsClient
       .heatmap(path, device, from, to)
       .then((h) => {
+        if (cancelled) return;
         setHeat(h);
         setSiteUrl(h.siteUrl || "");
       })
-      .catch((e) => setErr(e.message));
+      .catch((e) => { if (!cancelled) setErr(e.message); });
+    return () => { cancelled = true; };
   }, [path, device, from, to]);
-
-  // Escucha desde el montaje: la página del iframe puede informar su altura
-  // antes de que termine el efecto que actualiza siteUrl.
-  useEffect(() => {
-    const onMsg = (e: MessageEvent) => {
-      if (!siteOrigin.current || siteOrigin.current !== e.origin) return;
-      const height = Number(e.data?.h);
-      if (e.data?.type === "robin-heatmap-size" && Number.isFinite(height) && height > 0) setFrameH(Math.min(40000, height));
-    };
-    window.addEventListener("message", onMsg);
-    return () => window.removeEventListener("message", onMsg);
-  }, []);
 
   useEffect(() => {
     const el = box.current;
@@ -70,20 +57,20 @@ export function HeatmapsTab({ from, to }: { from: string; to: string }) {
     return () => ro.disconnect();
   }, []);
 
-  // Envía los datos a la página cuando carga o cambian
-  const send = () => {
-    if (!heat || !frame.current?.contentWindow || !siteUrl) return;
-    frame.current.contentWindow.postMessage({ type: "robin-heatmap", mode, clicks: heat.clicks, scroll: heat.scroll }, new URL(siteUrl).origin);
-  };
-  useEffect(() => {
-    send();
-    const t = setTimeout(send, 800); // por si la página tarda en pintar imágenes
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heat, mode]);
-
-  const width = FRAME_WIDTH[device];
+  const baseWidth = FRAME_WIDTH[device];
+  const typicalWidth = useMemo(() => {
+    const widths = (heat?.clicks || []).flatMap((click) => Array(Math.min(20, Math.max(1, click.n || 1))).fill(Number(click.pw)))
+      .filter((value) => Number.isFinite(value) && value >= 300 && value <= 2500).sort((a, b) => a - b);
+    return widths.length ? widths[Math.floor(widths.length / 2)] : baseWidth;
+  }, [heat, baseWidth]);
+  const width = device === "desktop"
+    ? Math.max(1024, Math.min(1920, typicalWidth))
+    : Math.max(320, Math.min(480, typicalWidth));
   const scale = Math.min(1, (boxW - 2) / width);
+  const height = Math.min(40000, Math.max(2000,
+    (Number(heat?.page_height) || 0) * width / typicalWidth,
+    ...(heat?.clicks || []).map((click) => (Number(click.y) || 0) * width / (Number(click.pw) || width) + 500)
+  ));
   const pageUrl = siteUrl ? new URL(path, `${siteUrl}/`) : null;
   pageUrl?.searchParams.set("robin_heatmap", "1");
   const src = pageUrl?.toString() || "";
@@ -143,22 +130,38 @@ export function HeatmapsTab({ from, to }: { from: string; to: string }) {
             <Globe /> Abrir la página
           </a>
         )}
-        <p className="wa-note">Solo se cuentan visitas que aceptaron las cookies de analítica. Rojo = más clics · azul = menos.</p>
+        <p className="wa-note">Solo se cuentan visitas que aceptaron las cookies de analítica. La posición de los clics es aproximada cuando cambia el diseño o el ancho de pantalla.</p>
         {err && <p className="wa-bad">{err}</p>}
       </aside>
 
       <div className="wa-heat-stage panel" ref={box}>
         {src ? (
-          <div className="wa-heat-scaler" style={{ width: width * scale, height: frameH * scale }}>
+          <div className="wa-heat-scaler" style={{ width: width * scale, height: height * scale }}>
             <iframe
               key={`${path}-${device}`}
-              ref={frame}
               title="Mapa de calor"
               src={src}
-              onLoad={send}
               scrolling="no"
-              style={{ width, height: frameH, transform: `scale(${scale})` }}
+              style={{ width, height, transform: `scale(${scale})` }}
             />
+            <div className="wa-heat-overlay" aria-hidden="true">
+              {mode === "clicks" ? (heat?.clicks || []).filter((click) =>
+                Number.isFinite(Number(click.x)) && Number.isFinite(Number(click.y)) && Number(click.pw) > 0
+              ).map((click, index) => {
+                const intensity = Math.min(1, 0.25 + Math.log2(1 + (click.n || 1)) / 5);
+                return <span key={index} className="wa-heat-dot" style={{
+                  left: `${Math.max(0, Math.min(width, Number(click.x) * width / Number(click.pw))) * scale}px`,
+                  top: `${Math.max(0, Number(click.y) * width / Number(click.pw)) * scale}px`,
+                  width: `${Math.max(24, 64 * scale)}px`, height: `${Math.max(24, 64 * scale)}px`,
+                  opacity: intensity,
+                }} />;
+              }) : (heat?.scroll || []).map((section, index) => (
+                <div key={section.depth} className="wa-heat-scroll" style={{
+                  top: `${index * 10}%`, height: "10%",
+                  background: `rgba(238, 66, 55, ${Math.max(0.04, Math.min(0.4, Number(section.pct || 0) / 250))})`,
+                }}><span>{section.depth}% · {section.pct}% de visitas</span></div>
+              ))}
+            </div>
           </div>
         ) : (
           <Empty>Cargando página…</Empty>
@@ -167,4 +170,3 @@ export function HeatmapsTab({ from, to }: { from: string; to: string }) {
     </div>
   );
 }
-

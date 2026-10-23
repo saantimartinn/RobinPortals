@@ -233,6 +233,10 @@
   to = "/.netlify/functions/bookings-availability"
   status = 200
 [[redirects]]
+  from = "/api/bookings/cancel"
+  to = "/.netlify/functions/bookings-cancel"
+  status = 200
+[[redirects]]
   from = "/api/bookings/create"
   to = "/.netlify/functions/bookings-create"
   status = 200
