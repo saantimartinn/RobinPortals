@@ -7,7 +7,7 @@ process.env.PORTAL__SUPABASE_URL = 'https://portal.example';
 process.env.PORTAL__ONLY_PORTAL = 'yes';
 process.env.ROBINJR__SUPABASE_URL = 'https://robinjr.example';
 process.env.SITE_LEVEL = 'shared';
-const { wrapFunction } = require('../app-env.cjs');
+const { wrapFunction, wrapScheduled } = require('../app-env.cjs');
 
 const probe = () => ({
   handler: async () => {
@@ -33,4 +33,14 @@ test('each app sees only its own variables, also when invocations overlap', asyn
 test('module-level reads happen inside the app environment', () => {
   const mod = wrapFunction('robinjr', () => ({ loadedWith: process.env.SUPABASE_URL }));
   assert.equal(mod.loadedWith, 'https://robinjr.example');
+});
+
+test('scheduled jobs only run when the site enables them', async () => {
+  let runs = 0;
+  const job = wrapScheduled('portal', () => ({ handler: async () => { runs += 1; return { statusCode: 200 }; } }));
+  delete process.env.ROBIN_RUN_SCHEDULED;
+  assert.equal((await job.handler()).statusCode, 204);
+  process.env.ROBIN_RUN_SCHEDULED = 'true';
+  assert.equal((await job.handler()).statusCode, 200);
+  assert.equal(runs, 1);
 });
