@@ -8,7 +8,11 @@
 const { BUCKET } = require('./supabase');
 const drive = require('./google-drive');
 const { buildContractPdf } = require('./contract-pdf');
-const { usesInternational2700Plan } = require('../shared/financial-config.cjs');
+const {
+  GENERAL_HISTORICAL_PRICE_VERSION,
+  pricingVersionForNewUser,
+  usesInternational2700Plan,
+} = require('../shared/financial-config.cjs');
 const storage = require('./storage');
 const { isIsolatedSandbox } = require('./sandbox-mode');
 
@@ -89,12 +93,18 @@ async function syncDriveForUser(sb, userId) {
       const contrato2700 = cd.variant
         ? cd.variant === 'general_noes'
         : planContrato2700;
+      const tipoContrato = (u.tipo || cd.tipo || 'general').toLowerCase();
+      const pricingVersion = cd.pricing_version || (
+        tipoContrato === 'general' && !contrato2700 && u.contract_signed
+          ? GENERAL_HISTORICAL_PRICE_VERSION
+          : pricingVersionForNewUser(tipoContrato)
+      );
       const esMaestria = contrato2700 && (u.application_level || '') === 'maestria';
       const fechaStr = fmtFecha(cd.fecha_firma || new Date().toISOString());
       const signature = await storage.downloadObject(sb, cd.signature_path);
       const signatureDataUrl = `data:${cd.signature_mime || 'image/png'};base64,${signature.toString('base64')}`;
       const pdf = await buildContractPdf({
-        tipo: (u.tipo || cd.tipo || 'general').toLowerCase(),
+        tipo: tipoContrato,
         esOtros,
         contrato2700,
         esMaestria,
@@ -104,6 +114,7 @@ async function syncDriveForUser(sb, userId) {
         numCarreras: u.num_carreras || null,
         fechaStr,
         signatureDataUrl,
+        pricingVersion,
       });
       const fname = 'Contrato Robin - ' + nameBase + '.pdf';
       const r = await drive.uploadFile(

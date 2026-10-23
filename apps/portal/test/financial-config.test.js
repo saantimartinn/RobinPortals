@@ -101,8 +101,9 @@ test('General nuevo mantiene 666,33 € de entrada y adapta solo las dos cuotas 
   ]);
 });
 
-test('General existente conserva el plan histórico y los clientes nuevos reciben versión vigente', () => {
-  assert.deepEqual(applicationPlanForUser({ tipo: 'general', num_carreras: 2 }), [
+test('General sin firmar recibe la tarifa vigente y una firma histórica conserva su plan', () => {
+  assert.deepEqual(applicationPlanForUser({ tipo: 'general', num_carreras: 2 }), applicationPlan('general', 2));
+  assert.deepEqual(applicationPlanForUser({ tipo: 'general', num_carreras: 2, contract_signed: true }), [
     { installment: 1, amount: 566.67 },
     { installment: 2, amount: 716.67 },
     { installment: 3, amount: 716.66 },

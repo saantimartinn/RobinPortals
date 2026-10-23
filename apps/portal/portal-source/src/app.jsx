@@ -11,10 +11,10 @@ import "./login.css";
 import { isAdminUser } from "./session.js";
 import { CANVAS } from "./theme.js";
 import { reportClientError } from "./client-utils.js";
+import { AdminPortal } from "./application/AdminPortal.jsx";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
 import { ONBOARDING_ORDER, OnboardingNavContext } from "./application/onboarding/onboarding-nav.js";
-import { AdminPortal } from "./application/AdminPortal.jsx";
 import {
   OnboardingContract,
   OnboardingDNI,
