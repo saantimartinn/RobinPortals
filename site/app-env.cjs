@@ -103,4 +103,13 @@ function wrapFunction(appId, load) {
   return wrapped;
 }
 
-module.exports = { wrapFunction, prefix, APP_IDS };
+// Scheduled jobs (birthday emails, retries, transcripts…) only run where the site
+// sets ROBIN_RUN_SCHEDULED=true, so a deploy that is not yet live does not repeat
+// the jobs the current production sites still run.
+function wrapScheduled(appId, load) {
+  const wrapped = wrapFunction(appId, load);
+  const run = wrapped.handler;
+  return { ...wrapped, handler: (...args) => (siteEnv.ROBIN_RUN_SCHEDULED === 'true' ? run(...args) : Promise.resolve({ statusCode: 204, body: '' })) };
+}
+
+module.exports = { wrapFunction, wrapScheduled, prefix, APP_IDS };
