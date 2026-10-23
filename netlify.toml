@@ -4,6 +4,7 @@
 [build]
 command = "node site/build.mjs --install"
 publish = "site/.output/public"
+edge_functions = "site/.output/edge-functions"
 
 [build.environment]
 NODE_VERSION = "22"

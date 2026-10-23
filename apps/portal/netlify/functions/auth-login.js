@@ -12,10 +12,11 @@ const IDENTITY_PROVIDERS = [
 ];
 
 async function verifyExternalIdentity(path, username, password) {
+  const credentials = JSON.stringify({ username, password });
   const response = await fetch(`${siteUrl()}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: credentials,
     cache: 'no-store',
     signal: AbortSignal.timeout(8000),
   });

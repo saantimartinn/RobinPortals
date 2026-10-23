@@ -6,7 +6,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse, stringify } from 'smol-toml';
-import { APPS, ROOT, PUBLIC_DIR, FUNCTIONS_DIR, functionName } from './apps.mjs';
+import { APPS, ROOT, PUBLIC_DIR, FUNCTIONS_DIR, EDGE_FUNCTIONS_DIR, functionName } from './apps.mjs';
 
 const FUNCTION_TARGET = /^\/\.netlify\/functions\/([^/?]+)(.*)$/;
 
@@ -100,6 +100,7 @@ export function buildConfig() {
     build: {
       command: 'node site/build.mjs --install',
       publish: relative(ROOT, PUBLIC_DIR),
+      edge_functions: relative(ROOT, EDGE_FUNCTIONS_DIR),
       environment: { NODE_VERSION: '22' },
     },
     dev: { framework: '#static', port: 8889, autoLaunch: false },
