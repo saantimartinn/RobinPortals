@@ -9,6 +9,8 @@ export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 export const OUTPUT = resolve(ROOT, 'site/.output');
 export const PUBLIC_DIR = resolve(OUTPUT, 'public');
 export const FUNCTIONS_DIR = resolve(OUTPUT, 'functions');
+// Per-app variables bundled into the functions (site/build.mjs --embed-env).
+export const EMBEDDED_ENV = resolve(OUTPUT, 'app-env.values.cjs');
 
 export const APPS = [
   {

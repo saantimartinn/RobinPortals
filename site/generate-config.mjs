@@ -98,7 +98,7 @@ export function buildConfig() {
 
   const config = {
     build: {
-      command: 'node site/build.mjs --install',
+      command: 'node site/build.mjs --install --embed-env',
       publish: relative(ROOT, PUBLIC_DIR),
       environment: { NODE_VERSION: '22' },
     },

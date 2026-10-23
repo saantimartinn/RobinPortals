@@ -61,7 +61,7 @@
 .student-portal .student-support p,.admin-workspace .admin-sidebar-note p{margin:0;color:var(--robin-ink-600);font-size:.8125rem;line-height:1.5}
 .student-portal .student-support button{justify-content:center;margin-top:.75rem;color:var(--robin-navy);font-size:.8125rem;font-weight:600}
 
-/* Onboarding (apps/*/application/onboarding/onboarding-shared.jsx): the same
+/* Onboarding (application/onboarding/onboarding-shared.jsx in the portal and RobinJr): the same
    layout, with the steps in the sidebar and the current step in a paper card. */
 .student-portal.is-onboarding{min-height:100vh}
 .student-portal.is-onboarding .student-sidebar{top:0;height:100vh}
