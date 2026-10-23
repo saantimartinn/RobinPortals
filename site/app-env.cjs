@@ -1,8 +1,9 @@
 'use strict';
 
 // Gives every app of the shared site its own environment, as if it were still
-// its own Netlify project. The site environment holds each app's variables
-// under a prefix (PORTAL__SUPABASE_URL, ROBINJR__SUPABASE_URL, …); while one
+// its own Netlify project. Each app's variables are bundled at build time
+// (Netlify) or held in the site environment under a prefix (PORTAL__SUPABASE_URL,
+// ROBINJR__SUPABASE_URL, …, local development); while one
 // app's function runs, process.env shows that app's variables under their
 // plain names, hides the other apps' ones, and falls back to the site
 // variables (URL, CONTEXT, PATH, …) for everything else. AsyncLocalStorage
@@ -25,10 +26,19 @@ function isScopedKey(key) {
   return typeof key === 'string' && APP_IDS.some((appId) => key.startsWith(prefix(appId)));
 }
 
+// On Netlify the apps' variables are bundled at build time (site/build.mjs
+// --embed-env) because functions only get 4 KB of environment.
+let embedded = {};
+try {
+  embedded = require('./.output/app-env.values.cjs');
+} catch (error) {
+  if (error.code !== 'MODULE_NOT_FOUND') throw error;
+}
+
 function scopeFor(appId) {
   if (!scopes.has(appId)) {
     const own = prefix(appId);
-    const values = {};
+    const values = { ...(embedded[appId] || {}) };
     for (const [key, value] of Object.entries(siteEnv)) {
       if (key.startsWith(own)) values[key.slice(own.length)] = value;
     }

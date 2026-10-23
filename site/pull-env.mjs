@@ -5,26 +5,16 @@
 // value of the "dev" context is used, and failing that the one already in the
 // local .env. The previous file is kept as apps/<app>/.env.bak.
 // Usage: node site/pull-env.mjs [app ...]
-import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { APPS, ROOT } from './apps.mjs';
 import { readEnvFile, writeEnvFile } from './dotenv.mjs';
-
-function netlifyApi(method, data) {
-  const result = spawnSync('netlify', ['api', method, '--data', JSON.stringify(data)], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  if (result.status !== 0) throw new Error(`netlify api ${method}: ${result.stderr || result.stdout}`);
-  return JSON.parse(result.stdout);
-}
-
-const usable = (value) => typeof value === 'string' && value !== '' && !value.includes('****');
-const contextValue = (variable, context) => variable.values.find((entry) => entry.context === context)?.value;
+import { appSiteEnv, contextValue, productionValue, usableValue as usable } from './netlify-api.mjs';
 
 const wanted = process.argv.slice(2);
 const apps = APPS.filter((app) => !wanted.length || wanted.includes(app.id));
 for (const app of apps) {
-  const { account_id: accountId, name } = netlifyApi('getSite', { site_id: app.netlifySiteId });
-  const variables = netlifyApi('getEnvVars', { account_id: accountId, site_id: app.netlifySiteId });
+  const { name, variables } = appSiteEnv(app);
   const envPath = resolve(ROOT, app.dir, '.env');
   const local = readEnvFile(envPath);
   const values = {};
@@ -32,7 +22,7 @@ for (const app of apps) {
   const fromLocal = [];
   const missing = [];
   for (const variable of variables) {
-    const production = contextValue(variable, 'production') ?? contextValue(variable, 'all');
+    const production = productionValue(variable);
     const dev = contextValue(variable, 'dev') ?? contextValue(variable, 'all');
     if (usable(production)) values[variable.key] = production;
     else if (usable(dev)) { values[variable.key] = dev; fromDev.push(variable.key); }

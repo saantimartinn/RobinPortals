@@ -1,5 +1,7 @@
 # Cloudflare
 
-Hoy `project-robin.com` reparte `/admin`, `/portal` y `/therobinplan` a varios sitios de Netlify con un Worker (`apps/portal/infrastructure/cloudflare/project-robin-router.js`).
+`project-robin.com` pasa por un Worker de Cloudflare.
 
-Con el sitio unificado, esas rutas apuntarán al sitio de apps de este repositorio, y el Worker dejará de ser necesario. La web pública es un proyecto aparte.
+- **Hoy en producción:** `apps/portal/infrastructure/cloudflare/project-robin-router.js` reparte `/admin`, `/portal` y `/therobinplan` entre tres sitios de Netlify y reescribe sus rutas.
+- **Con el sitio unificado:** `project-robin-router.js` (esta carpeta) manda `/portal`, `/robinjr`, `/therobinplan`, `/admin`, `/login`, `/api/admin/*` y `/api/internal/*` al sitio de apps **sin cambiar la ruta**; todo lo demás es la web, que es un proyecto aparte. Antes de publicarlo, `APPS_ORIGIN` tiene que ser la URL `.netlify.app` del sitio de apps. Sus rutas se prueban en `site/test/router.test.mjs`.
+- **Marcha atrás:** volver a publicar el Worker anterior.
