@@ -15,20 +15,20 @@ test('dashboard summaries preserve phase, payment, priority and sorting rules', 
   assert.equal(phases.bottleneck, 3);
 
   const now = Date.parse('2026-10-20T12:00:00Z');
-  const alerts = dashboard.dashboardAlerts({
+  const alertInput = {
     clients,
     payments: [
       { user_id: 'a', status: 'unlocked', unlocked_at: new Date(now - 8 * 86400000).toISOString(), installment: 2, amount: 900 },
       { user_id: 'b', status: 'unlocked', unlocked_at: new Date(now - 7 * 86400000).toISOString(), installment: 1, amount: 500 },
     ],
     documents: [{ user_id: 'b', status: 'required', required: true }, { user_id: 'b', status: 'required', required: true }],
-    sort: 'urgency',
     now,
-  });
-  assert.deepEqual(alerts.map((item) => item.kind), ['fuego', 'impago', 'docs', 'deadline']);
-  assert.equal(alerts[1].client.id, 'a');
-  assert.equal(alerts[2].label, '📄 2 doc(s) requerido(s) pendiente(s)');
-  assert.equal(dashboard.dashboardAlerts({ clients, sort: 'name' })[0].client.nombre, 'Ana');
+  };
+  const alerts = dashboard.dashboardAlerts({ ...alertInput, sort: 'urgency' });
+  assert.deepEqual(alerts.map((item) => item.kind), ['impago', 'docs']);
+  assert.equal(alerts[0].client.id, 'a');
+  assert.equal(alerts[1].label, '📄 2 doc(s) requerido(s) pendiente(s)');
+  assert.equal(dashboard.dashboardAlerts({ ...alertInput, sort: 'name' })[0].client.nombre, 'Ana');
 
   const fin = dashboard.dashboardFinancialSummary([
     { user_id: 'a', status: 'paid', amount: 75 },

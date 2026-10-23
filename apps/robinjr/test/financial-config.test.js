@@ -6,6 +6,7 @@ const {
   APPLICATION_TOTALS,
   DELFT_PRICE_VERSION,
   GENERAL_PRICE_VERSION,
+  ROBIN_JR_TOTAL,
   applicationPlan,
   applicationPlanForUser,
   invoiceBreakdown,
@@ -28,7 +29,7 @@ test('cada plan de aplicación cuadra exactamente con su total canónico', () =>
   assert.equal(applicationPlan('general', 1, 'otros', false).reduce((s, r) => s + r.amount, 0), APPLICATION_TOTALS.international);
 });
 
-test('LATAM siempre suma 2.700 €, incluso con documento europeo o etiqueta directa', () => {
+test('Robin Jr mantiene sus tres cuotas también para alumnos LATAM', () => {
   const clients = [
     { origin: 'otros', pais: 'México', has_eu_id: true },
     { origin: 'otros', pais: 'Colombia', has_eu_id: false },
@@ -40,11 +41,11 @@ test('LATAM siempre suma 2.700 €, incluso con documento europeo o etiqueta dir
     assert.equal(isLatamClient(client), true);
     const rows = applicationPlanForUser({ tipo: 'general', num_carreras: 3, ...client });
     assert.deepEqual(rows, [
-      { installment: 1, amount: 900 },
-      { installment: 2, amount: 900 },
-      { installment: 3, amount: 900 },
+      { installment: 1, amount: 500 },
+      { installment: 2, amount: 500 },
+      { installment: 3, amount: 499.99 },
     ]);
-    assert.equal(rows.reduce((sum, row) => sum + row.amount, 0), 2700);
+    assert.equal(rows.reduce((sum, row) => sum + row.amount, 0), ROBIN_JR_TOTAL);
   }
 });
 
@@ -83,59 +84,40 @@ test('Delft usa 999 € de entrada y dos cuotas posteriores de 1.000 €', () =>
   ]);
 });
 
-test('General nuevo mantiene 666,33 € de entrada y adapta solo las dos cuotas posteriores', () => {
-  assert.deepEqual(applicationPlan('general', 1), [
-    { installment: 1, amount: 666.33 },
-    { installment: 2, amount: 666.33 },
-    { installment: 3, amount: 666.34 },
-  ]);
-  assert.deepEqual(applicationPlan('general', 2), [
-    { installment: 1, amount: 666.33 },
-    { installment: 2, amount: 866.33 },
-    { installment: 3, amount: 866.34 },
-  ]);
-  assert.deepEqual(applicationPlan('general', 3), [
-    { installment: 1, amount: 666.33 },
-    { installment: 2, amount: 916.33 },
-    { installment: 3, amount: 916.34 },
-  ]);
+test('General de Robin Jr conserva 500 €, 500 € y 499,99 € para cualquier número de carreras', () => {
+  const expected = [
+    { installment: 1, amount: 500 },
+    { installment: 2, amount: 500 },
+    { installment: 3, amount: 499.99 },
+  ];
+  for (const careers of [1, 2, 3]) assert.deepEqual(applicationPlan('general', careers), expected);
 });
 
-test('General existente conserva el plan histórico y los clientes nuevos reciben versión vigente', () => {
-  assert.deepEqual(applicationPlanForUser({ tipo: 'general', num_carreras: 2 }), [
-    { installment: 1, amount: 566.67 },
-    { installment: 2, amount: 716.67 },
-    { installment: 3, amount: 716.66 },
-  ]);
+test('los metadatos de paquetes heredados no alteran el plan Robin Jr', () => {
+  const expected = applicationPlan('general', 1);
+  assert.deepEqual(applicationPlanForUser({ tipo: 'general', num_carreras: 2 }), expected);
   assert.deepEqual(applicationPlanForUser({
     tipo: 'general',
     num_carreras: 2,
     contract_data: { pricing_version: GENERAL_PRICE_VERSION },
-  }), applicationPlan('general', 2));
+  }), expected);
   assert.equal(pricingVersionForNewUser('general'), GENERAL_PRICE_VERSION);
   assert.equal(pricingVersionForNewUser('delft'), DELFT_PRICE_VERSION);
 });
 
-test('Delft conserva 933 € por cuota en contratos históricos ya firmados', () => {
+test('la etiqueta Delft heredada tampoco altera las cuotas de Robin Jr', () => {
+  const expected = applicationPlanForUser({ tipo: 'general' });
   assert.deepEqual(applicationPlanForUser({
     tipo: 'delft',
     contract_signed: true,
     contract_data: { version_template: 'contratos-2027-revision-integrada' },
-  }), [
-    { installment: 1, amount: 933 },
-    { installment: 2, amount: 933 },
-    { installment: 3, amount: 933 },
-  ]);
+  }), expected);
 
   assert.deepEqual(applicationPlanForUser({
     tipo: 'delft',
     contract_signed: true,
     contract_data: { pricing_version: DELFT_PRICE_VERSION },
-  }), [
-    { installment: 1, amount: 999 },
-    { installment: 2, amount: 1000 },
-    { installment: 3, amount: 1000 },
-  ]);
+  }), expected);
 });
 
 test('los contratos de admisiones describen el calendario de pagos 2027 vigente', () => {
