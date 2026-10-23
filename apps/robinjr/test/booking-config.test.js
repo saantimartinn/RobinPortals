@@ -7,12 +7,12 @@ test('la configuración de reservas conserva los defaults vigentes', () => {
   assert.deepEqual(bookingConfig({}), DEFAULT_BOOKING_CONFIG);
 });
 
-test('valida título, duración de slot y horizonte', () => {
+test('mantiene el título y la duración de Robin Jr y valida el horizonte', () => {
   assert.deepEqual(bookingConfig({
     BOOKING_AVAIL_TITLE: '  AGENDA ROBIN  ',
     BOOKING_MAX_DAYS: '21',
     BOOKING_SLOT_MIN: '45',
-  }), { availabilityTitle: 'AGENDA ROBIN', maxDays: 21, slotMin: 45 });
+  }), { availabilityTitle: 'RobinJr', maxDays: 21, slotMin: 60 });
   assert.deepEqual(bookingConfig({ BOOKING_MAX_DAYS: '90', BOOKING_SLOT_MIN: '0' }), DEFAULT_BOOKING_CONFIG);
 });
 

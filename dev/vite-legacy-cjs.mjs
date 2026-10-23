@@ -10,8 +10,7 @@ const browserCjsNames = new Set([
 ]);
 
 /** Convert the legacy, server-shared Robin config modules into native browser
- * modules during Vite dev. Rollup handles these in production builds; Vite's
- * dev server otherwise sends raw `module.exports` to Safari. */
+ * modules during both Vite dev and production builds. */
 export function legacyCjsBrowser({ sharedDir }) {
   const financialConfig = require(resolve(sharedDir, 'financial-config.cjs'));
   return {
@@ -25,10 +24,14 @@ export function legacyCjsBrowser({ sharedDir }) {
       let source = code;
       if (name === 'contract-content.cjs') {
         source = source.replace(
-          /const\s*\{\s*GENERAL_PRICE_VERSION\s*\}\s*=\s*require\(['"]\.\/financial-config\.cjs['"]\);/,
-          `const GENERAL_PRICE_VERSION = ${JSON.stringify(financialConfig.GENERAL_PRICE_VERSION)};`,
+          /const\s*\{\s*([A-Z][A-Z0-9_]*)\s*\}\s*=\s*require\(['"]\.\/financial-config\.cjs['"]\);/g,
+          (_, key) => {
+            if (!Object.hasOwn(financialConfig, key)) throw new Error(`Unknown financial config export: ${key}`);
+            return `const ${key} = ${JSON.stringify(financialConfig[key])};`;
+          },
         );
       }
+      if (/\brequire\s*\(/.test(source)) throw new Error(`Unsupported CommonJS require in browser module: ${filename}`);
       return {
         code: `const module = { exports: {} };\nconst exports = module.exports;\n(function (module, exports) {\n${source}\n})(module, exports);\nexport default module.exports;`,
         map: null,

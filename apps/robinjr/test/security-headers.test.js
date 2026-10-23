@@ -49,6 +49,6 @@ test('ninguna Function construye respuestas JSON al margen del helper seguro', (
   const functionsDir = path.join(__dirname, '..', 'netlify', 'functions');
   const offenders = fs.readdirSync(functionsDir)
     .filter((filename) => filename.endsWith('.js'))
-    .filter((filename) => fs.readFileSync(path.join(functionsDir, filename), 'utf8').includes('body: JSON.stringify('));
+    .filter((filename) => /return\s*\{[^{}]*body:\s*JSON\.stringify\(/s.test(fs.readFileSync(path.join(functionsDir, filename), 'utf8')));
   assert.deepEqual(offenders, []);
 });

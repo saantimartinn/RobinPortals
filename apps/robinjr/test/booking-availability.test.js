@@ -5,7 +5,7 @@ const { evaluateSlot } = require('../lib/booking-availability');
 
 const start = '2026-09-01T08:00:00.000Z';
 const windowEvent = {
-  summary: 'LLAMADAS CLIENTES',
+  summary: 'RobinJr',
   start: '2026-09-01T07:00:00.000Z',
   end: '2026-09-01T10:00:00.000Z',
 };
