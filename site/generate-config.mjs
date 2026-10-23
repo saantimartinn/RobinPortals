@@ -98,15 +98,9 @@ export function buildConfig() {
 
   const config = {
     build: {
-      command: 'node site/build.mjs --install --embed-env',
+      command: 'node site/build.mjs --install',
       publish: relative(ROOT, PUBLIC_DIR),
-      environment: {
-        NODE_VERSION: '22',
-        // The functions carry each app's variables on purpose (site/build.mjs --embed-env):
-        // keep Netlify's secrets scanning off those private files only; the published
-        // site (site/.output/public) is still scanned.
-        SECRETS_SCAN_OMIT_PATHS: 'site/.output/app-env.values.cjs,.netlify/functions,.netlify/functions-internal',
-      },
+      environment: { NODE_VERSION: '22' },
     },
     dev: { framework: '#static', port: 8889, autoLaunch: false },
     functions,

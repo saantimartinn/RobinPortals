@@ -1,8 +1,7 @@
 // Prepares the environment of the shared apps site on Netlify, as the body of
 // `netlify api createEnvVars`, without sending it anywhere:
-//   - every app's variables from apps/<app>/.env (see site/pull-env.mjs) as APP__NAME,
-//     scoped to builds only: site/build.mjs --embed-env bundles them into the
-//     functions, which only get 4 KB of environment;
+//   - every app's variables from apps/<app>/.env (see site/pull-env.mjs) as APP__NAME
+//     (the functions are modern Netlify Functions, so the ~10 KB fit; see site/app-env.cjs);
 //   - new random JWT_SECRET values (portal and admin share one: same session cookie);
 //   - the site variables PUBLIC_BASE_URL, ROBIN_SITE_URL and ALLOWED_ORIGINS.
 // It reads the apps' current Netlify projects to list the secrets whose
@@ -51,14 +50,14 @@ for (const app of APPS) {
 
 const site = { PUBLIC_BASE_URL: publicUrl, ROBIN_SITE_URL: siteUrl, ALLOWED_ORIGINS: [publicUrl, siteUrl].join(',') };
 const body = [
-  ...Object.entries(values).map(([key, value]) => ({ key, scopes: ['builds'], values: [{ context: 'all', value }] })),
-  ...Object.entries(site).map(([key, value]) => ({ key, scopes: ['builds', 'functions', 'runtime'], values: [{ context: 'all', value }] })),
+  // No scopes: the Personal plan does not allow them, and the functions need these anyway.
+  ...Object.entries({ ...values, ...site }).map(([key, value]) => ({ key, values: [{ context: 'all', value }] })),
 ];
 const output = resolve(ROOT, '.netlify/production-env.json');
 mkdirSync(resolve(ROOT, '.netlify'), { recursive: true });
 writeFileSync(output, JSON.stringify(body, null, 2), { mode: 0o600 });
 chmodSync(output, 0o600);
-console.log(`[netlify-env] ${body.length} variables -> .netlify/production-env.json (${Object.keys(values).length} de las apps, solo build; ${Object.keys(site).length} del sitio)`);
+console.log(`[netlify-env] ${body.length} variables -> .netlify/production-env.json (${Object.keys(values).length} de las apps, ${Object.keys(site).length} del sitio)`);
 console.log('[netlify-env] JWT_SECRET nuevos generados (portal y admin comparten el mismo).');
 if (manual.length) {
   console.log('[netlify-env] Netlify no deja leer su valor de producción; en el fichero va el de desarrollo o el local. Pon el real a mano:');
