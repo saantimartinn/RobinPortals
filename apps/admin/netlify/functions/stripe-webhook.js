@@ -41,11 +41,17 @@ exports.handler = async (event) => {
   }
 
   try {
-    const sb = getSupabase();
-
     if (evt.type === 'checkout.session.completed' ||
         evt.type === 'checkout.session.async_payment_succeeded') {
       const cs = evt.data.object;
+      // Stripe delivers every checkout in the account to this endpoint, including
+      // Robin Community subscriptions. Only admin-created checkouts belong here.
+      const kind = cs.metadata && cs.metadata.kind;
+      if (kind !== 'installment' && kind !== 'onboarding') {
+        log.result('ignored', { entity_type: 'stripe_event', entity_id: evt.id });
+        return json({ received: true });
+      }
+      const sb = getSupabase();
       const result = await stripeLib.fulfillCheckout(sb, cs);
       const awaitingAsyncPayment = result && result.reason === 'not_paid' && evt.type === 'checkout.session.completed';
       if (!awaitingAsyncPayment) stripeLib.assertFulfilled(result);
