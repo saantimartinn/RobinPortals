@@ -5,8 +5,6 @@
  *   - 'passport' -> Pasaporte (página de datos, una sola imagen)
  * Recibe base64 directamente — encaja con el multipart parser de Netlify.
  */
-const Anthropic = require('@anthropic-ai/sdk');
-
 function imageBlock({ base64, mimetype }) {
   return {
     type: 'image',
@@ -55,9 +53,10 @@ Reglas:
 - No incluyas comentarios ni texto fuera del JSON.`;
 
 async function extractDniFields({ anverso, reverso, docType }) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  // Netlify may expose the app-prefixed variable alongside the scoped name.
+  // Prefer it so a stale site-level key cannot override this portal's key.
+  const apiKey = String(process.env.PORTAL__ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY || '').trim();
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY no configurada');
-  const client = new Anthropic({ apiKey });
 
   const isPassport = String(docType || '').toLowerCase() === 'passport';
 
@@ -85,12 +84,27 @@ async function extractDniFields({ anverso, reverso, docType }) {
         },
       ];
 
-  const resp = await client.messages.create({
-    model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
-    max_tokens: 1024,
-    system: isPassport ? PASSPORT_PROMPT : SYSTEM_PROMPT,
-    messages,
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: process.env.PORTAL__ANTHROPIC_MODEL || process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
+      max_tokens: 1024,
+      system: isPassport ? PASSPORT_PROMPT : SYSTEM_PROMPT,
+      messages,
+    }),
+    signal: AbortSignal.timeout(30000),
   });
+  if (!response.ok) {
+    const error = new Error(`OCR provider HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  const resp = await response.json();
 
   const text = resp.content
     .filter((b) => b.type === 'text')
