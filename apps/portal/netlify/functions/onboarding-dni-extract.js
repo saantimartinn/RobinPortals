@@ -54,30 +54,49 @@ exports.handler = async (event) => {
     if (action !== 'extract') return json({ error: 'invalid_action' }, { statusCode: 400 });
 
     const images = await loadDniImages(sb, session.uid, body);
-    const fields = await extractDniFields({
-      anverso: { base64: images.anverso.base64, mimetype: images.anverso.mimetype },
-      reverso: images.reverso
-        ? { base64: images.reverso.base64, mimetype: images.reverso.mimetype }
-        : null,
-      docType: images.docType,
-    });
-
-    if (isIsolatedSandbox()) {
-      await storage.removeObject(sb, images.anverso.path, { bucket: BUCKET });
-      if (images.reverso) await storage.removeObject(sb, images.reverso.path, { bucket: BUCKET });
-      return json({ ok: true, fields });
+    const sandbox = isIsolatedSandbox();
+    if (!sandbox) {
+      const { error: updateError } = await sb
+        .from('users')
+        .update({
+          dni_anverso_path: images.anverso.path,
+          dni_reverso_path: images.reverso ? images.reverso.path : null,
+        })
+        .eq('id', session.uid);
+      if (updateError) throw updateError;
     }
 
-    const { error: updateError } = await sb
-      .from('users')
-      .update({
-        dni_anverso_path: images.anverso.path,
-        dni_reverso_path: images.reverso ? images.reverso.path : null,
-      })
-      .eq('id', session.uid);
-    if (updateError) throw updateError;
+    let fields = null;
+    let manual_entry = false;
+    let ocr_status = null;
+    let ocr_error_type = null;
+    try {
+      fields = await extractDniFields({
+        anverso: { base64: images.anverso.base64, mimetype: images.anverso.mimetype },
+        reverso: images.reverso
+          ? { base64: images.reverso.base64, mimetype: images.reverso.mimetype }
+          : null,
+        docType: images.docType,
+      });
+    } catch (error) {
+      manual_entry = true;
+      ocr_status = Number(error && error.status) || null;
+      ocr_error_type = String(error && error.name || 'Error').slice(0, 80);
+      console.error(JSON.stringify({
+        operation: 'onboarding.dni_ocr',
+        result: 'manual_entry',
+        provider_status: ocr_status,
+        error_type: ocr_error_type,
+      }));
+    }
 
-    return json({ ok: true, fields });
+    if (sandbox) {
+      await storage.removeObject(sb, images.anverso.path, { bucket: BUCKET });
+      if (images.reverso) await storage.removeObject(sb, images.reverso.path, { bucket: BUCKET });
+      return json({ ok: true, fields, manual_entry, ...(manual_entry ? { ocr_status, ocr_error_type } : {}) });
+    }
+
+    return json({ ok: true, fields, manual_entry, ...(manual_entry ? { ocr_status, ocr_error_type } : {}) });
   } catch (error) {
     if (inputError(error)) {
       return json({ error: error.code || error.message || 'invalid_upload' }, { statusCode: 400 });

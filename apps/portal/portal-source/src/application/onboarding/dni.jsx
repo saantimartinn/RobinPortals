@@ -16,6 +16,7 @@ export function OnboardingDNI({ user, onLogout, onDone }) {
   const [aPreview, setAPreview] = useState(null);
   const [rPreview, setRPreview] = useState(null);
   const [phase, setPhase] = useState("upload");   // 'upload' | 'review'
+  const [manualEntry, setManualEntry] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [fields, setFields] = useState({ nombre: "", apellidos: "", direccion: "", fecha_nacimiento: "", dni_numero: "", telefono_alumno: user.telefono_alumno || "" });
@@ -34,6 +35,7 @@ export function OnboardingDNI({ user, onLogout, onDone }) {
     setBusy(true); setError("");
     try {
       const res = await dniExtract(anverso, esPasaporte ? null : reverso, docType);
+      setManualEntry(!!res.manual_entry);
       setFields({
         nombre: res.fields?.nombre || "",
         apellidos: res.fields?.apellidos || "",
@@ -110,7 +112,9 @@ export function OnboardingDNI({ user, onLogout, onDone }) {
       ) : (
         <div className="space-y-4">
           <div className="text-sm bg-sky-50 text-sky-700 rounded-xl px-3 py-2 border border-sky-100">
-            Revisa los datos del <strong>alumno</strong> extraídos del {docLabel} y corrige lo que haga falta antes de confirmar.
+            {manualEntry
+              ? <>Las imágenes se han guardado, pero no hemos podido leer los datos automáticamente. Escríbelos tal como aparecen en el {docLabel} antes de confirmar.</>
+              : <>Revisa los datos del <strong>alumno</strong> extraídos del {docLabel} y corrige lo que haga falta antes de confirmar.</>}
             {esPasaporte && " El pasaporte no incluye dirección: complétala manualmente."}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -8,6 +8,8 @@ import robinStudentArt from "../../../../packages/brand/assets/robin-student.svg
 import robinCommunityArt from "../../../../packages/brand/assets/robin-community.svg";
 import "./login.css";
 
+const STUDENT_MAINTENANCE = true;
+
 import { isAdminUser } from "./session.js";
 import { CANVAS } from "./theme.js";
 import { reportClientError } from "./client-utils.js";
@@ -242,6 +244,11 @@ export default function PortalRobin() {
     });
   }
 
+  const staffLogin = new URLSearchParams(window.location.search).get("next") === "/admin";
+  if (STUDENT_MAINTENANCE && !staffLogin && /^\/login\/?$/.test(window.location.pathname)) {
+    return <MaintenanceScreen />;
+  }
+
   if (authState.loading) {
     return (
       <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}>
@@ -252,11 +259,15 @@ export default function PortalRobin() {
     );
   }
 
-  if (!authState.user) return <LoginScreen onLogin={handleLogin} />;
+  if (!authState.user) {
+    if (STUDENT_MAINTENANCE && !staffLogin) return <MaintenanceScreen />;
+    return <LoginScreen onLogin={handleLogin} />;
+  }
   if (isAdminUser(authState.user)) return <>
     <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <AdminPortal user={authState.user} />
   </>;
+  if (STUDENT_MAINTENANCE) return <MaintenanceScreen />;
   if (authState.user.auth_source === "external_client") return <>
     <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#2D3A64]" role="status">
@@ -361,9 +372,21 @@ function LoginScreen({ onLogin }) {
           <button className="robin-postcard-submit" type="submit" disabled={!email || !password || loading}>
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : "Entrar"}
           </button>
-          <p className="robin-postcard-hint">Si acabas de unirte, tu usuario es el número de ID que te enviamos.</p>
+          <p className="robin-postcard-hint">Acceso de administración.</p>
         </form>
       </div>
     </main>
   );
+}
+
+function MaintenanceScreen() {
+  return <main className="robin-maintenance" role="status">
+    <div className="robin-maintenance-card">
+      <img className="robin-maintenance-bird" src={robinStudentArt} alt="Pájaro de Robin" />
+      <img className="robin-maintenance-wordmark" src={robinWordmark} alt="Robin" />
+      <h1>Estamos en mantenimiento</h1>
+      <p>El portal del alumno estará en mantenimiento hasta el lunes 26 de octubre. Estamos revisando los accesos y el proceso de documentación para que puedas continuar con tranquilidad.</p>
+      <p className="robin-maintenance-footnote">Gracias por tu paciencia. Vuelve a intentarlo el lunes.</p>
+    </div>
+  </main>;
 }
