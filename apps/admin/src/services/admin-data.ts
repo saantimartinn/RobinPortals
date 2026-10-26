@@ -174,7 +174,7 @@ export const adminDataClient = {
   },
   async listBookings(): Promise<WebBooking[]> {
     const response = await apiFetch("/api/admin/crm/bookings", { credentials: "include" });
-    if (!response.ok) throw new Error("No se pudieron cargar las reservas de consulta");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return (await response.json()).bookings || [];
   },
   async listLeads(): Promise<Contact[]> {

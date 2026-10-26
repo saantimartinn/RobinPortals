@@ -18,7 +18,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [courseFilter, setCourseFilter] = useState("all");
   const [view, setView] = useState<InboxView>("all");
   const [bookings, setBookings] = useState<WebBooking[] | null>(null);
-  const [bookingError, setBookingError] = useState(false);
+  const [bookingError, setBookingError] = useState("");
   const [bookingRetry, setBookingRetry] = useState(0);
   const [addingLead, setAddingLead] = useState(false);
   const [manualLead, setManualLead] = useState({ name: "", email: "", phone: "", notes: "", owner: "", source: "organic" });
@@ -43,10 +43,10 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
     if (view !== "reservas") return;
     let active = true;
     setBookings(null);
-    setBookingError(false);
+    setBookingError("");
     adminDataClient.listBookings()
       .then((rows) => { if (active) setBookings(rows); })
-      .catch(() => { if (active) { setBookings([]); setBookingError(true); } });
+      .catch((error) => { if (active) { setBookings([]); setBookingError(error instanceof Error ? error.message : "Error de conexión"); } });
     return () => { active = false; };
   }, [view, bookingRetry]);
   const bookingByEmail = useMemo(() => {
@@ -113,7 +113,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
         {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>{label}</button>)}
       </nav>
       {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
-      {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario. <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
+      {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario ({bookingError}). <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
