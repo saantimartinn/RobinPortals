@@ -1,10 +1,9 @@
 // Admin feature module for lead inbox; the feature registry connects it to the authenticated shell.
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Download, Filter, Plus, Search, UserCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Contact } from "@/types/domain";
-import { adminDataClient, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, Title, ContactDrawer } from './feature-shared';
 import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
@@ -17,28 +16,6 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
   const [view, setView] = useState<InboxView>("all");
-  // Website consultation bookings (hello@ calendar), loaded when Reservas is opened.
-  const [bookings, setBookings] = useState<WebBooking[] | null>(null);
-  const [bookingsError, setBookingsError] = useState("");
-  useEffect(() => {
-    if (view !== "reservas" || bookings) return;
-    let active = true;
-    adminDataClient.listBookings()
-      .then((result) => { if (active) setBookings(result); })
-      .catch((error) => { if (active) { setBookings([]); setBookingsError(error instanceof Error ? error.message : String(error)); } });
-    return () => { active = false; };
-  }, [view, bookings]);
-  // Booking per email: the next upcoming one, else the latest past one.
-  const bookingTimes = useMemo(() => {
-    const times: Record<string, string> = {};
-    const now = Date.now();
-    for (const booking of bookings || []) {
-      for (const email of booking.emails) {
-        if (!times[email] || meetingOrder(booking.start, now) < meetingOrder(times[email], now)) times[email] = booking.start;
-      }
-    }
-    return times;
-  }, [bookings]);
   const [addingLead, setAddingLead] = useState(false);
   const [manualLead, setManualLead] = useState({ name: "", email: "", phone: "", notes: "", owner: "", source: "organic" });
   const [savingLead, setSavingLead] = useState(false);
@@ -46,38 +23,17 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [groupName, setGroupName] = useState("");
   const [groupRows, setGroupRows] = useState<LeadGroupRow[]>(() => Array.from({ length: 6 }, emptyLeadGroupRow));
   const [savingGroup, setSavingGroup] = useState(false);
-  const list = useMemo(() => (view === "reservas" ? contacts.map((contact) => ({ ...contact, meetingAt: bookingTimes[contact.email.toLowerCase()] })) : contacts).filter((contact) => {
+  const list = useMemo(() => contacts.filter((contact) => {
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
-    if (view === "reservas") {
-      // Las reservas siguen aquí aunque ya tengan responsable: la consulta está pendiente.
-      if (contact.formName !== "reserva" || stage === "Cliente" || stage === "Lost") return false;
-    } else {
-      if (stage !== "Por contactar") return false;
-      // La bandeja es exclusivamente de entrada: al asignar un responsable, el
-      // lead pasa al CRM personal y deja de mostrarse aquí inmediatamente.
-      if (leadOwners[contact.id]) return false;
-    }
+    // Al asignarlo, el lead pasa al CRM personal y sale de la bandeja.
+    if (stage !== "Por contactar" || leadOwners[contact.id]) return false;
+    if (view === "reservas" && contact.formName !== "contacto") return false;
     if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
     if (campaignFilter !== "all" && contact.campaign !== campaignFilter) return false;
     if (courseFilter !== "all" && contact.course !== courseFilter) return false;
     return view === "all" || view === "reservas" || (contact.country || "Otros") === view;
-  }).sort(view === "reservas"
-    ? (a, b) => meetingOrder(a.meetingAt) - meetingOrder(b.meetingAt) || a.id.localeCompare(b.id)
-    : (a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view, bookingTimes]);
-  // Reservas: the booking leads plus website bookings whose email is not in the CRM.
-  const bookingRows = useMemo(() => {
-    if (view !== "reservas") return [];
-    const known = new Set(contacts.map((contact) => contact.email.toLowerCase()).filter(Boolean));
-    const search = query.trim().toLowerCase();
-    const extraAllowed = [sourceFilter, campaignFilter, courseFilter].every((value) => value === "all");
-    const extra: BookingRow[] = extraAllowed ? (bookings || [])
-      .filter((booking) => booking.emails.length && !booking.emails.some((email) => known.has(email)))
-      .map((booking) => ({ key: booking.eventId, meetingAt: booking.start, name: booking.name || booking.emails[0], email: booking.emails[0], course: "", country: "—" }))
-      .filter((row) => `${row.name} ${row.email}`.toLowerCase().includes(search)) : [];
-    const rows: BookingRow[] = list.map((contact) => ({ key: contact.id, meetingAt: contact.meetingAt, contact, name: contact.name, email: contact.email, course: contact.course || "", country: contact.country || "Otros" }));
-    return [...rows, ...extra].sort((a, b) => meetingOrder(a.meetingAt) - meetingOrder(b.meetingAt) || a.key.localeCompare(b.key));
-  }, [view, contacts, bookings, list, query, sourceFilter, campaignFilter, courseFilter]);
+  }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view]);
   const sources = useMemo(() => [...new Set(contacts.map((contact) => contact.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const campaigns = useMemo(() => [...new Set(contacts.map((contact) => contact.campaign).filter((campaign) => campaign && campaign !== "Pendiente de identificar"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const courses = useMemo(() => [...new Set(contacts.map((contact) => contact.course?.trim()).filter((course): course is string => Boolean(course)))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })), [contacts]);
@@ -97,7 +53,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
     finally { setSavingGroup(false); }
   }
   function exportLeads() {
-    const rows = contacts.filter((contact) => !leadOwners[contact.id] && (leadStages[contact.id] || contact.stage || "Por contactar") !== "Cliente");
+    const rows = list;
     const csvCell = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
     const headers = ["Nombre", "Email", "Teléfono", "Origen", "Campaña", "Curso", "País", "Interés", "Responsable", "Días sin contactar", "Heat", "Motivo Lost", "Detalle Lost", "Comentario", "Fecha de alta"];
     const body = rows.map((contact) => [contact.name, contact.email, contact.phone, contact.source, contact.campaign, contact.course || "", contact.country || "Otros", contact.interest || "", leadOwners[contact.id] || "Sin asignar", leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id])) ?? "", contact.heat ?? "", lostReasonLabel(contact.lostReason), contact.lostReasonDetail || "", contact.comment || "", contact.createdAt || ""].map(csvCell).join(","));
@@ -111,7 +67,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   return (
     <div className="page">
       <Title name="Bandeja de entrada de leads" sub="Asigna cada nuevo lead al administrador que lo gestionará." eyebrow="Inicio / Vista global">
-        <Badge variant="outline">{view === "reservas" ? `${bookingRows.length} reservas` : `${list.length} leads`}</Badge>
+        <Badge variant="outline">{list.length} leads</Badge>
       </Title>
       <div className="module-toolbar">
         <label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nombre, email o canal…" /></label>
@@ -122,15 +78,15 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
       </div>
       {filtersOpen && <section className="lead-filters panel"><label>Origen<select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}><option value="all">Todos los orígenes</option>{sources.map((source) => <option key={source} value={source}>{source}</option>)}</select></label><label>Campaña<select value={campaignFilter} onChange={(event) => setCampaignFilter(event.target.value)}><option value="all">Todas las campañas</option>{campaigns.map((campaign) => <option key={campaign} value={campaign}>{campaign}</option>)}</select></label><label>Curso<select value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)}><option value="all">Todos los cursos</option>{courses.map((course) => <option key={course} value={course}>{course}</option>)}</select></label><button type="button" onClick={() => { setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>Limpiar filtros</button></section>}
       <nav className="inbox-views" aria-label="Secciones de la bandeja">
-        {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => setView(key)}>{label}</button>)}
+        {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>{label}</button>)}
       </nav>
-      {view === "reservas" && bookingsError && <p className="assignment-note">{bookingsError}. Se muestran las reservas sin fecha.</p>}
-      {view === "reservas" && !bookings ? <section className="panel inbox-panel"><p className="empty-copy">Cargando reservas…</p></section> : view === "reservas" ? <BookingTable rows={bookingRows} admins={admins} leadOwners={leadOwners} onAssignLead={onAssignLead} notify={notify} onOpen={setSelected} /> :
+      {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario de contacto, pendientes de asignación.</p>}
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
             <thead><tr><th>Lead</th><th>Entrada</th><th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th></tr></thead>
             <tbody>
+              {list.length === 0 && <tr><td colSpan={8} className="empty-copy">{view === "reservas" ? "No hay leads del formulario de contacto pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
               {list.map((contact) => (
                 <tr key={contact.id} className="unassigned-lead" onClick={() => setSelected(contact)}>
                   <td><button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
@@ -159,7 +115,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
             </tbody>
           </table>
         </div>
-      </section>}
+      </section>
       <p className="assignment-note"><UserCheck /> Al asignar un lead, aparecerá inmediatamente en el CRM personal del usuario seleccionado.</p>
       {addingLead && <div className="drawer-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget) setAddingLead(false); }}><form className="manual-lead-card" onSubmit={async (event) => { event.preventDefault(); setSavingLead(true); try { await onAddLead(manualLead); notify(`${manualLead.name} añadido correctamente`); setManualLead({ name: "", email: "", phone: "", notes: "", owner: "", source: "organic" }); setAddingLead(false); } catch (error) { notify(error instanceof Error ? error.message : "No se pudo crear el lead"); } finally { setSavingLead(false); } }}><button className="drawer-close" type="button" onClick={() => setAddingLead(false)}>×</button><span>Nuevo lead</span><h2>Añadir manualmente</h2><p>El lead quedará en Por contactar.</p><label>Nombre<input required value={manualLead.name} onChange={(event) => setManualLead((lead) => ({ ...lead, name: event.target.value }))} /></label><div className="manual-lead-row"><label>Email<input type="email" value={manualLead.email} onChange={(event) => setManualLead((lead) => ({ ...lead, email: event.target.value }))} /></label><label>Teléfono<input value={manualLead.phone} onChange={(event) => setManualLead((lead) => ({ ...lead, phone: event.target.value }))} /></label></div><label>Origen<select value={manualLead.source} onChange={(event) => setManualLead((lead) => ({ ...lead, source: event.target.value }))}><option value="organic">Orgánico</option><option value="organic_social">Orgánico RRSS</option><option value="referral">Referidos</option><option value="schools">Colegios</option><option value="google_ads">Google Ads</option><option value="tiktok_ads">TikTok Ads</option><option value="email">Email</option><option value="events">Eventos</option><option value="other">Otros</option></select></label><label>Asignar a<select value={manualLead.owner} onChange={(event) => setManualLead((lead) => ({ ...lead, owner: event.target.value }))}><option value="">Sin asignar</option>{admins.map((admin) => <option key={admin}>{admin}</option>)}</select></label><label>Notas<textarea value={manualLead.notes} onChange={(event) => setManualLead((lead) => ({ ...lead, notes: event.target.value }))} /></label><div className="manual-lead-actions"><Button type="button" variant="outline" onClick={() => setAddingLead(false)}>Cancelar</Button><Button type="submit" disabled={savingLead}>{savingLead ? "Guardando…" : "Crear lead"}</Button></div></form></div>}
       {addingGroup && <div className="lead-sheet-backdrop"><form className="lead-sheet" onSubmit={saveLeadGroup}>
@@ -192,54 +148,3 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
 
 type InboxView = "all" | "España" | "Portugal" | "reservas";
 const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["reservas", "Reservas"]];
-
-// Upcoming consultations first (closest on top), then past ones (most recent first), then undated.
-function meetingOrder(meetingAt?: string, now = Date.now()) {
-  const time = meetingAt ? new Date(meetingAt).getTime() : NaN;
-  if (!Number.isFinite(time)) return Number.MAX_SAFE_INTEGER;
-  return time >= now ? time - now : 1e15 + (now - time);
-}
-
-const meetingDate = new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "Europe/Madrid" });
-const meetingTime = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" });
-
-type BookingRow = { key: string; meetingAt?: string; contact?: Contact; name: string; email: string; course: string; country: string };
-
-function BookingTable({ rows, admins, leadOwners, onAssignLead, notify, onOpen }: { rows: BookingRow[]; admins: string[]; leadOwners: Record<string, string>; onAssignLead: FeatureModuleProps["onAssignLead"]; notify: FeatureModuleProps["notify"]; onOpen: (contact: Contact) => void }) {
-  return (
-    <section className="panel inbox-panel">
-      <div className="data-table">
-        <table>
-          <thead><tr><th>Lead</th><th>Fecha</th><th>Hora</th><th>Curso</th><th>País</th><th>Responsable</th></tr></thead>
-          <tbody>
-            {rows.length === 0 && <tr><td colSpan={6} className="empty-copy">No hay reservas de consulta.</td></tr>}
-            {rows.map((row) => {
-              const at = row.meetingAt ? new Date(row.meetingAt) : null;
-              const valid = Boolean(at && Number.isFinite(at.getTime()));
-              const past = valid && (at as Date).getTime() < Date.now();
-              const contact = row.contact;
-              return (
-                <tr key={row.key} className={past ? "booking-past" : undefined} onClick={contact ? () => onOpen(contact) : undefined}>
-                  <td>{contact ? <button type="button" className="lead-name-button" onClick={() => onOpen(contact)}><b>{row.name}</b><small>{row.email}</small></button> : <span className="lead-name-button"><b>{row.name}</b><small>{row.email} · sin lead en el CRM</small></span>}</td>
-                  <td>{valid ? <time dateTime={row.meetingAt}>{meetingDate.format(at as Date)}</time> : "Sin fecha"}</td>
-                  <td>{valid ? meetingTime.format(at as Date) : "—"}</td>
-                  <td>{row.course}</td>
-                  <td>{row.country}</td>
-                  <td>{contact ? (
-                    <select className="owner-select" value={leadOwners[contact.id] || ""} onClick={(event) => event.stopPropagation()} onChange={(event) => {
-                      onAssignLead(contact.id, event.target.value);
-                      notify(`${contact.name} asignado a ${event.target.value || "nadie"}`);
-                    }}>
-                      <option value="">Sin asignar</option>
-                      {admins.map((admin) => <option key={admin}>{admin}</option>)}
-                    </select>
-                  ) : "—"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
-}
