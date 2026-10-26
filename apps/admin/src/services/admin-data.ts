@@ -110,10 +110,7 @@ function toContact(row: Record<string, any>): Contact {
   const name = placeholderName ? recoveredName || row.email || row.phone || "Sin nombre" : storedName;
   const stage = (row.crm_stage || "Por contactar") as CrmStage;
   const category = row.lead_type === "Delft" ? "delft" : row.lead_type;
-  const explicitFormName = String(row.source_payload?.form_name || row.source_payload?.form || (String(row.comment || "").match(/Formulario:\s*([^\n·]+)/i)?.[1] ?? "")).trim().toLowerCase();
-  const pagePath = String(row.source_payload?.page_url || "").replace(/^https?:\/\/[^/]+/i, "").split(/[?#]/)[0].replace(/\/+$/, "");
-  // Older website submissions omitted form_name; their contact-page URL is the only saved form marker.
-  const formName = explicitFormName || (row.source_payload?.source === "website" && ["/contacto", "/pt/contacto"].includes(pagePath) ? "contacto" : "");
+  const formName = String(row.source_payload?.form_name || row.source_payload?.form || (String(row.comment || "").match(/Formulario:\s*([^\n·]+)/i)?.[1] ?? "")).trim().toLowerCase();
   const formNotes = fieldValue(fields, /(message|mensaje|notes?|notas?|comentario|comments?|details?|detalles?|respuesta|response|consulta)/);
   const payloadValue = (...keys: string[]) => keys.map((key) => row.source_payload?.[key]).find((value) => value != null && String(value).trim());
   const sourceComment = row.comment || row.body_text || row.summary || "";
