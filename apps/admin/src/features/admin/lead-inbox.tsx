@@ -1,9 +1,10 @@
 // Admin feature module for lead inbox; the feature registry connects it to the authenticated shell.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Download, Filter, Plus, Search, UserCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Contact } from "@/types/domain";
+import { adminDataClient, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, Title, ContactDrawer } from './feature-shared';
 import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
@@ -16,6 +17,9 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
   const [view, setView] = useState<InboxView>("all");
+  const [bookings, setBookings] = useState<WebBooking[] | null>(null);
+  const [bookingError, setBookingError] = useState(false);
+  const [bookingRetry, setBookingRetry] = useState(0);
   const [addingLead, setAddingLead] = useState(false);
   const [manualLead, setManualLead] = useState({ name: "", email: "", phone: "", notes: "", owner: "", source: "organic" });
   const [savingLead, setSavingLead] = useState(false);
@@ -28,13 +32,40 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
     // Al asignarlo, el lead pasa al CRM personal y sale de la bandeja.
     if (stage !== "Por contactar" || leadOwners[contact.id]) return false;
     if (view === "reservas" && contact.formName !== "reserva") return false;
-    if (view === "all" && contact.formName === "reserva") return false;
+    if (view !== "reservas" && contact.formName === "reserva") return false;
     if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
     if (campaignFilter !== "all" && contact.campaign !== campaignFilter) return false;
     if (courseFilter !== "all" && contact.course !== courseFilter) return false;
     return view === "all" || view === "reservas" || (contact.country || "Otros") === view;
   }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view]);
+  useEffect(() => {
+    if (view !== "reservas") return;
+    let active = true;
+    setBookings(null);
+    setBookingError(false);
+    adminDataClient.listBookings()
+      .then((rows) => { if (active) setBookings(rows); })
+      .catch(() => { if (active) { setBookings([]); setBookingError(true); } });
+    return () => { active = false; };
+  }, [view, bookingRetry]);
+  const bookingByEmail = useMemo(() => {
+    const grouped = new Map<string, WebBooking[]>();
+    for (const booking of bookings || []) {
+      if (!Number.isFinite(Date.parse(booking.start))) continue;
+      for (const rawEmail of booking.emails || []) {
+        const email = rawEmail.trim().toLowerCase();
+        if (email) grouped.set(email, [...(grouped.get(email) || []), booking]);
+      }
+    }
+    const selected = new Map<string, WebBooking>();
+    const now = Date.now();
+    for (const [email, matches] of grouped) {
+      matches.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+      selected.set(email, matches.find((booking) => Date.parse(booking.start) >= now) || matches[matches.length - 1]);
+    }
+    return selected;
+  }, [bookings]);
   const sources = useMemo(() => [...new Set(contacts.map((contact) => contact.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const campaigns = useMemo(() => [...new Set(contacts.map((contact) => contact.campaign).filter((campaign) => campaign && campaign !== "Pendiente de identificar"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const courses = useMemo(() => [...new Set(contacts.map((contact) => contact.course?.trim()).filter((course): course is string => Boolean(course)))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })), [contacts]);
@@ -82,16 +113,18 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
         {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>{label}</button>)}
       </nav>
       {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
+      {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario. <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
-            <thead><tr><th>Lead</th><th>Entrada</th><th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th></tr></thead>
+            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th></tr></thead>
             <tbody>
-              {list.length === 0 && <tr><td colSpan={8} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
+              {list.length === 0 && <tr><td colSpan={view === "reservas" ? 9 : 8} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
               {list.map((contact) => (
                 <tr key={contact.id} className="unassigned-lead" onClick={() => setSelected(contact)}>
                   <td><button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
                   <td><time className="lead-entry-time" dateTime={contact.createdAt}>{formatLeadEntry(contact.createdAt)}</time></td>
+                  {view === "reservas" && <td>{bookings === null ? "Cargando…" : bookingError ? "No disponible" : <BookingDate booking={bookingByEmail.get(contact.email.trim().toLowerCase())} />}</td>}
                   <td><span className="lead-source-readonly">{campaignOrOrigin(contact)}</span>{["Meta Ads", "Página web"].includes(contact.source) && <small className="lead-source-kind">{contact.source}</small>}</td>
                   <td>{contact.course || ""}</td>
                   <td>{contact.country || "Otros"}</td>
@@ -145,6 +178,15 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
       {selected && <ContactDrawer contact={{ ...selected, owner: leadOwners[selected.id] || "Sin asignar", stage: leadStages[selected.id] }} admins={admins} heat={selected.heat || 50} onHeatChange={(value) => onSetLeadHeat(selected.id, value)} onOwnerChange={(owner) => { onAssignLead(selected.id, owner); notify(`${selected.name} asignado a ${owner}`); }} onContactRoleChange={(value) => onSetLeadContactRole(selected.id, value)} onDeleteLead={async (id) => { await onDeleteLead(id); notify(`${selected.name} eliminado correctamente`); }} onClose={() => setSelected(null)} leadMode />}
     </div>
   );
+}
+
+const bookingDateFormatter = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Europe/Madrid" });
+const bookingTimeFormatter = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Madrid" });
+
+function BookingDate({ booking }: { booking?: WebBooking }) {
+  if (!booking) return <>Sin cita vinculada</>;
+  const date = new Date(booking.start);
+  return <time className="lead-entry-time" dateTime={booking.start}>{bookingDateFormatter.format(date)} · {bookingTimeFormatter.format(date)}</time>;
 }
 
 type InboxView = "all" | "España" | "Portugal" | "reservas";
