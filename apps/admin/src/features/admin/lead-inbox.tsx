@@ -27,7 +27,8 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
     // Al asignarlo, el lead pasa al CRM personal y sale de la bandeja.
     if (stage !== "Por contactar" || leadOwners[contact.id]) return false;
-    if (view === "reservas" && contact.formName !== "contacto") return false;
+    if (view === "reservas" && contact.formName !== "reserva") return false;
+    if (view === "all" && contact.formName === "reserva") return false;
     if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
     if (campaignFilter !== "all" && contact.campaign !== campaignFilter) return false;
@@ -80,13 +81,13 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
       <nav className="inbox-views" aria-label="Secciones de la bandeja">
         {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>{label}</button>)}
       </nav>
-      {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario de contacto, pendientes de asignación.</p>}
+      {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
             <thead><tr><th>Lead</th><th>Entrada</th><th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th></tr></thead>
             <tbody>
-              {list.length === 0 && <tr><td colSpan={8} className="empty-copy">{view === "reservas" ? "No hay leads del formulario de contacto pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
+              {list.length === 0 && <tr><td colSpan={8} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
               {list.map((contact) => (
                 <tr key={contact.id} className="unassigned-lead" onClick={() => setSelected(contact)}>
                   <td><button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
