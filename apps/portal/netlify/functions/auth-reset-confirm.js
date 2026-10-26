@@ -1,5 +1,6 @@
 const { getSupabase } = require('../../lib/supabase');
-const { buildSessionCookie, hashPassword } = require('../../lib/auth');
+const { buildSessionCookie } = require('../../lib/auth');
+const { storePasswordWithoutHash } = require('../../../../packages/auth/password-storage.cjs');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { readResetToken, passwordVersion } = require('../../lib/password-reset');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
@@ -27,7 +28,7 @@ exports.handler = async (event) => {
       return json({ error: 'invalid_or_expired_link' }, { statusCode: 400 });
     }
     const { data: updated, error: updateError } = await sb.from('users')
-      .update({ password_hash: hashPassword(newPassword) })
+      .update({ password_hash: storePasswordWithoutHash(newPassword) })
       .eq('id', user.id)
       .eq('password_hash', user.password_hash)
       .select('id');

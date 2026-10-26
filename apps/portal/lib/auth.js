@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
 const { createCookieHelpers } = require('../../../packages/auth/cookies.cjs');
+const { verifyStoredPlaintextPassword } = require('../../../packages/auth/password-storage.cjs');
 const sharedCookies = createCookieHelpers({ parse: parseCookies, serialize: serializeCookie });
 
 const COOKIE_NAME = 'robin_portal_session';
@@ -23,6 +24,8 @@ function hashPassword(plain) {
   return bcrypt.hashSync(plain, 12);
 }
 function verifyPassword(plain, hash) {
+  const plainResult = verifyStoredPlaintextPassword(plain, hash);
+  if (plainResult !== null) return plainResult;
   return bcrypt.compareSync(plain, hash);
 }
 

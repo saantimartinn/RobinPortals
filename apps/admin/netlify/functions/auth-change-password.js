@@ -1,12 +1,12 @@
 // Netlify handler for /api/auth/change-password; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
 const {
-  hashPassword,
   verifyPassword,
   readSessionFromEvent,
 } = require('../../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { passwordPolicy } = require('../../shared/password-policy.cjs');
+const { storePasswordWithoutHash } = require('../../../../packages/auth/password-storage.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -29,8 +29,8 @@ exports.handler = async (event) => {
     if (!verifyPassword(current_password, user.password_hash)) {
       return json({ error: 'invalid_credentials' }, { statusCode: 401 });
     }
-    const hash = hashPassword(new_password);
-    const { error: e2 } = await sb.from('users').update({ password_hash: hash }).eq('id', user.id);
+    const storedPassword = storePasswordWithoutHash(new_password);
+    const { error: e2 } = await sb.from('users').update({ password_hash: storedPassword }).eq('id', user.id);
     if (e2) throw e2;
     return json({ ok: true });
   } catch (e) {

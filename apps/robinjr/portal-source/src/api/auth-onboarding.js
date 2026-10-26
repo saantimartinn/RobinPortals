@@ -1,8 +1,12 @@
 // Browser API client for auth onboarding; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
+import { changeCommonPassword } from "../../../../../packages/auth/change-password-client.mjs";
 
 export async function login(username, password) {
   return api.post("/api/auth/login", { username, password });
+}
+export async function changePassword(currentPassword, newPassword) {
+  return changeCommonPassword(currentPassword, newPassword);
 }
 export async function logout() {
   try { await api.post("/api/auth/logout"); } catch (error) { console.warn("[api] optional operation failed", error && error.message); }

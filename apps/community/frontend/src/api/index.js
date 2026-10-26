@@ -1,4 +1,5 @@
 // Browser API client for index; keeps endpoint and fetch details out of the screens.
+import { changeCommonPassword } from "../../../../../packages/auth/change-password-client.mjs";
 async function request(method, url, body, isForm) {
   const opts = { method, credentials: "same-origin", headers: {} };
   if (body && !isForm) {
@@ -32,6 +33,10 @@ export const api = {
 
 export async function login(username, password) {
   return api.post("/api/auth/login", { username, password });
+}
+
+export async function changePassword(currentPassword, newPassword) {
+  return changeCommonPassword(currentPassword, newPassword);
 }
 
 export async function requestPasswordReset(email) {
