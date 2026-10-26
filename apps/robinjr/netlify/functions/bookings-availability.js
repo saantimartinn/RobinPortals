@@ -15,6 +15,7 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { adminName, canonicalAdvisorEmail } = require('../../lib/admins');
 const { bookingConfig, requestedDays } = require('../../lib/booking-config');
+const { overlapsWithBookingBuffer, BOOKING_BUFFER_MIN, BOOKING_BUFFER_MS } = require('../../lib/booking-availability');
 const gcal = require('../../lib/google-calendar');
 
 const TZ = 'Europe/Madrid';
@@ -42,7 +43,7 @@ function overlaps(sMs, eMs, busy) {
   for (const b of busy) {
     const bs = new Date(b.start).getTime();
     const be = new Date(b.end).getTime();
-    if (sMs < be && eMs > bs) return true;
+    if (overlapsWithBookingBuffer(sMs, eMs, bs, be)) return true;
   }
   return false;
 }
@@ -79,7 +80,11 @@ exports.handler = async (event) => {
     let events = [];
     let calendarOk = true;
     try {
-      events = await gcal.listEvents(advisorEmail, timeMin.toISOString(), timeMax.toISOString());
+      events = await gcal.listEvents(
+        advisorEmail,
+        new Date(timeMin.getTime() - BOOKING_BUFFER_MS).toISOString(),
+        new Date(timeMax.getTime() + BOOKING_BUFFER_MS).toISOString()
+      );
     } catch (e) {
       calendarOk = false;
       console.error('availability listEvents error', e.message);
@@ -104,11 +109,12 @@ exports.handler = async (event) => {
 
     const minStartMs = now.getTime() + 30 * 60000; // al menos 30 min en el futuro
     const SLOTMS = config.slotMin * 60000;
+    const STEPMs = BOOKING_BUFFER_MIN * 60000;
 
     // Genera slots alineados al inicio de cada ventana, evitando solapes con eventos ocupados
     const slotsByDate = {};
     for (const w of windows) {
-      for (let t = w.start; t + SLOTMS <= w.end; t += SLOTMS) {
+      for (let t = w.start; t + SLOTMS <= w.end; t += STEPMs) {
         if (t < minStartMs) continue;
         if (overlaps(t, t + SLOTMS, busy)) continue;
         const s = new Date(t);

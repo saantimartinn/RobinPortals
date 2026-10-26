@@ -27,7 +27,7 @@ export function Reservas() {
   useEffect(() => {
     let cancel = false;
     (async () => {
-      setLoading(true); setError("");
+      setLoading(true);
       try {
         const res = await bookingsList();
         if (!cancel) setServerBookings(res.bookings || []);
@@ -73,7 +73,13 @@ export function Reservas() {
       setSelectedSlot("");
       setRefreshKey((k) => k + 1);
     } catch (e) {
-      setError(e.message || "No se pudo crear la reserva.");
+      if (e.status === 409 && e.data?.error === "slot_unavailable") {
+        setError("Ese horario ya no está disponible. Elige otro; dejamos al menos 15 minutos entre llamadas.");
+        setSelectedSlot("");
+        setRefreshKey((k) => k + 1);
+      } else {
+        setError(e.message || "No se pudo crear la reserva.");
+      }
     } finally {
       setBusy(false);
     }
@@ -113,7 +119,7 @@ export function Reservas() {
                   const sel = d.date === selectedDate;
                   return (
                     <button key={d.date} type="button" disabled={!has}
-                      onClick={() => { setSelectedDate(d.date); setSelectedSlot(""); }}
+                      onClick={() => { setSelectedDate(d.date); setSelectedSlot(""); setError(""); }}
                       className={"flex-shrink-0 rounded-xl border px-3 py-2 text-center min-w-[68px] " + (sel ? "border-transparent text-white" : has ? "border-slate-200 bg-white text-slate-700 hover:border-slate-300" : "border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed")}
                       style={sel ? { background: NAVY } : undefined}>
                       <div className="text-[10px] ">{f.wd}</div>
@@ -124,6 +130,7 @@ export function Reservas() {
               </div>
 
               <div className="text-xs font-semibold text-slate-600 mb-2 ">Hora ({slotMin} min)</div>
+              <div className="text-[11px] text-slate-500 mb-2">Hay al menos 15 minutos libres entre llamadas de un mismo mentor.</div>
               {daySlots.length === 0 ? (
                 <div className="text-xs text-slate-500 mb-4">Sin huecos disponibles este día.</div>
               ) : (
@@ -132,7 +139,7 @@ export function Reservas() {
                     const sel = sl.start === selectedSlot;
                     return (
                       <button key={sl.start} type="button"
-                        onClick={() => setSelectedSlot(sl.start)}
+                        onClick={() => { setSelectedSlot(sl.start); setError(""); }}
                         className={"rounded-lg border px-2 py-2 text-sm font-medium " + (sel ? "border-transparent text-white" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300")}
                         style={sel ? { background: NAVY } : undefined}>
                         {sl.label}

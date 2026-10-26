@@ -17,7 +17,7 @@ const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = req
 const { createMeetEvent, deleteCalendarEvent, listEvents } = require('../../lib/google-calendar');
 const { adminName, canonicalAdvisorEmail } = require('../../lib/admins');
 const { createOperationLogger, errorCode } = require('../../lib/observability');
-const { evaluateSlot } = require('../../lib/booking-availability');
+const { evaluateSlot, BOOKING_BUFFER_MS } = require('../../lib/booking-availability');
 const { bookingConfig } = require('../../lib/booking-config');
 const { isoDate, numberValue } = require('../../lib/validation');
 const { sendBookingNotifications } = require('../../lib/booking-create');
@@ -36,6 +36,12 @@ async function insertBookingOrRollback({ sb, row, advisorEmail, eventId, removeE
   const persistenceError = error || new Error('booking_insert_failed');
   if (cleanupError) persistenceError.calendarCleanupError = cleanupError;
   throw persistenceError;
+}
+
+function isBookingSlotConflict(error) {
+  const message = String(error && error.message || '');
+  return (error && error.code === '23P01' && message.includes('booking_slot_unavailable'))
+    || (error && error.code === '23505' && message.includes('bookings_advisor_scheduled_slot_key'));
 }
 
 exports.handler = async (event) => {
@@ -110,7 +116,11 @@ exports.handler = async (event) => {
     const requestedEnd = new Date(requestedStart.getTime() + durationMin * 60000);
     let currentEvents;
     try {
-      currentEvents = await listEvents(advisorEmail, requestedStart.toISOString(), requestedEnd.toISOString());
+      currentEvents = await listEvents(
+        advisorEmail,
+        new Date(requestedStart.getTime() - BOOKING_BUFFER_MS).toISOString(),
+        new Date(requestedEnd.getTime() + BOOKING_BUFFER_MS).toISOString()
+      );
     } catch (e) {
       log.warn('degraded', { error_code: errorCode(e, 'availability_check_failed') });
       return json({ error: 'availability_check_failed' }, { statusCode: 502 });
@@ -180,6 +190,10 @@ exports.handler = async (event) => {
           error_code: errorCode(persistenceError.calendarCleanupError, 'calendar_cleanup_failed'),
         });
       }
+      if (isBookingSlotConflict(persistenceError) && !persistenceError.calendarCleanupError) {
+        log.warn('rejected', { error_code: 'slot_unavailable' });
+        return json({ error: 'slot_unavailable' }, { statusCode: 409 });
+      }
       console.error('[booking_insert_error]', errorCode(persistenceError, 'booking_insert_failed'));
       throw persistenceError;
     }
@@ -201,3 +215,4 @@ exports.handler = async (event) => {
 };
 
 module.exports.insertBookingOrRollback = insertBookingOrRollback;
+module.exports.isBookingSlotConflict = isBookingSlotConflict;
