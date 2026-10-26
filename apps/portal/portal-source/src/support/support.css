@@ -1,0 +1,37 @@
+.robin-report-floating{position:fixed;top:1rem;right:1rem;z-index:140;display:inline-flex;align-items:center;gap:.45rem;padding:.65rem .9rem;border:1px solid var(--robin-navy);border-radius:9px;background:var(--robin-paper);color:var(--robin-navy);font:600 .85rem var(--robin-font-text);box-shadow:0 4px 18px #17274618;cursor:pointer}
+.robin-report-floating:hover,.robin-cross-report:hover{background:var(--robin-ink-50)}
+.robin-cross-report{display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;padding:.5rem .7rem;border:1px solid var(--robin-navy);border-radius:9px;background:transparent;color:var(--robin-navy);font:600 .78rem var(--robin-font-text);cursor:pointer}
+.robin-support-backdrop{position:fixed;inset:0;z-index:500;display:grid;place-items:center;overflow-y:auto;padding:1rem;background:#14213d99;backdrop-filter:blur(3px)}
+.robin-support-modal{position:relative;width:min(31rem,100%);max-height:calc(100vh - 2rem);overflow-y:auto;padding:2rem;background:var(--robin-paper);border:var(--robin-line);border-radius:18px;box-shadow:0 22px 70px #14213d35;color:var(--robin-navy);font-family:var(--robin-font-text)}
+.robin-support-close{position:absolute;top:.9rem;right:.9rem;display:grid;place-items:center;width:2rem;height:2rem;border:0;border-radius:8px;background:transparent;color:var(--robin-ink-600);cursor:pointer}
+.robin-support-close:hover{background:var(--robin-ink-50)}
+.robin-support-eyebrow{margin:0 0 .55rem;color:var(--robin-orange);font-size:.75rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.robin-support-modal h2{margin:0 2rem 1rem 0;font:600 clamp(1.8rem,5vw,2.3rem)/1.08 var(--robin-font-display)}
+.robin-support-modal p{line-height:1.55}
+.robin-support-description{margin:0 0 1.4rem;color:var(--robin-ink-600);font-size:.9rem}
+.robin-intro-modal{text-align:center}
+.robin-intro-modal h2{margin-right:0}
+.robin-intro-modal p:not(.robin-support-eyebrow){color:var(--robin-ink-600)}
+.robin-intro-bird{display:block;width:6rem;height:6rem;margin:0 auto 1rem}
+.robin-support-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:.65rem;margin-top:1.5rem}
+.robin-intro-modal .robin-support-actions{justify-content:center}
+.robin-support-primary,.robin-support-secondary{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:2.75rem;padding:.65rem 1rem;border-radius:9px;font:600 .9rem var(--robin-font-text);cursor:pointer}
+.robin-support-primary{border:1px solid var(--robin-navy);background:var(--robin-navy);color:white}
+.robin-support-secondary{border:1px solid var(--robin-ink-300);background:transparent;color:var(--robin-navy)}
+.robin-support-primary:disabled{opacity:.55;cursor:wait}
+.robin-report-form{display:grid;gap:1rem}
+.robin-report-form label{display:grid;gap:.4rem;color:var(--robin-navy);font-size:.88rem;font-weight:600}
+.robin-report-form input,.robin-report-form select,.robin-report-form textarea{width:100%;padding:.7rem .8rem;border:1px solid var(--robin-ink-300);border-radius:8px;background:white;color:var(--robin-navy);font:400 .9rem var(--robin-font-text)}
+.robin-report-form textarea{resize:vertical}
+.robin-report-form :is(input,select,textarea):focus{outline:2px solid var(--robin-orange);outline-offset:1px}
+.robin-report-form .robin-report-honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.robin-report-error{display:flex;align-items:flex-start;gap:.4rem;margin:0;color:var(--robin-danger);font-size:.86rem}
+.robin-report-sent{text-align:center}
+.robin-report-sent svg{color:#2f865a}
+.robin-report-sent h2{margin:1rem 0 .5rem}
+.robin-report-sent p{color:var(--robin-ink-600)}
+@media(max-width:600px){.robin-support-modal{padding:1.5rem}.robin-report-floating{top:.65rem;right:.65rem}.robin-cross-report{padding:.45rem;font-size:.72rem}}
+.robin-password-page{min-height:100vh;display:grid;place-items:center;padding:5rem 1rem 2rem;background:var(--robin-cream)}
+.robin-password-page .robin-support-modal h1{margin:0 2rem 1rem 0;font:600 clamp(1.8rem,5vw,2.3rem)/1.08 var(--robin-font-display)}
+.robin-password-page .robin-report-sent h1{margin:1rem 0}
+.robin-password-page .robin-support-primary{text-decoration:none}

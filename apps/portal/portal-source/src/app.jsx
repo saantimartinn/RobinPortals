@@ -7,8 +7,8 @@ import robinJrArt from "../../../../packages/brand/assets/robin-jr.svg";
 import robinStudentArt from "../../../../packages/brand/assets/robin-student.svg";
 import robinCommunityArt from "../../../../packages/brand/assets/robin-community.svg";
 import "./login.css";
-
-const STUDENT_MAINTENANCE = true;
+import { SupportDialogs } from "./support/SupportDialogs.jsx";
+import { RecoveryRequest, ResetPasswordScreen } from "./support/PasswordRecovery.jsx";
 
 import { isAdminUser } from "./session.js";
 import { CANVAS } from "./theme.js";
@@ -57,7 +57,45 @@ export default function PortalRobin() {
   const [checkingSubscriptionAccess, setCheckingSubscriptionAccess] = useState(false);
   const [subscriptionAccessResolved, setSubscriptionAccessResolved] = useState(false);
   const [entryNotice, setEntryNotice] = useState("");
+  const [reportOpen, setReportOpen] = useState(false);
+  const [introOpen, setIntroOpen] = useState(false);
+  const [resetToken] = useState(() => {
+    try { return new URLSearchParams(window.location.hash.slice(1)).get("reset"); } catch (_) { return null; }
+  });
   const landingHandled = useRef(false);
+
+  useEffect(() => {
+    if (!resetToken) return;
+    window.history.replaceState({}, "", window.location.pathname + window.location.search);
+  }, [resetToken]);
+
+  useEffect(() => {
+    const user = authState.user;
+    if (resetToken || !user || isAdminUser(user) || user.auth_source === "external_client") return;
+    try {
+      if (!window.localStorage.getItem(`robin_portal_update_notice_2026:${user.id}`)) setIntroOpen(true);
+    } catch (_) { setIntroOpen(true); }
+  }, [authState.user?.id, resetToken]);
+
+  function dismissIntro() {
+    try { window.localStorage.setItem(`robin_portal_update_notice_2026:${authState.user?.id}`, "seen"); } catch (_) {}
+    setIntroOpen(false);
+  }
+
+  function withSupport(content, floatingButton = false) {
+    return <>
+      {content}
+      {floatingButton && <button className="robin-report-floating" type="button" onClick={() => setReportOpen(true)}><AlertCircle size={17} /> Reportar problema</button>}
+      <SupportDialogs
+        user={authState.user}
+        reportOpen={reportOpen}
+        onCloseReport={() => setReportOpen(false)}
+        introOpen={introOpen}
+        onCloseIntro={dismissIntro}
+        onOpenReport={() => { if (introOpen) dismissIntro(); setReportOpen(true); }}
+      />
+    </>;
+  }
 
   function setAuthenticatedUser(user) {
     const onboardingStep = nextOnboardingStep(user);
@@ -125,7 +163,7 @@ export default function PortalRobin() {
   }, [authState.user?.id]);
 
   useEffect(() => {
-    if (!authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
+    if (resetToken || !authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
     const admin = isAdminUser(authState.user);
     const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
     let next = null;
@@ -186,7 +224,7 @@ export default function PortalRobin() {
       landingHandled.current = true;
       window.location.replace("/portal/");
     }
-  }, [authState.user?.id, checkingSubscriptionAccess, subscriptionAccess, subscriptionAccessResolved]);
+  }, [authState.user?.id, checkingSubscriptionAccess, subscriptionAccess, subscriptionAccessResolved, resetToken]);
 
   useEffect(() => {
     let active = true;
@@ -244,37 +282,32 @@ export default function PortalRobin() {
     });
   }
 
-  const staffLogin = new URLSearchParams(window.location.search).get("next") === "/admin";
-  if (STUDENT_MAINTENANCE && !staffLogin && /^\/login\/?$/.test(window.location.pathname)) {
-    return <MaintenanceScreen />;
-  }
+  if (resetToken) return withSupport(<ResetPasswordScreen token={resetToken} />, true);
 
   if (authState.loading) {
-    return (
+    return withSupport(
       <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}>
         <div className="flex items-center gap-3 text-slate-500 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" /> Cargando portal…
         </div>
-      </div>
+      </div>, true
     );
   }
 
   if (!authState.user) {
-    if (STUDENT_MAINTENANCE && !staffLogin) return <MaintenanceScreen />;
-    return <LoginScreen onLogin={handleLogin} />;
+    return withSupport(<LoginScreen onLogin={handleLogin} />, true);
   }
-  if (isAdminUser(authState.user)) return <>
-    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
+  if (isAdminUser(authState.user)) return withSupport(<>
+    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} onReportProblem={() => setReportOpen(true)} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <AdminPortal user={authState.user} />
-  </>;
-  if (STUDENT_MAINTENANCE) return <MaintenanceScreen />;
-  if (authState.user.auth_source === "external_client") return <>
-    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
+  </>);
+  if (authState.user.auth_source === "external_client") return withSupport(<>
+    <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} onReportProblem={() => setReportOpen(true)} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#2D3A64]" role="status">
       <h1 className="text-2xl font-bold">Portal del Alumno no disponible</h1>
       <p>Esta cuenta no tiene un usuario en la base de datos del Portal del Alumno.</p>
     </main>
-  </>;
+  </>);
 
   if (authState.needsOnboarding) {
     // The server says which step is next; the user may go back to any earlier one.
@@ -291,14 +324,14 @@ export default function PortalRobin() {
     const onDone = async () => { await refreshState(); setOnboardingOverride(ONBOARDING_ORDER[index + 1] || null); };
     const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone };
     const Step = { origin: OnboardingOrigin, dni: OnboardingDNI, contract: OnboardingContract, profile: OnboardingProfile, payment: OnboardingPayment }[step];
-    if (Step) return <OnboardingNavContext.Provider value={nav}><Step key={step} {...onboardingProps} /></OnboardingNavContext.Provider>;
+    if (Step) return withSupport(<OnboardingNavContext.Provider value={nav}><Step key={step} {...onboardingProps} /></OnboardingNavContext.Provider>, true);
   }
 
   const user = authState.user;
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();
-  return (
+  return withSupport(
     <>
-      <CrossPortalNav current="application" user={user} onLogout={handleLogout} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
+      <CrossPortalNav current="application" user={user} onLogout={handleLogout} onReportProblem={() => setReportOpen(true)} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
       <PortalShell
         user={user}
         clientName={clientName}
@@ -323,6 +356,7 @@ function LoginScreen({ onLogin }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
 
   async function submit(event) {
     event.preventDefault();
@@ -372,21 +406,11 @@ function LoginScreen({ onLogin }) {
           <button className="robin-postcard-submit" type="submit" disabled={!email || !password || loading}>
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : "Entrar"}
           </button>
-          <p className="robin-postcard-hint">Acceso de administración.</p>
+          <p className="robin-postcard-hint">Tu espacio Robin en un solo lugar.</p>
+          <button className="robin-forgot-password" type="button" onClick={() => setRecoveryOpen(true)}>Recuperar contraseña</button>
         </form>
       </div>
+      {recoveryOpen && <RecoveryRequest onClose={() => setRecoveryOpen(false)} />}
     </main>
   );
-}
-
-function MaintenanceScreen() {
-  return <main className="robin-maintenance" role="status">
-    <div className="robin-maintenance-card">
-      <img className="robin-maintenance-bird" src={robinStudentArt} alt="Pájaro de Robin" />
-      <img className="robin-maintenance-wordmark" src={robinWordmark} alt="Robin" />
-      <h1>Estamos en mantenimiento</h1>
-      <p>El portal del alumno estará en mantenimiento hasta el lunes 26 de octubre. Estamos revisando los accesos y el proceso de documentación para que puedas continuar con tranquilidad.</p>
-      <p className="robin-maintenance-footnote">Gracias por tu paciencia. Vuelve a intentarlo el lunes.</p>
-    </div>
-  </main>;
 }

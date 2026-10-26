@@ -4,9 +4,7 @@ const { verifyPassword, signSession, buildSessionCookie } = require('../../lib/a
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { findIdentityCandidates, resolvePasswordCandidate } = require('../../lib/identity');
 const { createOperationLogger } = require('../../lib/observability');
-const { isApplicationAdmin } = require('../../lib/authorization');
 const { siteUrl } = require('../../../../packages/auth/site.cjs');
-const STUDENT_MAINTENANCE = true;
 
 const IDENTITY_PROVIDERS = [
   ['robinjr', '/robinjr/api/auth/verify-login'],
@@ -94,7 +92,6 @@ exports.handler = async (event) => {
         log.warn('rejected', { error_code: 'invalid_credentials' });
         return json({ error: 'invalid_credentials' }, { statusCode: 401 });
       }
-      if (STUDENT_MAINTENANCE) return json({ error: 'student_maintenance' }, { statusCode: 503 });
       const identity = external.identity;
       const externalUser = {
         id: 'external:' + identity.source + ':' + identity.id,
@@ -117,11 +114,6 @@ exports.handler = async (event) => {
       return json({ error: 'ambiguous_identity' }, { statusCode: 409 });
     }
     const user = resolved.candidate.row;
-    if (STUDENT_MAINTENANCE && !isApplicationAdmin(user)) {
-      log.result('maintenance', { actor_id: user.id, actor_role: user.role });
-      return json({ error: 'student_maintenance' }, { statusCode: 503 });
-    }
-
     const token = signSession(user);
     const cookie = buildSessionCookie(token);
 

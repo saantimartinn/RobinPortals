@@ -7,6 +7,7 @@ import { eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.
 import { statusLabel } from "./documents/document-utils.js";
 import { Factura } from "./payments/InvoiceReceipt.jsx";
 import { CareerRequirementsTimeline } from "./careers/CareerRequirementsTimeline.jsx";
+import { portalApiUrl } from "../api/core.js";
 import {
   paymentsList, paymentsCheckout, careersListMine,
   documentsList, documentsGet, documentsUpload,
@@ -38,7 +39,7 @@ export function PagosCliente() {
     // Si el pago tiene factura de Holded, se abre su PDF; si no (pagos antiguos),
     // se usa la factura imprimible del portal como respaldo.
     if (p && p.payment_data && p.payment_data.holded_invoice_id) {
-      window.open("/portal/api/invoice-pdf?payment_id=" + encodeURIComponent(p.id), "_blank", "noopener");
+      window.open(portalApiUrl("/api/invoice-pdf?payment_id=" + encodeURIComponent(p.id)), "_blank", "noopener");
     } else {
       openFactura(p);
     }

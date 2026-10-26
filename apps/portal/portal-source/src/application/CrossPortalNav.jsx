@@ -1,14 +1,15 @@
 // Common Robin navigation. Authentication and portal membership are checked by each product backend.
 import React, { useEffect, useState } from "react";
-import { LogOut, RefreshCw } from "lucide-react";
+import { AlertCircle, LogOut, RefreshCw } from "lucide-react";
 import { ROBIN_LINKS as LINKS } from "../../../../../packages/portal-nav/links.js";
 import robinWordmark from "../assets/robin-wordmark.png";
 import { isAdminUser } from "../session.js";
+import { portalApiUrl } from "../api/core.js";
 import "../../../../../packages/portal-nav/cross-portal-nav.css";
 
 const STUDENT_LINKS = new Set(["robinjr", "application", "subscriptions"]);
 
-export function CrossPortalNav({ current = "application", user = null, onLogout, onRefresh, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" }) {
+export function CrossPortalNav({ current = "application", user = null, onLogout, onRefresh, onReportProblem, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" }) {
   const [notice, setNotice] = useState("");
   useEffect(() => {
     if (!notice) return undefined;
@@ -23,7 +24,7 @@ export function CrossPortalNav({ current = "application", user = null, onLogout,
   async function openRobinJr(event) {
     event.preventDefault();
     try {
-      const response = await fetch("/portal/api/auth/sso-ticket", {
+      const response = await fetch(portalApiUrl("/api/auth/sso-ticket"), {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
@@ -58,6 +59,7 @@ export function CrossPortalNav({ current = "application", user = null, onLogout,
       </nav>
       {accountName ? (
         <div className="robin-cross-actions">
+          {onReportProblem && <button className="robin-cross-report" type="button" onClick={onReportProblem}><AlertCircle size={16} /> Reportar problema</button>}
           <span className="robin-cross-account">{accountName}</span>
           {onRefresh && <button className="robin-cross-icon-button" type="button" onClick={onRefresh} aria-label="Recargar" title="Recargar"><RefreshCw size={18} /></button>}
           {onLogout && <button className="robin-cross-icon-button" type="button" onClick={onLogout} aria-label="Cerrar sesión" title="Cerrar sesión"><LogOut size={18} /></button>}
