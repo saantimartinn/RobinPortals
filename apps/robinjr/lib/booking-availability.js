@@ -1,4 +1,12 @@
 // Server-side booking availability helpers used by request handlers; provider calls and domain rules stay behind this boundary.
+const BOOKING_BUFFER_MIN = 15;
+const BOOKING_BUFFER_MS = BOOKING_BUFFER_MIN * 60000;
+
+function overlapsWithBookingBuffer(startMs, endMs, eventStartMs, eventEndMs) {
+  return startMs < eventEndMs + BOOKING_BUFFER_MS
+    && endMs + BOOKING_BUFFER_MS > eventStartMs;
+}
+
 function evaluateSlot(events, startAt, durationMin, availabilityTitle = 'RobinJr') {
   const requestedStart = new Date(startAt);
   const requestedEnd = new Date(requestedStart.getTime() + Number(durationMin) * 60000);
@@ -7,7 +15,7 @@ function evaluateSlot(events, startAt, durationMin, availabilityTitle = 'RobinJr
   const overlapsRequested = (calendarEvent) => {
     const eventStart = new Date(calendarEvent.start).getTime();
     const eventEnd = new Date(calendarEvent.end).getTime();
-    return requestedStart.getTime() < eventEnd && requestedEnd.getTime() > eventStart;
+    return overlapsWithBookingBuffer(requestedStart.getTime(), requestedEnd.getTime(), eventStart, eventEnd);
   };
   const coversRequested = (calendarEvent) =>
     new Date(calendarEvent.start).getTime() <= requestedStart.getTime()
@@ -24,4 +32,4 @@ function evaluateSlot(events, startAt, durationMin, availabilityTitle = 'RobinJr
   return { available: insideWindow && !occupied, insideWindow, occupied };
 }
 
-module.exports = { evaluateSlot };
+module.exports = { evaluateSlot, overlapsWithBookingBuffer, BOOKING_BUFFER_MIN, BOOKING_BUFFER_MS };

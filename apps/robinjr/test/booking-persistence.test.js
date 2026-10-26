@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { insertBookingOrRollback } = require('../netlify/functions/bookings-create');
+const { insertBookingOrRollback, isBookingSlotConflict } = require('../netlify/functions/bookings-create');
 
 function supabaseInsert(result) {
   return {
@@ -66,4 +66,10 @@ test('conserva el fallo de limpieza para observabilidad', async () => {
     }),
     (error) => error === dbError && error.calendarCleanupError === cleanupError
   );
+});
+
+test('reconoce solo conflictos de horario, incluidos los de la base de datos', () => {
+  assert.equal(isBookingSlotConflict({ code: '23P01', message: 'booking_slot_unavailable' }), true);
+  assert.equal(isBookingSlotConflict({ code: '23505', message: 'duplicate key value violates unique constraint "bookings_advisor_scheduled_slot_key"' }), true);
+  assert.equal(isBookingSlotConflict({ code: '23505', message: 'bookings_calendar_event_key' }), false);
 });
