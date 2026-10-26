@@ -1,6 +1,11 @@
 // Browser API client for core; keeps endpoint and fetch details out of the screens.
 import { getLocalPreviewResponse } from "../preview-api.js";
 
+export function portalApiUrl(url) {
+  const standalone = /^santipruebas(?:--[^.]+)?\.netlify\.app$/i.test(window.location.hostname);
+  return url.startsWith("/api/") && !standalone ? "/portal" + url : url;
+}
+
 async function request(method, url, body) {
   const preview = await getLocalPreviewResponse(method, url);
   if (preview?.active) return preview.data;
@@ -10,7 +15,7 @@ async function request(method, url, body) {
     opts.body = JSON.stringify(body);
   }
   // Each app's functions are mounted under its own path prefix on the shared Robin site.
-  const publicUrl = url.startsWith("/api/") ? "/portal" + url : url;
+  const publicUrl = portalApiUrl(url);
   const resp = await fetch(publicUrl, opts);
   let data = null;
   try { data = await resp.json(); } catch (error) { console.warn("[api] optional operation failed", error && error.message); }
@@ -30,4 +35,3 @@ export const api = {
   get: (url) => request("GET", url),
   post: (url, body) => request("POST", url, body),
 };
-

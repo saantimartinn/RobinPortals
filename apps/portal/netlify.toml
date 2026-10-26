@@ -36,6 +36,14 @@
   to = "/.netlify/functions/auth-change-password"
   status = 200
 [[redirects]]
+  from = "/api/auth/reset-request"
+  to = "/.netlify/functions/auth-reset-request"
+  status = 200
+[[redirects]]
+  from = "/api/auth/reset-confirm"
+  to = "/.netlify/functions/auth-reset-confirm"
+  status = 200
+[[redirects]]
   from = "/api/notion/webhook"
   to = "/.netlify/functions/notion-webhook"
   status = 200
@@ -50,6 +58,10 @@
 [[redirects]]
   from = "/api/faqs"
   to = "/.netlify/functions/faqs"
+  status = 200
+[[redirects]]
+  from = "/api/report-problem"
+  to = "/.netlify/functions/report-problem"
   status = 200
 
 [[redirects]]
@@ -291,6 +303,14 @@
 
 # ---------- Fallback del portal ----------
 # Si una ruta /portal/<algo> no es un fichero real, llevar al login
+[[redirects]]
+  from = "/login"
+  to = "/portal/index.html"
+  status = 200
+[[redirects]]
+  from = "/login/"
+  to = "/portal/index.html"
+  status = 200
 [[redirects]]
   from = "/portal/*"
   to = "/portal/index.html"

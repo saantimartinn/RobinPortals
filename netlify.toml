@@ -85,6 +85,16 @@ to = "/.netlify/functions/portal-auth-change-password"
 status = 200
 
 [[redirects]]
+from = "/portal/api/auth/reset-request"
+to = "/.netlify/functions/portal-auth-reset-request"
+status = 200
+
+[[redirects]]
+from = "/portal/api/auth/reset-confirm"
+to = "/.netlify/functions/portal-auth-reset-confirm"
+status = 200
+
+[[redirects]]
 from = "/portal/api/notion/webhook"
 to = "/.netlify/functions/portal-notion-webhook"
 status = 200
@@ -102,6 +112,11 @@ status = 200
 [[redirects]]
 from = "/portal/api/faqs"
 to = "/.netlify/functions/portal-faqs"
+status = 200
+
+[[redirects]]
+from = "/portal/api/report-problem"
+to = "/.netlify/functions/portal-report-problem"
 status = 200
 
 [[redirects]]

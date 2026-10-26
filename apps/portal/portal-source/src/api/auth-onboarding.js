@@ -4,6 +4,15 @@ import { api } from "./core.js";
 export async function login(username, password) {
   return api.post("/api/auth/login", { username, password });
 }
+export async function passwordResetRequest(identifier) {
+  return api.post("/api/auth/reset-request", { identifier });
+}
+export async function passwordResetConfirm(token, newPassword) {
+  return api.post("/api/auth/reset-confirm", { token, new_password: newPassword });
+}
+export async function changePassword(currentPassword, newPassword) {
+  return api.post("/api/auth/change-password", { current_password: currentPassword, new_password: newPassword });
+}
 export async function logout() {
   try { await api.post("/api/auth/logout"); } catch (error) { console.warn("[api] optional operation failed", error && error.message); }
 }
