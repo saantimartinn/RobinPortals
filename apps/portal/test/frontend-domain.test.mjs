@@ -22,6 +22,8 @@ test('el frontend dirige admin y supervisor al mismo portal', () => {
 
 test('el OCR sube las imágenes a Storage y envía a Netlify únicamente sus rutas', async () => {
   const previousFetch = globalThis.fetch;
+  const previousWindow = globalThis.window;
+  globalThis.window = { location: { hostname: 'robinportals.netlify.app' } };
   const calls = [];
   globalThis.fetch = async (url, options) => {
     calls.push({ url, options });
@@ -54,5 +56,7 @@ test('el OCR sube las imágenes a Storage y envía a Netlify únicamente sus rut
     assert.equal(calls[1].options.headers['cache-control'], 'no-store');
   } finally {
     globalThis.fetch = previousFetch;
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
   }
 });

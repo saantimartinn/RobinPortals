@@ -1,13 +1,14 @@
 // Netlify handler for /api/auth/change-password; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../lib/supabase');
 const {
-  hashPassword,
   verifyPassword,
   readSessionFromEvent,
 } = require('../lib/auth');
 const { principalTable } = require('../lib/principal');
+const { readApplicationIdentity } = require('../lib/application-permissions');
 const { requestPasswordReset, applyPasswordReset } = require('../lib/password-reset');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
+const { storePasswordWithoutHash } = require('../../../../packages/auth/password-storage.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -31,22 +32,27 @@ exports.handler = async (event) => {
   }
 
   const session = readSessionFromEvent(event);
-  if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
+  if (!session && !event.headers?.cookie && !event.headers?.Cookie) return json({ error: 'unauthorized' }, { statusCode: 401 });
   const { current_password, new_password } = body;
   if (!current_password || !new_password || new_password.length < 8) {
     return json({ error: 'invalid_fields' }, { statusCode: 400 });
   }
 
   try {
+    const identity = await readApplicationIdentity(event);
+    const userId = identity?.auth_source === 'external_client' && identity.external_source === 'community'
+      ? identity.external_identity_id
+      : !identity && session ? session.uid : null;
+    if (!userId) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const sb = getSupabase();
-    const table = principalTable(session.role);
-    const { data: user, error } = await sb.from(table).select('*').eq('id', session.uid).single();
+    const table = identity ? 'subscribers' : principalTable(session.role);
+    const { data: user, error } = await sb.from(table).select('id,password_hash').eq('id', userId).single();
     if (error || !user) return json({ error: 'unauthorized' }, { statusCode: 401 });
     if (!verifyPassword(current_password, user.password_hash)) {
       return json({ error: 'invalid_credentials' }, { statusCode: 401 });
     }
-    const hash = hashPassword(new_password);
-    const { error: e2 } = await sb.from(table).update({ password_hash: hash }).eq('id', user.id);
+    const storedPassword = storePasswordWithoutHash(new_password);
+    const { error: e2 } = await sb.from(table).update({ password_hash: storedPassword }).eq('id', user.id);
     if (e2) throw e2;
     return json({ ok: true });
   } catch (e) {

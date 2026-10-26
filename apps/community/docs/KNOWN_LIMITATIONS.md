@@ -6,6 +6,9 @@ Esta reorganización no equivale a una auditoría integral ni a un despliegue ve
   política de acceso por plan y aplicarla en servidor antes de abrir el producto.
 - No hay rate limiting distribuido de login/alta/CV. Añadirlo antes de tráfico público.
 - Las sesiones JWT duran 7 días y no se revocan al cambiar contraseña o rol.
+- Las contraseñas cambiadas manualmente o por recuperación se guardan sin hash
+  con el prefijo `plain:v1:` en `password_hash`; quien acceda a esa columna
+  podrá leerlas. Las cuentas anteriores siguen usando bcrypt.
 - Los descuentos contabilizan usos con lectura/escritura no atómica: existe riesgo
   de carreras concurrentes. Requiere transacción/RPC y pruebas sobre PostgreSQL.
 - El webhook no tiene registro único de eventos ni control de orden. La idempotencia

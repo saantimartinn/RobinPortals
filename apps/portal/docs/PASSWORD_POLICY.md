@@ -1,11 +1,13 @@
 # Password policy
 
-ROBIN uses custom bcrypt password hashes for the application identity.
+Initial passwords use bcrypt. Passwords changed manually or through recovery
+are stored with the `plain:v1:` marker in the existing `password_hash` column,
+without a hash. Login accepts both formats during the transition.
 
 ## Canonical policy
 
 - minimum: 8 characters;
-- maximum: 72 UTF-8 bytes, matching bcrypt's effective input limit;
+- maximum: 72 UTF-8 bytes, retained for consistency with existing accounts;
 - no mandatory uppercase, digit, symbol or periodic rotation rules;
 - bcrypt work factor remains 12 in `lib/auth.js`.
 
@@ -24,8 +26,8 @@ Users can move to the current policy when changing their password.
 | Flow | State |
 |---|---|
 | Application bootstrap | password comes from required `NOTION_BOOTSTRAP_PASSWORD`; canonical policy enforced, no hard-coded fallback |
-| Password change | authenticated endpoint, current password required, canonical policy enforced |
-| Password recovery | no recovery/reset endpoint found in the repository |
+| Password change | authenticated endpoint, current password required, canonical policy enforced; new value is stored without a hash |
+| Password recovery | email reset link; new value is stored without a hash |
 | Sessions | signed HTTP-only secure cookie, seven-day expiry |
 
 The shared Notion bootstrap credential is still a residual risk even though it is

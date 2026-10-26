@@ -1,6 +1,7 @@
 // Server-side password reset helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { getSupabase } = require('./supabase');
-const { hashPassword, signPasswordResetToken, verifyPasswordResetToken, isCurrentPasswordResetToken } = require('./auth');
+const { signPasswordResetToken, verifyPasswordResetToken, isCurrentPasswordResetToken } = require('./auth');
+const { storePasswordWithoutHash } = require('../../../../packages/auth/password-storage.cjs');
 const { sendEmail } = require('./email');
 
 const GENERIC_RESPONSE = {
@@ -96,7 +97,7 @@ async function applyPasswordReset(token, password) {
   }
 
   const { data: updated, error: updateError } = await sb.from('subscribers')
-    .update({ password_hash: hashPassword(password) })
+    .update({ password_hash: storePasswordWithoutHash(password) })
     .eq('id', user.id)
     .eq('password_hash', user.password_hash)
     .select('id')
