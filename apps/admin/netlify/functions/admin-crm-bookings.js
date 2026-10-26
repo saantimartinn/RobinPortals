@@ -12,7 +12,7 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
   try {
     const session = readSessionFromEvent(event);
-    const admin = session && await findAdminForSession(getSupabase(), session, 'id');
+    const admin = session && await findAdminForSession(getSupabase(), session);
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     if (!isConfigured('hello@project-robin.com')) return json({ error: 'booking_calendar_not_configured' }, { statusCode: 503 });
     const now = Date.now();
