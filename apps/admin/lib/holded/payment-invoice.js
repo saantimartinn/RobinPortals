@@ -2,6 +2,7 @@
 const { errorCode } = require('../observability');
 const { holdedFetch, isConfigured } = require('./client');
 const { createInvoiceForPayment } = require('./invoices');
+const { claimInvoice, recordInvoice, applyInvoice } = require('../../../../packages/billing/holded-invoice-claim.cjs');
 
 /**
  * Genera (idempotente, best-effort) la factura de Holded para una fila de payments.
@@ -35,9 +36,15 @@ async function generateInvoiceForPaymentRow(sb, paymentId) {
       .single();
     if (userError || !user) return { ok: false, reason: 'user_not_found' };
 
+    const claim = await claimInvoice(sb, payment.id);
+    if (!claim.claimed) {
+      if (!claim.invoiceData) return { ok: false, reason: 'invoice_creation_pending' };
+      await applyInvoice(sb, payment.id, claim.invoiceData);
+      return { ok: true, already: true, invoice_id: claim.invoiceData.holded_invoice_id };
+    }
+
     const invoice = await createInvoiceForPayment(sb, user, payment);
-    const updatedPaymentData = {
-      ...paymentData,
+    const invoiceData = {
       holded_invoice_id: invoice.invoiceId,
       holded_invoice_num: invoice.docNumber,
       holded_tax_rate: invoice.taxRate,
@@ -45,7 +52,8 @@ async function generateInvoiceForPaymentRow(sb, paymentId) {
       holded_tax_key: invoice.taxKey,
       holded_at: new Date().toISOString(),
     };
-    await sb.from('payments').update({ payment_data: updatedPaymentData }).eq('id', payment.id);
+    await recordInvoice(sb, payment.id, invoiceData);
+    await applyInvoice(sb, payment.id, invoiceData);
     try {
       await sb.from('webhook_log').insert({
         source: 'holded',
