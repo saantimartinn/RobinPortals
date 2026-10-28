@@ -35,6 +35,7 @@ const {
   taxRateForClient,
 } = require('../shared/financial-config.cjs');
 const { errorCode } = require('./observability');
+const { claimInvoice, recordInvoice, applyInvoice } = require('../../../packages/billing/holded-invoice-claim.cjs');
 const CONCEPTO = FISCAL.concepto;
 const IELTS_NOTE = 'Operación exenta de IVA conforme al artículo 20.Uno.9.º de la Ley 37/1992.';
 const IELTS_EVALUATION = 'Evaluación inicial de inglés/IELTS';
@@ -314,15 +315,22 @@ async function generateInvoiceForPaymentRow(sb, paymentId) {
       .single();
     if (e2 || !u) return { ok: false, reason: 'user_not_found' };
 
+    const claim = await claimInvoice(sb, p.id);
+    if (!claim.claimed) {
+      if (!claim.invoiceData) return { ok: false, reason: 'invoice_creation_pending' };
+      await applyInvoice(sb, p.id, claim.invoiceData);
+      return { ok: true, already: true, invoice_id: claim.invoiceData.holded_invoice_id };
+    }
+
     const inv = await createInvoiceForPayment(sb, u, p);
-    const newPd = {
-      ...pd,
+    const invoiceData = {
       holded_invoice_id: inv.invoiceId,
       holded_invoice_num: inv.docNumber,
       holded_tax_rate: inv.taxRate,
       holded_at: new Date().toISOString(),
     };
-    await sb.from('payments').update({ payment_data: newPd }).eq('id', p.id);
+    await recordInvoice(sb, p.id, invoiceData);
+    await applyInvoice(sb, p.id, invoiceData);
     try {
       await sb.from('webhook_log').insert({
         source: 'holded',
