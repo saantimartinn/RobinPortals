@@ -59,6 +59,7 @@ exports.handler = async (event) => {
       tipo: u.tipo || 'general',
       num_carreras: u.num_carreras || 1,
       first_payment_amount: firstPayment ? firstPayment.amount : null,
+      special_price_total_eur: u.contract_data?.special_price_total_eur || null,
       pricing_version: contractPricingVersion(u.contract_data),
       payment_currency: firstPayment ? 'EUR' : null,
       origin: u.origin || null,

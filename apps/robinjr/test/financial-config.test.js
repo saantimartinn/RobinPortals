@@ -18,6 +18,12 @@ const { latamPlanWithPaidAmounts } = require('../lib/payments');
 const { taxCodesFor, taxRateFor: holdedTaxRateFor } = require('../lib/holded');
 const { VARIANTS } = require('../shared/contract-content.cjs');
 
+test('un precio total especial crea un único pago sin cuotas posteriores', () => {
+  assert.deepEqual(applicationPlanForUser({ contract_data: { special_price_total_eur: 1 } }), [
+    { installment: 1, amount: 1 },
+  ]);
+});
+
 test('cada plan de aplicación cuadra exactamente con su total canónico', () => {
   for (const careers of [1, 2, 3]) {
     const total = applicationPlan('general', careers).reduce((sum, row) => sum + row.amount, 0);

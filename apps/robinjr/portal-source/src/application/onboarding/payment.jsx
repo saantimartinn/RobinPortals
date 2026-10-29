@@ -67,7 +67,7 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
             <CreditCard className="h-5 w-5 text-white/70" />
           </div>
           <div className="text-3xl font-bold mt-4 tracking-tight">{amountStr ? `${amountStr} €` : "Importe calculado al continuar"}</div>
-          <div className="mt-2 text-xs text-white/60">Primera cuota del programa</div>
+          <div className="mt-2 text-xs text-white/60">{user.special_price_total_eur ? "Pago total del programa" : "Primera cuota del programa"}</div>
         </div>
 
         {error && (
@@ -81,7 +81,9 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
         </Btn>
 
         <div className="text-[11px] text-slate-400 text-center">
-          Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor.
+          {user.special_price_total_eur
+            ? "Serás redirigido a la pasarela de pago segura. Este es el único pago del programa."
+            : "Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor."}
         </div>
       </div>
     </OnboardingShell>

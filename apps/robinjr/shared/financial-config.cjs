@@ -215,6 +215,10 @@ function pricingVersionForNewUser(tipo) {
  * vigente, y los contratos nuevos quedan marcados con DELFT_PRICE_VERSION.
  */
 function applicationPlanForUser(user) {
+  const specialPrice = Number(user?.contract_data?.special_price_total_eur);
+  if (Number.isFinite(specialPrice) && specialPrice > 0 && specialPrice <= 100000 && Number.isInteger(specialPrice * 100)) {
+    return [{ installment: 1, amount: specialPrice }];
+  }
   // Este repositorio sirve Robin Jr: los metadatos de paquetes heredados no
   // alteran el plan vigente de tres cuotas para sus alumnos.
   return robinJrPlan();
