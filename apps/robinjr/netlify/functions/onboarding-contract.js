@@ -110,7 +110,9 @@ exports.handler = async (event) => {
           contentType: signatureMime,
         });
 
+    const specialPriceTotalEur = Number(u.contract_data?.special_price_total_eur) || null;
     const contract_data = {
+      ...(specialPriceTotalEur ? { special_price_total_eur: specialPriceTotalEur } : {}),
       version_template: 'contratos-2027-revision-integrada',
       pricing_version: pricingVersion,
       tipo,

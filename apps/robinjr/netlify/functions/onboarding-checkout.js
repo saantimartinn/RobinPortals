@@ -77,7 +77,7 @@ exports.handler = async (event) => {
       const order = await revolut.createOrder({
         amountMinor,
         currency: 'EUR',
-        description: ('Project Robin · Primera cuota' + (nombre ? ' · ' + nombre : '')).slice(0, 240),
+        description: ('Project Robin · ' + (u.contract_data?.special_price_total_eur ? 'Pago total' : 'Primera cuota') + (nombre ? ' · ' + nombre : '')).slice(0, 240),
         email: u.email,
         attemptId: attempt.id,
         kind: 'onboarding',
