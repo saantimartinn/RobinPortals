@@ -53,6 +53,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
   const [stageReminderVersion, setStageReminderVersion] = useState(0);
   const boardWrapRef = useRef<HTMLDivElement>(null);
   const owned = useMemo(() => contacts.filter((contact) => (isDeveloperAdmin || leadOwners[contact.id] === currentUser) && `${contact.name} ${contact.email} ${contact.source}`.toLowerCase().includes(query.toLowerCase())), [contacts, currentUser, isDeveloperAdmin, leadOwners, query]);
+  const pipelineCount = owned.filter((contact) => salesStages.includes(leadStages[contact.id])).length;
   const campaigns = useMemo(() => Array.from(new Set(contacts
     .filter((contact) => (isDeveloperAdmin || leadOwners[contact.id] === currentUser) && (leadStages[contact.id] || contact.stage || "Por contactar") === "Por contactar")
     .map((contact) => leadCampaignLabel(contact.campaign))))
@@ -220,7 +221,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
   const title = path === "/crm/contactados" ? "Pipeline de contactados" : path === "/crm/clientes" ? "Clientes" : path === "/crm/lost" ? "Lost" : "Por contactar";
   return (
     <div className="page">
-      <Title name={title} sub={isDeveloperAdmin ? "Acceso global de desarrollo · todos los leads." : `Cartera comercial de ${currentUser}.`} eyebrow="CRM personal"><Badge variant="outline">{owned.length} REGISTROS</Badge></Title>
+      <Title name={title} sub={isDeveloperAdmin ? "Acceso global de desarrollo · todos los leads." : `Cartera comercial de ${currentUser}.`} eyebrow="CRM personal"><Badge variant="outline">{path === "/crm/contactados" ? pipelineCount : owned.length} {path === "/crm/contactados" ? "EN PIPELINE" : "REGISTROS"}</Badge></Title>
       <div className="module-toolbar"><label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar en mi cartera…" /></label>{path === "/crm" && <><Button variant="outline" aria-expanded={filtersOpen} onClick={() => setFiltersOpen((open) => !open)}><Filter />Filtros{activeCrmFilters > 0 && <span className="filter-count">{activeCrmFilters}</span>}</Button><Button variant="outline" aria-pressed={leadView === "table"} onClick={() => setLeadView((view) => view === "cards" ? "table" : "cards")}>{leadView === "cards" ? <List /> : <LayoutGrid />}{leadView === "cards" ? "Vista tabla" : "Vista tarjetas"}</Button><Button className="crm-email-button" variant="outline" onClick={() => setEmailComposerOpen(true)}><Mail />Correo electrónico</Button></>}{isDeveloperAdmin && <a className="ui-button outline" href={`${window.location.pathname.startsWith("/admin") ? "/admin" : ""}/base-datos`}><Database />Base de datos</a>}{path === "/crm/clientes" && <Button variant="outline" disabled={exportingClients} onClick={() => void exportClientDatabase()}><Download />{exportingClients ? "Preparando…" : "Descargar base de datos"}</Button>}</div>
 
       {path === "/crm" && (

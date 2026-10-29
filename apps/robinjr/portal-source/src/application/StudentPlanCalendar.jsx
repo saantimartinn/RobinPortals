@@ -1,7 +1,7 @@
 // Mi plan reúne reservas confirmadas y deadlines de documentos; las carreras
 // no generan eventos ni requisitos documentales en este calendario.
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, FileText, Loader2, MessageCircle } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, FileText, Loader2, LockKeyhole, MessageCircle, X } from "lucide-react";
 import { Badge, Card, CardContent, CardHeader } from "../ui.jsx";
 import { bookingsList, documentsList } from "../api.js";
 
@@ -42,6 +42,7 @@ function formatSelectedDate(value) {
 }
 
 export function StudentPlanCalendar() {
+  const [showSessionsNotice, setShowSessionsNotice] = useState(true);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,6 +51,15 @@ export function StudentPlanCalendar() {
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [selectedDate, setSelectedDate] = useState(() => dateKey(today()));
+
+  useEffect(() => {
+    if (!showSessionsNotice) return;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setShowSessionsNotice(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [showSessionsNotice]);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,6 +105,18 @@ export function StudentPlanCalendar() {
 
   return (
     <div className="space-y-5">
+      {showSessionsNotice && (
+        <div className="student-plan-notice-backdrop" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setShowSessionsNotice(false);
+        }}>
+          <div className="student-plan-notice" role="dialog" aria-modal="true" aria-labelledby="student-plan-notice-title">
+            <button type="button" className="student-plan-notice-close" aria-label="Cerrar aviso" onClick={() => setShowSessionsNotice(false)}><X size={18} /></button>
+            <span className="student-plan-notice-icon"><LockKeyhole size={25} /></span>
+            <h2 id="student-plan-notice-title">Tus sesiones se desbloquearán después de la primera llamada</h2>
+            <button type="button" className="student-plan-notice-action" autoFocus onClick={() => setShowSessionsNotice(false)}>Entendido</button>
+          </div>
+        </div>
+      )}
       <Card className="student-plan-card">
         <CardHeader title="Mi plan" subtitle="Tus fechas importantes y llamadas, organizadas en un calendario" icon={CalendarDays} />
         <CardContent>
