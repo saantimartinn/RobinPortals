@@ -92,7 +92,7 @@ async function extractDniFields({ anverso, reverso, docType }) {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: process.env.PORTAL__ANTHROPIC_MODEL || process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
+      model: process.env.PORTAL__ANTHROPIC_MODEL || process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5',
       max_tokens: 1024,
       system: isPassport ? PASSPORT_PROMPT : SYSTEM_PROMPT,
       messages,
