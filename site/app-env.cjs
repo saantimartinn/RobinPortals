@@ -32,6 +32,14 @@ function scopeFor(appId) {
     for (const [key, value] of Object.entries(siteEnv)) {
       if (key.startsWith(own)) values[key.slice(own.length)] = value;
     }
+    // New checkouts use the Portal del Alumno Revolut merchant. Community's
+    // existing Stripe subscriptions still renew under their original provider.
+    if (appId === 'robinjr' || appId === 'community') {
+      for (const key of ['REVOLUT_API_BASE', 'REVOLUT_API_VERSION', 'REVOLUT_MERCHANT_SECRET_KEY', 'REVOLUT_WEBHOOK_SIGNING_SECRET']) {
+        const shared = siteEnv[`PORTAL__${key}`];
+        if (shared) values[key] = shared;
+      }
+    }
     scopes.set(appId, values);
   }
   return scopes.get(appId);
@@ -93,13 +101,17 @@ function wrapFunction(appId, load) {
   return wrapped;
 }
 
+function runInApp(appId, fn) {
+  return storage.run(scopeFor(appId), fn);
+}
+
 // Scheduled jobs (birthday emails, retries, transcripts…) only run where the site
 // sets ROBIN_RUN_SCHEDULED=true, so a deploy that is not yet live does not repeat
 // the jobs the current production sites still run.
 function wrapScheduled(appId, load) {
   const wrapped = wrapFunction(appId, load);
   const run = wrapped.handler;
-  return { ...wrapped, handler: (...args) => (siteEnv.ROBIN_RUN_SCHEDULED === 'true' ? run(...args) : Promise.resolve({ statusCode: 204, body: '' })) };
+  return { ...wrapped, handler: (...args) => (siteEnv.ROBIN_RUN_SCHEDULED === 'true' || wrapped.alwaysRun === true ? run(...args) : Promise.resolve({ statusCode: 204, body: '' })) };
 }
 
 // The apps' functions use the classic Lambda format (exports.handler(event)), but
@@ -145,4 +157,4 @@ function serve(appId, load, { scheduled = false } = {}) {
   return toModern((scheduled ? wrapScheduled : wrapFunction)(appId, load).handler);
 }
 
-module.exports = { wrapFunction, wrapScheduled, serve, toModern, prefix, APP_IDS };
+module.exports = { wrapFunction, wrapScheduled, serve, toModern, runInApp, prefix, APP_IDS };

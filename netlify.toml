@@ -41,6 +41,9 @@ schedule = "*/10 * * * *"
 [functions.robinjr-birthday-notifications]
 schedule = "0 6 * * *"
 
+[functions.community-revolut-subscription-reconcile]
+schedule = "@hourly"
+
 [functions."community-*"]
 node_bundler = "esbuild"
 
@@ -772,6 +775,16 @@ status = 200
 [[redirects]]
 from = "/therobinplan/api/subscriber/profile"
 to = "/.netlify/functions/community-subscriber-profile-update"
+status = 200
+
+[[redirects]]
+from = "/therobinplan/api/subscription/sync"
+to = "/.netlify/functions/community-subscription-sync"
+status = 200
+
+[[redirects]]
+from = "/therobinplan/api/subscription/cancel"
+to = "/.netlify/functions/community-subscription-cancel"
 status = 200
 
 [[redirects]]

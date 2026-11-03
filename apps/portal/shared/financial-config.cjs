@@ -199,6 +199,11 @@ function pricingVersionForNewUser(tipo) {
   return null;
 }
 
+function applyFirstPaymentPromo(user, installments) {
+  if (String(user?.email || '').trim().toLowerCase() !== 'manuelvillamuriel@gmail.com') return installments;
+  return installments.map((row) => row.installment === 1 ? { ...row, amount: 1 } : row);
+}
+
 /** Los perfiles sin contrato firmado siempre reciben las tarifas vigentes. */
 function applicationPlanForUser(user) {
   const source = user || {};
@@ -207,16 +212,16 @@ function applicationPlanForUser(user) {
   const isInternational = usesInternational2700Plan(source);
   // Conserva el plan histórico únicamente para expedientes ya firmados.
   if (source.contract_signed && key === 'general' && !isInternational && pricingVersion !== GENERAL_PRICE_VERSION) {
-    return generalPlan(HISTORICAL_GENERAL_TOTALS, source.num_carreras);
+    return applyFirstPaymentPromo(source, generalPlan(HISTORICAL_GENERAL_TOTALS, source.num_carreras));
   }
   if (key === 'delft' && source.contract_signed && pricingVersion !== DELFT_PRICE_VERSION) {
-    return [
+    return applyFirstPaymentPromo(source, [
       { installment: 1, amount: 933 },
       { installment: 2, amount: 933 },
       { installment: 3, amount: 933 },
-    ];
+    ]);
   }
-  return applicationPlan(source.tipo, source.num_carreras, source.origin, source.has_eu_id, source.pais);
+  return applyFirstPaymentPromo(source, applicationPlan(source.tipo, source.num_carreras, source.origin, source.has_eu_id, source.pais));
 }
 
 module.exports = {

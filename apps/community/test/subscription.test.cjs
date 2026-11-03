@@ -4,6 +4,15 @@ const assert=require('node:assert/strict');
 const stripe=require('../backend/lib/stripe');
 const subscriptions=require('../backend/lib/subscription');
 const billing=require('../backend/lib/subscription-billing');
+const revolut=require('../backend/lib/revolut-subscriptions');
+const {hasOneEuroFirstPayment}=require('../../../packages/payments/first-payment-promo.cjs');
+test('la promoción se limita al correo exacto y solo al primer ciclo de Revolut',()=>{
+  assert.equal(hasOneEuroFirstPayment(' MANUELVILLAMURIEL@gmail.com '),true);
+  assert.equal(hasOneEuroFirstPayment('manuelvillamuriel+test@gmail.com'),false);
+  const phases=revolut.planSpec('monthly',4999,{oneEuro:true}).variations[0].phases;
+  assert.deepEqual(phases.map(x=>[x.amount,x.cycle_count||null]),[[100,1],[4999,null]]);
+  assert.deepEqual(revolut.planSpec('annual',29999,{}).variations[0].phases.map(x=>x.amount),[29999]);
+});
 test('checkout refuses portal payments and unpaid subscription sessions',async()=>{
   const db={from(){throw new Error('must not access database');}};
   assert.equal((await stripe.fulfillCheckout(db,{metadata:{kind:'onboarding'}})).reason,'unsupported_checkout');

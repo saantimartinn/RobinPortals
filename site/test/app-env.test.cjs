@@ -6,6 +6,8 @@ const test = require('node:test');
 process.env.PORTAL__SUPABASE_URL = 'https://portal.example';
 process.env.PORTAL__ONLY_PORTAL = 'yes';
 process.env.ROBINJR__SUPABASE_URL = 'https://robinjr.example';
+process.env.PORTAL__REVOLUT_MERCHANT_SECRET_KEY = 'shared-test-key';
+process.env.ROBINJR__REVOLUT_MERCHANT_SECRET_KEY = 'old-sandbox-key';
 process.env.SITE_LEVEL = 'shared';
 const { wrapFunction, wrapScheduled, toModern } = require('../app-env.cjs');
 
@@ -43,6 +45,19 @@ test('scheduled jobs only run when the site enables them', async () => {
   process.env.ROBIN_RUN_SCHEDULED = 'true';
   assert.equal((await job.handler()).statusCode, 200);
   assert.equal(runs, 1);
+});
+
+test('Junior and Community use the Portal Revolut key inside their own scope', async () => {
+  for (const app of ['robinjr', 'community']) {
+    const fn = wrapFunction(app, () => ({ handler: () => process.env.REVOLUT_MERCHANT_SECRET_KEY }));
+    assert.equal(fn.handler(), 'shared-test-key');
+  }
+});
+
+test('the Revolut reconciliation runs while legacy scheduled jobs remain disabled', async () => {
+  delete process.env.ROBIN_RUN_SCHEDULED;
+  const fn = wrapScheduled('community', () => ({ alwaysRun: true, handler: () => ({ statusCode: 200 }) }));
+  assert.equal(fn.handler().statusCode, 200);
 });
 
 test('modern functions translate the request and the classic result', async () => {

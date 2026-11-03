@@ -151,3 +151,14 @@ test('los contratos de admisiones describen el calendario de pagos 2027 vigente'
   assert.match(delft, /1\.000 € tras la presentación de las aplicaciones/);
   assert.match(delft, /1\.000 € tras la aceptación en al menos una universidad/);
 });
+
+test('solo el correo promocional paga 1 € en la primera cuota de Robin Jr', () => {
+  const contract_data = { pricing_version: ROBIN_JR_PRICE_VERSION };
+  const regular = applicationPlanForUser({ email: 'otro@example.com', contract_data });
+  const promotional = applicationPlanForUser({ email: ' MANUELVILLAMURIEL@gmail.com ', contract_data });
+  assert.deepEqual(promotional, [
+    { installment: 1, amount: 1 },
+    ...regular.slice(1),
+  ]);
+  assert.equal(regular[0].amount, 500);
+});

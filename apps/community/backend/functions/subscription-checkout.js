@@ -1,98 +1,91 @@
-/**
- * POST /api/subscription/checkout  Body: { plan: 'monthly' | 'annual' }
- * Crea una Stripe Checkout Session en modo 'subscription' para The Robin Plan.
- * El cobro es RECURRENTE automático (mode:'subscription' + price recurring):
- * Stripe cobra cada periodo por su cuenta y el stripe-webhook sincroniza estado.
- *
- * Descuento: el cupón se crea con la duración fijada por el admin en el código:
- *   discount_duration_months = 1..12 -> 'repeating' esos meses
- *   discount_duration_months = null   -> 'forever' (ilimitado)
- * Confirmación autoritativa vía stripe-webhook (checkout.session.completed).
- */
+/** Hosted Revolut checkout for a new recurring Robin Community subscription. */
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
-const stripeLib = require('../lib/stripe');
+const { getBaseUrl } = require('../lib/stripe');
 const subLib = require('../lib/subscription');
+const revolut = require('../lib/revolut-subscriptions');
+const { syncOne } = require('../lib/revolut-subscription-sync');
+const { hasOneEuroFirstPayment } = require('../../../../packages/payments/first-payment-promo.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
   if (!verifyOrigin(event)) return json({ error: 'bad_origin' }, { statusCode: 403 });
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
-  if (!stripeLib.isConfigured()) return json({ error: 'stripe_not_configured' }, { statusCode: 503 });
-
+  if (!revolut.configured()) return json({ error: 'revolut_not_configured' }, { statusCode: 503 });
   const body = parseJsonBody(event);
   if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });
   const planKey = body.plan === 'annual' ? 'annual' : 'monthly';
-  const priceId = subLib.planPriceId(planKey);
-  const amount = subLib.planAmount(planKey);
+  const billing = {
+    name: String(body.billing?.name || '').trim(),
+    taxId: String(body.billing?.taxId || '').trim().toUpperCase(),
+    country: String(body.billing?.country || '').trim(),
+    address: String(body.billing?.address || '').trim(),
+  };
+  if (!billing.name || !billing.taxId || !billing.country || !billing.address) {
+    return json({ error: 'billing_details_required' }, { statusCode: 400 });
+  }
 
   try {
     const sb = getSupabase();
-    const { data: u, error: e1 } = await sb
-      .from('subscribers')
-      .select('id, email, nombre, apellidos, stripe_customer_id, subscription_status, discount_code, discount_percent, discount_duration_months')
-      .eq('id', session.uid)
-      .single();
-    if (e1 || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
-    if (u.subscription_status === 'active' || u.subscription_status === 'trialing') {
-      return json({ error: 'already_subscribed' }, { statusCode: 409 });
+    const { data: u, error: userError } = await sb.from('subscribers')
+      .select('id,email,nombre,apellidos,stripe_subscription_id,subscription_status,discount_percent,discount_duration_months')
+      .eq('id', session.uid).single();
+    if (userError || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    if (['active', 'trialing'].includes(u.subscription_status)) return json({ error: 'already_subscribed' }, { statusCode: 409 });
+    if (u.stripe_subscription_id && !['canceled', 'none'].includes(u.subscription_status)) {
+      return json({ error: 'existing_stripe_subscription' }, { statusCode: 409 });
     }
 
-    const stripe = stripeLib.getStripe();
-    const base = stripeLib.getBaseUrl(event);
-    const nombre = [u.nombre, u.apellidos].filter(Boolean).join(' ') || (u.email || '');
-
-    const lineItem = priceId
-      ? { price: priceId, quantity: 1 }
-      : {
-          quantity: 1,
-          price_data: {
-            currency: subLib.CURRENCY.toLowerCase(),
-            unit_amount: stripeLib.toCents(amount),
-            recurring: { interval: subLib.planInterval(planKey) },
-            product_data: { name: `The Robin Plan · ${planKey === 'annual' ? 'Anual' : 'Mensual'}` },
-          },
-        };
-
-    // Descuento por codigo (porcentaje) aplicado al alta -> cupon Stripe.
-    // La duración la decide el admin en el código (discount_duration_months).
-    let discounts;
-    const pct = Number(u.discount_percent);
-    if (pct > 0 && pct <= 100) {
-      try {
-        const dur = Number(u.discount_duration_months);
-        const durationCfg = (Number.isFinite(dur) && dur >= 1 && dur <= 12)
-          ? { duration: 'repeating', duration_in_months: Math.round(dur) }
-          : { duration: 'forever' };
-        const durLabel = durationCfg.duration === 'repeating' ? ` · ${durationCfg.duration_in_months}m` : '';
-        const coupon = await stripe.coupons.create({
-          percent_off: pct,
-          ...durationCfg,
-          name: `The Robin Plan${u.discount_code ? ' · ' + u.discount_code : ''} (-${pct}%${durLabel})`,
-        });
-        discounts = [{ coupon: coupon.id }];
-      } catch (err) { console.error('discount coupon error', err); }
+    const { data: old, error: oldError } = await sb.from('revolut_subscriptions').select('*').eq('subscriber_id', u.id).maybeSingle();
+    if (oldError) throw oldError;
+    if (old && old.state === 'active') {
+      await syncOne(sb, old);
+      return json({ already_subscribed: true });
+    }
+    if (old && old.state === 'pending' && old.setup_order_id) {
+      const order = await revolut.retrieveOrder(old.setup_order_id);
+      if (order.state === 'completed') {
+        await syncOne(sb, old);
+        return json({ already_subscribed: true });
+      }
+      if (order.checkout_url && !['failed', 'cancelled', 'completed'].includes(order.state)) {
+        return json({ url: order.checkout_url, id: old.subscription_id });
+      }
     }
 
-    const cs = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [lineItem],
-      discounts,
-      customer: u.stripe_customer_id || undefined,
-      customer_email: u.stripe_customer_id ? undefined : (u.email || undefined),
-      client_reference_id: String(u.id),
-      success_url: `${base}/therobinplan/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${base}/therobinplan/?sub=cancel`,
-      metadata: { kind: 'subscription', user_id: String(u.id), plan: planKey, nombre },
-      subscription_data: { metadata: { user_id: String(u.id), plan: planKey } },
+    const oneEuro = hasOneEuroFirstPayment(u.email) && !old?.promo_used && !u.stripe_subscription_id;
+    const percent = oneEuro ? 0 : Number(u.discount_percent) || 0;
+    const months = Number(u.discount_duration_months);
+    const cycles = percent > 0 && Number.isFinite(months) && months > 0
+      ? (planKey === 'annual' ? Math.ceil(months / 12) : Math.round(months)) : null;
+    const amountMinor = Math.round(subLib.planAmount(planKey) * 100);
+    const spec = revolut.planSpec(planKey, amountMinor, { oneEuro, percent, cycles });
+    const variationId = await revolut.variationFor(spec);
+    const customerId = old?.customer_id || (await revolut.createCustomer(u)).id;
+    if (!customerId) throw new Error('revolut_customer_id_missing');
+
+    const base = getBaseUrl(event);
+    const subscription = await revolut.createSubscription({
+      variationId, customerId, subscriberId: u.id,
+      idempotencyKey: `${u.id}-${old?.subscription_id || 'initial'}`,
+      redirectUrl: `${base}/therobinplan/?revolut_subscription=return`,
     });
-
-    return json({ url: cs.url, id: cs.id });
-  } catch (e) {
-    console.error('subscription-checkout error', e);
-    return serverError(e);
+    if (!subscription.id || !subscription.setup_order_id) throw new Error('revolut_subscription_response_invalid');
+    const { error: saveError } = await sb.from('revolut_subscriptions').upsert({
+      subscriber_id: u.id, customer_id: customerId, subscription_id: subscription.id,
+      setup_order_id: subscription.setup_order_id, plan_key: planKey,
+      billing_info: billing,
+      promo_used: Boolean(old?.promo_used), state: subscription.state || 'pending',
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'subscriber_id' });
+    if (saveError) throw saveError;
+    const order = await revolut.retrieveOrder(subscription.setup_order_id);
+    if (!order.checkout_url) throw new Error('revolut_checkout_url_missing');
+    return json({ url: order.checkout_url, id: subscription.id, provider: 'revolut' });
+  } catch (error) {
+    console.error('subscription-checkout error', error);
+    return serverError(error);
   }
 };

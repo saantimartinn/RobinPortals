@@ -48,8 +48,10 @@ exports.handler = async (event) => {
     const sb = getSupabase();
     const attempt = await attempts.getAttemptByProviderOrder(sb, 'revolut', orderId);
     if (!attempt) {
-      await logWebhook(sb, type, orderId, 'ignored', 'payment_attempt_not_found');
-      return { statusCode: 204, body: '' };
+      // The same merchant also processes Robin Jr orders. Its payment rows
+      // live in another database, so pass an unmatched order to that portal.
+      const { runInApp } = require('../../../../site/app-env.cjs');
+      return runInApp('robinjr', () => require('../../../robinjr/netlify/functions/revolut-webhook.js').handler(event));
     }
 
     if (type === 'ORDER_COMPLETED') {

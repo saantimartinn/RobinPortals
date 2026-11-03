@@ -89,8 +89,12 @@ function taxRateFor(user) {
   return taxRateForClient(user);
 }
 
-function accountFor(tipo) {
-  return ACCOUNT_BY_TIPO[norm(tipo) || 'general'] || ACCOUNT_BY_TIPO.general;
+function accountFor(tipo, user, payment) {
+  const pd = payment && payment.payment_data || {};
+  if (pd.ielts_preset === 'evaluation' || pd.ielts_preset === 'class') {
+    return process.env.HOLDED_ACCOUNT_ENGLISH || '70500008';
+  }
+  return process.env.HOLDED_ACCOUNT_ROBINJR || '70500006';
 }
 
 function parseContractData(user) {
@@ -253,7 +257,7 @@ async function createInvoiceForPayment(sb, user, payment) {
     : ymd(due);
 
   // La v2 acepta directamente el ID interno de la cuenta del plan contable.
-  const acct = accountFor(user.tipo);
+  const acct = accountFor(user.tipo, user, payment);
 
   const body = {
     contact_id: contactId,

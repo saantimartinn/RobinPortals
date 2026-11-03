@@ -122,8 +122,9 @@ async function createHoldedInvoice(portal, contactId, invoice) {
   const rate = outsideEU ? 0 : 21;
   const net = Math.round((gross / (1 + rate / 100)) * 100) / 100;
   const date = new Date((invoice.paid_at || new Date().toISOString())).toISOString().slice(0, 10);
-  const account = process.env.HOLDED_ACCOUNT_SUBSCRIPTIONS || process.env.HOLDED_ACCOUNT_GENERAL || '70500001';
-  const result = await holdedFetch('/invoices', { contact_id: contactId, date, due_date: date, currency: String(invoice.currency || 'eur').toLowerCase(), notes: `The Robin Plan · Stripe ${invoice.stripe_invoice_id}`, items: [{ name: 'Suscripción The Robin Plan', desc: '', units: 1, price: net, taxes: rate ? [`s_iva_${rate}`] : [], account }] });
+  const account = process.env.HOLDED_ACCOUNT_SUBSCRIPTIONS || '70500005';
+  const providerRef = invoice.order_id ? `Revolut ${invoice.order_id}` : `Stripe ${invoice.stripe_invoice_id}`;
+  const result = await holdedFetch('/invoices', { contact_id: contactId, date, due_date: date, currency: String(invoice.currency || 'eur').toLowerCase(), notes: `The Robin Plan · ${providerRef}`, items: [{ name: 'Suscripción The Robin Plan', desc: '', units: 1, price: net, taxes: rate ? [`s_iva_${rate}`] : [], account }] });
   const id = result && (result.id || result.invoice_id || (result.invoice && result.invoice.id));
   if (!id) throw new Error('holded_invoice_no_id');
   let number = null;
@@ -169,4 +170,61 @@ async function processStripeInvoice(sb, stripeInvoice) {
   }
 }
 
-module.exports = { processStripeInvoice, findPortalMatch, scoreCandidate, normEmail, normPhone, normTaxId };
+async function processRevolutOrder(sb, record, cycle, order) {
+  if (!order || order.state !== 'completed' || Number(order.amount) <= 0) return { ok: false, reason: 'order_not_paid' };
+  const { data: existing, error: readError } = await sb.from('revolut_subscription_invoices')
+    .select('*').eq('order_id', order.id).maybeSingle();
+  if (readError) throw readError;
+  if (existing?.holded_invoice_id) return { ok: true, already: true };
+  if (!existing) {
+    const { error: insertError } = await sb.from('revolut_subscription_invoices').insert({
+      order_id: order.id, subscriber_id: record.subscriber_id,
+      subscription_id: record.subscription_id, cycle_id: cycle.id,
+      amount: Number(order.amount) / 100, currency: order.currency || 'EUR',
+      paid_at: order.updated_at || new Date().toISOString(),
+    });
+    if (insertError && insertError.code !== '23505') throw insertError;
+  }
+  const { data: claimed, error: claimError } = await sb.from('revolut_subscription_invoices')
+    .update({ billing_status: 'processing', updated_at: new Date().toISOString() })
+    .eq('order_id', order.id).in('billing_status', ['pending', 'failed'])
+    .select('*');
+  if (claimError) throw claimError;
+  if (!claimed?.length) return { ok: true, processing: true };
+
+  try {
+    const { data: subscriber, error: userError } = await sb.from('subscribers')
+      .select('id,email,nombre,apellidos,holded_contact_id').eq('id', record.subscriber_id).single();
+    if (userError || !subscriber) throw userError || new Error('subscriber_not_found');
+    const info = record.billing_info || {};
+    const code = normTaxId(info.taxId);
+    if (!info.name || !code || !info.country || !info.address) throw new Error('billing_details_missing');
+    let contactId = subscriber.holded_contact_id;
+    if (!contactId) {
+      const contact = await holdedFetch('/contacts', {
+        name: info.name, code, email: subscriber.email, type: 'client', is_person: true,
+        bill_address: { address: info.address, country: info.country },
+      });
+      contactId = contact?.id || contact?.contact?.id;
+      if (!contactId) throw new Error('holded_contact_no_id');
+      const { error: contactError } = await sb.from('subscribers').update({ holded_contact_id: contactId }).eq('id', subscriber.id);
+      if (contactError) throw contactError;
+    }
+    const outsideEU = !EU_COUNTRIES.has(norm(info.country));
+    const client = { origin: outsideEU ? 'otros' : 'espana', pais: info.country };
+    const created = await createHoldedInvoice(client, contactId, claimed[0]);
+    const { error: saveError } = await sb.from('revolut_subscription_invoices').update({
+      billing_status: 'invoiced', holded_invoice_id: created.id,
+      holded_invoice_number: created.number, last_error: null, updated_at: new Date().toISOString(),
+    }).eq('order_id', order.id);
+    if (saveError) throw saveError;
+    return { ok: true, invoice_id: created.id };
+  } catch (error) {
+    await sb.from('revolut_subscription_invoices').update({
+      billing_status: 'failed', last_error: error.message, updated_at: new Date().toISOString(),
+    }).eq('order_id', order.id);
+    return { ok: false, reason: error.message };
+  }
+}
+
+module.exports = { processStripeInvoice, processRevolutOrder, findPortalMatch, scoreCandidate, normEmail, normPhone, normTaxId };
