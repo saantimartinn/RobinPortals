@@ -57,7 +57,7 @@ Reglas:
 async function extractDniFields({ anverso, reverso, docType }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY no configurada');
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({ apiKey, baseURL: 'https://api.anthropic.com' });
 
   const isPassport = String(docType || '').toLowerCase() === 'passport';
 
