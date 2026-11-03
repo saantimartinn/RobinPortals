@@ -21,13 +21,13 @@ export function PaymentStatusBadge({ status }) {
   return <Badge tone="slate">Bloqueado</Badge>;
 }
 
-export function paymentTitle(payment, total) {
+export function paymentTitle(payment, total, isNewRobinJr = false) {
   if (payment && payment.concept) return payment.concept;
   if (payment?.installment === 1 && total === 1) return 'Pago único del programa';
   const milestone = {
     1: 'Al inicio del programa',
     2: 'Después de las mentorías con exalumnos',
-    3: 'Al llegar a Wrap up',
+    3: isNewRobinJr ? 'Al finalizar 1.º de Bachillerato, en la fecha comunicada por escrito' : 'Al llegar a Wrap up',
   };
   if (payment && milestone[payment.installment]) return `Cuota ${payment.installment} · ${milestone[payment.installment]}`;
   return `Cuota ${payment ? payment.installment : ''} de ${total || 3}`;

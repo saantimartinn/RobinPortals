@@ -7,6 +7,7 @@ const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = req
 const { ensurePayments } = require('../../lib/payments');
 const { sendEmail } = require('../../lib/email');
 const { portalUrl } = require('../../lib/operational-config');
+const { ROBIN_JR_PRICE_VERSION, contractPricingVersion } = require('../../shared/financial-config.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -35,6 +36,15 @@ exports.handler = async (event) => {
       .eq('id', user_id)
       .single();
     if (!u) return json({ error: 'user_not_found' }, { statusCode: 404 });
+    const isNewRobinJr = contractPricingVersion(u.contract_data) === ROBIN_JR_PRICE_VERSION;
+    const dueDate = String(body.due_date || '').trim();
+    const parsedDueDate = new Date(dueDate + 'T00:00:00Z');
+    if (isNewRobinJr && installment === 3 && (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)
+      || Number.isNaN(parsedDueDate.getTime())
+      || parsedDueDate.toISOString().slice(0, 10) !== dueDate
+      || dueDate < new Date().toISOString().slice(0, 10))) {
+      return json({ error: 'third_installment_due_date_required' }, { statusCode: 400 });
+    }
     // La cuota 2 corresponde al hito posterior a las mentorías (fase 6);
     // la cuota 3 se habilita al cerrar el programa (fase 9, Wrap up).
     const requiredPhase = installment === 2 ? 6 : 9;
@@ -50,7 +60,11 @@ exports.handler = async (event) => {
     const nowIso = new Date().toISOString();
     const { error: e1 } = await sb
       .from('payments')
-      .update({ status: 'unlocked', unlocked_at: target.unlocked_at || nowIso })
+      .update({
+        status: 'unlocked',
+        unlocked_at: target.unlocked_at || nowIso,
+        ...(isNewRobinJr ? { due_date: installment === 3 ? dueDate : nowIso.slice(0, 10) } : {}),
+      })
       .eq('id', target.id);
     if (e1) throw e1;
 
@@ -67,6 +81,7 @@ exports.handler = async (event) => {
 Tu asesor de Project Robin ha desbloqueado la cuota ${installment} de tu paquete.
 
 Importe: ${importeStr} €
+${isNewRobinJr && installment === 3 ? `Fecha de vencimiento comunicada: ${dueDate}\n` : ''}
 Puedes realizar el pago entrando en el portal: ${paymentPortalUrl}
 
 Si tienes cualquier duda, responde a este correo.

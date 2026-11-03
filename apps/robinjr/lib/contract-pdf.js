@@ -25,6 +25,7 @@ function buildContractPdf({
   fechaStr,      // "DD de Mes de YYYY"
   signatureDataUrl, // data:image/png;base64,...
   pricingVersion,
+  courseYear,
 }) {
   return new Promise((resolve, reject) => {
     try {
@@ -48,6 +49,7 @@ function buildContractPdf({
         DIRECCION: alumnoDireccion,
         NUM_CARRERAS: numCarreras ? String(numCarreras) : '1, 2 o 3',
         FECHA: fechaStr || '',
+        CURSO_ESCOLAR: courseYear || '',
       };
 
       const doc = new PDFDocument({
@@ -81,6 +83,11 @@ function buildContractPdf({
 
       // ----- Cuerpo: walk blocks -----
       for (const b of variant.blocks) {
+        if (variant.key === 'robin_junior' && b.type === 'h2'
+          && (b.text === '3. Precio y calendario de pagos'
+            || (b.text === '7. Protección de datos' && doc.y > 600))) {
+          doc.addPage();
+        }
         switch (b.type) {
           case 'h2':
             doc.moveDown(0.6);

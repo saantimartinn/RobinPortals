@@ -2,8 +2,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { PRIVACY_EMAIL, VARIANTS, contractVariant, variantKey, fill } = require('../shared/contract-content.cjs');
-const { GENERAL_PRICE_VERSION, usesInternational2700Plan } = require('../shared/financial-config.cjs');
+const { PRIVACY_EMAIL, VARIANTS, contractVariant, variantKey, schoolYearForDate, fill } = require('../shared/contract-content.cjs');
+const { GENERAL_PRICE_VERSION, ROBIN_JR_PRICE_VERSION, usesInternational2700Plan } = require('../shared/financial-config.cjs');
 
 function contractText(key) {
   return VARIANTS[key].blocks
@@ -12,14 +12,15 @@ function contractText(key) {
     .join('\n');
 }
 
-test('las cinco categorías contractuales 2027 están disponibles', () => {
-  assert.deepEqual(Object.keys(VARIANTS).sort(), ['delft', 'general', 'general_noes', 'llegada', 'mentoria']);
+test('las variantes contractuales anteriores y Robin Junior están disponibles', () => {
+  assert.deepEqual(Object.keys(VARIANTS).sort(), ['delft', 'general', 'general_noes', 'llegada', 'mentoria', 'robin_junior']);
   assert.equal(variantKey('general', false), 'general');
   assert.equal(variantKey('general', true), 'general_noes');
   assert.equal(variantKey('delft', false), 'delft');
   assert.equal(variantKey('delft', true), 'general_noes');
   assert.equal(variantKey('llegada', false), 'llegada');
   assert.equal(variantKey('mentoria', false), 'mentoria');
+  assert.equal(variantKey('robin_junior', false), 'general');
 });
 
 test('el contrato de 2.700 € sigue exactamente la misma regla que las cuotas', () => {
@@ -48,7 +49,7 @@ test('todos los contratos usan el contacto de privacidad confirmado', () => {
 
 test('todos los contratos usan la dirección dinámica recogida del alumno', () => {
   for (const key of Object.keys(VARIANTS)) {
-    assert.match(contractText(key), /Dirección completa: \{\{DIRECCION\}\}/, key);
+    assert.match(contractText(key), /\{\{DIRECCION\}\}/, key);
   }
   assert.equal(fill('{{DIRECCION}}', { DIRECCION: 'Calle de prueba 1' }), 'Calle de prueba 1');
 });
@@ -76,10 +77,34 @@ test('el contrato General conserva precios históricos solo para clientes existe
 });
 
 test('todos los servicios terminan el 14 de septiembre de 2027 y migran a suscripción', () => {
-  for (const key of Object.keys(VARIANTS)) {
+  for (const key of Object.keys(VARIANTS).filter((key) => key !== 'robin_junior')) {
     const text = contractText(key);
     assert.match(text, /14 de septiembre de 2027/, key);
     assert.match(text, /15 de septiembre de 2027/, key);
     assert.match(text, /suscripción ROBIN/, key);
   }
+});
+
+test('la nueva versión selecciona el contrato Robin Junior para cualquier alta de este portal', () => {
+  for (const tipo of ['general', 'delft', 'mentoria', 'llegada']) {
+    assert.equal(contractVariant(tipo, false, ROBIN_JR_PRICE_VERSION).key, 'robin_junior');
+    assert.equal(contractVariant(tipo, true, ROBIN_JR_PRICE_VERSION).key, 'robin_junior');
+  }
+  assert.equal(contractVariant('general', false, GENERAL_PRICE_VERSION).key, 'general');
+  assert.equal(contractVariant('general', false, null).key, 'general_historical');
+});
+
+test('Robin Junior reproduce el alcance y las cuotas del modelo sin datos del cliente firmado', () => {
+  const text = contractText('robin_junior');
+  for (const phrase of [
+    'ocho sesiones', 'Mentorías individuales', 'Mentorías grupales', 'Diagnóstico de inglés',
+    'Summer School', 'Open Days', 'no incluye la presentación de solicitudes',
+    '1.499 €', 'Primera cuota: 500 €', 'Segunda cuota: 500 €',
+    'Tercera y última cuota: 499 €', 'siete días hábiles',
+    'descuento del 10 %', '{{CURSO_ESCOLAR}}',
+  ]) assert.ok(text.includes(phrase), phrase);
+  assert.doesNotMatch(text, /Martina|Chamero|51558757W|46749756W/);
+  assert.doesNotMatch(text, /alojamiento garantizado en residencia partner|14 de septiembre de 2027/i);
+  assert.equal(schoolYearForDate('2026-11-03T12:00:00Z'), '2026–2027');
+  assert.equal(schoolYearForDate('2027-02-01T12:00:00Z'), '2026–2027');
 });

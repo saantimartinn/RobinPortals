@@ -37,7 +37,7 @@ cliente de servidor y aplican sesión, rol y ownership en código. Los buckets `
 - `client_careers`: combinación `(user_id, career_template_id)` única.
 - `career_templates` conserva fichas visuales y datos básicos; los documentos y sus fechas límite se gestionan de forma independiente.
 - El campo heredado `career_templates.required_docs` se vacía por compatibilidad; no es fuente de requisitos documentales. La migración `202610210004_detach_career_documents.sql` también elimina el vínculo de las carreras existentes con `documents`, sin borrar documentos del alumno.
-- Robin Jr usa nueve fases. Su plan económico suma 1.499,99 € en tres cuotas: 500 €, 500 € y 499,99 €; la habilitación de las cuotas posteriores se vincula a las fases 6 y 9.
+- Robin Jr usa nueve fases. Las altas nuevas con `pricing_version=robin-jr-1499-v2` suman 1.499 € en tres cuotas de 500 €, 500 € y 499 €; las altas anteriores conservan 1.499,99 €. La habilitación de las cuotas posteriores se vincula a las fases 6 y 9; la tercera requiere fecha individual.
 - `payments`: `installment >= 1` y combinación `(user_id, installment)` única.
 - `notification_recipients`: combinación `(notification_id, user_id)` única.
 - `ai_chat_messages.role`: `user`, `assistant` o `advisor`.

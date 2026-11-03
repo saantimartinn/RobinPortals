@@ -25,6 +25,7 @@ export function AdminPagos({ client }) {
   const [xDue, setXDue] = useState("");
   const [xBusy, setXBusy] = useState(false);
   const [xErr, setXErr] = useState("");
+  const [thirdDueDate, setThirdDueDate] = useState("");
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 60 * 1000);
@@ -47,7 +48,8 @@ export function AdminPagos({ client }) {
   async function unlock(p) {
     setBusyId(p.id); setError("");
     try {
-      await adminPaymentsUnlock(client.id, p.installment);
+      await adminPaymentsUnlock(client.id, p.installment, p.installment === 3 ? thirdDueDate : undefined);
+      if (p.installment === 3) setThirdDueDate("");
       await refresh();
     } catch (e) {
       setError(e.message || "No se pudo desbloquear.");
@@ -79,7 +81,7 @@ export function AdminPagos({ client }) {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Cuotas del cliente" subtitle="Robin Jr · 500 € + 500 € + 499,99 € · total 1.499,99 €" icon={CreditCard} />
+        <CardHeader title="Cuotas del cliente" subtitle={data.user?.pricing_version === 'robin-jr-1499-v2' ? "Robin Jr · 500 € + 500 € + 499 € · total 1.499 €" : "Robin Jr · 500 € + 500 € + 499,99 € · total 1.499,99 €"} icon={CreditCard} />
         <CardContent>
           {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2 mb-3">{error}</div>}
           {loading ? (
@@ -103,12 +105,13 @@ export function AdminPagos({ client }) {
                       {isPaid ? <CheckCircle2 className="h-5 w-5" /> : isLocked ? <Shield className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length)} · {eur(p.amount)}</div>
+                      <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length, data.user?.pricing_version === 'robin-jr-1499-v2')} · {eur(p.amount)}</div>
                       <div className="text-xs text-slate-400">
                         {isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
                         {isUnlocked && p.unlocked_at && `Desbloqueado el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
                         {isLocked && p.installment === 2 && "Bloqueado hasta completar las 3 mentorías con exalumnos"}
-                        {isLocked && p.installment === 3 && "Bloqueado hasta la fase Wrap up"}
+                        {isLocked && p.installment === 3 && (data.user?.pricing_version === 'robin-jr-1499-v2' ? "Bloqueado hasta finalizar 1.º de Bachillerato y comunicar la fecha por escrito" : "Bloqueado hasta la fase Wrap up")}
+                        {isUnlocked && p.due_date && ` · Vence el ${new Date(p.due_date + 'T00:00:00').toLocaleDateString('es-ES')}`}
                         {isLocked && p.installment > 3 && "Bloqueado"}
                       </div>
                       {isUnlocked && daysSinceUnlock !== null && (
@@ -131,9 +134,14 @@ export function AdminPagos({ client }) {
                         </Btn>
                       )}
                       {isLocked && p.installment !== 1 && (
-                        <Btn size="sm" onClick={() => unlock(p)} disabled={busyId === p.id || Number(data.user?.application_phase || 1) < (p.installment === 2 ? 6 : 9)}>
+                        <Btn size="sm" onClick={() => unlock(p)} disabled={busyId === p.id || Number(data.user?.application_phase || 1) < (p.installment === 2 ? 6 : 9) || (p.installment === 3 && data.user?.pricing_version === 'robin-jr-1499-v2' && !thirdDueDate)}>
                           {busyId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Desbloquear"}
                         </Btn>
+                      )}
+                      {isLocked && p.installment === 3 && data.user?.pricing_version === 'robin-jr-1499-v2' && (
+                        <label className="text-xs text-slate-600">Fecha comunicada por escrito
+                          <input type="date" value={thirdDueDate} onChange={(e) => setThirdDueDate(e.target.value)} className="block mt-1 rounded-lg border border-slate-200 px-2 py-1 text-sm" />
+                        </label>
                       )}
                       {p.installment >= 4 && (
                         <Btn size="sm" variant="danger" onClick={() => delExtra(p)} disabled={busyId === p.id} title="Eliminar pago extra">

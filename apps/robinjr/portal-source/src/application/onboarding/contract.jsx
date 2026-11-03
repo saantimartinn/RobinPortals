@@ -8,26 +8,27 @@ import { OnboardingShell } from './onboarding-shared.jsx';
 import contractContent from "../../../../shared/contract-content.cjs";
 import financialConfig from "../../../../shared/financial-config.cjs";
 
-const { contractVariant: selectContractVariant } = contractContent;
-const { usesInternational2700Plan } = financialConfig;
+const { contractVariant: selectContractVariant, schoolYearForDate } = contractContent;
+const { ROBIN_JR_PRICE_VERSION, usesInternational2700Plan } = financialConfig;
 
 export function OnboardingContract({ user, onLogout, onDone }) {
   const today = new Date();
   const todayStr = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "long", year: "numeric" }).format(today);
 
   const tipo = (user.tipo || "general").toLowerCase();
-  const variant = CONTRACT_VARIANTS[tipo] || CONTRACT_VARIANTS.general;
+  const isRobinJr = user.pricing_version === ROBIN_JR_PRICE_VERSION;
+  const variant = isRobinJr ? CONTRACT_VARIANTS.robin_junior : (CONTRACT_VARIANTS[tipo] || CONTRACT_VARIANTS.general);
   const esOtros = (user.origin || "") === "otros";
-  const contrato2700 = usesInternational2700Plan(user);
-  const esMaestria = contrato2700 && (user.application_level || "") === "maestria";
+  const contrato2700 = !isRobinJr && usesInternational2700Plan(user);
+  const esMaestria = !isRobinJr && contrato2700 && (user.application_level || "") === "maestria";
   const esPasaporte = esOtros && user.has_eu_id === false;
   const docLabel = esPasaporte ? "Pasaporte" : "DNI";
-  const contractTitulo = esMaestria
+  const contractTitulo = isRobinJr ? variant.titulo : esMaestria
     ? "Contrato — Consultoría académica (Máster)"
     : contrato2700
       ? "Contrato — Consultoría académica (Internacional)"
       : variant.titulo;
-  const contractSubtitle = contrato2700
+  const contractSubtitle = isRobinJr ? variant.short : contrato2700
     ? (esMaestria
         ? "Internacional · admisión a programas de máster en Países Bajos"
         : "Internacional · aplicación a universidades en Países Bajos")
@@ -107,6 +108,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
                 DIRECCION: alumnoDireccion,
                 NUM_CARRERAS: "1, 2 o 3",
                 FECHA: todayStr,
+                CURSO_ESCOLAR: schoolYearForDate(today),
               };
               return contractVariant.blocks.map((b, i) => renderContractBlock(b, i, values));
             })()}
@@ -204,6 +206,11 @@ export function OnboardingContract({ user, onLogout, onDone }) {
 }
 
 const CONTRACT_VARIANTS = {
+  robin_junior: {
+    titulo: "Contrato Robin Junior",
+    short: "Acompañamiento durante 1.º de Bachillerato",
+    extras: [],
+  },
   general: {
     titulo: "Contrato — Consultoría académica",
     short: "General · aplicación a universidades en Países Bajos",

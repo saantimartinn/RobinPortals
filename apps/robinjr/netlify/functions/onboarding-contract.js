@@ -15,11 +15,12 @@ const { sendEmail } = require('../../lib/email');
 const { buildContractPdf } = require('../../lib/contract-pdf');
 const {
   DELFT_PRICE_VERSION,
+  ROBIN_JR_PRICE_VERSION,
   contractPricingVersion,
   usesInternational2700Plan,
 } = require('../../shared/financial-config.cjs');
 const storage = require('../../lib/storage');
-const { variantKey } = require('../../shared/contract-content.cjs');
+const { contractVariant, schoolYearForDate } = require('../../shared/contract-content.cjs');
 const { isIsolatedSandbox } = require('../../lib/sandbox-mode');
 
 function esc(s) {
@@ -56,6 +57,7 @@ function buildCoverHtml({ clienteNombre, alumnoNombre, fechaStr, leadId, tipoTit
 }
 
 const TITULO_POR_VARIANTE = {
+  robin_junior: 'Contrato Robin Junior',
   general: 'Contrato — Consultoría académica',
   general_noes: 'Contrato — Consultoría académica (Internacional)',
   delft: 'Contrato — TU Delft',
@@ -102,6 +104,8 @@ exports.handler = async (event) => {
     const signatureMime = (/^data:([^;,]+)/.exec(String(signature_content)) || [])[1] || 'image/png';
     const existingPricingVersion = contractPricingVersion(u.contract_data);
     const pricingVersion = existingPricingVersion || (tipo === 'delft' ? DELFT_PRICE_VERSION : null);
+    const isRobinJr = pricingVersion === ROBIN_JR_PRICE_VERSION;
+    const contractKind = contractVariant(tipo, contrato2700, pricingVersion).key;
     const uploadedSignature = isolatedSandbox
       ? { path: null }
       : await storage.uploadDataUrl(sb, signature_content, {
@@ -113,10 +117,10 @@ exports.handler = async (event) => {
     const specialPriceTotalEur = Number(u.contract_data?.special_price_total_eur) || null;
     const contract_data = {
       ...(specialPriceTotalEur ? { special_price_total_eur: specialPriceTotalEur } : {}),
-      version_template: 'contratos-2027-revision-integrada',
+      version_template: isRobinJr ? 'contrato-robin-junior-v1' : 'contratos-2027-revision-integrada',
       pricing_version: pricingVersion,
       tipo,
-      variant: variantKey(tipo, contrato2700),
+      variant: contractKind,
       fecha_firma: nowIso,
       alumno: {
         nombre: u.nombre || null,
@@ -128,7 +132,7 @@ exports.handler = async (event) => {
         nombre: String(nombre_cliente).trim(),
         dni: String(dni_cliente).trim().toUpperCase(),
       },
-      extras: extrasList,
+      extras: isRobinJr ? [] : extrasList,
       signature_path: uploadedSignature.path,
       signature_mime: signatureMime,
     };
@@ -164,15 +168,16 @@ exports.handler = async (event) => {
         fechaStr,
         signatureDataUrl: signature_content,
         pricingVersion,
+        courseYear: schoolYearForDate(nowIso),
       });
 
       const clienteNombre = contract_data.cliente.nombre || 'Cliente';
       const alumnoNombre = `${u.nombre || ''} ${u.apellidos || ''}`.trim() || '—';
       const leadId = u.lead_id || u.id || '';
-      const variant = variantKey(tipo, contrato2700);
+      const variant = contractKind;
       const tipoTitulo = TITULO_POR_VARIANTE[variant] || TITULO_POR_VARIANTE.general;
-      const subject = 'CONTRATO ROBIN "' + clienteNombre + ', ' + leadId + '"';
-      const filename = 'Contrato Robin - ' + clienteNombre.replace(/[^a-zA-Z0-9 ._-]/g, '').slice(0, 80) + '.pdf';
+      const subject = (isRobinJr ? 'CONTRATO ROBIN JUNIOR "' : 'CONTRATO ROBIN "') + clienteNombre + ', ' + leadId + '"';
+      const filename = (isRobinJr ? 'Contrato Robin Junior - ' : 'Contrato Robin - ') + clienteNombre.replace(/[^a-zA-Z0-9 ._-]/g, '').slice(0, 80) + '.pdf';
       const html = buildCoverHtml({ clienteNombre, alumnoNombre, fechaStr, leadId, tipoTitulo });
 
       const attachments = [{

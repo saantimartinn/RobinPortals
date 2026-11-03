@@ -58,7 +58,8 @@ La asignación completa route → handler y handler → servicio está en [API_I
 - El progreso contiene nueve fases en este orden: Diagnóstico, Tus resultados, tres sesiones de mentoría con exalumnos, dos sesiones grupales, diagnóstico final con la profesora y Wrap up. `application-steps.js` es la lista visible que debe mantenerse alineada con el backend.
 - Mis carreras presenta tarjetas asignadas. El admin crea una ficha con nombre, imagen, descripción, asignaturas y requisitos y después la asigna al alumno. Al abrirla, el alumno ve el detalle en un popup. Los documentos y deadlines no pertenecen a una carrera.
 - Mi plan combina eventos próximos y deadlines documentales; las reservas se administran desde Google Calendar y no sustituyen los deadlines de documentos.
-- El plan cuesta 1.499,99 € en tres cuotas: 500 €, 500 € y 499,99 €. La cuota 2 se puede habilitar desde la fase 6 y la cuota 3 desde Wrap up (fase 9); la habilitación es una acción administrativa.
+- Las altas nuevas del plan Robin Jr cuestan 1.499 € en tres cuotas: 500 €, 500 € y 499 €. Los clientes anteriores conservan 500 €, 500 € y 499,99 €. La cuota 2 se puede habilitar desde la fase 6 y la cuota 3 desde Wrap up (fase 9); la tercera requiere registrar la fecha individual comunicada por escrito.
+- Las altas nuevas con `pricing_version=robin-jr-1499-v2` ven y firman el contrato Robin Junior de ocho sesiones para 1.º de Bachillerato; la vista previa y el PDF comparten el mismo contenido. Las plantillas anteriores permanecen para sus versiones históricas.
 - Para ofrecer huecos, el advisor crea eventos titulados exactamente `RobinJr` en su Google Calendar. Cada evento genera tramos consecutivos de 60 minutos; al reservar, el backend consulta de nuevo Calendar antes de crear la reunión.
 
 ## Flujo de administración

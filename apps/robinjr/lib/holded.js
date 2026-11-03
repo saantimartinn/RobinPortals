@@ -30,6 +30,8 @@ const HOLDED_BASE = 'https://api.holded.com/api/v2';
 
 const {
   FISCAL,
+  ROBIN_JR_PRICE_VERSION,
+  contractPricingVersion,
   invoiceBreakdown,
   isEuClient,
   taxRateForClient,
@@ -40,6 +42,17 @@ const CONCEPTO = FISCAL.concepto;
 const IELTS_NOTE = 'Operación exenta de IVA conforme al artículo 20.Uno.9.º de la Ley 37/1992.';
 const IELTS_EVALUATION = 'Evaluación inicial de inglés/IELTS';
 const IELTS_CLASS = 'Clase de preparación de inglés/IELTS';
+const ROBIN_JR_CONCEPTS = Object.freeze({
+  1: 'Robin Junior — 1.ª cuota del programa',
+  2: 'Robin Junior — 2.ª cuota del programa',
+  3: 'Robin Junior — 3.ª y última cuota del programa',
+});
+
+function isRobinJrInstallment(user, payment) {
+  return !!ROBIN_JR_CONCEPTS[Number(payment && payment.installment)]
+    && contractPricingVersion(user && user.contract_data) === ROBIN_JR_PRICE_VERSION
+    && !Number(user && user.contract_data && user.contract_data.special_price_total_eur);
+}
 
 // Cuenta contable (Categorización · Cuenta Contable) según el tipo de servicio.
 // Valor = ID interno de la cuenta del plan contable de Holded (la v2 lo exige y lo
@@ -121,6 +134,9 @@ function invoiceConcept(user, payment) {
   const pd = payment && payment.payment_data || {};
   if (pd.ielts_preset === 'evaluation') return IELTS_EVALUATION;
   if (pd.ielts_preset === 'class') return `${IELTS_CLASS} – ${pd.ielts_mode === 'group' ? 'Grupo' : 'Individual'} – ${Number(pd.ielts_hours)} horas`;
+  if (isRobinJrInstallment(user, payment)) {
+    return ROBIN_JR_CONCEPTS[Number(payment.installment)];
+  }
   if (payment && payment.concept) return stripSuffix(payment.concept);
   return standardConcept(user, payment);
 }
@@ -227,6 +243,14 @@ async function createInvoiceForPayment(sb, user, payment) {
   const net = breakdown.base;
   const now = Math.floor(Date.now() / 1000);
   const due = now + 7 * 24 * 3600;
+  const programInstallment = isRobinJrInstallment(user, payment);
+  const storedDueDate = String(payment.due_date || '').trim();
+  if (programInstallment && Number(payment.installment) === 3 && !/^\d{4}-\d{2}-\d{2}$/.test(storedDueDate)) {
+    throw new Error('robin_jr_third_due_date_missing');
+  }
+  const dueDate = programInstallment
+    ? (storedDueDate || String(payment.paid_at || '').slice(0, 10) || ymd(now))
+    : ymd(due);
 
   // La v2 acepta directamente el ID interno de la cuenta del plan contable.
   const acct = accountFor(user.tipo);
@@ -234,12 +258,12 @@ async function createInvoiceForPayment(sb, user, payment) {
   const body = {
     contact_id: contactId,
     date: ymd(now),
-    due_date: ymd(due),
+    due_date: dueDate,
     currency: String(payment.currency || 'eur').toLowerCase(),
     notes: isIelts ? IELTS_NOTE : 'Cliente Robin ' + (user.lead_id || user.id || ''),
     retention: 0,
     items: [{
-      name: invoiceConcept(user, payment) + suffixFor(user),
+      name: invoiceConcept(user, payment) + (isRobinJrInstallment(user, payment) ? '' : suffixFor(user)),
       desc: '',
       units: 1,
       price: net,

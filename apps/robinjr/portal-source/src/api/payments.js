@@ -22,8 +22,8 @@ export async function adminPaymentsAdd(userId, payload) {
 export async function adminPaymentsDelete(userId, paymentId) {
   return api.post("/api/admin/payments/delete", { user_id: userId, payment_id: paymentId });
 }
-export async function adminPaymentsUnlock(userId, installment) {
-  return api.post("/api/admin/payments/unlock", { user_id: userId, installment });
+export async function adminPaymentsUnlock(userId, installment, dueDate) {
+  return api.post("/api/admin/payments/unlock", { user_id: userId, installment, ...(dueDate ? { due_date: dueDate } : {}) });
 }
 export async function adminPaymentsSetAmount(userId, installment, amount) {
   return api.post("/api/admin/payments/set-amount", { user_id: userId, installment, amount });
