@@ -24,6 +24,7 @@ exports.handler = async (event) => {
   const body = parseJsonBody(event);
   if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });
 
+  let stage = 'user_lookup';
   try {
     const sb = getSupabase();
     const { data: user, error: userError } = await sb
@@ -36,6 +37,7 @@ exports.handler = async (event) => {
     const action = String(body.action || 'extract');
 
     if (action === 'upload_ticket') {
+      stage = 'upload_ticket';
       const upload = await createDniUploadTicket(sb, session.uid, body);
       return json({
         upload: {
@@ -47,13 +49,16 @@ exports.handler = async (event) => {
     }
 
     if (action === 'cancel') {
+      stage = 'cancel';
       await cancelDniUpload(sb, session.uid, body);
       return json({ ok: true });
     }
 
     if (action !== 'extract') return json({ error: 'invalid_action' }, { statusCode: 400 });
 
+    stage = 'load_images';
     const images = await loadDniImages(sb, session.uid, body);
+    stage = 'ocr';
     const fields = await extractDniFields({
       anverso: { base64: images.anverso.base64, mimetype: images.anverso.mimetype },
       reverso: images.reverso
@@ -68,6 +73,7 @@ exports.handler = async (event) => {
       return json({ ok: true, fields });
     }
 
+    stage = 'save_paths';
     const { error: updateError } = await sb
       .from('users')
       .update({
@@ -81,6 +87,15 @@ exports.handler = async (event) => {
   } catch (error) {
     if (inputError(error)) {
       return json({ error: error.code || error.message || 'invalid_upload' }, { statusCode: 400 });
+    }
+    console.error(JSON.stringify({
+      operation: 'onboarding.dni_extract',
+      stage,
+      upstream_status: Number(error?.status || error?.statusCode) || null,
+      error_type: error?.name || null,
+    }));
+    if (Number(error?.status || error?.statusCode) === 401 && stage === 'ocr') {
+      return json({ error: 'ocr_provider_auth_failed' }, { statusCode: 503 });
     }
     return serverError(error, 'onboarding.dni_extract');
   }
