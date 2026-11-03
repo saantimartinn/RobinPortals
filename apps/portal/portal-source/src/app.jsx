@@ -163,7 +163,7 @@ export default function PortalRobin() {
   }, [authState.user?.id]);
 
   useEffect(() => {
-    if (resetToken || !authState.user || landingHandled.current) return;
+    if (resetToken || !authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
     const admin = isAdminUser(authState.user);
     const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
     let next = null;
@@ -176,8 +176,7 @@ export default function PortalRobin() {
       }
       return;
     }
-    if (next === "robinjr" || (authState.user.auth_source === "external_client" &&
-      (authState.user.external_source === "robinjr" || authState.user.available_portals?.includes("robinjr")))) {
+    if (next === "robinjr") {
       landingHandled.current = true;
       (async () => {
         try {
@@ -191,7 +190,6 @@ export default function PortalRobin() {
       })();
       return;
     }
-    if (checkingSubscriptionAccess || !subscriptionAccessResolved) return;
     if (next === "/therobinplan/" || next === "/therobinplan") {
       if (subscriptionAccess) {
         landingHandled.current = true;
@@ -203,7 +201,17 @@ export default function PortalRobin() {
       return;
     }
     if (authState.user.auth_source === "external_client" && !next) {
-      if (authState.user.external_source === "community" && subscriptionAccess) {
+      if (authState.user.external_source === "robinjr") {
+        landingHandled.current = true;
+        (async () => {
+          try {
+            const result = await issueSsoTicket("robinjr");
+            window.location.replace(ROBIN_LINKS[1][0] + "?sso_ticket=" + encodeURIComponent(result.ticket));
+          } catch (_) {
+            setEntryNotice("No se ha podido validar tu acceso a RobinJr.");
+          }
+        })();
+      } else if (authState.user.external_source === "community" && subscriptionAccess) {
         landingHandled.current = true;
         window.location.replace("/therobinplan/");
       } else {

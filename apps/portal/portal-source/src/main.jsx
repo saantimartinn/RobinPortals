@@ -13,3 +13,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <App />
   </React.StrictMode>
 );
+
+// Retire the old /portal/ offline worker from browsers that visited the prototype.
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then((registrations) => Promise.all(registrations
+      .filter((registration) => new URL(registration.scope).pathname === "/portal/")
+      .map((registration) => registration.unregister())))
+    .catch(() => {});
+}

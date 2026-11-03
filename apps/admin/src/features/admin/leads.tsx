@@ -1,6 +1,6 @@
 // Admin feature module for leads; the feature registry connects it to the authenticated shell.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ChevronDown, ChevronRight, Database, Download, Filter, Flame, GraduationCap, LayoutGrid, List, Mail, PhoneCall, Search, UserCheck, X } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronRight, Database, Download, Filter, Flame, LayoutGrid, List, Mail, PhoneCall, Search, UserCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Contact, CrmStage, LeadCategory, LeadContactRole, LostReason } from "@/types/domain";
@@ -13,6 +13,7 @@ import { EmailComposer } from "./email-composer";
 
 export { LeadInbox } from "./lead-inbox";
 import { leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
+const portalLabels: Record<string, string> = { alumno: "Alumno", robinjr: "Robin Jr", community: "Community" };
 export type { LeadGroupRow } from "./lead-shared";
 export { emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin, webFormLabel } from "./lead-shared";
 
@@ -33,6 +34,8 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
   const [lostTo, setLostTo] = useState("");
   const [pendingClientId, setPendingClientId] = useState<string | null>(null);
   const [selectedAdvisor, setSelectedAdvisor] = useState("");
+  const [selectedPortal, setSelectedPortal] = useState<"alumno" | "robinjr" | "community" | "">("");
+  const [recentPortalAccounts, setRecentPortalAccounts] = useState<Record<string, string[]>>({});
   const [pendingLostId, setPendingLostId] = useState<string | null>(null);
   const [lostDestination, setLostDestination] = useState<"lost" | "future">("lost");
   const [lostReason, setLostReason] = useState<LostReason | "">("");
@@ -162,12 +165,16 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
       showStageReminder();
       return;
     }
-    const clientType = categories[leadId];
-    if (!contact?.email || !clientType) {
-      notify("No se puede crear el cliente sin email y tipo de contrato");
+    if (!contact?.email) {
+      notify("No se puede crear el cliente sin email");
       return;
     }
+    beginPortalConversion(leadId);
+  }
+
+  function beginPortalConversion(leadId: string) {
     setSelectedAdvisor("");
+    setSelectedPortal("");
     setPendingClientId(leadId);
   }
 
@@ -175,17 +182,19 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
     const leadId = pendingClientId;
     const contact = contacts.find((item) => item.id === leadId);
     const clientType = leadId ? categories[leadId] : "";
-    if (!leadId || !contact || !clientType || !selectedAdvisor) return;
+    if (!leadId || !contact || !selectedPortal || (selectedPortal !== "community" && (!clientType || !selectedAdvisor))) return;
     setConvertingId(leadId);
-    notify(`Creando la cuenta de ${contact.name} en el portal…`);
+    const portalName = { alumno: "Portal del Alumno", robinjr: "Robin Jr", community: "Community" }[selectedPortal];
+    notify(`Creando la cuenta de ${contact.name} en ${portalName}…`);
     try {
-      const result = await integrationClient.convertLead({ leadId, name: contact.name, email: contact.email, advisor: selectedAdvisor, clientType });
-      onMoveLead(leadId, "Cliente");
-      await onPortalRefresh();
+      const result = await integrationClient.convertLead({ leadId, name: contact.name, email: contact.email, advisor: selectedAdvisor, clientType: clientType || "", targetPortal: selectedPortal });
+      setRecentPortalAccounts((current) => ({ ...current, [leadId]: [...new Set([...(current[leadId] || []), selectedPortal])] }));
+      if ((leadStages[leadId] || contact.stage) !== "Cliente") onMoveLead(leadId, "Cliente");
+      if (selectedPortal === "alumno") await onPortalRefresh();
       setPendingClientId(null);
-      if (result.result === "exists") notify(`${contact.name} ya existía; ahora su asesor es ${selectedAdvisor}`);
-      else if (result.emailSent) notify(`Cuenta creada, asignada a ${selectedAdvisor} y correo de acceso enviado`);
-      else notify(`Cuenta creada y asignada a ${selectedAdvisor}; el correo queda pendiente`);
+      if (result.result === "exists") notify(`${contact.name} ya tenía cuenta en ${portalName}`);
+      else if (result.emailSent) notify(`Cuenta creada en ${portalName} y correo de acceso enviado`);
+      else notify(`Cuenta creada en ${portalName}; el correo queda pendiente`);
     } catch (error) {
       notify(error instanceof Error ? error.message : "No se pudo crear la cuenta en el portal");
     } finally { setConvertingId(null); }
@@ -282,14 +291,60 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
         </div>
       )}
 
-      {path === "/crm/clientes" && <div className="personal-leads">{portalConnected && !portalSnapshot ? <div className="empty compact"><GraduationCap /><h2>Cargando clientes…</h2></div> : portalSnapshot ? portalSnapshot.clients.filter((client) => isDeveloperAdmin || client.assigned_to === portalSnapshot.admin.email).map((client) => <a className="lead-card" key={client.id} href={`${portalSnapshot.portalUrl}/portal/`} target="_blank" rel="noreferrer"><small>{client.tipo || "general"}</small><h3>{[client.nombre, client.apellidos].filter(Boolean).join(" ") || client.email}</h3><p>{client.email}</p><div><span>Fase {client.application_phase || 1}</span><strong>{client.pago_completed ? "Al corriente" : "Onboarding"}</strong></div><footer>Abrir portal<ChevronRight /></footer></a>) : owned.filter((contact) => leadStages[contact.id] === "Cliente").map((contact) => <button className="lead-card" key={contact.id} onClick={() => openContact(contact)}><small>{categories[contact.id]}</small><h3>{contact.name}</h3><p>{contact.email}</p><div><span>Agente de venta: {leadOwners[contact.id] || currentUser}</span><strong>{contact.value.toLocaleString("es-ES")} €</strong></div><footer>Ver portal del cliente<ChevronRight /></footer></button>)}</div>}
+      {path === "/crm/clientes" && <div className="personal-leads">
+        {owned.filter((contact) => leadStages[contact.id] === "Cliente").map((contact) => {
+          const portals = [...new Set([
+            ...Object.keys(contact.portalAccounts || {}),
+            ...(recentPortalAccounts[contact.id] || []),
+            ...(portalSnapshot?.clients.some((client) => client.email?.toLowerCase() === contact.email?.toLowerCase()) ? ["alumno"] : []),
+          ])];
+          return <article className="lead-card" key={contact.id}>
+            <small>{categories[contact.id] || "Cliente"}</small>
+            <h3>{contact.name}</h3><p>{contact.email}</p>
+            <div><span>Portales</span><strong>{portals.map((key) => portalLabels[key] || key).join(" · ") || "Destino no registrado"}</strong></div>
+            <footer><Button type="button" variant="outline" onClick={() => beginPortalConversion(contact.id)}>Añadir portal</Button></footer>
+          </article>;
+        })}
+        {portalSnapshot?.clients.filter((client) => (isDeveloperAdmin || client.assigned_to === portalSnapshot.admin.email)
+          && !contacts.some((contact) => leadStages[contact.id] === "Cliente" && contact.email?.toLowerCase() === client.email?.toLowerCase()))
+          .map((client) => <a className="lead-card" key={client.id} href={`${portalSnapshot.portalUrl}/portal/`} target="_blank" rel="noreferrer"><small>{client.tipo || "general"}</small><h3>{[client.nombre, client.apellidos].filter(Boolean).join(" ") || client.email}</h3><p>{client.email}</p><div><span>Fase {client.application_phase || 1}</span><strong>{client.pago_completed ? "Al corriente" : "Onboarding"}</strong></div><footer>Abrir portal<ChevronRight /></footer></a>)}
+      </div>}
 
       {path === "/crm/lost" && <><div className="lost-filters"><label>Desde<input type="date" value={lostFrom} onChange={(event) => setLostFrom(event.target.value)} /></label><label>Hasta<input type="date" value={lostTo} onChange={(event) => setLostTo(event.target.value)} /></label><label>Categoría<select value={lostCategory} onChange={(event) => setLostCategory(event.target.value)}><option value="">Todas</option>{leadCategories.map((category) => <option key={category}>{category}</option>)}</select></label><label>Heat mínimo<input type="number" min="0" max="100" value={lostHeat} onChange={(event) => setLostHeat(event.target.value)} /></label></div><div className="data-table panel"><table><thead><tr><th>Lead</th><th>Categoría</th><th>Heat final</th><th>Origen</th><th>Motivo</th><th>Fecha Lost</th></tr></thead><tbody>{owned.filter((contact) => { const lostDate = (leadLostDates[contact.id] || "").slice(0, 10); return leadStages[contact.id] === "Lost" && (!lostCategory || categories[contact.id] === lostCategory) && leadHeat[contact.id] >= Number(lostHeat || 0) && (!lostFrom || lostDate >= lostFrom) && (!lostTo || lostDate <= lostTo); }).map((contact) => <tr key={contact.id} onClick={() => openContact(contact)}><td><b>{contact.name}</b><small>{contact.email}</small></td><td>{categories[contact.id]}</td><td>{leadHeat[contact.id]}</td><td>{contact.source}</td><td>{lostReasonLabel(contact.lostReason)}{contact.lostReasonDetail && <small>{contact.lostReasonDetail}</small>}</td><td>{leadLostDates[contact.id]?.slice(0, 10) || "—"}</td></tr>)}</tbody></table></div></>}
 
       {selected && <ContactDrawer contact={selected} admins={admins} leadMode heat={leadHeat[selected.id]} onHeatChange={(value) => onSetLeadHeat(selected.id, value)} onOwnerChange={(owner) => { onAssignLead(selected.id, owner); notify(`${selected.name} asignado a ${owner}`); }} onContactRoleChange={(value) => onSetLeadContactRole(selected.id, value)} onDeleteLead={async (id) => { await onDeleteLead(id); notify(`${selected.name} eliminado correctamente`); }} onClose={() => setSelected(null)} />}
       {emailComposerOpen && path === "/crm" && <EmailComposer contacts={porContactarLeads} notify={notify} onClose={() => setEmailComposerOpen(false)} />}
       {pendingQualificationId && <div className="drawer-wrap outcome-dialog-wrap"><form className="manual-lead-card crm-outcome-card qualification-dialog" onSubmit={(event) => { event.preventDefault(); void confirmQualification(); }}><button className="drawer-close" type="button" disabled={qualifying} onClick={() => setPendingQualificationId(null)}>×</button><span>Pasar a contactado</span><h2>Completa el primer contacto</h2><p>Antes de continuar debes identificar a la persona, ajustar el heat y registrar la primera llamada.</p><label>Contacto principal<select required autoFocus value={qualificationContactRole} onChange={(event) => setQualificationContactRole(event.target.value as LeadContactRole | "")}><option value="">Seleccionar…</option>{contactRoleOptions.map((role) => <option key={role} value={role}>{contactRoleLabels[role]}</option>)}</select></label><label>Nuevo heat <strong className="qualification-heat-value">{qualificationHeat}</strong><input type="range" min="0" max="100" value={qualificationHeat} onChange={(event) => setQualificationHeat(Number(event.target.value))} /></label><small className={qualificationHeat === qualificationInitialHeat ? "qualification-pending" : "qualification-complete"}>{qualificationHeat === qualificationInitialHeat ? `Debes cambiar el valor actual (${qualificationInitialHeat}).` : `Heat ajustado de ${qualificationInitialHeat} a ${qualificationHeat}.`}</small><label>Duración de la llamada (minutos)<input type="number" min="1" max="1440" step="1" required value={qualificationDuration} onChange={(event) => setQualificationDuration(event.target.value)} placeholder="Ej. 20" /></label><label>Notas de la llamada<textarea maxLength={4000} value={qualificationNotes} onChange={(event) => setQualificationNotes(event.target.value)} placeholder="Opcional" /></label>{qualificationError && <small className="team-note-error" role="alert">{qualificationError}</small>}<div className="manual-lead-actions"><Button type="button" variant="outline" disabled={qualifying} onClick={() => setPendingQualificationId(null)}>Cancelar</Button><Button type="submit" disabled={qualifying || !qualificationContactRole || qualificationHeat === qualificationInitialHeat || !qualificationDuration}>{qualifying ? "Guardando…" : "Guardar y pasar a Contactado"}</Button></div></form></div>}
-      {pendingClientId && <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget && !convertingId) setPendingClientId(null); }}><form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmClientConversion(); }}><button className="drawer-close" type="button" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>×</button><span>Pasar a IN</span><h2>Asignar asesor del cliente</h2><p>El agente de venta será <b>{leadOwners[pendingClientId] || contacts.find((contact) => contact.id === pendingClientId)?.owner || (isDeveloperAdmin ? "Sin asignar" : currentUser)}</b>. El asesor elegido será quien reciba al alumno en el Portal del Alumno.</p><label>Asesor<select required autoFocus value={selectedAdvisor} onChange={(event) => setSelectedAdvisor(event.target.value)}><option value="">Seleccionar asesor…</option>{admins.map((admin) => <option key={admin} value={admin}>{admin}</option>)}</select></label><div className="outcome-role-summary"><span>Agente de venta<strong>{leadOwners[pendingClientId] || contacts.find((contact) => contact.id === pendingClientId)?.owner || (isDeveloperAdmin ? "Sin asignar" : currentUser)}</strong></span><span>Asesor del cliente<strong>{selectedAdvisor || "Pendiente"}</strong></span></div><div className="manual-lead-actions"><Button type="button" variant="outline" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>Cancelar</Button><Button type="submit" disabled={!selectedAdvisor || !!convertingId}>{convertingId ? "Creando cliente…" : "Crear cliente"}</Button></div></form></div>}
+      {pendingClientId && <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget && !convertingId) setPendingClientId(null); }}>
+        <form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmClientConversion(); }}>
+          <button className="drawer-close" type="button" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>×</button>
+          <span>{leadStages[pendingClientId] === "Cliente" ? "Añadir portal" : "Pasar a IN"}</span>
+          <h2>Elegir portal del cliente</h2>
+          <p>La cuenta se creará en la base de datos del portal elegido. Puedes añadirle acceso a otro portal más adelante.</p>
+          <label>Portal de destino
+            <select required autoFocus value={selectedPortal} onChange={(event) => setSelectedPortal(event.target.value as typeof selectedPortal)}>
+              <option value="">Seleccionar portal…</option>
+              <option value="robinjr">Robin Jr</option>
+              <option value="alumno">Portal del Alumno</option>
+              <option value="community">Community</option>
+            </select>
+          </label>
+          {selectedPortal !== "community" && <label>Asesor
+            <select required value={selectedAdvisor} onChange={(event) => setSelectedAdvisor(event.target.value)}>
+              <option value="">Seleccionar asesor…</option>{admins.map((admin) => <option key={admin} value={admin}>{admin}</option>)}
+            </select>
+          </label>}
+          {selectedPortal !== "community" && !categories[pendingClientId] && <p>Elige antes un tipo de contrato para crear el acceso a este portal.</p>}
+          <div className="outcome-role-summary">
+            <span>Agente de venta<strong>{leadOwners[pendingClientId] || contacts.find((contact) => contact.id === pendingClientId)?.owner || (isDeveloperAdmin ? "Sin asignar" : currentUser)}</strong></span>
+            {selectedPortal !== "community" && <span>Asesor del cliente<strong>{selectedAdvisor || "Pendiente"}</strong></span>}
+          </div>
+          <div className="manual-lead-actions">
+            <Button type="button" variant="outline" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>Cancelar</Button>
+            <Button type="submit" disabled={!selectedPortal || (selectedPortal !== "community" && (!categories[pendingClientId] || !selectedAdvisor)) || !!convertingId}>{convertingId ? "Creando acceso…" : "Crear acceso"}</Button>
+          </div>
+        </form>
+      </div>}
       {pendingLostId && <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget && !savingOutcome) setPendingLostId(null); }}><form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmLost(); }}><button className="drawer-close" type="button" disabled={savingOutcome} onClick={() => setPendingLostId(null)}>×</button><span>Retirar del pipeline</span><h2>{lostDestination === "future" ? "Lead de próximo curso" : "Motivo obligatorio"}</h2><p>{lostDestination === "future" ? "El lead saldrá del CRM activo y se guardará únicamente en la tabla de próximos cursos." : "Selecciona por qué se ha perdido este lead. Este dato quedará guardado para el análisis comercial."}</p><label>Destino<select autoFocus value={lostDestination} onChange={(event) => { const destination = event.target.value as "lost" | "future"; setLostDestination(destination); setOutcomeError(""); }}><option value="lost">Lost definitivo</option><option value="future">Lead de próximo curso</option></select></label>{lostDestination === "lost" ? <><label>Motivo<select required value={lostReason} onChange={(event) => { setLostReason(event.target.value as LostReason | ""); if (event.target.value !== "other") setLostReasonDetail(""); }}><option value="">Seleccionar motivo…</option>{lostReasonOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>{lostReason === "other" && <label>Explicación breve<input required maxLength={120} value={lostReasonDetail} onChange={(event) => setLostReasonDetail(event.target.value)} placeholder="Escribe el motivo" /></label>}</> : <label>Curso académico<select required value={futureAcademicYear} onChange={(event) => setFutureAcademicYear(event.target.value as FutureAcademicYear | "")}><option value="">Seleccionar curso…</option><option value="2027-28">2027-28</option><option value="2028-29">2028-29</option></select></label>}{outcomeError && <small className="team-note-error" role="alert">{outcomeError}</small>}<div className="manual-lead-actions"><Button type="button" variant="outline" disabled={savingOutcome} onClick={() => setPendingLostId(null)}>Cancelar</Button><Button type="submit" disabled={savingOutcome || (lostDestination === "lost" ? !lostReason || (lostReason === "other" && !lostReasonDetail.trim()) : !futureAcademicYear)}>{savingOutcome ? "Moviendo…" : lostDestination === "future" ? "Enviar a próximos cursos" : "Marcar como Lost"}</Button></div></form></div>}
       {stageReminderOpen && <div className="crm-stage-reminder" role="alertdialog" aria-modal="true" aria-labelledby="crm-stage-reminder-title"><section><div className="crm-stage-reminder-icon"><PhoneCall /></div><h2 id="crm-stage-reminder-title">¿Has registrado todas las llamadas?</h2><p>¿Has añadido todas las notas?</p>{stageReminderClosable ? <button type="button" aria-label="Cerrar aviso" onClick={() => setStageReminderOpen(false)}><X /></button> : <small>Podrás cerrar este aviso en 1 segundo.</small>}</section></div>}
     </div>

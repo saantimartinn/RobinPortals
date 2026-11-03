@@ -12,8 +12,12 @@ function firstName(value) {
   return String(value || '').trim().split(/\s+/)[0] || '';
 }
 
-function buildAccountAccessMessage({ name, username, password, loginUrl = portalUrl() }) {
+function buildAccountAccessMessage({ name, username, password, targetPortal = 'alumno', loginUrl = portalUrl() }) {
   const greeting = firstName(name) ? `Hola ${firstName(name)},` : 'Hola,';
+  const destination = { alumno: 'Portal del Alumno', robinjr: 'Robin Jr', community: 'Community' }[targetPortal] || 'Portal del Alumno';
+  const nextStep = targetPortal === 'community'
+    ? 'Al entrar podrás continuar con el acceso a Community.'
+    : 'Desde el portal podrás completar el onboarding y continuar con tu proceso de aplicación.';
   const text = `${greeting}
 
 Tu cuenta de cliente de Robin ya está preparada.
@@ -26,12 +30,18 @@ Desde el portal podrás completar el onboarding y continuar con tu proceso de ap
 
 El equipo de Robin`;
   const html = `<!doctype html><html lang="es"><body style="margin:0;background:#f4f6f9;font-family:Arial,sans-serif;color:#17263d"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:28px 12px"><tr><td align="center"><table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#fff;border-radius:12px;overflow:hidden"><tr><td style="background:#102b4b;color:#fff;padding:24px 28px;font-size:22px;font-weight:700">Bienvenido a Robin</td></tr><tr><td style="padding:28px"><p>${escapeHtml(greeting)}</p><p>Tu cuenta de cliente de Robin ya está preparada.</p><div style="background:#f4f6f9;border-radius:8px;padding:18px;margin:20px 0"><p style="margin:0 0 8px"><strong>Usuario:</strong> ${escapeHtml(username)}</p><p style="margin:0"><strong>Contraseña:</strong> ${escapeHtml(password)}</p></div><p><a href="${escapeHtml(loginUrl)}" style="display:inline-block;background:#102b4b;color:#fff;text-decoration:none;padding:12px 18px;border-radius:7px;font-weight:700">Acceder al portal</a></p><p style="font-size:14px;line-height:1.6">Desde el portal podrás completar el onboarding y continuar con tu proceso de aplicación.</p><p>El equipo de Robin</p></td></tr></table></td></tr></table></body></html>`;
-  return { subject: SUBJECT, text, html };
+  return {
+    subject: targetPortal === 'community' ? 'Tu acceso a Robin Community' : targetPortal === 'robinjr' ? 'Tu acceso a Robin Jr' : SUBJECT,
+    text: text.replace('Tu cuenta de cliente de Robin ya está preparada.', `Tu cuenta de ${destination} ya está preparada.`)
+      .replace('Desde el portal podrás completar el onboarding y continuar con tu proceso de aplicación.', nextStep),
+    html: html.replace('Tu cuenta de cliente de Robin ya está preparada.', `Tu cuenta de ${escapeHtml(destination)} ya está preparada.`)
+      .replace('Desde el portal podrás completar el onboarding y continuar con tu proceso de aplicación.', escapeHtml(nextStep)),
+  };
 }
 
-async function sendAccountAccessEmail({ email, name, username, password }) {
+async function sendAccountAccessEmail({ email, name, username, password, targetPortal }) {
   if (!email) return { sent: false, reason: 'no_email' };
-  const message = buildAccountAccessMessage({ name, username, password });
+  const message = buildAccountAccessMessage({ name, username, password, targetPortal });
   return sendEmail({ to: email, ...message, tag: 'account_access' });
 }
 

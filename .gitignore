@@ -11,6 +11,11 @@ coverage/
 *.log
 .DS_Store
 
+# Xcode user state and local builds
+**/xcuserdata/
+*.xcuserstate
+**/DerivedData/
+
 # Netlify local state and databases
 .netlify/
 **/.netlify/

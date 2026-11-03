@@ -44,9 +44,7 @@ export function OnboardingDNI({ user, onLogout, onDone }) {
       });
       setPhase("review");
     } catch (e) {
-      setError(e.data?.error === 'ocr_provider_auth_failed'
-        ? 'El lector de documentos no está disponible por un problema de acceso al servicio. Inténtalo de nuevo más tarde o avisa a tu asesor.'
-        : "No se pudo leer el " + docLabel + ". " + (e.message || ""));
+      setError("No se pudo leer el " + docLabel + ". " + (e.message || ""));
     } finally {
       setBusy(false);
     }
