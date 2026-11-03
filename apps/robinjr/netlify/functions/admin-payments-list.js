@@ -5,6 +5,7 @@ const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { ensurePayments, invoiceNumber } = require('../../lib/payments');
+const { contractPricingVersion } = require('../../shared/financial-config.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -45,6 +46,7 @@ exports.handler = async (event) => {
         origin: u.origin || null, pais: u.pais || null,
         has_eu_id: u.has_eu_id == null ? null : !!u.has_eu_id,
         application_phase: u.application_phase || 1,
+        pricing_version: contractPricingVersion(u.contract_data),
       },
       payments,
     });

@@ -1,9 +1,10 @@
 /**
- * Contenido de los cinco contratos 2027 (revisión integrada).
+ * Contenido de los contratos 2027 y Robin Junior.
  * Fuente única para la vista previa del onboarding y el PDF firmado.
  */
 
 const { GENERAL_PRICE_VERSION } = require('./financial-config.cjs');
+const { ROBIN_JR_PRICE_VERSION } = require('./financial-config.cjs');
 
 const PRIVACY_EMAIL = 'hello@project-robin.com';
 
@@ -199,6 +200,55 @@ const GENERAL_HISTORICAL = buildGeneralContract(
   PAGOS_TRES_TERCIOS
 );
 
+const ROBIN_JUNIOR = {
+  key: 'robin_junior',
+  title: 'Contrato Robin Junior',
+  acceptanceFooter: 'LA CLIENTE Y TUTORA LEGAL DECLARA HABER LEÍDO Y ACEPTADO ESTE CONTRATO EN NOMBRE PROPIO Y EN REPRESENTACIÓN DE LA ALUMNA.',
+  blocks: [
+    { type: 'p', text: 'Programa de acompañamiento para 1.º de Bachillerato · Curso {{CURSO_ESCOLAR}}' },
+    { type: 'h2', text: 'Partes' },
+    { type: 'p', text: 'De una parte, PROJECT ROBIN STUDENTS MOBILITY S.L., con NIF B75355057 y domicilio en Calle Covarrubias 9, 28010 Madrid (España), en adelante, Project Robin o la Empresa.' },
+    { type: 'p', text: 'Y, de otra parte, {{CLIENTE_NOMBRE}}, con {{CLIENTE_DOC_LABEL}} {{CLIENTE_DOC}}, actuando en nombre propio y como tutor/a legal de {{ALUMNO_NOMBRE}}, con {{ALUMNO_DOC_LABEL}} {{ALUMNO_DOC}}, en adelante, la Cliente y la Alumna, respectivamente.' },
+    { type: 'p', text: 'Domicilio comunicado: {{DIRECCION}}. La Cliente declara que cuenta con capacidad para representar a la Alumna y autorizar la contratación de los servicios descritos.' },
+    { type: 'h2', text: '1. Objeto del contrato' },
+    { type: 'p', text: 'La Empresa prestará a la Alumna el programa Robin Junior durante 1.º de Bachillerato, con el propósito de ayudarla a explorar opciones de estudios universitarios en los Países Bajos y preparar con antelación los hitos relevantes para una futura candidatura. El programa es de orientación y acompañamiento: no incluye la presentación de solicitudes de admisión ni garantiza admisión, plaza en una Summer School, beca, alojamiento o resultado académico.' },
+    { type: 'h2', text: '2. Servicios incluidos' },
+    { type: 'p', text: 'El programa comprende ocho sesiones, distribuidas de la siguiente manera:' },
+    { type: 'ul', items: [
+      'Sesión 1 · Diagnóstico y contexto: revisión inicial del perfil, intereses y situación académica de la Alumna, explicación del sistema universitario neerlandés y realización de una prueba de compatibilidad con apoyo de herramientas digitales.',
+      'Sesión 2 · Opciones y ruta: presentación y revisión de carreras y universidades potencialmente compatibles; selección conjunta de hasta tres áreas o grados para explorar.',
+      'Sesiones 3–5 · Mentorías individuales: tres sesiones individuales con antiguos alumnos que hayan estudiado en Países Bajos, orientadas a las tres opciones seleccionadas. La disponibilidad de perfiles se coordinará según la oferta de mentores de la Empresa.',
+      'Sesiones 6–7 · Mentorías grupales: dos encuentros grupales con mentores y otros estudiantes del programa, en fechas comunicadas con antelación.',
+      'Sesión 8 · Diagnóstico de inglés: una sesión de diagnóstico con una profesora para valorar el nivel de inglés y orientar los siguientes pasos. No incluye un curso de inglés ni preparación continuada de exámenes.',
+    ] },
+    { type: 'p', text: 'Además, el programa incluye orientación para identificar y organizar la solicitud a una Summer School en Países Bajos y apoyo para planificar visitas a Open Days universitarios, sujeto a calendarios, plazas, requisitos y disponibilidad de terceros. La Empresa ayudará a organizar estos pasos, pero no puede garantizar la admisión, celebración o disponibilidad de dichas actividades.' },
+    { type: 'p', text: 'La preparación de la PAU, las clases particulares, un curso de inglés, la reserva o búsqueda de alojamiento, viajes, tasas de Summer School, transporte, manutención, seguro y cualquier otro servicio o gasto de terceros no están incluidos. Podrán contratarse aparte, si están disponibles, mediante presupuesto y aceptación expresa. La gestión de alojamiento para una Summer School solo se ofrecerá como servicio adicional separado y estará sujeta a disponibilidad; no se garantiza habitación.' },
+    { type: 'h2', text: '3. Precio y calendario de pagos' },
+    { type: 'p', text: 'El precio total del programa Robin Junior es de 1.499 € (mil cuatrocientos noventa y nueve euros). Se abonará en tres cuotas:' },
+    { type: 'ul', items: [
+      'Primera cuota: 500 €. Al inicio del servicio, tras la firma del contrato y antes de comenzar las sesiones.',
+      'Segunda cuota: 500 €. Tras la realización de las mentorías incluidas en el programa.',
+      'Tercera y última cuota: 499 €. Al finalizar 1.º de Bachillerato, con fecha concreta comunicada por escrito por la Empresa.',
+    ] },
+    { type: 'p', text: 'Cada cuota deberá abonarse dentro de los siete días hábiles siguientes a su vencimiento. El primer pago será requisito para iniciar el servicio.' },
+    { type: 'p', text: 'Si la Alumna continúa con el programa Robin de 2.º de Bachillerato en el curso inmediatamente siguiente, se aplicará un descuento del 10 % sobre el precio de Robin vigente en el momento de formalizar esa contratación. Este descuento no fija ni anticipa el precio del programa del siguiente curso y no se aplica a servicios adicionales.' },
+    { type: 'h2', text: '4. Forma de pago' },
+    { type: 'p', text: 'El pago se efectuará mediante la pasarela habilitada en el portal de la Cliente o por transferencia bancaria a favor de PROJECT ROBIN STUDENTS MOBILITY S.L.:' },
+    { type: 'p', text: 'Banco: Banco Sabadell. IBAN: ES52 0081 5330 7600 0218 7930. SWIFT/BIC: BSABESBB. Concepto de la transferencia: ROBIN JUNIOR - {{ALUMNO_NOMBRE}}.' },
+    { type: 'p', text: 'En caso de retraso en el pago, la Empresa podrá suspender temporalmente las sesiones y actuaciones pendientes hasta que se regularicen las cantidades vencidas, previa comunicación a la Cliente y sin perjuicio de los derechos que le reconozca la normativa aplicable.' },
+    { type: 'h2', text: '5. Compromisos y límites del servicio' },
+    { type: 'p', text: 'Project Robin prestará los servicios con diligencia profesional y conforme al alcance de este contrato. La orientación sobre requisitos y opciones se basa en la información disponible en el momento de cada sesión y puede cambiar si universidades u organizadores modifican sus condiciones. La Empresa no decide ni controla las admisiones, plazas, calendarios, becas, alojamientos o decisiones de terceros.' },
+    { type: 'p', text: 'La Cliente y la Alumna se comprometen a facilitar información completa y veraz, asistir puntualmente a las sesiones y atender los pasos o plazos que se les comuniquen. La Empresa no será responsable de retrasos o resultados adversos causados por información incorrecta o documentación entregada tarde, sin excluir la responsabilidad que corresponda por actuaciones imputables a la propia Empresa.' },
+    { type: 'h2', text: '6. Duración' },
+    { type: 'p', text: 'El contrato comienza en la fecha de firma y cubre el programa durante el curso de 1.º de Bachillerato {{CURSO_ESCOLAR}}. Las ocho sesiones y las actuaciones de orientación se organizarán durante ese curso, de común acuerdo y atendiendo a la disponibilidad de la Alumna, la Empresa y los mentores. Cualquier servicio posterior, incluido el programa Robin de 2.º de Bachillerato, requerirá una contratación independiente.' },
+    { type: 'h2', text: '7. Protección de datos' },
+    { type: 'p', text: 'Project Robin tratará los datos personales de la Cliente y de la Alumna para gestionar la relación contractual, prestar las sesiones y coordinar las actividades incluidas. En la medida necesaria para prestar el servicio, podrán comunicarse datos pertinentes a mentores, profesores u organizadores de actividades, limitados a lo necesario para dicha coordinación. La Empresa aplicará medidas razonables de seguridad y conservará los datos durante el tiempo necesario para prestar el servicio y cumplir sus obligaciones legales.' },
+    { type: 'p', text: `La Cliente y la Alumna podrán ejercer los derechos que les reconoce la normativa de protección de datos escribiendo a ${PRIVACY_EMAIL}. La firma de este contrato no sustituye las autorizaciones específicas que puedan ser necesarias para actividades, imágenes, viajes o tratamientos adicionales.` },
+    { type: 'h2', text: '8. Ley aplicable y resolución de controversias' },
+    { type: 'p', text: 'Este contrato se regirá por la legislación española. Las partes procurarán resolver de buena fe cualquier discrepancia. Si no fuera posible, serán competentes los juzgados y tribunales que correspondan conforme a la normativa aplicable.' },
+  ],
+};
+
 const GENERAL_NOES = {
   key: 'general_noes',
   title: 'Contrato de Términos y Condiciones de los Servicios de Consultoría Académica y Mentoría · Modalidad internacional de 2.700 €',
@@ -356,16 +406,25 @@ const MENTORIA = transitionContract({
   ],
 });
 
-const VARIANTS = { general: GENERAL, general_noes: GENERAL_NOES, delft: DELFT, llegada: LLEGADA, mentoria: MENTORIA };
+const VARIANTS = { general: GENERAL, general_noes: GENERAL_NOES, delft: DELFT, llegada: LLEGADA, mentoria: MENTORIA, robin_junior: ROBIN_JUNIOR };
+
+function schoolYearForDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getUTCFullYear();
+  const first = date.getUTCMonth() >= 8 ? year : year - 1;
+  return `${first}–${first + 1}`;
+}
 
 function variantKey(tipo, usesInternational2700) {
   const t = String(tipo || 'general').toLowerCase();
   if (usesInternational2700) return 'general_noes';
-  if (VARIANTS[t]) return t;
+  if (t !== 'robin_junior' && VARIANTS[t]) return t;
   return 'general';
 }
 
 function contractVariant(tipo, usesInternational2700, pricingVersion) {
+  if (pricingVersion === ROBIN_JR_PRICE_VERSION) return ROBIN_JUNIOR;
   const key = variantKey(tipo, usesInternational2700);
   if (key === 'general' && pricingVersion !== GENERAL_PRICE_VERSION) return GENERAL_HISTORICAL;
   return VARIANTS[key] || VARIANTS.general;
@@ -378,4 +437,4 @@ function fill(text, values) {
   });
 }
 
-module.exports = { PRIVACY_EMAIL, VARIANTS, contractVariant, variantKey, fill };
+module.exports = { PRIVACY_EMAIL, VARIANTS, contractVariant, variantKey, schoolYearForDate, fill };

@@ -2,7 +2,8 @@
 const CURRENCY = 'EUR';
 const DELFT_PRICE_VERSION = 'delft-2999-v1';
 const GENERAL_PRICE_VERSION = 'robin-jr-499-3x-v1';
-const ROBIN_JR_TOTAL = 1499.99;
+const ROBIN_JR_PRICE_VERSION = 'robin-jr-1499-v2';
+const ROBIN_JR_TOTAL = 1499;
 
 const APPLICATION_TOTALS = Object.freeze({
   general: Object.freeze({ 1: ROBIN_JR_TOTAL, 2: ROBIN_JR_TOTAL, 3: ROBIN_JR_TOTAL }),
@@ -162,8 +163,16 @@ function generalPlan(totals, numCarreras, remainderToLast = false) {
 }
 
 function robinJrPlan() {
-  // La suma fija del programa es 1.499,99 €. Mantener las cuotas explícitas
+  // La suma fija del programa es 1.499 €. Mantener las cuotas explícitas
   // evita repartir céntimos de forma distinta en contratos, pagos y facturas.
+  return [
+    { installment: 1, amount: 500 },
+    { installment: 2, amount: 500 },
+    { installment: 3, amount: 499 },
+  ];
+}
+
+function previousRobinJrPlan() {
   return [
     { installment: 1, amount: 500 },
     { installment: 2, amount: 500 },
@@ -202,17 +211,13 @@ function contractPricingVersion(contractData) {
   return contractData.pricing_version || null;
 }
 
-function pricingVersionForNewUser(tipo) {
-  const key = String(tipo || 'general').toLowerCase();
-  if (key === 'general') return GENERAL_PRICE_VERSION;
-  if (key === 'delft') return DELFT_PRICE_VERSION;
-  return null;
+function pricingVersionForNewUser() {
+  return ROBIN_JR_PRICE_VERSION;
 }
 
 /**
- * Conserva el plan histórico de Delft en contratos ya firmados antes del
- * cambio a 2.999 €. Los clientes sin contrato firmado usan siempre el precio
- * vigente, y los contratos nuevos quedan marcados con DELFT_PRICE_VERSION.
+ * Conserva las cuotas anteriores para los clientes existentes. Solo las altas
+ * marcadas con la versión nueva reciben el total de 1.499 €.
  */
 function applicationPlanForUser(user) {
   const specialPrice = Number(user?.contract_data?.special_price_total_eur);
@@ -220,8 +225,10 @@ function applicationPlanForUser(user) {
     return [{ installment: 1, amount: specialPrice }];
   }
   // Este repositorio sirve Robin Jr: los metadatos de paquetes heredados no
-  // alteran el plan vigente de tres cuotas para sus alumnos.
-  return robinJrPlan();
+  // alteran el plan de tres cuotas de cada versión.
+  return contractPricingVersion(user?.contract_data) === ROBIN_JR_PRICE_VERSION
+    ? robinJrPlan()
+    : previousRobinJrPlan();
 }
 
 module.exports = {
@@ -229,6 +236,7 @@ module.exports = {
   CURRENCY,
   DELFT_PRICE_VERSION,
   GENERAL_PRICE_VERSION,
+  ROBIN_JR_PRICE_VERSION,
   ROBIN_JR_TOTAL,
   HISTORICAL_GENERAL_TOTALS,
   FISCAL,

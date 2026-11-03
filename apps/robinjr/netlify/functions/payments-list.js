@@ -3,6 +3,7 @@ const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { ensurePayments, invoiceNumber } = require('../../lib/payments');
+const { contractPricingVersion } = require('../../shared/financial-config.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -40,6 +41,7 @@ exports.handler = async (event) => {
         dni_numero: u.dni_numero, direccion: u.direccion,
         tipo: u.tipo || 'general', num_carreras: u.num_carreras || 1,
         origin: u.origin || null, pais: u.pais || null,
+        pricing_version: contractPricingVersion(u.contract_data),
         has_eu_id: u.has_eu_id == null ? null : !!u.has_eu_id,
       },
       payments,

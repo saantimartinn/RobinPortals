@@ -1,12 +1,14 @@
 /**
- * Robin Jr usa dos cuotas de 500 € y una última de 499,99 €. Los pagos extra conservan su
- * concepto, importe y vencimiento propios.
+ * Las altas nuevas de Robin Jr usan 500 €, 500 € y 499 €; las anteriores
+ * conservan 500 €, 500 € y 499,99 €. Los pagos extra mantienen sus condiciones.
  */
 
 const {
   APPLICATION_TOTALS,
+  ROBIN_JR_PRICE_VERSION,
   applicationPlan: plan,
   applicationPlanForUser,
+  contractPricingVersion,
   isLatamClient,
   splitEqual,
 } = require('../shared/financial-config.cjs');
@@ -64,6 +66,13 @@ async function ensurePayments(sb, user) {
   }
   const pricedUser = { ...user, has_eu_id: hasEuId, pais };
   let computed = applicationPlanForUser(pricedUser);
+  let contractData = user.contract_data;
+  if (typeof contractData === 'string') {
+    try { contractData = JSON.parse(contractData); } catch (_) { contractData = null; }
+  }
+  const firstDueDate = user.contract_signed && contractPricingVersion(contractData) === ROBIN_JR_PRICE_VERSION
+    ? String(contractData?.fecha_firma || user.contract_signed_at || '').slice(0, 10)
+    : null;
   const { data: existing, error } = await sb
     .from('payments')
     .select('*')
@@ -100,12 +109,19 @@ async function ensurePayments(sb, user) {
           amount: c.amount,
           currency: 'EUR',
           status, unlocked_at, paid_at, payment_data,
+          ...(c.installment === 1 && firstDueDate ? { due_date: firstDueDate } : {}),
         })
         .select()
         .single();
       if (e2) throw e2;
       out.push(ins);
     } else {
+      if (c.installment === 1 && firstDueDate && !existing_row.due_date) {
+        const { error: dueError } = await sb.from('payments')
+          .update({ due_date: firstDueDate }).eq('id', existing_row.id);
+        if (dueError) throw dueError;
+        existing_row.due_date = firstDueDate;
+      }
       // Importe personalizado por el asesor: no se recalcula nunca.
       const isCustom = false; // Robin Jr aplica importes fijos a las tres cuotas.
       if (c.installment === 1 && !user.pago_completed && existing_row.status === 'locked') {

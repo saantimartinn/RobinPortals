@@ -6,6 +6,7 @@ const {
   APPLICATION_TOTALS,
   DELFT_PRICE_VERSION,
   GENERAL_PRICE_VERSION,
+  ROBIN_JR_PRICE_VERSION,
   ROBIN_JR_TOTAL,
   applicationPlan,
   applicationPlanForUser,
@@ -45,11 +46,11 @@ test('Robin Jr mantiene sus tres cuotas también para alumnos LATAM', () => {
 
   for (const client of clients) {
     assert.equal(isLatamClient(client), true);
-    const rows = applicationPlanForUser({ tipo: 'general', num_carreras: 3, ...client });
+    const rows = applicationPlanForUser({ tipo: 'general', num_carreras: 3, ...client, contract_data: { pricing_version: ROBIN_JR_PRICE_VERSION } });
     assert.deepEqual(rows, [
       { installment: 1, amount: 500 },
       { installment: 2, amount: 500 },
-      { installment: 3, amount: 499.99 },
+      { installment: 3, amount: 499 },
     ]);
     assert.equal(rows.reduce((sum, row) => sum + row.amount, 0), ROBIN_JR_TOTAL);
   }
@@ -90,25 +91,30 @@ test('Delft usa 999 € de entrada y dos cuotas posteriores de 1.000 €', () =>
   ]);
 });
 
-test('General de Robin Jr conserva 500 €, 500 € y 499,99 € para cualquier número de carreras', () => {
+test('General de Robin Jr conserva 500 €, 500 € y 499 € para cualquier número de carreras', () => {
   const expected = [
     { installment: 1, amount: 500 },
     { installment: 2, amount: 500 },
-    { installment: 3, amount: 499.99 },
+    { installment: 3, amount: 499 },
   ];
   for (const careers of [1, 2, 3]) assert.deepEqual(applicationPlan('general', careers), expected);
 });
 
 test('los metadatos de paquetes heredados no alteran el plan Robin Jr', () => {
-  const expected = applicationPlan('general', 1);
+  const expected = [
+    { installment: 1, amount: 500 },
+    { installment: 2, amount: 500 },
+    { installment: 3, amount: 499.99 },
+  ];
   assert.deepEqual(applicationPlanForUser({ tipo: 'general', num_carreras: 2 }), expected);
   assert.deepEqual(applicationPlanForUser({
     tipo: 'general',
     num_carreras: 2,
     contract_data: { pricing_version: GENERAL_PRICE_VERSION },
   }), expected);
-  assert.equal(pricingVersionForNewUser('general'), GENERAL_PRICE_VERSION);
-  assert.equal(pricingVersionForNewUser('delft'), DELFT_PRICE_VERSION);
+  assert.equal(pricingVersionForNewUser('general'), ROBIN_JR_PRICE_VERSION);
+  assert.equal(pricingVersionForNewUser('delft'), ROBIN_JR_PRICE_VERSION);
+  assert.deepEqual(applicationPlanForUser({ contract_data: { pricing_version: ROBIN_JR_PRICE_VERSION } }), applicationPlan('general', 1));
 });
 
 test('la etiqueta Delft heredada tampoco altera las cuotas de Robin Jr', () => {

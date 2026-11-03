@@ -80,12 +80,12 @@ export function PagosCliente() {
                       {isPaid ? <CheckCircle2 className="h-5 w-5" /> : isLocked ? <Shield className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length)} · {eur(p.amount)}</div>
+                      <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length, data.user?.pricing_version === 'robin-jr-1499-v2')} · {eur(p.amount)}</div>
                       <div className="text-xs text-slate-400">
                         {isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
                         {isUnlocked && p.unlocked_at && `Disponible desde el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
                         {isLocked && p.installment === 2 && "Disponible tras completar las 3 mentorías con exalumnos"}
-                        {isLocked && p.installment === 3 && "Disponible al llegar a la fase Wrap up"}
+                        {isLocked && p.installment === 3 && (data.user?.pricing_version === 'robin-jr-1499-v2' ? "Disponible al finalizar 1.º de Bachillerato, en la fecha comunicada por escrito" : "Disponible al llegar a la fase Wrap up")}
                         {isLocked && p.installment > 3 && "Se desbloqueará cuando tu asesor lo indique"}
                       </div>
                       {p.due_date && !isPaid && (
