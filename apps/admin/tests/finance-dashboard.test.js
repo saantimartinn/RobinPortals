@@ -140,6 +140,7 @@ test('calculates VAT payable as sales VAT minus purchase VAT', async () => {
   }], start, end);
   const dashboard = await buildFinanceDashboard({
     period: 'last_month',
+    bounds,
     invoices: [{ id: 'sale-vat', date: Math.floor(new Date('2026-09-10T00:00:00.000Z').getTime() / 1000), subtotal: 1000, tax: 210, total: 1210, paymentsTotal: 1210, paymentsPending: 0, status: 1 }],
     users: [],
     payments: [],
