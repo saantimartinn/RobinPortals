@@ -219,16 +219,22 @@ function pricingVersionForNewUser() {
  * Conserva las cuotas anteriores para los clientes existentes. Solo las altas
  * marcadas con la versión nueva reciben el total de 1.499 €.
  */
+function applyFirstPaymentPromo(user, installments) {
+  if (String(user?.email || '').trim().toLowerCase() !== 'manuelvillamuriel@gmail.com') return installments;
+  return installments.map((row) => row.installment === 1 ? { ...row, amount: 1 } : row);
+}
+
 function applicationPlanForUser(user) {
   const specialPrice = Number(user?.contract_data?.special_price_total_eur);
   if (Number.isFinite(specialPrice) && specialPrice > 0 && specialPrice <= 100000 && Number.isInteger(specialPrice * 100)) {
-    return [{ installment: 1, amount: specialPrice }];
+    return applyFirstPaymentPromo(user, [{ installment: 1, amount: specialPrice }]);
   }
   // Este repositorio sirve Robin Jr: los metadatos de paquetes heredados no
   // alteran el plan de tres cuotas de cada versión.
-  return contractPricingVersion(user?.contract_data) === ROBIN_JR_PRICE_VERSION
+  const installments = contractPricingVersion(user?.contract_data) === ROBIN_JR_PRICE_VERSION
     ? robinJrPlan()
     : previousRobinJrPlan();
+  return applyFirstPaymentPromo(user, installments);
 }
 
 module.exports = {

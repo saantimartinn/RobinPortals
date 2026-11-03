@@ -1,18 +1,10 @@
 /**
  * lib/subscription.js — The Robin Plan (portal de suscriptores)
- * Config de planes + helpers de cumplimiento (fulfillment) para Stripe Billing.
+ * Config de planes y helpers de cumplimiento de las suscripciones Stripe
+ * existentes. Las altas nuevas usan Revolut con estos mismos importes.
  *
- * Precio fijo: 49,99 €/mes o 299,99 €/año. Por defecto se cobra con
- * price_data ad-hoc en el propio Checkout (no requiere crear nada en Stripe
- * Dashboard primero). Si más adelante se quiere permitir cambiar de plan
- * (mensual ⇄ anual) desde el Stripe Customer Portal, hay que crear ahí 2
- * Price reales con estos mismos importes y configurar:
- *   - STRIPE_PRICE_MONTHLY  (price_... de un Price recurrente mensual)
- *   - STRIPE_PRICE_ANNUAL   (price_... de un Price recurrente anual)
- * Con esas env vars puestas, el checkout usa el Price real de Stripe en vez
- * del price_data ad-hoc (necesario para que el Customer Portal permita
- * cambiar de plan). Sin ellas, el checkout sigue funcionando igual con el
- * importe fijo de abajo.
+ * Precio fijo de nuevas altas: 49,99 €/mes o 299,99 €/año. Los Price ID de
+ * Stripe se conservan solo para consultar las suscripciones anteriores.
  */
 
 const CURRENCY = 'EUR';

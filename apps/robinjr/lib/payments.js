@@ -64,7 +64,13 @@ async function ensurePayments(sb, user) {
       pais = pais === undefined ? null : pais;
     }
   }
-  const pricedUser = { ...user, has_eu_id: hasEuId, pais };
+  let email = user.email;
+  if (!email) {
+    const { data: identity, error: identityError } = await sb.from('users').select('email').eq('id', user.id).single();
+    if (identityError) throw identityError;
+    email = identity?.email;
+  }
+  const pricedUser = { ...user, email, has_eu_id: hasEuId, pais };
   let computed = applicationPlanForUser(pricedUser);
   let contractData = user.contract_data;
   if (typeof contractData === 'string') {

@@ -31,17 +31,23 @@ function SubPayments({ user }) {
         </div>
       )}
       <Card>
-        <CardHeader title="Pagos y facturación" subtitle="Gestionado de forma segura por Stripe" icon={Wallet} right={<Badge tone={statusInfo.tone}>{statusInfo.label}</Badge>} />
+        <CardHeader title="Pagos y facturación" subtitle={`Gestionado de forma segura por ${user.payment_provider === "revolut" ? "Revolut" : "Stripe"}`} icon={Wallet} right={<Badge tone={statusInfo.tone}>{statusInfo.label}</Badge>} />
         <CardContent className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-3">
             <Row label="Plan actual" value={user.subscription_plan === "annual" ? "Anual" : "Mensual"} />
             <Row label="Próximo cobro" value={formatDate(user.current_period_end)} />
           </div>
           {error && <div className="text-sm text-rose-600">{error}</div>}
-          <Btn disabled={busy} onClick={openPortal}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />} Gestionar pagos y facturas
-          </Btn>
-          <div className="text-xs text-slate-400">Accede a tu método de pago, historial de facturas y recibos descargables.</div>
+          {user.payment_provider === "revolut" ? (
+            <div className="text-xs text-slate-500">Para consultar facturas o cambiar el método de pago, contacta con el equipo Robin.</div>
+          ) : (
+            <>
+              <Btn disabled={busy} onClick={openPortal}>
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Receipt className="h-4 w-4" />} Gestionar pagos y facturas
+              </Btn>
+              <div className="text-xs text-slate-400">Accede a tu método de pago, historial de facturas y recibos descargables.</div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

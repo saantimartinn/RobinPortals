@@ -5,7 +5,7 @@ import { CANVAS, NAVY } from "../shared/theme.js";
 import React, { useEffect, useState } from "react";
 import { SUBSCRIBER_SERVICES } from "../shared/constants.js";
 import { formatMoney } from "../shared/utils.js";
-import { subscriptionCheckout, subscriptionPlans } from "../api/index.js";
+import { subscriptionCheckout, subscriptionPlans, subscriptionSync } from "../api/index.js";
 
 function SubscriptionPlanPicker({ user, onSubscribed }) {
   const [plans, setPlans] = useState([]);
@@ -13,6 +13,10 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
   const [selected, setSelected] = useState("monthly");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [billing, setBilling] = useState({
+    name: [user.nombre, user.apellidos].filter(Boolean).join(" "),
+    taxId: "", country: "España", address: "",
+  });
 
   useEffect(() => {
     (async () => {
@@ -22,14 +26,36 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
     })();
   }, []);
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("revolut_subscription") !== "return") return;
+    let stopped = false;
+    (async () => {
+      setBusy(true);
+      for (let attempt = 0; attempt < 5 && !stopped; attempt += 1) {
+        try {
+          const result = await subscriptionSync();
+          if (result.status === "active") {
+            window.history.replaceState(null, "", window.location.pathname);
+            onSubscribed();
+            return;
+          }
+        } catch (_) {}
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+      if (!stopped) { setError("Estamos confirmando el pago. Vuelve a cargar esta página en unos instantes."); setBusy(false); }
+    })();
+    return () => { stopped = true; };
+  }, []);
+
   async function startCheckout(planKey) {
     setBusy(true); setError("");
     try {
-      const r = await subscriptionCheckout(planKey);
+      const r = await subscriptionCheckout(planKey, billing);
       if (r && r.url) window.location.href = r.url;
+      else if (r && r.already_subscribed) await onSubscribed();
     } catch (e) {
-      setError(e.data && e.data.error === "stripe_prices_not_configured"
-        ? "La suscripción todavía no está configurada. Contacta con el equipo Robin."
+      setError(e.data && e.data.error === "billing_details_required"
+        ? "Completa los datos de facturación para continuar."
         : (e.message || "No hemos podido iniciar el pago."));
       setBusy(false);
     }
@@ -64,7 +90,8 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
             const label = key === "monthly" ? "Plan Mensual" : "Plan Anual";
             const interval = key === "monthly" ? "/ mes" : "/ año";
             const price = p ? formatMoney(p.amount, p.currency) : null;
-            const hasDisc = p && p.discounted_amount != null && p.discount_percent > 0;
+            const oneEuro = p && p.first_payment_amount === 1;
+            const hasDisc = !oneEuro && p && p.discounted_amount != null && p.discount_percent > 0;
             const discPrice = hasDisc ? formatMoney(p.discounted_amount, p.currency) : null;
             const isSel = selected === key;
             const monthlyPlan = plans.find((x) => x.key === "monthly");
@@ -81,9 +108,10 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
                   {key === "annual" && <Badge tone="gold">{savings > 0 ? `Ahorra ${savings}€/año` : "Ahorra"}</Badge>}
                 </div>
                 <div className="mt-3 text-3xl font-bold text-slate-900">
-                  {loadingPlans ? <Loader2 className="h-6 w-6 animate-spin text-slate-300" /> : (hasDisc ? discPrice : (price || "Consultar"))}
-                  {(hasDisc ? discPrice : price) && <span className="text-sm font-normal text-slate-400"> {interval}</span>}
+                  {loadingPlans ? <Loader2 className="h-6 w-6 animate-spin text-slate-300" /> : (oneEuro ? "1,00 €" : (hasDisc ? discPrice : (price || "Consultar")))}
+                  {(oneEuro || hasDisc || price) && <span className="text-sm font-normal text-slate-400"> {oneEuro ? "primer pago" : interval}</span>}
                 </div>
+                {oneEuro && <div className="mt-1 text-sm text-slate-500">Después {price} {interval}</div>}
                 {hasDisc && (
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-sm text-slate-400 line-through">{price}</span>
@@ -97,6 +125,20 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
         </div>
 
         <div className="max-w-2xl mx-auto mt-6">
+          <div className="rounded-2xl bg-white border border-slate-100 p-5 mb-4">
+            <div className="text-sm font-semibold text-slate-800 mb-3">Datos de facturación</div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                ["name", "Nombre o razón social"], ["taxId", "DNI, NIE o identificador fiscal"],
+                ["country", "País"], ["address", "Dirección fiscal"],
+              ].map(([key, label]) => (
+                <label key={key} className="text-xs font-medium text-slate-600">{label}
+                  <input required value={billing[key]} onChange={(e) => setBilling({ ...billing, [key]: e.target.value })}
+                    className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900" />
+                </label>
+              ))}
+            </div>
+          </div>
           <div className="rounded-2xl bg-white border border-slate-100 p-5">
             <div className="text-xs font-semibold text-slate-500 mb-3">Incluido en tu plan</div>
             <div className="grid sm:grid-cols-2 gap-2">
@@ -112,7 +154,7 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Continuar al pago seguro
             </Btn>
           </div>
-          <div className="text-center text-xs text-slate-400 mt-3">Pago procesado por Stripe · puedes cancelar cuando quieras</div>
+          <div className="text-center text-xs text-slate-400 mt-3">Pago procesado por Revolut · renovación automática · puedes cancelar cuando quieras</div>
         </div>
       </div>
     </div>

@@ -36,6 +36,9 @@ exports.handler = async (event) => {
     const sb = getSupabase();
     const { data: u, error } = await sb.from(principalTable(session.role)).select('*').eq('id', session.uid).single();
     if (error || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    let paymentProvider = u.stripe_subscription_id ? 'stripe' : null;
+    const { data: revolut } = await sb.from('revolut_subscriptions').select('subscription_id').eq('subscriber_id', u.id).maybeSingle();
+    if (revolut?.subscription_id) paymentProvider = 'revolut';
     return json({
       id: u.id,
       lead_id: u.lead_id,
@@ -56,6 +59,7 @@ exports.handler = async (event) => {
       subscription_started_at: u.subscription_started_at || null,
       current_period_end: u.current_period_end || null,
       cancel_at_period_end: !!u.cancel_at_period_end,
+      payment_provider: paymentProvider,
     });
   } catch (e) {
     console.error('me error', e);

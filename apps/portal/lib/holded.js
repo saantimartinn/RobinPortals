@@ -76,7 +76,14 @@ function taxRateFor(user) {
   return taxRateForClient(user);
 }
 
-function accountFor(tipo) {
+function accountFor(tipo, user, payment) {
+  const pd = payment && payment.payment_data || {};
+  if (pd.ielts_preset === 'evaluation' || pd.ielts_preset === 'class') {
+    return process.env.HOLDED_ACCOUNT_ENGLISH || '70500008';
+  }
+  if (user && !isEU(user) && (norm(tipo) || 'general') === 'general') {
+    return process.env.HOLDED_ACCOUNT_LATAM_PLANS || '70500007';
+  }
   return ACCOUNT_BY_TIPO[norm(tipo) || 'general'] || ACCOUNT_BY_TIPO.general;
 }
 
@@ -229,7 +236,7 @@ async function createInvoiceForPayment(sb, user, payment) {
   const due = now + 7 * 24 * 3600;
 
   // La v2 acepta directamente el ID interno de la cuenta del plan contable.
-  const acct = accountFor(user.tipo);
+  const acct = accountFor(user.tipo, user, payment);
 
   const body = {
     contact_id: contactId,

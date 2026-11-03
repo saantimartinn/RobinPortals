@@ -5,7 +5,7 @@ import { NAVY } from "../../shared/theme.js";
 import React, { useMemo, useState } from "react";
 import { SUBSCRIBER_SERVICES, SUB_STATUS_LABELS } from "../../shared/constants.js";
 import { formatDate } from "../../shared/utils.js";
-import { subscriptionPortal } from "../../api/index.js";
+import { subscriptionCancel, subscriptionPortal } from "../../api/index.js";
 
 function SubSubscription({ user, requests, onUserRefresh }) {
   const statusInfo = SUB_STATUS_LABELS[user.subscription_status] || SUB_STATUS_LABELS.none;
@@ -23,6 +23,14 @@ function SubSubscription({ user, requests, onUserRefresh }) {
     }
   }
 
+  async function cancelRevolut() {
+    if (!window.confirm("¿Cancelar la renovación automática de tu suscripción? Conservarás el acceso hasta el final del periodo pagado.")) return;
+    setBusy(true); setError("");
+    try { await subscriptionCancel(); await onUserRefresh(); }
+    catch (e) { setError(e.message || "No hemos podido cancelar la suscripción."); }
+    finally { setBusy(false); }
+  }
+
   const grouped = useMemo(() => {
     const out = {};
     SUBSCRIBER_SERVICES.forEach((s) => { (out[s.category] = out[s.category] || []).push(s); });
@@ -38,7 +46,7 @@ function SubSubscription({ user, requests, onUserRefresh }) {
           {user.cancel_at_period_end && (
             <div className="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <span>Tu suscripción se cancelará al final del periodo actual ({formatDate(user.current_period_end)}). Puedes reactivarla desde Stripe.</span>
+              <span>Tu suscripción terminará al final del periodo actual ({formatDate(user.current_period_end)}).</span>
             </div>
           )}
           {user.subscription_status === "past_due" && (
@@ -54,10 +62,19 @@ function SubSubscription({ user, requests, onUserRefresh }) {
             <Row label="Renovación automática" value={user.cancel_at_period_end ? "Desactivada" : "Activada"} tone={user.cancel_at_period_end ? "amber" : "green"} />
           </div>
           {error && <div className="text-sm text-rose-600">{error}</div>}
-          <Btn disabled={busy} onClick={openPortal}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />} Gestionar plan, pago y facturas
-          </Btn>
-          <div className="text-xs text-slate-400">Desde ahí puedes cambiar de plan (mensual ⇄ anual), pausar o cancelar tu suscripción.</div>
+          {user.payment_provider === "revolut" ? (
+            <>
+              {!user.cancel_at_period_end && <Btn disabled={busy} onClick={cancelRevolut}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Cancelar renovación</Btn>}
+              <div className="text-xs text-slate-400">Si necesitas cambiar de plan o método de pago, contacta con el equipo Robin.</div>
+            </>
+          ) : (
+            <>
+              <Btn disabled={busy} onClick={openPortal}>
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />} Gestionar plan, pago y facturas
+              </Btn>
+              <div className="text-xs text-slate-400">Desde ahí puedes cambiar de plan (mensual ⇄ anual), pausar o cancelar tu suscripción.</div>
+            </>
+          )}
         </CardContent>
       </Card>
 

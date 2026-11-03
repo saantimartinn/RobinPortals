@@ -89,8 +89,16 @@ export async function subscriberProfileUpdate(payload) {
   return api.post("/api/subscriber/profile", payload);
 }
 
-export async function subscriptionCheckout(plan) {
-  return api.post("/api/subscription/checkout", { plan });
+export async function subscriptionCheckout(plan, billing) {
+  return api.post("/api/subscription/checkout", { plan, billing });
+}
+
+export async function subscriptionSync() {
+  return api.get("/api/subscription/sync");
+}
+
+export async function subscriptionCancel() {
+  return api.post("/api/subscription/cancel", {});
 }
 
 export async function subscriptionPlans() {
