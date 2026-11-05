@@ -31,7 +31,7 @@ export function OnboardingShell({ user, title, subtitle, stepNumber, totalSteps 
               const content = <><span className="onboarding-step-mark">{done && n !== stepNumber ? <Check size={14} strokeWidth={2.5} /> : n}</span><span>{label}</span></>;
               return (
                 <li key={label}>
-                  {nav && index <= nav.furthest && n !== stepNumber
+                  {nav && index <= nav.furthest && n !== stepNumber && nav.canOpen(ONBOARDING_ORDER[index])
                     ? <button type="button" className={`student-nav-item ${state}`} onClick={() => nav.goTo(ONBOARDING_ORDER[index])}>{content}</button>
                     : <span className={`student-nav-item ${state}`} aria-current={n === stepNumber ? "step" : undefined}>{content}</span>}
                 </li>
