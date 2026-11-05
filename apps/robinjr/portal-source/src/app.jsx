@@ -151,17 +151,22 @@ export default function PortalRobin() {
 
   if (authState.needsOnboarding) {
     // The server says which step is next; the user may go back to any earlier one.
+    const availableOrder = authState.user.contract_signed
+      ? ONBOARDING_ORDER.filter((key) => key !== "contract")
+      : ONBOARDING_ORDER;
     const furthest = ONBOARDING_ORDER.indexOf(authState.onboardingStep);
     const overrideIndex = ONBOARDING_ORDER.indexOf(onboardingOverride);
-    const step = overrideIndex >= 0 && overrideIndex < furthest ? onboardingOverride : authState.onboardingStep;
-    const index = ONBOARDING_ORDER.indexOf(step);
+    const step = overrideIndex >= 0 && overrideIndex < furthest && availableOrder.includes(onboardingOverride)
+      ? onboardingOverride : authState.onboardingStep;
+    const availableIndex = availableOrder.indexOf(step);
     const nav = {
       furthest,
-      goTo: (key) => setOnboardingOverride(ONBOARDING_ORDER.indexOf(key) < furthest ? key : null),
-      goBack: index > 0 ? () => setOnboardingOverride(ONBOARDING_ORDER[index - 1]) : null,
+      canOpen: (key) => availableOrder.includes(key),
+      goTo: (key) => setOnboardingOverride(availableOrder.includes(key) && ONBOARDING_ORDER.indexOf(key) < furthest ? key : null),
+      goBack: availableIndex > 0 ? () => setOnboardingOverride(availableOrder[availableIndex - 1]) : null,
     };
     // After redoing an earlier step, continue with the one right after it.
-    const onDone = async () => { await refreshState(); setOnboardingOverride(ONBOARDING_ORDER[index + 1] || null); };
+    const onDone = async () => { await refreshState(); setOnboardingOverride(availableOrder[availableIndex + 1] || null); };
     const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone };
     const Step = { origin: OnboardingOrigin, dni: OnboardingDNI, contract: OnboardingContract, profile: OnboardingProfile, payment: OnboardingPayment }[step];
     if (Step) return <OnboardingNavContext.Provider value={nav}><Step key={step} {...onboardingProps} /></OnboardingNavContext.Provider>;

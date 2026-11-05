@@ -94,7 +94,7 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
         <div className="onboarding-question-body">
         {screen === 0 && (
           <>
-            <h2 className="onboarding-q-title">¿Desde dónde realizas tu solicitud de acceso a la universidad?</h2>
+            <h2 className="onboarding-q-title">¿Desde dónde realizas tu solicitud?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={origin === "espana"} onClick={() => { setOrigin("espana"); setError(""); }}
                 title="España" desc="Resido en España y solicito plaza desde aquí." icon={SpainFlag} flag />
