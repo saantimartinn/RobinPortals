@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dniExtract } from '../portal-source/src/api.js';
-import { buildDefaultDocs, groupStudentDocumentsByCareer, statusLabel } from '../portal-source/src/application/documents/document-utils.js';
+import { buildDefaultDocs, countRequiredDocumentsToUpload, groupStudentDocumentsByCareer, statusLabel } from '../portal-source/src/application/documents/document-utils.js';
 import { isAdminUser } from '../portal-source/src/session.js';
 
 test('los documentos por defecto conservan grado y máster separados', () => {
@@ -37,6 +37,17 @@ test('agrupa documentos por todas las carreras que los requieren sin duplicar la
     'Psicología · Universidad B',
   ]);
   assert.deepEqual(result.ungrouped.map((entry) => entry.document.id), ['event-name', 'manual']);
+});
+
+test('el resumen solo cuenta documentos obligatorios que todavía requieren un archivo', () => {
+  const documents = [
+    { required: true, status: 'required', has_file: false },
+    { required: true, status: 'rejected', has_file: false },
+    { required: false, status: 'required', has_file: false },
+    { required: true, status: 'pending_review', has_file: true },
+    { required: true, status: 'required', has_file: true },
+  ];
+  assert.equal(countRequiredDocumentsToUpload(documents), 2);
 });
 
 test('el frontend dirige admin y supervisor al mismo portal', () => {

@@ -51,6 +51,12 @@ export function statusLabel(status) {
   return { tone: 'slate', label: 'Pendiente subir' };
 }
 
+export function countRequiredDocumentsToUpload(documents = []) {
+  return documents.filter((document) => document.required === true
+    && !document.has_file
+    && ['required', 'rejected'].includes(document.status)).length;
+}
+
 function normalizeDocumentName(value) {
   return String(value || '')
     .normalize('NFKD')

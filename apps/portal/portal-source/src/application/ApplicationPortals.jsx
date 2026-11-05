@@ -30,6 +30,7 @@ import { daysBetween, eur, PaymentStatusBadge, paymentTitle } from "./payments/p
 import { reportClientError, formatTime, formatDate } from "../client-utils.js";
 import { KpiCard, NotificationPopup, Row } from "../shared/PortalWidgets.jsx";
 import { CarrerasCliente, DocumentosCliente, PagosCliente } from "./ClientSections.jsx";
+import { countRequiredDocumentsToUpload } from "./documents/document-utils.js";
 import { FaqsPage } from "./Faqs.jsx";
 import {
   onboardingState, originSave, dniExtract, dniSave, profileSave, livedAbroadSave, contractSave, onboardingCheckout,
@@ -61,7 +62,7 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
     Promise.allSettled([documentsList(), bookingsList()]).then(([docs, calls]) => {
       if (cancelled) return;
       setSummary({
-        documents: docs.status === "fulfilled" ? (docs.value.documents || []).filter(d => ["required", "rejected"].includes(d.status)).length : null,
+        documents: docs.status === "fulfilled" ? countRequiredDocumentsToUpload(docs.value.documents) : null,
         bookings: calls.status === "fulfilled" ? (calls.value.bookings || []).filter(b => b.status !== "cancelled" && new Date(b.start_at) > new Date()).length : null,
       });
     });

@@ -32,7 +32,7 @@ export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
 
       <div className="student-quick-actions">
         {[
-          { label: "Documentos pendientes", value: docsPendingCount ?? "—", hint: "Revisar mis documentos", key: "documentos", icon: FileText },
+          { label: "Documentos por subir", value: docsPendingCount ?? "—", hint: "Revisar mis documentos", key: "documentos", icon: FileText },
           { label: "Próximas llamadas", value: bookingsCount ?? "—", hint: "Ver disponibilidad", key: "reservas", icon: Calendar },
           { label: "Tu futuro académico", value: "Mis carreras", hint: "Explorar mis opciones", key: "carreras", icon: GraduationCap },
         ].map(({ label, value, hint, key, icon: Icon }) => (
