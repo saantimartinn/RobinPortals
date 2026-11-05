@@ -12,11 +12,16 @@ Maintained files in this directory and links to their responsibilities.
 | [`analytics-personal.tsx`](../../../../../src/features/admin/analytics-personal.tsx) | Admin feature module: analytics personal. |
 | [`analytics-sales.tsx`](../../../../../src/features/admin/analytics-sales.tsx) | Admin feature module: analytics sales. |
 | [`analytics.tsx`](../../../../../src/features/admin/analytics.tsx) | Admin feature module: analytics. |
+| [`client-folders.tsx`](../../../../../src/features/admin/client-folders.tsx) | Admin feature module: client folders. |
+| [`developer-logs.tsx`](../../../../../src/features/admin/developer-logs.tsx) | Admin feature module: developer logs. |
+| [`developers.tsx`](../../../../../src/features/admin/developers.tsx) | Admin feature module: developers. |
 | [`email-composer.tsx`](../../../../../src/features/admin/email-composer.tsx) | Admin feature module: email composer. |
 | [`feature-shared.tsx`](../../../../../src/features/admin/feature-shared.tsx) | Admin feature module: feature shared. |
 | [`lead-inbox.tsx`](../../../../../src/features/admin/lead-inbox.tsx) | Admin feature module: lead inbox. |
 | [`lead-shared.tsx`](../../../../../src/features/admin/lead-shared.tsx) | Admin feature module: lead shared. |
 | [`leads.tsx`](../../../../../src/features/admin/leads.tsx) | Admin feature module: leads. |
+| [`release-test-explanations.ts`](../../../../../src/features/admin/release-test-explanations.ts) | Admin feature module: release test explanations. |
+| [`release-tests.tsx`](../../../../../src/features/admin/release-tests.tsx) | Admin feature module: release tests. |
 | [`settings.tsx`](../../../../../src/features/admin/settings.tsx) | Admin feature module: settings. |
 | [`students.tsx`](../../../../../src/features/admin/students.tsx) | Admin feature module: students. |
 

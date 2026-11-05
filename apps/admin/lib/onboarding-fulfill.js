@@ -55,7 +55,7 @@ async function syncDriveForUser(sb, userId) {
         const fname = esPasaporte
           ? (nameBase + ' - Pasaporte' + ext)
           : (nameBase + ' - DNI anverso' + ext);
-        const r = await drive.uploadFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
+        const r = await drive.upsertFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
         out.uploads.push({ kind: 'dni_anverso', id: r.id });
       }
     }
@@ -69,7 +69,7 @@ async function syncDriveForUser(sb, userId) {
                    : ext === '.gif'  ? 'image/gif'
                    : 'image/jpeg';
         const fname = nameBase + ' - DNI reverso' + ext;
-        const r = await drive.uploadFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
+        const r = await drive.upsertFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
         out.uploads.push({ kind: 'dni_reverso', id: r.id });
       }
     }
@@ -96,7 +96,7 @@ async function syncDriveForUser(sb, userId) {
         signatureDataUrl,
       });
       const fname = 'Contrato Robin - ' + nameBase + '.pdf';
-      const r = await drive.uploadFile(
+      const r = await drive.upsertFile(
         { name: fname, mimeType: 'application/pdf', buffer: pdf },
         folders.contrato,
         token
@@ -153,12 +153,16 @@ async function markOnboardingPaid(sb, userId, pagoData) {
     justCompleted = !!(flipped && flipped.length);
   }
 
-  let gdrive = null;
-  try {
-    gdrive = await syncDriveForUser(sb, userId);
-  } catch (driveErr) {
-    console.error('[drive] sync error:', driveErr && driveErr.message);
-    gdrive = { skipped: true, reason: 'error', detail: driveErr && driveErr.message };
+  // Solo quien gana la transición a pagado inicia la sincronización automática.
+  // La sincronización manual sigue disponible y reutiliza los archivos existentes.
+  let gdrive = { skipped: true, reason: 'already_completed' };
+  if (justCompleted) {
+    try {
+      gdrive = await syncDriveForUser(sb, userId);
+    } catch (driveErr) {
+      console.error('[drive] sync error:', driveErr && driveErr.message);
+      gdrive = { skipped: true, reason: 'error', detail: driveErr && driveErr.message };
+    }
   }
 
   // Factura de Holded para la 1.ª cuota (best-effort, idempotente).

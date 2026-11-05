@@ -68,7 +68,12 @@ async function findExisting(crm, { source, externalId, email, phone }) {
 
 async function findExistingFuture(crm, { source, externalId, email, phone }) {
   if (externalId) {
-    const { data } = await crm.from('crm_future_leads').select('id,original_lead_id').eq('source', source).eq('external_id', externalId).limit(1);
+    let { data, error } = await crm.from('crm_future_leads').select('id,original_lead_id').eq('source', source).eq('external_id', externalId).limit(1);
+    if (error?.code === '42703') {
+      ({ data, error } = await crm.from('crm_future_leads').select('id,original_lead_id')
+        .contains('lead_snapshot', { source_payload: { source, external_id: externalId } }).limit(1));
+    }
+    if (error) throw error;
     if (data && data[0]) return data[0];
   }
   if (email) {
@@ -106,14 +111,16 @@ async function storeDirectFutureLead(crm, { row, source, externalId, course, exi
     moved_by_name: 'Clasificación automática · 1º de Bachillerato',
     moved_at: new Date().toISOString(),
   };
-  if (existingFuture) {
-    const { data, error } = await crm.from('crm_future_leads').update(futureRow).eq('id', existingFuture.id).select('*').single();
-    if (error) throw error;
-    return { result: 'updated_future', lead: null, futureLead: data };
+  const save = (payload) => existingFuture
+    ? crm.from('crm_future_leads').update(payload).eq('id', existingFuture.id).select('*').single()
+    : crm.from('crm_future_leads').insert(payload).select('*').single();
+  let { data, error } = await save(futureRow);
+  if (['42703', 'PGRST204'].includes(error?.code) && /external_id/.test(error.message || '')) {
+    const { external_id: _missingColumn, ...compatibleRow } = futureRow;
+    ({ data, error } = await save(compatibleRow));
   }
-  const { data, error } = await crm.from('crm_future_leads').insert(futureRow).select('*').single();
   if (error) throw error;
-  return { result: 'routed_future', lead: null, futureLead: data };
+  return { result: existingFuture ? 'updated_future' : 'routed_future', lead: null, futureLead: data };
 }
 
 async function ingestCrmLead(input) {

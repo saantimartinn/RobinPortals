@@ -1,14 +1,16 @@
 # Arquitectura actual
 
-Robin Platform es un monolito web desplegado en Netlify: una aplicación React/Vite,
-Functions Node.js para HTTP y trabajos programados, y dos Edge Functions dedicadas a
-limitación de abuso. Esta estructura conserva un único despliegue y fronteras de dominio
-en código, sin introducir servicios adicionales durante la limpieza.
+Portal del Alumno es una app del monorepo Project Robin. Tiene frontend React/Vite,
+Functions Node.js y Edge Functions propias. `site/build.mjs` la publica junto con
+Admin, Robin Jr y Community en un único sitio Netlify, manteniendo fronteras de
+dominio en código y datos.
 
 ## Flujo de una petición
 
-1. Netlify redirige `/` a `/portal/` y sirve el build desde `deploy/portal`.
-2. El frontend usa rutas `/api/*` del mismo origen; `netlify.toml` las asigna a Functions.
+1. El Worker de raíz entrega `/portal/*` al sitio unificado; Netlify sirve el
+   bundle de Portal desde `site/.output/public`.
+2. El frontend usa rutas del mismo origen; el `netlify.toml` generado de raíz
+   las asigna a las Functions de Portal.
 3. Las rutas protegidas verifican origen, cookie de sesión firmada y autorización backend.
 4. La Function orquesta servicios de `lib/`, que realizan validación, reglas de dominio y
    accesos a datos o proveedores.
@@ -38,7 +40,7 @@ del cliente de servidor se encuentra en cada Function. Véanse
 
 | Capa | Ubicación | Responsabilidad |
 |---|---|---|
-| Configuración de despliegue | `netlify.toml`, `.github/workflows/ci.yml` | Build, rutas, headers, schedules y gates |
+| Configuración de despliegue | `apps/portal/netlify.toml`, `site/generate-config.mjs`, `site/build.mjs` | Rutas, headers, schedules y build unificado |
 | Protección Edge | `netlify/edge-functions/` | Rate limits previos a las Functions |
 | Interfaz HTTP | `netlify/functions/` | Método, origen, sesión, autorización y respuesta |
 | Dominio e integraciones | `lib/` | Reglas, orquestación y adaptadores de proveedores |

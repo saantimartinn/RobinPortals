@@ -29,7 +29,8 @@ async function fulfillInstallment(sb, input) {
   const nowIso = new Date().toISOString();
   let user = { id: payment.user_id };
   try {
-    const { data } = await sb.from('users').select('id, lead_id').eq('id', payment.user_id).single();
+    // El marcador de conversión distingue U01 de la factura 01 de Mentoría.
+    const { data } = await sb.from('users').select('id, lead_id, contract_data').eq('id', payment.user_id).single();
     if (data) user = data;
   } catch (error) { console.warn('[optional_operation_failed]', error && error.message); }
 

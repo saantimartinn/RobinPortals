@@ -17,4 +17,7 @@ export async function adminDeveloperClientUpdate(id, column, value) {
 export async function adminAssignClient(userId) {
   return api.post("/api/admin/clients/assign", { user_id: userId });
 }
+export async function adminConvertMentoriaClient(userId, targetType) {
+  return api.post("/api/admin/clients/convert-mentoria", { user_id: userId, target_type: targetType });
+}
 

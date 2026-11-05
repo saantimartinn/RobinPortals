@@ -57,12 +57,12 @@ async function metaAccountId() {
 
 async function resolveAds(adIds) {
   const result = new Map();
-  for (let index = 0; index < adIds.length; index += 50) {
-    const ids = adIds.slice(index, index + 50);
-    const payload = await metaGraph('', { ids: ids.join(','), fields: 'campaign{id,name}' });
-    ids.forEach((id) => {
-      const campaign = payload?.[id]?.campaign;
-      if (campaign?.name) result.set(String(id), { id: String(campaign.id || ''), name: campaign.name });
+  for (let index = 0; index < adIds.length; index += 10) {
+    const ids = adIds.slice(index, index + 10);
+    const resolved = await Promise.allSettled(ids.map((id) => metaGraph(id, { fields: 'campaign{id,name}' })));
+    resolved.forEach((item, offset) => {
+      const campaign = item.status === 'fulfilled' ? item.value?.campaign : null;
+      if (campaign?.name) result.set(String(ids[offset]), { id: String(campaign.id || ''), name: campaign.name });
     });
   }
   return result;

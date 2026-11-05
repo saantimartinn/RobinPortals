@@ -3,13 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Download, Filter, Plus, Search, UserCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Contact } from "@/types/domain";
+import type { Contact, LostReason } from "@/types/domain";
 import { adminDataClient, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
-import { lostReasonLabel, Title, ContactDrawer } from './feature-shared';
+import { lostReasonLabel, lostReasonOptions, Title, ContactDrawer } from './feature-shared';
 import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
 
-export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
+export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Contact | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -27,6 +27,9 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const [groupName, setGroupName] = useState("");
   const [groupRows, setGroupRows] = useState<LeadGroupRow[]>(() => Array.from({ length: 6 }, emptyLeadGroupRow));
   const [savingGroup, setSavingGroup] = useState(false);
+  const [pendingLost, setPendingLost] = useState<Contact | null>(null);
+  const [lostReason, setLostReason] = useState<LostReason | "">("");
+  const [lostReasonDetail, setLostReasonDetail] = useState("");
   const list = useMemo(() => contacts.filter((contact) => {
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
     // Al asignarlo, el lead pasa al CRM personal y sale de la bandeja.
@@ -70,6 +73,20 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   const campaigns = useMemo(() => [...new Set(contacts.map((contact) => contact.campaign).filter((campaign) => campaign && campaign !== "Pendiente de identificar"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const courses = useMemo(() => [...new Set(contacts.map((contact) => contact.course?.trim()).filter((course): course is string => Boolean(course)))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })), [contacts]);
   const activeFilters = [sourceFilter, campaignFilter, courseFilter].filter((value) => value !== "all").length;
+  function openLost(contact: Contact) {
+    setPendingLost(contact);
+    setLostReason("");
+    setLostReasonDetail("");
+  }
+  function confirmLost(event: React.FormEvent) {
+    event.preventDefault();
+    if (!pendingLost || !lostReason || (lostReason === "other" && !lostReasonDetail.trim())) return;
+    // Lost es una vista del CRM personal: asignamos el lead al usuario que lo descarta para que siga visible allí.
+    onAssignLead(pendingLost.id, currentUser);
+    onMoveLead(pendingLost.id, "Lost", { lostReason, lostReasonDetail: lostReason === "other" ? lostReasonDetail.trim() : "" });
+    notify(`${pendingLost.name} enviado a Lost`);
+    setPendingLost(null);
+  }
   async function saveLeadGroup(event: React.FormEvent) {
     event.preventDefault();
     const populated = groupRows.filter((row) => Object.entries(row).some(([key, value]) => key !== "heat" && key !== "taskStatus" && String(value).trim()));
@@ -98,7 +115,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
   }
   return (
     <div className="page">
-      <Title name="Bandeja de entrada de leads" sub="Asigna cada nuevo lead al administrador que lo gestionará." eyebrow="Inicio / Vista global">
+      <Title name="Bandeja de entrada de leads" sub="Asigna cada nuevo lead o márcalo como Lost." eyebrow="Inicio / Vista global">
         <Badge variant="outline">{list.length} leads</Badge>
       </Title>
       <div className="module-toolbar">
@@ -117,9 +134,9 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
-            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th></tr></thead>
+            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th><th>Marcar como Lost</th></tr></thead>
             <tbody>
-              {list.length === 0 && <tr><td colSpan={view === "reservas" ? 9 : 8} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
+              {list.length === 0 && <tr><td colSpan={view === "reservas" ? 10 : 9} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
               {list.map((contact) => (
                 <tr key={contact.id} className="unassigned-lead" onClick={() => setSelected(contact)}>
                   <td><button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
@@ -144,6 +161,7 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
                     </select>
                   </td>
                   <td><span className="days-without-contact">{leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id])) ?? "—"}</span></td>
+                  <td><button type="button" className="inbox-lost-action" aria-label={`Marcar como Lost: ${contact.name}`} onClick={(event) => { event.stopPropagation(); openLost(contact); }}>LOST</button></td>
                 </tr>
               ))}
             </tbody>
@@ -151,6 +169,29 @@ export function LeadInbox({ admins, contacts, leadOwners, leadStages, onAssignLe
         </div>
       </section>
       <p className="assignment-note"><UserCheck /> Al asignar un lead, aparecerá inmediatamente en el CRM personal del usuario seleccionado.</p>
+      {pendingLost && (
+        <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendingLost(null); }}>
+          <form className="manual-lead-card crm-outcome-card" role="dialog" aria-modal="true" aria-labelledby="inbox-lost-title" onSubmit={confirmLost}>
+            <button className="drawer-close" type="button" aria-label="Cerrar" onClick={() => setPendingLost(null)}>×</button>
+            <span>Enviar a Lost</span>
+            <h2 id="inbox-lost-title">{pendingLost.name}</h2>
+            <p>Selecciona el motivo de la pérdida. El lead quedará asignado a {currentUser} y visible en su sección Lost.</p>
+            <label>Motivo
+              <select required autoFocus value={lostReason} onChange={(event) => { setLostReason(event.target.value as LostReason | ""); if (event.target.value !== "other") setLostReasonDetail(""); }}>
+                <option value="">Seleccionar motivo…</option>
+                {lostReasonOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>
+            </label>
+            {lostReason === "other" && <label>Explicación breve
+              <input required maxLength={120} value={lostReasonDetail} onChange={(event) => setLostReasonDetail(event.target.value)} placeholder="Escribe el motivo" />
+            </label>}
+            <div className="manual-lead-actions">
+              <Button type="button" variant="outline" onClick={() => setPendingLost(null)}>Cancelar</Button>
+              <Button type="submit" disabled={!lostReason || (lostReason === "other" && !lostReasonDetail.trim())}>Marcar como Lost</Button>
+            </div>
+          </form>
+        </div>
+      )}
       {addingLead && <div className="drawer-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget) setAddingLead(false); }}><form className="manual-lead-card" onSubmit={async (event) => { event.preventDefault(); setSavingLead(true); try { await onAddLead(manualLead); notify(`${manualLead.name} añadido correctamente`); setManualLead({ name: "", email: "", phone: "", notes: "", owner: "", source: "organic" }); setAddingLead(false); } catch (error) { notify(error instanceof Error ? error.message : "No se pudo crear el lead"); } finally { setSavingLead(false); } }}><button className="drawer-close" type="button" onClick={() => setAddingLead(false)}>×</button><span>Nuevo lead</span><h2>Añadir manualmente</h2><p>El lead quedará en Por contactar.</p><label>Nombre<input required value={manualLead.name} onChange={(event) => setManualLead((lead) => ({ ...lead, name: event.target.value }))} /></label><div className="manual-lead-row"><label>Email<input type="email" value={manualLead.email} onChange={(event) => setManualLead((lead) => ({ ...lead, email: event.target.value }))} /></label><label>Teléfono<input value={manualLead.phone} onChange={(event) => setManualLead((lead) => ({ ...lead, phone: event.target.value }))} /></label></div><label>Origen<select value={manualLead.source} onChange={(event) => setManualLead((lead) => ({ ...lead, source: event.target.value }))}><option value="organic">Orgánico</option><option value="organic_social">Orgánico RRSS</option><option value="referral">Referidos</option><option value="schools">Colegios</option><option value="google_ads">Google Ads</option><option value="tiktok_ads">TikTok Ads</option><option value="email">Email</option><option value="events">Eventos</option><option value="other">Otros</option></select></label><label>Asignar a<select value={manualLead.owner} onChange={(event) => setManualLead((lead) => ({ ...lead, owner: event.target.value }))}><option value="">Sin asignar</option>{admins.map((admin) => <option key={admin}>{admin}</option>)}</select></label><label>Notas<textarea value={manualLead.notes} onChange={(event) => setManualLead((lead) => ({ ...lead, notes: event.target.value }))} /></label><div className="manual-lead-actions"><Button type="button" variant="outline" onClick={() => setAddingLead(false)}>Cancelar</Button><Button type="submit" disabled={savingLead}>{savingLead ? "Guardando…" : "Crear lead"}</Button></div></form></div>}
       {addingGroup && <div className="lead-sheet-backdrop"><form className="lead-sheet" onSubmit={saveLeadGroup}>
         <header><div><span>Captura en grupo</span><h2>Añadir grupo de leads</h2><p>Rellena una fila por persona. Los campos corresponden a la ficha CRM de Supabase; las filas vacías se ignoran.</p></div><button type="button" className="drawer-close" aria-label="Cerrar" onClick={() => setAddingGroup(false)}>×</button></header>

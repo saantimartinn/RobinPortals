@@ -65,11 +65,13 @@ exports.handler = async (event) => {
 
     const now = new Date();
     const nowSec = Math.floor(now.getTime() / 1000);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const yearStart = new Date(now.getFullYear(), 0, 1);
-    const previousYearStart = new Date(now.getFullYear() - 1, 0, 1);
-    const previousYearEnd = new Date(now.getFullYear(), 0, 1);
-    const trendStart = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+    const year = now.getUTCFullYear();
+    const month = now.getUTCMonth();
+    const monthStart = new Date(Date.UTC(year, month, 1));
+    const yearStart = new Date(Date.UTC(year, 0, 1));
+    const previousYearStart = new Date(Date.UTC(year - 1, 0, 1));
+    const previousYearEnd = yearStart;
+    const trendStart = new Date(Date.UTC(year, month - 11, 1));
     const queryStart = new Date(Math.min(previousYearStart.getTime(), trendStart.getTime()));
     const invoices = await holded.listSalesInvoices({ start: Math.floor(queryStart.getTime() / 1000), end: nowSec });
     const inRange = (invoice, start) => Number(invoice.date || 0) >= Math.floor(start.getTime() / 1000);
@@ -77,14 +79,14 @@ exports.handler = async (event) => {
     const yearInvoices = invoices.filter((invoice) => inRange(invoice, yearStart));
     const previousYearInvoices = invoices.filter((invoice) => Number(invoice.date || 0) >= previousYearStart.getTime() / 1000 && Number(invoice.date || 0) < previousYearEnd.getTime() / 1000);
     const monthly = Array.from({ length: 12 }, (_, index) => {
-      const start = new Date(now.getFullYear(), now.getMonth() - 11 + index, 1);
-      const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+      const start = new Date(Date.UTC(year, month - 11 + index, 1));
+      const end = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1));
       const rows = invoices.filter((invoice) => Number(invoice.date || 0) >= start.getTime() / 1000 && Number(invoice.date || 0) < end.getTime() / 1000);
-      const previousStart = new Date(start.getFullYear() - 1, start.getMonth(), 1);
-      const previousEnd = new Date(start.getFullYear() - 1, start.getMonth() + 1, 1);
+      const previousStart = new Date(Date.UTC(start.getUTCFullYear() - 1, start.getUTCMonth(), 1));
+      const previousEnd = new Date(Date.UTC(start.getUTCFullYear() - 1, start.getUTCMonth() + 1, 1));
       const previousRows = invoices.filter((invoice) => Number(invoice.date || 0) >= previousStart.getTime() / 1000 && Number(invoice.date || 0) < previousEnd.getTime() / 1000);
       const summary = totals(rows, nowSec);
-      return { month: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`, label: new Intl.DateTimeFormat('es-ES', { month: 'short' }).format(start), sales: summary.sales, previousYearSales: totals(previousRows, nowSec).sales, billed: summary.billed, collected: summary.collected, pending: summary.pending, invoices: summary.invoices };
+      return { month: `${start.getUTCFullYear()}-${String(start.getUTCMonth() + 1).padStart(2, '0')}`, label: new Intl.DateTimeFormat('es-ES', { month: 'short', timeZone: 'UTC' }).format(start), sales: summary.sales, previousYearSales: totals(previousRows, nowSec).sales, billed: summary.billed, collected: summary.collected, pending: summary.pending, invoices: summary.invoices };
     });
 
     return json({

@@ -1,6 +1,7 @@
 /**
  * POST /api/onboarding/checkout
- * Crea un checkout alojado para la PRIMERA cuota del onboarding.
+ * Crea un checkout alojado para la primera cuota pendiente del onboarding.
+ * La cuota de 0 € cubierta por Mentoría se completa al firmar y no se cobra.
  * Devuelve { url } al que el frontend redirige. El pago se confirma vía
  * el webhook del proveedor (autoritativo) y/o payments-verify (al volver).
  */
@@ -63,6 +64,9 @@ exports.handler = async (event) => {
 
     const first = applicationPlanForUser(u)[0];
     const amount = first.amount;
+    if (amount <= 0) {
+      return json({ error: 'first_payment_covered_by_credit' }, { statusCode: 409 });
+    }
     const amountMinor = toMinorUnits(amount);
     const nombre = [u.nombre, u.apellidos].filter(Boolean).join(' ') || (u.email || '');
 

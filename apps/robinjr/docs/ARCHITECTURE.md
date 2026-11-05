@@ -80,7 +80,7 @@ del cliente de servidor se encuentra en cada Function. Véanse
 - El admin crea y asigna tarjetas de carrera. `career_templates` guarda la ficha y
   `client_careers` la asignación; documentos y fechas límite permanecen en el dominio
   independiente de documentos.
-- Las cuotas son 500 €, 500 € y 499,99 €. La segunda se habilita al alcanzar la fase 6
+- Las altas nuevas pagan 500 €, 500 € y 499 €; el plan histórico conserva 499,99 € como tercera cuota. La segunda se habilita al alcanzar la fase 6
   y la tercera en la fase 9; un admin realiza la acción de habilitación.
 - El alumno reserva huecos de 60 minutos generados desde eventos `RobinJr` en el calendario
   del advisor. El backend vuelve a consultar Calendar al confirmar la reserva.

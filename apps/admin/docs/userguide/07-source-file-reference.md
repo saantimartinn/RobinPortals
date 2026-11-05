@@ -35,8 +35,8 @@ Después de mover archivos o renombrar exports, revisa enlaces locales, imports,
 
 - [Volver a USERGUIDE](../../USERGUIDE.md)
 - [06 · Flujos entre repositorios](06-cross-repository-flows.md)
-- [Robin Platform · índice por archivo](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/userguide/07-source-file-reference.md)
-- [Robin Subscriptions · índice por archivo](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/userguide/07-source-file-reference.md)
+- [Robin Platform · índice por archivo](../../../portal/docs/userguide/07-source-file-reference.md)
+- [Robin Subscriptions · índice por archivo](../../../community/docs/userguide/07-source-file-reference.md)
 
 **Volver al inicio:** [USERGUIDE](../../USERGUIDE.md) · [READMELONG](../../READMELONG.md)
 

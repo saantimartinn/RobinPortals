@@ -368,8 +368,18 @@ to = "/.netlify/functions/portal-admin-developer-clients"
 status = 200
 
 [[redirects]]
+from = "/portal/api/admin/client-folders"
+to = "/.netlify/functions/portal-admin-client-folders"
+status = 200
+
+[[redirects]]
 from = "/portal/api/admin/clients/assign"
 to = "/.netlify/functions/portal-admin-client-assign"
+status = 200
+
+[[redirects]]
+from = "/portal/api/admin/clients/convert-mentoria"
+to = "/.netlify/functions/portal-admin-client-convert-mentoria"
 status = 200
 
 [[redirects]]
@@ -693,6 +703,11 @@ to = "/.netlify/functions/robinjr-admin-developer-clients"
 status = 200
 
 [[redirects]]
+from = "/robinjr/api/admin/client-folders"
+to = "/.netlify/functions/robinjr-admin-client-folders"
+status = 200
+
+[[redirects]]
 from = "/robinjr/api/admin/clients/assign"
 to = "/.netlify/functions/robinjr-admin-client-assign"
 status = 200
@@ -849,6 +864,11 @@ status = 200
 force = true
 
 [[redirects]]
+from = "/therobinplan/api/sub-admin/client-folders"
+to = "/.netlify/functions/community-sub-admin-client-folders"
+status = 200
+
+[[redirects]]
 from = "/therobinplan/api/sub-admin/data"
 to = "/.netlify/functions/community-sub-admin-data"
 status = 200
@@ -977,6 +997,26 @@ status = 200
 [[redirects]]
 from = "/api/admin/sales/test"
 to = "/.netlify/functions/admin-admin-sales-test"
+status = 200
+
+[[redirects]]
+from = "/api/admin/tests/run"
+to = "/.netlify/functions/admin-admin-tests-run"
+status = 200
+
+[[redirects]]
+from = "/api/admin/tests/payment"
+to = "/.netlify/functions/admin-admin-tests-payment"
+status = 200
+
+[[redirects]]
+from = "/api/admin/developer-logs"
+to = "/.netlify/functions/admin-admin-developer-logs"
+status = 200
+
+[[redirects]]
+from = "/api/admin/platform-logs"
+to = "/.netlify/functions/admin-admin-platform-logs"
 status = 200
 
 [[redirects]]
@@ -1262,6 +1302,11 @@ status = 200
 [[redirects]]
 from = "/api/bookings"
 to = "/.netlify/functions/admin-bookings-list"
+status = 200
+
+[[redirects]]
+from = "/api/admin/client-folders"
+to = "/.netlify/functions/admin-admin-client-folders"
 status = 200
 
 [[redirects]]

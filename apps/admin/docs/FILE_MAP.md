@@ -40,20 +40,25 @@ Los endpoints completos, rutas y verbos están en [API_INVENTORY.md](API_INVENTO
 - finance-dashboard.js y holded.js son fachadas; el cálculo se descompone en lib/finance y lib/holded.
 - Adaptadores externos encapsulados: Google Calendar/Drive/Gmail/Sheets/Analytics, Holded, Notion, Stripe, Anthropic, email y Storage. Los secretos viven solo en runtime servidor.
 
-## Contratos entre los tres repos
+## Contratos entre apps del monorepo
 
 | Desde | Hacia | Contrato |
 |---|---|---|
-| Admin navegador | Worker en Robin Platform | Entrada pública /admin; el Worker enruta al origin de Admin y reescribe recursos del build. |
+| Admin navegador | Worker de raíz | Entrada pública `/admin`; el Worker entrega el path sin reescritura al sitio unificado. |
 | Admin navegador | Robin Platform API | /portal/api/* gestiona identidad común; las rutas /api/admin/* siguen en este repo. |
 | Platform / webhooks CRM | Admin Functions | /api/internal/crm/* y webhooks llegan a handlers propios; estos deben comprobar secreto/firma y validar payload. |
-| Platform | Robin Subscriptions | Navegación y SSO por HTTP; Subscriptions mantiene cookie/JWT y base independiente. |
+| Portal del Alumno | Robin Community | Navegación y SSO por HTTP; Community mantiene sesión y dominio de datos propios. |
 
-Guías vecinas: [Robin Platform](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md) · [Robin Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md).
+Guías vecinas: [Portal del Alumno](../../portal/USERGUIDE.md) · [Robin Community](../../community/USERGUIDE.md).
 
 ## Publicación y exploración
 
-[netlify.toml](../netlify.toml) decide Functions, cabeceras, edge y publicación; Vite produce dist y el backend no forma parte del contenido estático. El código Cloudflare está en el repo Platform. La configuración efectiva de DNS y rutas de zona requiere confirmación del dashboard: [CLOUDFLARE_ROUTING.md](CLOUDFLARE_ROUTING.md).
+[netlify.toml](../netlify.toml) aporta las rutas y Functions de Admin al
+`netlify.toml` generado en la raíz. Vite produce el bundle que incorpora
+`site/build.mjs`; el backend no forma parte de los assets estáticos. El Worker
+vigente está en [`infra/cloudflare`](../../../infra/cloudflare/) y el estado
+efectivo de DNS/rutas requiere confirmación del dashboard:
+[CLOUDFLARE_ROUTING.md](CLOUDFLARE_ROUTING.md).
 
 - [USERGUIDE](../USERGUIDE.md): índice de los recorridos detallados.
 - [Arquitectura](ARCHITECTURE.md): estructura por carpeta y dependencias.

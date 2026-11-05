@@ -5,7 +5,7 @@ constant belongs in a database, and secrets never belong in source control.
 
 | Category | Current source of truth | Examples | Change process |
 |---|---|---|---|
-| Financial rules | `shared/financial-config.cjs` | Three Robin Jr installments: 500 €, 500 € and 499,99 €; currency, VAT, fiscal identity | reviewed deploy; amounts paid per customer remain canonical in `payments` |
+| Financial rules | `shared/financial-config.cjs` | Current Robin Jr installments: 500 €, 500 € and 499 € (1.499 € total); historical plans remain versioned | reviewed deploy; amounts paid per customer remain canonical in `payments` |
 | Legal contract content | `shared/contract-content.cjs` | contract clauses and fiscal text | legal review plus deploy |
 | Security/authorization | backend modules plus secrets in environment | advisor allowlist, roles, JWT settings | security review plus deploy; credentials only in environment |
 | Operational configuration | environment variables documented in `.env.example` | booking horizon, Google targets, Notion responsibility mapping, email inboxes | change Netlify environment and redeploy; Robin Jr booking title and 60-minute slots stay fixed in code |
@@ -36,4 +36,12 @@ Legacy contract wording may describe other Project Robin products. It is not the
 the Robin Jr payment plan; legal templates should only be changed with an explicit product
 and legal review.
 
-No Supabase query or database change was made for this classification.
+La conversión de Mentoría a General, Delft o Llegada de 666,33 € pertenece solo
+al Portal del Alumno. Robin Jr no expone ese botón ni aplica ese crédito. Su
+plantilla histórica de Mentoría todavía menciona 800 € y el total heredado de
+`APPLICATION_TOTALS.mentoria` es 450 €; las altas actuales de Robin Jr usan el
+plan propio de tres cuotas independientemente de `tipo`. Esta diferencia debe
+resolverse como decisión de producto separada antes de ofrecer Mentoría en Robin Jr.
+
+Esta sección describe reglas de código; confirma el esquema y las migraciones de
+cada entorno antes de modificar datos de Robin Jr.

@@ -22,3 +22,5 @@ navegador.
   históricos seudonimizados (109 clientes), sin nombres, emails ni teléfonos.
 - `202610190003_add_crm_leads_display_id.sql`: añade IDs legibles `ID-N` a
   los leads; conserva sus UUID internos como claves y referencias.
+- `202611040001_add_crm_lead_messages.sql`: permite registrar mensajes sin
+  duración junto a las llamadas del historial comercial.

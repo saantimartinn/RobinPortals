@@ -235,6 +235,7 @@ export function AdminPortal({ user }) {
                 searchQ={searchQ}
                 onSearch={setSearchQ}
                 onSelect={selectClient}
+                onConverted={reloadAssigned}
                 loading={loadingClients}
                 loadError={loadError}
                 onOpenAssign={openAssignModal}

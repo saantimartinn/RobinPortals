@@ -51,8 +51,8 @@ Al llegar desde Robin Platform, auth-sso valida la sesión de origen consultando
 
 | Aplicación | Propiedad |
 |---|---|
-| [Robin Platform cliente](https://github.com/RobinManuV/Robin-platform-cliente) | Portal principal, identidad de origen y Worker Cloudflare. |
-| [Robin Admin](https://github.com/RobinManuV/Robin-Admin) | Administración de operación/CRM; backend distinto. |
-| Robin Subscriptions | The Robin Plan, billing, DB y sesión del producto. |
+| [Portal del Alumno](../../portal/README.md) | Portal principal e identidad de origen; comparte sitio Netlify. |
+| [Robin Admin](../../admin/README.md) | Administración y CRM; Functions propias en el sitio unificado. |
+| Robin Community | The Robin Plan, billing, DB y sesión del producto. |
 
-Los contratos coordinados están descritos en [USERGUIDE](../USERGUIDE.md) y [flujo entre repos](userguide/06-cloudflare-cross-repo.md). La guía [CLOUDFLARE_ROUTING](CLOUDFLARE_ROUTING.md) documenta el prefijo, mientras [ARCHITECTURE](ARCHITECTURE.md) explica publicación y carpetas.
+Los contratos coordinados están descritos en [USERGUIDE](../USERGUIDE.md) y [flujo entre apps](userguide/06-cloudflare-cross-repo.md). La guía [CLOUDFLARE_ROUTING](CLOUDFLARE_ROUTING.md) documenta el prefijo, mientras [ARCHITECTURE](ARCHITECTURE.md) explica publicación y carpetas.

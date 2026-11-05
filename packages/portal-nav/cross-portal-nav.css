@@ -18,6 +18,7 @@
 .robin-cross-nav nav a[href^="/therobinplan"]::before{background-image:url("../brand/assets/robin-community.svg")}
 .robin-cross-nav nav a.is-active{color:var(--robin-navy);font-weight:650}
 .robin-cross-nav nav a.is-active::after{background:var(--robin-orange)}
+.robin-cross-nav nav a[href$="/admin/desarrolladores/tests"]{position:sticky;right:0;z-index:1;background:var(--robin-paper)}
 .robin-cross-actions{display:flex;align-items:center;gap:.6rem;flex:0 0 auto}
 .robin-cross-account{padding:0 .4rem;color:var(--robin-navy);font-size:.875rem;font-weight:600;white-space:nowrap}
 .robin-cross-icon-button{display:grid;place-items:center;flex:0 0 2.25rem;width:2.25rem;height:2.25rem;padding:0;border:var(--robin-line);border-radius:var(--robin-radius-control);background:transparent;color:var(--robin-navy);cursor:pointer}

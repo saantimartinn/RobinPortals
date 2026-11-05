@@ -379,6 +379,8 @@ const LLEGADA = transitionContract({
 });
 
 const MENTORIA = transitionContract({
+  // Plantilla histórica de Jr. La conversión con crédito de 666,33 € solo
+  // existe en Portal del Alumno; esta variante requiere revisión de producto.
   key: 'mentoria',
   title: 'Contrato de Términos y Condiciones · Servicios de consultoría académica y mentoría',
   programName: 'Mentoría Robin',

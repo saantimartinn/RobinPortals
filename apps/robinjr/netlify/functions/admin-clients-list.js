@@ -46,6 +46,13 @@ exports.handler = async (event) => {
 
     // Por seguridad, nunca devolver otro admin/supervisor como cliente.
     const list = await attachStudentPhones(sb, (clients || []).filter((client) => !hasApplicationAdminRole(client)));
+    const ids = list.map((client) => client.id);
+    let notesByUser = new Map();
+    if (ids.length) {
+      const { data: noteRows, error: notesError } = await sb.from('crm_client_notes').select('user_id,notes').in('user_id', ids);
+      if (notesError && !['42P01', 'PGRST205'].includes(notesError.code)) throw notesError;
+      notesByUser = new Map((noteRows || []).map((row) => [row.user_id, row.notes]));
+    }
 
     return json({
       admin: {
@@ -55,7 +62,7 @@ exports.handler = async (event) => {
         nombre: admin.nombre,
         apellidos: admin.apellidos,
       },
-      clients: list,
+      clients: list.map((client) => ({ ...client, crm_notes: notesByUser.get(client.id) || [] })),
     });
   } catch (e) {
     console.error('admin-clients-list error', e);

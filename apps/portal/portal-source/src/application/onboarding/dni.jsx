@@ -1,6 +1,6 @@
 // Onboarding step or helper for dni; OnboardingFlow owns the step sequence.
 import { useState } from "react";
-import { UploadCloud, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { UploadCloud, Camera, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { NAVY } from "../../theme.js";
 import { Btn, Field } from "../../ui.jsx";
 import { dniExtract, dniSave } from "../../api.js";
@@ -143,20 +143,32 @@ export function OnboardingDNI({ user, onLogout, onDone }) {
 }
 
 function UploadSlot({ label, preview, onPick }) {
+  const handleChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) onPick(file);
+    event.target.value = "";
+  };
+
   return (
-    <label className="relative block rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 transition cursor-pointer overflow-hidden min-h-[180px]">
-      {preview ? (
-        <img src={preview} alt="" className="w-full h-[180px] object-cover" />
-      ) : (
-        <div className="h-full min-h-[180px] flex flex-col items-center justify-center gap-2 p-4 text-center">
-          <div className="h-10 w-10 rounded-full grid place-items-center text-white" style={{ background: NAVY }}>
-            <UploadCloud className="h-5 w-5" />
+    <div className="space-y-2">
+      <label className="relative block rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 transition cursor-pointer overflow-hidden min-h-[180px]">
+        {preview ? (
+          <img src={preview} alt={`Vista previa: ${label}`} className="w-full h-[180px] object-cover" />
+        ) : (
+          <div className="h-full min-h-[180px] flex flex-col items-center justify-center gap-2 p-4 text-center">
+            <div className="h-10 w-10 rounded-full grid place-items-center text-white" style={{ background: NAVY }}>
+              <UploadCloud className="h-5 w-5" />
+            </div>
+            <div className="text-sm font-semibold text-slate-700">{label}</div>
+            <div className="text-xs text-slate-400">Foto clara, sin reflejos</div>
           </div>
-          <div className="text-sm font-semibold text-slate-700">{label}</div>
-          <div className="text-xs text-slate-400">Foto clara, sin reflejos</div>
-        </div>
-      )}
-      <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = ""; }} />
-    </label>
+        )}
+        <input type="file" accept="image/*" className="hidden" onChange={handleChange} />
+      </label>
+      <label className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-50">
+        <Camera className="h-4 w-4" /> Hacer foto de {label.toLowerCase()}
+        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleChange} />
+      </label>
+    </div>
   );
 }

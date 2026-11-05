@@ -17,6 +17,7 @@ Maintained architecture, routing, and user-guide documentation.
 | [`API_INVENTORY.md`](../../API_INVENTORY.md) | Maintained project documentation. |
 | [`ARCHITECTURE.md`](../../ARCHITECTURE.md) | Maintained project documentation. |
 | [`CLOUDFLARE_ROUTING.md`](../../CLOUDFLARE_ROUTING.md) | Maintained project documentation. |
+| [`DATAFLOW.md`](../../DATAFLOW.md) | Maintained project documentation. |
 | [`FILE_INDEX.generated.md`](../../FILE_INDEX.generated.md) | Maintained project documentation. |
 | [`crm-historical-metrics.md`](../../crm-historical-metrics.md) | Maintained project documentation. |
 | [`notion-crm-mapping.md`](../../notion-crm-mapping.md) | Maintained project documentation. |

@@ -2,7 +2,10 @@
 
 ## Límites del despliegue
 
-Root `netlify.toml` construye el frontend independiente en `portal-source/`, lo copia a `deploy/portal/`, publica Netlify Functions desde `netlify/functions/` y aplica Edge Functions de `netlify/edge-functions/`. El Worker público se mantiene en `infrastructure/cloudflare/`; no está incluido en el build Netlify de portal.
+El `netlify.toml` de raíz se genera desde las configuraciones de las cuatro apps.
+`site/build.mjs` incorpora el frontend de `portal-source/` y sus Functions al
+sitio Netlify unificado. El Worker público vigente se mantiene en
+`infra/cloudflare/`; se despliega por separado del build Netlify.
 
 ## Arranque frontend
 
@@ -26,8 +29,8 @@ Robin Admin usa los endpoints de identidad de Platform a través del Worker (`/p
 
 - [IDENTITY_MODEL](../IDENTITY_MODEL.md), [AUTHORIZATION](../AUTHORIZATION.md), [PASSWORD_POLICY](../PASSWORD_POLICY.md)
 - [Cloudflare paths](../CLOUDFLARE_ROUTING.md)
-- [Robin Admin USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md)
-- [Robin Subscriptions USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md)
+- [Robin Admin USERGUIDE](../../../admin/USERGUIDE.md)
+- [Robin Subscriptions USERGUIDE](../../../community/USERGUIDE.md)
 
 
 ## Cómo depurar identidadCómo depurar identidad

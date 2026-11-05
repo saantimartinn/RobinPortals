@@ -1,8 +1,9 @@
 # Datos usados por la plataforma
 
-Este documento conserva únicamente el modelo consumido por los portales de alumnos y
-administración. Se deriva del snapshot estructural aportado el 19 de agosto de 2026; no es
-una consulta actual ni una migración. Esta limpieza no ejecutó cambios sobre la base de datos.
+Este documento conserva el modelo consumido por los portales de alumnos y administración.
+La lista de tablas procede del snapshot estructural del 19 de agosto de 2026 y no es una
+consulta completa del esquema actual. Las reglas de conversión de Mentoría descritas abajo
+proceden de la migración versionada de noviembre de 2026.
 
 ## Seguridad y acceso
 
@@ -36,6 +37,13 @@ cliente de servidor y aplican sesión, rol y ownership en código. Los buckets `
 - `birthday_events`: combinación `(user_id, birthday_year)` única; acceso exclusivo del backend mediante RLS sin políticas públicas.
 - `client_careers`: combinación `(user_id, career_template_id)` única.
 - `payments`: `installment >= 1` y combinación `(user_id, installment)` única.
+- La conversión de Mentoría conserva el cobro de 666,33 € como pago histórico en
+  `installment >= 4`, con `payment_data.mentoria_credit_source=true`. La primera
+  cuota del programa nuevo vuelve a ocupar `installment=1`; puede valer 0 €.
+- `users.contract_data.mentoria_upgrade` guarda importe, destino y referencia del
+  pago original; `previous_contracts` conserva el contrato anterior. La función
+  `convert_paid_mentoria_client` bloquea las filas y hace el cambio de forma
+  transaccional. Véase [Mentoría y conversión](MENTORIA_CONVERSION.md).
 - `notification_recipients`: combinación `(notification_id, user_id)` única.
 - `ai_chat_messages.role`: `user`, `assistant` o `advisor`.
 - Los binarios de `documents` se almacenan en Storage; la tabla conserva rutas y metadata.

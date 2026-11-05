@@ -4,7 +4,7 @@
  *   - general : 566,67 € iniciales + 50/50 del restante · total 1700/2000/2100 según carreras
  *   - delft   : 3 cuotas · total 2999 (999 + 1000 + 1000)
  *   - llegada : 2 cuotas iguales · total 1700 (850 c/u)
- *   - mentoria: 1 cuota · total 450
+ *   - mentoria: 1 cuota · total 666,33
  *   - 'otros' (internacional): 3 cuotas de 900 · total 2700
  */
 

@@ -163,7 +163,7 @@ export function AdminPagos({ client }) {
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length)} · {eur(p.amount)}</div>
                       <div className="text-xs text-slate-400">
-                        {isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
+                        {isPaid && p.payment_data?.source === 'mentoria_credit' ? 'Cubierta por el pago de Mentoría' : isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
                         {isUnlocked && p.unlocked_at && `Desbloqueado el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
                         {isLocked && `Bloqueado`}
                       </div>
@@ -198,7 +198,7 @@ export function AdminPagos({ client }) {
                           <Pencil className="h-3.5 w-3.5" /> Importe
                         </Btn>
                       )}
-                      {isPaid && (
+                      {isPaid && p.amount > 0 && (
                         <Btn variant="secondary" size="sm" onClick={() => { setFacturaPayment(p); setFacturaOpen(true); }}>
                           <FileText className="h-3.5 w-3.5" /> Justificante
                         </Btn>
@@ -208,7 +208,7 @@ export function AdminPagos({ client }) {
                           {busyId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Desbloquear"}
                         </Btn>
                       )}
-                      {p.installment >= 4 && (
+                      {p.installment >= 4 && !p.payment_data?.mentoria_credit_source && (
                         <Btn size="sm" variant="danger" onClick={() => delExtra(p)} disabled={busyId === p.id} title="Eliminar pago extra">
                           {busyId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                         </Btn>

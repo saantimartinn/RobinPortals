@@ -4,6 +4,11 @@
 
 `lib/supabase.js` construye clientes server con service-role key. `supabase/migrations/` y `supabase/*` mantienen SQL de origen; snapshots de `docs/DATABASE_CURRENT.md` documentan estructura conocida. El backend filtra acceso en cada Function; RLS y contratos deben confirmarse contra entorno de destino antes de migrar. Frontend solo recibe datos permitidos o signed URLs temporales.
 
+La migración de [Mentoría y conversión](../MENTORIA_CONVERSION.md) añade una función
+SQL ejecutable solo por `service_role`. Conserva el pago y el contrato de Mentoría
+al cambiar el tipo de cliente; los datos originales siguen disponibles para
+historial, facturación y auditoría.
+
 ## Proveedores
 
 | Proveedor | Adaptadores representativos | Flujos |
@@ -36,7 +41,7 @@ Antes de escribir SQL, identifica el proyecto y schema de destino, el consumidor
 
 Los adaptadores externalizan detalles de API y credenciales. Mantén el token en server-side, valida responses incompletas y limita requests con timeout/paginación. Un webhook debe verificar firma, deduplicar eventos y tolerar repetición; una tarea de sync debe permitir reintento sin producir duplicados.
 
-Si cambias datos de identidad o perfil, localiza al menos: writer, reader, UI, API de `/me`, migración/RLS y los repos que usan esa identidad. Usa la [USERGUIDE Admin](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md) y [USERGUIDE Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md) para identificar consumidores.
+Si cambias datos de identidad o perfil, localiza al menos: writer, reader, UI, API de `/me`, migración/RLS y los repos que usan esa identidad. Usa la [USERGUIDE Admin](../../../admin/USERGUIDE.md) y [USERGUIDE Subscriptions](../../../community/USERGUIDE.md) para identificar consumidores.
 
 ---
 

@@ -10,7 +10,7 @@ El onboarding se compone en `application/onboarding/OnboardingFlow.jsx` y delega
 
 `AdminPortal.jsx` compone el espacio de trabajo admin. Los submódulos en `application/admin/` implementan dashboard y utilities, gestión de usuarios/clientes, progreso, configuración académica, carreras, pagos, reservas, documentos, chat y notificaciones. Para cada alumno se puede crear una ficha de carrera (foto, descripción, asignaturas y requisitos) y asignarla. Las fechas límite se fijan en documentos, no en la ficha de carrera. `AdminWorkspace.jsx` proporciona el layout común y `admin-navigation.js` define items.
 
-El plan de Robin Jr contiene tres pagos (500 €, 500 € y 499,99 €). La segunda cuota se
+El plan vigente de Robin Jr contiene tres pagos (500 €, 500 € y 499 €). La segunda cuota se
 puede habilitar cuando el alumno alcanza la fase 6 y la última al llegar a Wrap up (fase 9).
 La secuencia exacta está en `application-steps.js` y las reglas backend en el handler de
 desbloqueo de pagos.

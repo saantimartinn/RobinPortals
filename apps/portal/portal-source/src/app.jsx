@@ -43,6 +43,10 @@ function nextOnboardingStep(user) {
   return null;
 }
 
+function sendNativeAuthEvent(payload) {
+  try { window.webkit?.messageHandlers?.robinAuth?.postMessage(payload); } catch (_) {}
+}
+
 export default function PortalRobin() {
   const [authState, setAuthState] = useState({
     loading: true,
@@ -252,7 +256,13 @@ export default function PortalRobin() {
 
   async function handleLogin(username, password) {
     const data = await apiLogin(username.trim(), password);
-    setAuthenticatedUser(await apiMe());
+    const user = await apiMe();
+    sendNativeAuthEvent({
+      action: "loginSucceeded",
+      username: username.trim(),
+      password,
+    });
+    setAuthenticatedUser(user);
     setActive("estado");
     return data;
   }
@@ -357,6 +367,16 @@ function LoginScreen({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [recoveryOpen, setRecoveryOpen] = useState(false);
+  const [biometryName, setBiometryName] = useState(null);
+
+  useEffect(() => {
+    const bridge = window.webkit?.messageHandlers?.robinAuth;
+    if (!bridge) return;
+    const onStatus = (event) => setBiometryName(event.detail?.available === true ? event.detail.method : null);
+    window.addEventListener("robin-native-auth-status", onStatus);
+    sendNativeAuthEvent({ action: "status" });
+    return () => window.removeEventListener("robin-native-auth-status", onStatus);
+  }, []);
 
   async function submit(event) {
     event.preventDefault();
@@ -406,8 +426,10 @@ function LoginScreen({ onLogin }) {
           <button className="robin-postcard-submit" type="submit" disabled={!email || !password || loading}>
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : "Entrar"}
           </button>
+          {biometryName && <button className="robin-postcard-submit" type="button" onClick={() => sendNativeAuthEvent({ action: "authenticate" })} disabled={loading}>Entrar con {biometryName}</button>}
           <p className="robin-postcard-hint">Tu espacio Robin en un solo lugar.</p>
           <button className="robin-forgot-password" type="button" onClick={() => setRecoveryOpen(true)}>Recuperar contraseña</button>
+          <a className="robin-forgot-password" href="/admin/politica-de-privacidad.html">Política de privacidad</a>
         </form>
       </div>
       {recoveryOpen && <RecoveryRequest onClose={() => setRecoveryOpen(false)} />}

@@ -1,6 +1,6 @@
 # API inventory
 
-Generated from `netlify.toml` and static analysis of 66 Netlify Functions.
+Generated from `netlify.toml` and static analysis of 69 Netlify Functions.
 Scheduled/internal Functions without a redirect are listed with their direct function path. This is an
 engineering inventory, not a substitute for runtime or legal review.
 
@@ -13,8 +13,9 @@ engineering inventory, not a substitute for runtime or legal review.
 | admin-careers-delete | POST | /api/admin/careers/delete | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, missing_id, forbidden | career_templates, users | none |
 | admin-chat | GET/POST | /api/admin/chat | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, forbidden, missing_user_id, client_not_found, empty_message | ai_chat_messages, ai_chat_state, notification_recipients, notifications, users | none |
 | admin-client-assign | POST | /api/admin/clients/assign | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_user_id, forbidden, not_found | users, webhook_log | Google Sheets, Holded, Notion |
+| admin-client-folders | POST | /api/admin/client-folders | Session cookie | application admin | none | origin | JSON | unauthorized, bad_origin, forbidden | users | none |
 | admin-clients-all | GET | /api/admin/clients/all | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden | users | none |
-| admin-clients-list | GET | /api/admin/clients | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden, portal_access_denied | users | none |
+| admin-clients-list | GET | /api/admin/clients | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden, portal_access_denied | crm_client_notes, users | none |
 | admin-dashboard | GET | /api/admin/dashboard | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden, portal_access_denied | admin_tasks, bookings, documents, payments, users | Google Calendar/Meet |
 | admin-developer-clients | GET/POST | /api/admin/developer-clients | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, developer_admin_required, invalid_update, user_not_found, unknown_column | users | none |
 | admin-documents-add | POST | /api/admin/documents/add | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, invalid_deadline, missing_fields, forbidden | documents, users | none |
@@ -35,8 +36,10 @@ engineering inventory, not a substitute for runtime or legal review.
 | admin-phase-set | POST | /api/admin/phase | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, invalid_params, forbidden | users | none |
 | admin-tasks | GET/POST | /api/admin/tasks | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | unauthorized, forbidden, bad_origin, missing_title, insert_failed, missing_id | admin_tasks, users | none |
 | auth-change-password | POST | /api/auth/change-password | Session cookie | authenticated | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, invalid_fields, weak_password, invalid_credentials | users | none |
-| auth-login | POST | /api/auth/login | Public | none | JSON body | origin, JSON, field checks | JSON | bad_origin, invalid_json, missing_fields, invalid_credentials, ambiguous_identity | none detected | none |
+| auth-login | POST | /api/auth/login | Public | none | none | origin, field checks | JSON | bad_origin, common_login_required | none detected | none |
 | auth-logout | POST | /api/auth/logout | Public/internal | none | none | origin | JSON | bad_origin | none detected | none |
+| auth-sso | POST | /api/auth/sso | Public/internal | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, invalid_ticket, ambiguous_identity, robinjr_account_required, robinjr_admin_account_required | users | none |
+| auth-verify-login | POST | /api/auth/verify-login | Public/internal | none | JSON body | origin, JSON, field checks | JSON | bad_origin, invalid_credentials, ambiguous_identity | none detected | none |
 | birthday-notifications | SCHEDULE | cron: 0 6 * * * | Netlify schedule | application admin | none | method/auth only | JSON | not_found, birthday_notifications_failed | birthday_events, notification_recipients, notifications, users, webhook_log | Google Calendar/Meet, Resend/email |
 | bookings-availability | GET | /api/bookings/availability | Session cookie | authenticated | query | method/auth only | JSON | unauthorized, user_not_found, no_admin_assigned | users | Google Calendar/Meet |
 | bookings-create | POST | /api/bookings/create | Session cookie | authenticated | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_start_at, invalid_duration, start_in_past, user_not_found | bookings, career_templates, client_careers, documents, payments, users, webhook_log | Google Calendar/Meet, Anthropic, Resend/email |
@@ -52,7 +55,7 @@ engineering inventory, not a substitute for runtime or legal review.
 | faqs | GET/POST | /api/faqs | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | unauthorized, bad_origin, forbidden, invalid_json, builtin_read_only, missing_id | portal_faqs, users | none |
 | integration-retry | SCHEDULE | cron: */10 * * * * | Netlify schedule | provider/system | raw/JSON body | field checks | JSON | not_found | payments, users, webhook_log | Google Calendar/Meet, Google Sheets, Holded |
 | invoice-pdf | GET | /api/invoice-pdf | Session cookie | authenticated | query | ownership, field checks | PDF | unauthorized, missing_payment_id, not_found, no_holded_invoice, pdf_unavailable, server_error | payments, users, webhook_log | Holded |
-| me | GET | /api/me | Session cookie | application admin | none | method/auth only | JSON | unauthorized | users | none |
+| me | GET | /api/me | Session cookie | application admin | none | field checks | JSON | unauthorized, common_login_required | users | none |
 | meet-health | GET/POST | /api/meet/health | Provider secret/signature | none | query | signature/secret | JSON | server_error/none explicit | none detected | Google Calendar/Meet |
 | meet-transcript-poll | SCHEDULE | cron: */15 * * * * | Netlify schedule | provider/system | none | method/auth only | JSON | not_found | bookings, processed_meet_docs, users, webhook_log | Google Drive, Google Calendar/Meet, Anthropic |
 | meet-webhook | POST | /api/meet/webhook | Provider secret/signature | provider/system | raw/JSON body + query | signature/secret, field checks | JSON | invalid_json, invalid_pubsub_message, unknown_advisor | bookings, users, webhook_log | Google Drive, Google Calendar/Meet, Anthropic |

@@ -333,18 +333,13 @@ const MENTORIA = transitionContract({
   title: 'Contrato de Términos y Condiciones · Servicios de consultoría académica y mentoría',
   programName: 'Mentoría Robin',
   priceBlocks: [
-    { type: 'p', text: 'El precio de la mentoría es de 800 € (IVA incluido).' },
-    { type: 'p', text: 'El Cliente podrá contratar, de forma opcional, los siguientes servicios adicionales:' },
-    { type: 'ul', items: ['Extra Revisión de candidaturas: 150 € (IVA incluido).'] },
-    { type: 'p', text: 'Estos servicios adicionales deberán ser expresamente aceptados por El Cliente.' },
-    { type: 'h3', text: 'División de pagos' },
-    { type: 'p', text: 'El pago de la mentoría se realizará en dos fases:' },
-    { type: 'ul', items: ['Primer pago: 400 € + extras contratados, en el momento del primer contacto y aceptación del servicio.', 'Segundo pago: 400 €.'] },
-    { type: 'p', text: 'El inicio de la prestación de los servicios quedará condicionado a la recepción del primer pago.' },
+    { type: 'p', text: 'El precio de la mentoría es de 666,33 € (IVA incluido), abonados en una única cuota al aceptar el servicio.' },
+    { type: 'p', text: 'El inicio de la prestación de los servicios quedará condicionado a la recepción de ese pago.' },
+    { type: 'p', text: 'Si El Cliente contrata posteriormente el programa General, Delft o Pack Llegada Robin, los 666,33 € efectivamente abonados por esta mentoría se descontarán de la primera cuota del nuevo programa. La contratación del nuevo programa requerirá la aceptación de sus propias condiciones.' },
   ],
   cancellationBlocks: [{ type: 'ul', items: [
     'Si El Cliente cancela el servicio antes de iniciarse la primera reunión, se reembolsará el 70 % del importe abonado.',
-    'Si el servicio ya ha comenzado, entendiéndose como tal la primera reunión o interacción efectiva, no se realizará reembolso del primer pago.',
+    'Si el servicio ya ha comenzado, entendiéndose como tal la primera reunión o interacción efectiva, no se realizará reembolso del pago de la mentoría.',
     'Si el alumno no inicia finalmente su experiencia en Países Bajos por motivos personales, el servicio se considerará prestado en la parte correspondiente al acompañamiento y asesoramiento, debiéndose abonar el importe íntegro.',
   ] }],
   finalBlocks: [

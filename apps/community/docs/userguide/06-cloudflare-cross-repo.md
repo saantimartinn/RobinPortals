@@ -1,30 +1,28 @@
-# 06 · Cloudflare y relaciones cross-repo
+# 06 · Rutas y flujos entre apps — Robin Community
 
-## Cloudflare ingress
+Project Robin reúne **Portal del Alumno, Robin Jr, Robin Community y Robin Admin** en este monorepo. `site/build.mjs` publica las cuatro apps en un sitio Netlify. Cada app conserva sus Functions y reglas de negocio; Community mantiene su dominio de datos de suscripción. Los contratos de identidad y API se revisan entre apps aunque compartan despliegue.
 
-El Worker vive en Robin Platform y toma `project-robin.com/therobinplan/*` hacia este Netlify origin. Conserva el prefijo en UI porque Vite `base` y `outDir` son `therobinplan`; solo para `/therobinplan/api/*` quita prefijo y deja que este `netlify.toml` encuentre su handler. No añadir prefijo adicional al `api/index.js` mientras la regla Worker esté activa.
+## Entrada pública
 
-Detalles y tabla de todos los repos: [CLOUDFLARE_ROUTING.md](../CLOUDFLARE_ROUTING.md) y [Robin Platform routing](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/CLOUDFLARE_ROUTING.md).
+El [Worker vigente](../../../../infra/cloudflare/project-robin-router.js) pasa `/portal/*`, `/robinjr/*`, `/therobinplan/*`, `/admin/*`, `/login`, `/api/admin/*` y `/api/internal/*` al sitio unificado sin reescribir la ruta. Todo lo demás queda en la web pública. Algunas URL de webhooks firmados siguen temporalmente en sus receptores antiguos; consulta la [guía de enrutamiento](../CLOUDFLARE_ROUTING.md).
 
-## Responsabilidades por repositorio
+El [`netlify.toml` de raíz](../../../../netlify.toml) se genera desde `apps/*/netlify.toml` con `npm run site:config`. Las rutas de una app deben cambiarse en su propia configuración y verificarse después en el archivo generado. `npm run dev` desde la raíz sirve las cuatro apps en local.
 
-- [Robin Platform](https://github.com/RobinManuV/Robin-platform-cliente): alumno/application, onboarding y sesión de origen; [USERGUIDE](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md).
-- [Robin Admin](https://github.com/RobinManuV/Robin-Admin): panel de staff, CRM, finanzas y métricas; [USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md).
-- Este repositorio: subscription, billing, comunidad y datos propios; [READMELONG](../../READMELONG.md).
+## Identidad y datos
 
-## Cambios coordinados
+- El Portal del Alumno sirve identidad compartida. Admin usa `/portal/api/*` para las operaciones de sesión que pertenecen a Portal.
+- Robin Jr sirve su experiencia en `/robinjr/*` y mantiene sus propias Functions.
+- Robin Community sirve `/therobinplan/*` y crea una sesión de suscriptor propia tras validar la identidad de origen.
+- Robin Admin sirve `/admin/*` y sus APIs CRM/operativas; las integraciones internas usan `/api/internal/*` con autenticación de backend.
 
-Coordinar si se modifica cookie scope, SSO contract, user/profile IDs, role strings, tab permissions, cross-portal nav, origin URL, Worker routes, payment callback, API error shapes o storage. Versionar primero al consumer con backward compatibility y después al provider; no fusionar esquemas distintos por similitud de tablas.
+Al cambiar un campo de `/api/me`, una cookie, un rol o una ruta, busca consumidores en las cuatro apps y comprueba tanto el redirect del sitio como la autorización de la Function. Un menú visible no concede acceso a un endpoint.
 
+## Mentoría
 
-## Secuencia de comprobación de routingSecuencia de comprobación de routing
+La conversión de Mentoría abonada a General, Delft o Llegada se ejecuta **solo en el Portal del Alumno**. La cuota de 666,33 € queda como pago histórico y se acredita a la primera cuota del nuevo programa. Robin Jr y el CRM Admin no ofrecen esa acción. Véase [Mentoría y conversión](../../../portal/docs/MENTORIA_CONVERSION.md).
 
-Para una petición desde el dominio público, examina primero la coincidencia de ruta Worker. Para `/therobinplan/`, el prefijo se conserva para localizar el artefacto compilado. Para `/therobinplan/api/*`, el Worker quita el prefijo antes de enviar `/api/*` al origin. Después Netlify aplica el redirect de API o el fallback SPA. Un acceso al hostname Netlify directo puede seguir otro path base.
-
-Al tocar el prefijo o la detección de hostname, inspecciona `frontend/src/api/index.js`, Vite base/outDir, `netlify.toml` y Worker de Platform en el mismo cambio conceptual. Revisa asset paths, query, cookies y navegación de retorno.
-
-El SSO es un contrato diferente de routing: Platform verifica identidad de aplicación y Subscriptions crea sesión propia. Coordina [Platform USERGUIDE](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md) y [Admin USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md); los contratos de sesión no comparten secrets ni base de cuentas.
+Para la topología del sitio consulta el [README de raíz](../../../../README.md) y la [guía del Worker](../../../../infra/cloudflare/README.md).
 
 ---
 
-**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./05-data-security-and-operations.md) · [Siguiente documento de lectura →](./07-source-file-reference.md) · [READMELONG](../../READMELONG.md)
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./05-data-security-and-operations.md) · [Siguiente →](./07-source-file-reference.md)

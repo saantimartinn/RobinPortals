@@ -45,18 +45,18 @@ Las rutas están configuradas en netlify.toml y se enumeran en [API_INVENTORY.md
 
 lib/http.js, validation.js y observability.js dan soporte transversal. supabase.js accede a la base de Platform y admin-supabase.js separa operaciones administrativas. shared contiene contratos que pueden importar varios lados; al cambiarlos hay que comprobar cliente, handlers y consumidores. supabase/migrations versiona esquema de este producto; secretos solo se usan en runtime de servidor.
 
-## Contratos de tres repos
+## Contratos entre apps del monorepo
 
 | Flujo | Límite |
 |---|---|
-| /admin | El Worker de este repo despacha al origin Robin Admin y gestiona prefijo/assets. La ruta de zona y el hostname efectivo se documentan aparte. |
-| /portal | Mismo frontend y API del portal. Las llamadas API son same-origin; Netlify Edge puede limitar antes de ejecutar Functions. |
-| /therobinplan | El Worker enruta a Subscriptions y preserva el prefijo configurado por Vite. El repo de Subscriptions opera sus cookies y base propias. |
+| /admin | El Worker de raíz entrega Admin al sitio unificado sin reescribir el path. |
+| /portal | Portal del Alumno, otra app del mismo sitio. |
+| /therobinplan | Robin Community, otra app del mismo sitio con datos de suscripción propios. |
 | /portal/api/* | Acceso a endpoints de Platform usado por el portal Admin para identidad compartida. |
 | /api/internal/crm/* | Contrato de integración con handlers de Robin Admin; autenticación por secreto/firma según handler. |
 
-Guías cruzadas: [Platform ↔ Admin ↔ Subscriptions](userguide/06-cloudflare-and-cross-repo.md), [mapa Admin](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/FILE_MAP.md), [mapa Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/FILE_MAP.md).
+Guías cruzadas: [rutas actuales](CLOUDFLARE_ROUTING.md), [mapa Admin](../../admin/docs/FILE_MAP.md) y [mapa Community](../../community/docs/FILE_MAP.md).
 
 ## Mantenimiento
 
-La lógica Cloudflare versionada vive en infrastructure/cloudflare. El dashboard confirma bindings, versión activa, dominios y DNS; no inventar esos datos a partir del código. [ARCHITECTURE](ARCHITECTURE.md) describe carpetas y runtime; [USERGUIDE](../USERGUIDE.md) lleva desde funciones visibles hasta handlers y persistencia. El [índice generado](FILE_INDEX.generated.md) y el árbol completo localizan archivos, pero el presente mapa explica cómo colaboran.
+La lógica Cloudflare vigente vive en [`infra/cloudflare`](../../../infra/cloudflare/). El dashboard confirma bindings, versión activa, dominios y DNS; no inventar esos datos a partir del código. [ARCHITECTURE](ARCHITECTURE.md) describe carpetas y runtime; [USERGUIDE](../USERGUIDE.md) lleva desde funciones visibles hasta handlers y persistencia. El [índice generado](FILE_INDEX.generated.md) y el árbol completo localizan archivos, pero el presente mapa explica cómo colaboran.

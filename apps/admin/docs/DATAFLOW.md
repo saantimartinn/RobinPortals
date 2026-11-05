@@ -124,7 +124,7 @@ La lista de adaptadores no implica que todos se ejecuten en cada operación. La 
 
 En producción, el Worker vive en Robin Platform. Para una ruta de Admin pública, Cloudflare elige este origin; para identidad compartida puede enviar la petición a Platform. El fallback de WordPress y la lista de rutas observadas son parte de la topología; consulta [CLOUDFLARE_ROUTING](CLOUDFLARE_ROUTING.md) para las reglas y la fecha del snapshot.
 
-Subscriptions tiene cuenta, cookie, DB y facturación propias. Platform puede validar identidad de aplicación en el SSO; esto no comparte el principal local de suscriptor con Admin. Sigue las guías de [Robin Platform](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/DATAFLOW.md) y [Robin Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/DATAFLOW.md) para los tramos que salen de este repo.
+Subscriptions tiene cuenta, cookie, DB y facturación propias. Platform puede validar identidad de aplicación en el SSO; esto no comparte el principal local de suscriptor con Admin. Sigue las guías de [Robin Platform](../../portal/docs/DATAFLOW.md) y [Robin Subscriptions](../../community/docs/DATAFLOW.md) para los tramos que salen de este repo.
 
 ## Cómo usar este mapa en una tarea
 
@@ -143,5 +143,5 @@ Subscriptions tiene cuenta, cookie, DB y facturación propias. Platform puede va
 - [API inventory](API_INVENTORY.md) · ruta hacia handler.
 - [Cloudflare routing](CLOUDFLARE_ROUTING.md) · origin y transformaciones.
 - [FILE_MAP](FILE_MAP.md) y [codebase index](codebase/README.md) · módulos y archivos.
-- [Privacy data map de Platform](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/PRIVACY_DATA_MAP.md).
-- [Privacy data map de Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/PRIVACY_DATA_MAP.md).
+- [Privacy data map de Platform](../../portal/docs/PRIVACY_DATA_MAP.md).
+- [Privacy data map de Subscriptions](../../community/docs/PRIVACY_DATA_MAP.md).

@@ -13,6 +13,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [backend/functions/auth-login.js](../backend/functions/auth-login.js) | Handler HTTP: auth-login | handler |
 | [backend/functions/auth-logout.js](../backend/functions/auth-logout.js) | Handler HTTP: auth-logout | handler |
 | [backend/functions/auth-sso.js](../backend/functions/auth-sso.js) | Handler HTTP: auth-sso | findSubscriber, handler |
+| [backend/functions/auth-verify-login.js](../backend/functions/auth-verify-login.js) | Handler HTTP: auth-verify-login | handler |
 | [backend/functions/challenges.js](../backend/functions/challenges.js) | Handler HTTP: challenges | handler |
 | [backend/functions/community-events-list.js](../backend/functions/community-events-list.js) | Handler HTTP: community-events-list | handler |
 | [backend/functions/community-rsvp.js](../backend/functions/community-rsvp.js) | Handler HTTP: community-rsvp | handler, notifyFriendsOfRsvp |
@@ -24,30 +25,36 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [backend/functions/notifications-list.js](../backend/functions/notifications-list.js) | Handler HTTP: notifications-list | handler |
 | [backend/functions/partner-logo-upload.js](../backend/functions/partner-logo-upload.js) | Handler HTTP: partner-logo-upload | _test, handler |
 | [backend/functions/partners-list.js](../backend/functions/partners-list.js) | Handler HTTP: partners-list | handler |
+| [backend/functions/revolut-subscription-reconcile.js](../backend/functions/revolut-subscription-reconcile.js) | Handler HTTP: revolut-subscription-reconcile | alwaysRun, handler |
 | [backend/functions/service-requests.js](../backend/functions/service-requests.js) | Handler HTTP: service-requests | escapeHtml, handler |
 | [backend/functions/social.js](../backend/functions/social.js) | Handler HTTP: social | handler |
 | [backend/functions/stripe-webhook.js](../backend/functions/stripe-webhook.js) | Handler HTTP: stripe-webhook | handler |
+| [backend/functions/sub-admin-client-folders.js](../backend/functions/sub-admin-client-folders.js) | Handler HTTP: sub-admin-client-folders | handler |
 | [backend/functions/sub-admin-data.js](../backend/functions/sub-admin-data.js) | Handler HTTP: sub-admin-data | handler |
 | [backend/functions/sub-admin-database.js](../backend/functions/sub-admin-database.js) | Handler HTTP: sub-admin-database | handler, requireDeveloper |
 | [backend/functions/sub-admin-mutate.js](../backend/functions/sub-admin-mutate.js) | Handler HTTP: sub-admin-mutate | bumpDays, handler, normDuration, pick |
 | [backend/functions/subscriber-cv-ai.js](../backend/functions/subscriber-cv-ai.js) | Handler HTTP: subscriber-cv-ai | docxToText, handler, stripDataUrl |
 | [backend/functions/subscriber-profile-update.js](../backend/functions/subscriber-profile-update.js) | Handler HTTP: subscriber-profile-update | handler |
 | [backend/functions/subscriber-signup.js](../backend/functions/subscriber-signup.js) | Handler HTTP: subscriber-signup | handler, isValidEmail |
+| [backend/functions/subscription-cancel.js](../backend/functions/subscription-cancel.js) | Handler HTTP: subscription-cancel | handler |
 | [backend/functions/subscription-checkout.js](../backend/functions/subscription-checkout.js) | Handler HTTP: subscription-checkout | handler |
-| [backend/functions/subscription-plans.js](../backend/functions/subscription-plans.js) | Handler HTTP: subscription-plans | handler, withDiscount |
+| [backend/functions/subscription-plans.js](../backend/functions/subscription-plans.js) | Handler HTTP: subscription-plans | decorate, handler, withDiscount |
 | [backend/functions/subscription-portal.js](../backend/functions/subscription-portal.js) | Handler HTTP: subscription-portal | handler |
+| [backend/functions/subscription-sync.js](../backend/functions/subscription-sync.js) | Handler HTTP: subscription-sync | handler |
 | [backend/lib/anthropic-chat.js](../backend/lib/anthropic-chat.js) | Servicio servidor: anthropic-chat | chatCompletion |
 | [backend/lib/application-permissions.js](../backend/lib/application-permissions.js) | Servicio servidor: application-permissions | canUseRobinPlan, readApplicationIdentity |
 | [backend/lib/auth.js](../backend/lib/auth.js) | Servicio servidor: auth | COOKIE_NAME, buildSessionCookie, clearApplicationSessionCookie, getJwtSecret, hashPassword, isCurrentPasswordResetToken, passwordResetVersion, readSessionFromEvent, signPasswordResetToken, signSession, verifyPassword, verifyPasswordResetToken |
 | [backend/lib/discounts.js](../backend/lib/discounts.js) | Servicio servidor: discounts | lookupCode |
 | [backend/lib/email.js](../backend/lib/email.js) | Servicio servidor: email | sendEmail |
-| [backend/lib/http.js](../backend/lib/http.js) | Servicio servidor: http | allowedOrigins, headerCI, json, methodNotAllowed, parseJsonBody, safeEqual, serverError, verifyOrigin |
+| [backend/lib/http.js](../backend/lib/http.js) | Servicio servidor: http | serverError |
 | [backend/lib/partner-logo.js](../backend/lib/partner-logo.js) | Servicio servidor: partner-logo | parseImageDataUrl, safeSegment, uploadPartnerLogo |
 | [backend/lib/password-reset.js](../backend/lib/password-reset.js) | Servicio servidor: password-reset | applyPasswordReset, emailHtml, requestPasswordReset, resetUrl |
 | [backend/lib/principal.js](../backend/lib/principal.js) | Servicio servidor: principal | isSubscriberRole, principalTable, subscriberDisplayName |
+| [backend/lib/revolut-subscription-sync.js](../backend/lib/revolut-subscription-sync.js) | Servicio servidor: revolut-subscription-sync | localStatus, syncOne |
+| [backend/lib/revolut-subscriptions.js](../backend/lib/revolut-subscriptions.js) | Servicio servidor: revolut-subscriptions | cancelSubscription, configured, createCustomer, createSubscription, listCycles, planSpec, request, retrieveOrder, retrieveSubscription, variationFor |
 | [backend/lib/social.js](../backend/lib/social.js) | Servicio servidor: social | areFriends, getFriendIds |
 | [backend/lib/stripe.js](../backend/lib/stripe.js) | Servicio servidor: stripe | fulfillCheckout, getBaseUrl, getStripe, isConfigured, toCents |
-| [backend/lib/subscription-billing.js](../backend/lib/subscription-billing.js) | Servicio servidor: subscription-billing | candidateValues, contractClient, createHoldedInvoice, ensureHoldedContact, findPortalMatch, fullName, getPortalSupabase, holdedFetch, intersects, norm, normEmail, normPhone, normTaxId, processStripeInvoice, profileValues, scoreCandidate |
+| [backend/lib/subscription-billing.js](../backend/lib/subscription-billing.js) | Servicio servidor: subscription-billing | candidateValues, contractClient, createHoldedInvoice, ensureHoldedContact, findPortalMatch, fullName, getPortalSupabase, holdedFetch, intersects, norm, normEmail, normPhone, normTaxId, processRevolutOrder, processStripeInvoice, profileValues, scoreCandidate |
 | [backend/lib/subscription.js](../backend/lib/subscription.js) | Servicio servidor: subscription | PLANS, fulfillSubscriptionCheckout, isConfigured, listAvailablePlans, mapStripeStatus, planAmount, planInterval, planPriceId, syncSubscriptionFromStripeObject |
 | [backend/lib/supabase.js](../backend/lib/supabase.js) | Servicio servidor: supabase | getSupabase |
 | [frontend/index.html](../frontend/index.html) | Configuración, herramienta o prueba | — |
@@ -63,10 +70,9 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/public/recursos/trabajar-y-estudiar-nl.pdf](../frontend/public/recursos/trabajar-y-estudiar-nl.pdf) | Recurso público | — |
 | [frontend/public/recursos/tranquilidad-para-los-padres.pdf](../frontend/public/recursos/tranquilidad-para-los-padres.pdf) | Recurso público | — |
 | [frontend/src/admin-permissions.js](../frontend/src/admin-permissions.js) | Módulo frontend: admin-permissions | canAdminSee, firstAllowedAdminUrl, isDeveloperAdminEmail |
-| [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMutate, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCheckout, subscriptionPlans, subscriptionPortal |
-| [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app | PortalRobin, handleLogin, handleLogout, handleSignup, onFocus, refresh, refreshUser |
-| [frontend/src/application/cross-portal-nav.css](../frontend/src/application/cross-portal-nav.css) | Módulo frontend: cross-portal-nav.css | — |
-| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav | CrossPortalNav, allowed |
+| [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, changePassword, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMutate, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCancel, subscriptionCheckout, subscriptionPlans, subscriptionPortal, subscriptionSync |
+| [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app | PortalRobin, handleLogout, onFocus, refresh, refreshUser |
+| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav | CrossPortalNav, openRobinJr |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | Módulo frontend: SubscriberPortal | SubscriberPortal |
 | [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | Módulo frontend: SubscriberShell | SubscriberShell, initialTab, poll, refreshEvents, refreshRequests |
 | [frontend/src/application/subscription-portal.css](../frontend/src/application/subscription-portal.css) | Módulo frontend: subscription-portal.css | — |
@@ -87,7 +93,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/features/admin/AdminPartnerManager.jsx](../frontend/src/features/admin/AdminPartnerManager.jsx) | Módulo frontend: AdminPartnerManager | AdminPartnerManager, blank, onLogo, remove, save |
 | [frontend/src/features/admin/AdminSubNotifications.jsx](../frontend/src/features/admin/AdminSubNotifications.jsx) | Módulo frontend: AdminSubNotifications | AdminSubNotifications, remove, submit, toggle |
 | [frontend/src/features/admin/AdminUserDetail.jsx](../frontend/src/features/admin/AdminUserDetail.jsx) | Módulo frontend: AdminUserDetail | AdminUserDetail, saveUser, setReqStatus |
-| [frontend/src/features/admin/AdminUsers.jsx](../frontend/src/features/admin/AdminUsers.jsx) | Módulo frontend: AdminUsers | AdminUsers |
+| [frontend/src/features/admin/AdminUsers.jsx](../frontend/src/features/admin/AdminUsers.jsx) | Módulo frontend: AdminUsers | AdminUsers, change, drop, dropProps, openFolder |
 | [frontend/src/features/admin/robin-plan-developer-database.css](../frontend/src/features/admin/robin-plan-developer-database.css) | Módulo frontend: robin-plan-developer-database.css | — |
 | [frontend/src/features/admin/RobinPlanDeveloperDatabase.jsx](../frontend/src/features/admin/RobinPlanDeveloperDatabase.jsx) | Módulo frontend: RobinPlanDeveloperDatabase | RobinPlanDeveloperDatabase, format, parse, runSql, save |
 | [frontend/src/features/admin/SUB_REQ_STATUS.js](../frontend/src/features/admin/SUB_REQ_STATUS.js) | Módulo frontend: SUB_REQ_STATUS | — |
@@ -128,7 +134,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/features/levels/RobinLockedNotice.jsx](../frontend/src/features/levels/RobinLockedNotice.jsx) | Módulo frontend: RobinLockedNotice | RobinLockedNotice |
 | [frontend/src/features/levels/RobinProgressBar.jsx](../frontend/src/features/levels/RobinProgressBar.jsx) | Módulo frontend: RobinProgressBar | RobinProgressBar |
 | [frontend/src/features/profile/SubProfile.jsx](../frontend/src/features/profile/SubProfile.jsx) | Módulo frontend: SubProfile | SubProfile, onPickAvatar, removeAvatar, save, saveExtra, setEx |
-| [frontend/src/features/profile/SubSettings.jsx](../frontend/src/features/profile/SubSettings.jsx) | Módulo frontend: SubSettings | SubSettings |
+| [frontend/src/features/profile/SubSettings.jsx](../frontend/src/features/profile/SubSettings.jsx) | Módulo frontend: SubSettings | ChangePasswordCard, SubSettings, submit |
 | [frontend/src/features/services/ComingSoon.jsx](../frontend/src/features/services/ComingSoon.jsx) | Módulo frontend: ComingSoon | ComingSoon |
 | [frontend/src/features/services/ResidenciasPage.jsx](../frontend/src/features/services/ResidenciasPage.jsx) | Módulo frontend: ResidenciasPage | ResidenciasPage |
 | [frontend/src/features/services/ServiceRequestCard.jsx](../frontend/src/features/services/ServiceRequestCard.jsx) | Módulo frontend: ServiceRequestCard | ServiceRequestCard, submit |
@@ -138,7 +144,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/features/subscription/SubFaqs.jsx](../frontend/src/features/subscription/SubFaqs.jsx) | Módulo frontend: SubFaqs | SubFaqs |
 | [frontend/src/features/subscription/SubHome.jsx](../frontend/src/features/subscription/SubHome.jsx) | Módulo frontend: SubHome | SubHome, inCity, isActive |
 | [frontend/src/features/subscription/SubPayments.jsx](../frontend/src/features/subscription/SubPayments.jsx) | Módulo frontend: SubPayments | SubPayments, openPortal |
-| [frontend/src/features/subscription/SubSubscription.jsx](../frontend/src/features/subscription/SubSubscription.jsx) | Módulo frontend: SubSubscription | SubSubscription, openPortal |
+| [frontend/src/features/subscription/SubSubscription.jsx](../frontend/src/features/subscription/SubSubscription.jsx) | Módulo frontend: SubSubscription | SubSubscription, cancelRevolut, openPortal |
 | [frontend/src/features/subscription/SubSupport.jsx](../frontend/src/features/subscription/SubSupport.jsx) | Módulo frontend: SubSupport | SubSupport, submit |
 | [frontend/src/index.css](../frontend/src/index.css) | Módulo frontend: index.css | — |
 | [frontend/src/main.jsx](../frontend/src/main.jsx) | Módulo frontend: main | — |
@@ -162,6 +168,8 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [supabase/migrations/002_subscription_faqs.sql](../supabase/migrations/002_subscription_faqs.sql) | Esquema de base de datos | — |
 | [supabase/migrations/003_partner_logos.sql](../supabase/migrations/003_partner_logos.sql) | Esquema de base de datos | — |
 | [supabase/migrations/004_subscription_billing.sql](../supabase/migrations/004_subscription_billing.sql) | Esquema de base de datos | — |
+| [supabase/migrations/005_revolut_subscriptions.sql](../supabase/migrations/005_revolut_subscriptions.sql) | Esquema de base de datos | — |
+| [supabase/migrations/006_crm_client_notes.sql](../supabase/migrations/006_crm_client_notes.sql) | Esquema de base de datos | — |
 | [supabase/seeds/demo.sql](../supabase/seeds/demo.sql) | Datos demo opcionales | — |
 | [test/application-permissions.test.cjs](../test/application-permissions.test.cjs) | Configuración, herramienta o prueba | — |
 | [test/auth.test.cjs](../test/auth.test.cjs) | Configuración, herramienta o prueba | event |

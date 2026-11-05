@@ -16,11 +16,14 @@ targets:
         CFBundleShortVersionString: "0.1.0"
         UIUserInterfaceStyle: Light
         UILaunchScreen: {}
+        NSCameraUsageDescription: Robin necesita la cámara para fotografiar el DNI o pasaporte del alumno.
+        NSFaceIDUsageDescription: Robin usa Face ID para acceder de forma segura a la contraseña guardada en este iPhone.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.projectrobin.ios
+        DEVELOPMENT_TEAM: GWRMHMM34D
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
         MARKETING_VERSION: "0.1.0"

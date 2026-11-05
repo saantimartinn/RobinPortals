@@ -5,9 +5,9 @@ Generado desde imports del código.
 | Módulo | Dependencias locales |
 |---|---|
 | [frontend/src/admin-permissions.js](../frontend/src/admin-permissions.js) | — |
-| [frontend/src/api/index.js](../frontend/src/api/index.js) | — |
-| [frontend/src/app.jsx](../frontend/src/app.jsx) | `./shared/theme.js`, `./features/admin/SubscriberAdmin.jsx`, `./application/SubscriberPortal.jsx`, `./api/index.js`, `./shared/utils.js`, `./application/CrossPortalNav.jsx`, `./admin-permissions.js` |
-| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | `../assets/robin-wordmark.png`, `../admin-permissions.js`, `./cross-portal-nav.css` |
+| [frontend/src/api/index.js](../frontend/src/api/index.js) | `../../../../../packages/auth/change-password-client.mjs` |
+| [frontend/src/app.jsx](../frontend/src/app.jsx) | `./shared/theme.js`, `../../../../packages/portal-nav/links.js`, `./features/admin/SubscriberAdmin.jsx`, `./application/SubscriberPortal.jsx`, `./api/index.js`, `./shared/utils.js`, `./application/CrossPortalNav.jsx` |
+| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | `../../../../../packages/portal-nav/links.js`, `../assets/robin-wordmark.png`, `../../../../../packages/portal-nav/cross-portal-nav.css` |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | `./SubscriberShell.jsx`, `./SubscriptionPlanPicker.jsx` |
 | [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | `./subscription-portal.css`, `../shared/NotificationPopup.jsx`, `../shared/constants.js`, `../features/levels/RobinBenefitsPage.jsx`, `../features/levels/RobinLevelUpToast.jsx`, `../features/community/SubChallenges.jsx`, `../features/community/SubCommunity.jsx`, `../features/subscription/SubHome.jsx`, `../features/subscription/SubPayments.jsx`, `../features/services/SubPersonal.jsx`, `../features/career/SubProfesional.jsx`, `../features/profile/SubProfile.jsx`, `../features/profile/SubSettings.jsx`, `../features/community/SubSocial.jsx`, `../features/subscription/SubSupport.jsx`, `../features/subscription/SubFaqs.jsx`, `../api/index.js`, `../shared/utils.js` |
 | [frontend/src/application/SubscriptionPlanPicker.jsx](../frontend/src/application/SubscriptionPlanPicker.jsx) | `../shared/ui.jsx`, `../shared/theme.js`, `../shared/constants.js`, `../shared/utils.js`, `../api/index.js` |
@@ -21,7 +21,7 @@ Generado desde imports del código.
 | [frontend/src/features/admin/AdminPartnerManager.jsx](../frontend/src/features/admin/AdminPartnerManager.jsx) | `../../shared/ui.jsx`, `../../shared/constants.js`, `../../api/index.js`, `../../shared/utils.js` |
 | [frontend/src/features/admin/AdminSubNotifications.jsx](../frontend/src/features/admin/AdminSubNotifications.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `../../shared/utils.js`, `../../api/index.js` |
 | [frontend/src/features/admin/AdminUserDetail.jsx](../frontend/src/features/admin/AdminUserDetail.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `../levels/RobinProgressBar.jsx`, `./SUB_REQ_STATUS.js`, `../../shared/utils.js`, `../../api/index.js` |
-| [frontend/src/features/admin/AdminUsers.jsx](../frontend/src/features/admin/AdminUsers.jsx) | `./AdminUserDetail.jsx`, `../../shared/ui.jsx`, `../../shared/constants.js` |
+| [frontend/src/features/admin/AdminUsers.jsx](../frontend/src/features/admin/AdminUsers.jsx) | `./AdminUserDetail.jsx`, `../../shared/ui.jsx`, `../../shared/constants.js`, `../../api/index.js`, `../../../../../../packages/client-folders/model.mjs`, `../../../../../../packages/client-folders/folders.css` |
 | [frontend/src/features/admin/RobinPlanDeveloperDatabase.jsx](../frontend/src/features/admin/RobinPlanDeveloperDatabase.jsx) | `../../api/index.js`, `./robin-plan-developer-database.css` |
 | [frontend/src/features/admin/SUB_REQ_STATUS.js](../frontend/src/features/admin/SUB_REQ_STATUS.js) | — |
 | [frontend/src/features/admin/SubscriberAdmin.jsx](../frontend/src/features/admin/SubscriberAdmin.jsx) | `./AdminChallengeManager.jsx`, `./AdminDiscountManager.jsx`, `./AdminEventManager.jsx`, `./AdminMentorManager.jsx`, `./AdminPanelOverview.jsx`, `./AdminPartnerManager.jsx`, `./AdminSubNotifications.jsx`, `./AdminUsers.jsx`, `./AdminFaqManager.jsx`, `../../api/index.js`, `../../admin-permissions.js`, `./RobinPlanDeveloperDatabase.jsx`, `../../application/subscription-portal.css` |
@@ -43,7 +43,7 @@ Generado desde imports del código.
 | [frontend/src/features/community/fileToDataUrl.js](../frontend/src/features/community/fileToDataUrl.js) | — |
 | [frontend/src/features/community/OtrosRobinsCarousel.jsx](../frontend/src/features/community/OtrosRobinsCarousel.jsx) | `../../shared/ui.jsx`, `./DEMO_ROBINS.js`, `../../shared/theme.js`, `./RobinCard.jsx` |
 | [frontend/src/features/community/OtrosRobinsPage.jsx](../frontend/src/features/community/OtrosRobinsPage.jsx) | `../../shared/ui.jsx`, `./DEMO_ROBINS.js`, `./RobinCard.jsx`, `../services/SubIntro.jsx` |
-| [frontend/src/features/community/RobinCard.jsx](../frontend/src/features/community/RobinCard.jsx) | `../../shared/theme.js` |
+| [frontend/src/features/community/RobinCard.jsx](../frontend/src/features/community/RobinCard.jsx) | — |
 | [frontend/src/features/community/SocialAvatar.jsx](../frontend/src/features/community/SocialAvatar.jsx) | `../../shared/theme.js` |
 | [frontend/src/features/community/SubAssociationsView.jsx](../frontend/src/features/community/SubAssociationsView.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `./cityVisible.js` |
 | [frontend/src/features/community/SubChallenges.jsx](../frontend/src/features/community/SubChallenges.jsx) | `../../shared/ui.jsx`, `./ChallengeCard.jsx`, `../../shared/theme.js`, `../services/SubIntro.jsx`, `../../api/index.js`, `../../shared/utils.js` |
@@ -61,7 +61,7 @@ Generado desde imports del código.
 | [frontend/src/features/levels/RobinLockedNotice.jsx](../frontend/src/features/levels/RobinLockedNotice.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js` |
 | [frontend/src/features/levels/RobinProgressBar.jsx](../frontend/src/features/levels/RobinProgressBar.jsx) | `../../shared/theme.js` |
 | [frontend/src/features/profile/SubProfile.jsx](../frontend/src/features/profile/SubProfile.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `../../shared/utils.js`, `../../api/index.js` |
-| [frontend/src/features/profile/SubSettings.jsx](../frontend/src/features/profile/SubSettings.jsx) | `../../shared/ui.jsx`, `../subscription/SubSubscription.jsx` |
+| [frontend/src/features/profile/SubSettings.jsx](../frontend/src/features/profile/SubSettings.jsx) | `../../shared/ui.jsx`, `../subscription/SubSubscription.jsx`, `../../api/index.js` |
 | [frontend/src/features/services/ComingSoon.jsx](../frontend/src/features/services/ComingSoon.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `./SubIntro.jsx` |
 | [frontend/src/features/services/ResidenciasPage.jsx](../frontend/src/features/services/ResidenciasPage.jsx) | `../../shared/ui.jsx`, `./ComingSoon.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `./SubIntro.jsx` |
 | [frontend/src/features/services/ServiceRequestCard.jsx](../frontend/src/features/services/ServiceRequestCard.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `../../api/index.js` |
@@ -73,7 +73,7 @@ Generado desde imports del código.
 | [frontend/src/features/subscription/SubPayments.jsx](../frontend/src/features/subscription/SubPayments.jsx) | `../../shared/ui.jsx`, `../../shared/constants.js`, `../../shared/utils.js`, `../../api/index.js` |
 | [frontend/src/features/subscription/SubSubscription.jsx](../frontend/src/features/subscription/SubSubscription.jsx) | `../../shared/ui.jsx`, `../../shared/theme.js`, `../../shared/constants.js`, `../../shared/utils.js`, `../../api/index.js` |
 | [frontend/src/features/subscription/SubSupport.jsx](../frontend/src/features/subscription/SubSupport.jsx) | `../../shared/ui.jsx`, `../../shared/utils.js`, `../../api/index.js` |
-| [frontend/src/main.jsx](../frontend/src/main.jsx) | `./app.jsx`, `./index.css` |
+| [frontend/src/main.jsx](../frontend/src/main.jsx) | `../../../../packages/brand/brand.css`, `./app.jsx`, `./index.css`, `../../../../packages/portal-nav/robin-shell.css` |
 | [frontend/src/shared/constants.js](../frontend/src/shared/constants.js) | — |
 | [frontend/src/shared/NotificationPopup.jsx](../frontend/src/shared/NotificationPopup.jsx) | `./ui.jsx`, `./theme.js`, `../api/index.js` |
 | [frontend/src/shared/TermsModal.jsx](../frontend/src/shared/TermsModal.jsx) | `./ui.jsx`, `./theme.js`, `./constants.js` |

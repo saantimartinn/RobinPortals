@@ -44,6 +44,10 @@ vive en `shared/application-roles.cjs` y se comparte entre backend y frontend.
   `admin` o `supervisor` queda sujeto a asignación.
 - En `admin-historial-add`, ocurre lo inverso: `admin` y `supervisor` evitan el filtro y un
   advisor listado necesita estar asignado.
+- `admin-client-convert-mentoria` exige `isApplicationAdmin` y
+  `canUseStudentPortal`. El admin desarrollador puede convertir cualquier
+  expediente de este portal; los demás solo los asignados a su email. La función
+  SQL solo es ejecutable por `service_role`, nunca por una sesión de navegador.
 
 Cambiar estas reglas es una modificación funcional y requiere tests por principal y
 revisión de seguridad. El inventario vivo está en [API_INVENTORY.md](API_INVENTORY.md).

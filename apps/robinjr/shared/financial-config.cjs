@@ -9,7 +9,7 @@ const APPLICATION_TOTALS = Object.freeze({
   general: Object.freeze({ 1: ROBIN_JR_TOTAL, 2: ROBIN_JR_TOTAL, 3: ROBIN_JR_TOTAL }),
   delft: 2999,
   llegada: 1700,
-  mentoria: 450,
+  mentoria: 450, // Valor heredado; las altas actuales de Jr usan robinJrPlan().
   international: 2700,
 });
 

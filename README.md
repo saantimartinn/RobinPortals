@@ -13,6 +13,9 @@ Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro
 - `site/` — herramientas del sitio unificado (config, build, entorno, tests)
 - `dev/` — arranque local (ver `dev/README.md`)
 
+La cuota y la conversión de clientes de Mentoría del Portal del Alumno están
+documentadas en [Mentoría y conversión](apps/portal/docs/MENTORIA_CONVERSION.md).
+
 ## Comandos
 
 | Comando | Qué hace |

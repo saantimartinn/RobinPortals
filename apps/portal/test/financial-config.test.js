@@ -13,7 +13,7 @@ const {
   pricingVersionForNewUser,
   taxRateForClient,
 } = require('../shared/financial-config.cjs');
-const { latamPlanWithPaidAmounts } = require('../lib/payments');
+const { latamPlanWithPaidAmounts, invoiceNumber } = require('../lib/payments');
 const { taxCodesFor, taxRateFor: holdedTaxRateFor } = require('../lib/holded');
 const { VARIANTS } = require('../shared/contract-content.cjs');
 
@@ -99,6 +99,30 @@ test('General nuevo mantiene 666,33 € de entrada y adapta solo las dos cuotas 
     { installment: 2, amount: 916.33 },
     { installment: 3, amount: 916.34 },
   ]);
+});
+
+test('Mentoría se cobra una vez y su pago cubre la primera cuota General', () => {
+  assert.deepEqual(applicationPlan('mentoria'), [{ installment: 1, amount: 666.33 }]);
+  const upgraded = { tipo: 'general', num_carreras: 1, contract_data: {
+    pricing_version: GENERAL_PRICE_VERSION,
+    mentoria_upgrade: { target_type: 'general', credit_eur: 666.33 },
+  } };
+  assert.deepEqual(applicationPlanForUser(upgraded), [
+    { installment: 1, amount: 0 },
+    { installment: 2, amount: 666.33 },
+    { installment: 3, amount: 666.34 },
+  ]);
+  assert.equal(666.33 + applicationPlanForUser(upgraded).reduce((sum, row) => sum + row.amount, 0), 1999);
+  assert.equal(applicationPlanForUser({ ...upgraded, tipo: 'delft', contract_data: {
+    pricing_version: DELFT_PRICE_VERSION,
+    mentoria_upgrade: { target_type: 'delft', credit_eur: 666.33 },
+  } })[0].amount, 332.67);
+  assert.equal(applicationPlanForUser({ ...upgraded, tipo: 'llegada', contract_data: {
+    mentoria_upgrade: { target_type: 'llegada', credit_eur: 666.33 },
+  } })[0].amount, 183.67);
+  assert.equal(applicationPlanForUser({ ...upgraded, origin: 'latam' })[0].amount, 233.67);
+  assert.match(invoiceNumber({ lead_id: 'PR-123456', contract_data: upgraded.contract_data },
+    { installment: 1, paid_at: '2026-11-05T12:00:00Z' }), /-U01$/);
 });
 
 test('General sin firmar recibe la tarifa vigente y una firma histórica conserva su plan', () => {

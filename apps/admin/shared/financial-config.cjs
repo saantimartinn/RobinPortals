@@ -6,7 +6,7 @@ const APPLICATION_TOTALS = Object.freeze({
   general: Object.freeze({ 1: 1700, 2: 2000, 3: 2100 }),
   delft: 2999,
   llegada: 1700,
-  mentoria: 450,
+  mentoria: 666.33,
   international: 2700,
 });
 

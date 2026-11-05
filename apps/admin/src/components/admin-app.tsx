@@ -14,6 +14,7 @@ import {
   CircleDollarSign,
   CreditCard,
   Database,
+  FlaskConical,
   FileText,
   ExternalLink,
   GraduationCap,
@@ -27,6 +28,7 @@ import {
   Percent,
   Settings,
   ShieldCheck,
+  ScrollText,
   Sparkles,
   Tag,
   TrendingUp,
@@ -75,6 +77,7 @@ const workspaceTabs: readonly (readonly [string, string, string, string | null])
   [ROBIN_LINKS[3][0], "Robin Community", "subscriptions", null],
   ["/crm", "CRM", "crm", "crm."],
   ["/analiticas/ventas", "Otras métricas", "analytics", "analytics."],
+  ["/desarrolladores/tests", "Desarrolladores", "developers", "developer."],
 ] as const;
 
 const sideMenus: Record<string, NavItem[]> = {
@@ -98,9 +101,14 @@ const sideMenus: Record<string, NavItem[]> = {
     ["/web", "Web", Globe2, "analytics.web"],
     ["/analiticas/operaciones", "Operaciones", PieChart, "analytics.operations"],
   ],
+  developers: [
+    ["/desarrolladores/tests", "Tests", FlaskConical, "developer.tests"],
+    ["/desarrolladores/logs", "Logs", ScrollText, "developer.logs"],
+  ],
 };
 
 function getArea(path: string) {
+  if (path.startsWith("/desarrolladores")) return "developers";
   if (path.startsWith("/crm")) return "crm";
   if (path.startsWith("/analiticas") || path.startsWith("/campanas") || path.startsWith("/web")) return "analytics";
   return "home";
@@ -113,6 +121,7 @@ function isSideItemActive(path: string, href: string) {
   if (href === "/campanas") return path.startsWith("/campanas");
   if (href === "/web") return path.startsWith("/web");
   if (href === "/analiticas/ventas") return path === "/analiticas" || path === "/analiticas/pagos" || path === "/analiticas/finanzas" || path === href;
+  if (href.startsWith("/desarrolladores/")) return path === href;
   return path === href;
 }
 
@@ -135,13 +144,15 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   const isProAdmin = isProAdminEmail(permissionProfile.email) || permissionProfile.is_pro_admin === true;
   const isDeveloperAdmin = isDeveloperAdminEmail(permissionProfile.email);
   const visibleTabs = allAdminTabPermissions;
-  const canSee = (key: string) => key === "developer.database" ? isDeveloperAdmin : visibleTabs.includes(key);
+  const canSee = (key: string) => key === "developer.database" ? isDeveloperAdmin : key.startsWith("developer.") || visibleTabs.includes(key);
   const routePermission = path === "/" || path.startsWith("/informes/inicio") ? "home.summary"
     : path === "/bandeja-leads" ? "home.leads"
       : path === "/alumnos-global" || path.startsWith("/alumnos-global/") ? "home.students"
         : path === "/analitica-global" || path === "/pagos" ? "home.analytics"
           : path === "/configuracion" ? "home.settings"
             : path === "/base-datos" ? "developer.database"
+            : path.startsWith("/desarrolladores/") ? path.startsWith("/desarrolladores/logs") ? "developer.logs" : "developer.tests"
+              : path === "/desarrolladores" ? "developer.tests"
             : path.startsWith("/crm/contactados") ? "crm.contacted"
               : path.startsWith("/crm/clientes") ? "crm.clients"
                 : path.startsWith("/crm/lost") ? "crm.lost"
@@ -152,7 +163,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
                           : path.startsWith("/web") ? "analytics.web"
                             : path.startsWith("/analiticas/operaciones") ? "analytics.operations"
                               : path.startsWith("/analiticas") ? "analytics.sales" : null;
-  const accessDenied = !isProAdmin && !!routePermission && !canSee(routePermission);
+  const accessDenied = !!routePermission && (routePermission === "developer.database" ? !isDeveloperAdmin : !isProAdmin && !canSee(routePermission));
   const firstAllowedHref = Object.values(sideMenus).flat().find(([, , , permission]) => canSee(permission))?.[0];
   const [currentUser] = useState(() => advisorName(authUser));
   const [crmContacts, setCrmContacts] = useState<Contact[]>([]);
@@ -266,9 +277,9 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
     persistLead(id, { stage, lostAt, lostReason, lostReasonDetail });
   }
 
-  async function qualifyLead(id: string, input: { contactRole: LeadContactRole; heat: number; durationMinutes: number; notes: string }) {
+  async function qualifyLead(id: string, input: { contactRole: LeadContactRole; heat: number; kind: "call" | "message"; durationMinutes: number | null; notes: string }) {
     await adminDataClient.updateLead(id, { contactRole: input.contactRole, heat: input.heat });
-    await adminDataClient.addLeadCall(id, input.durationMinutes, input.notes);
+    await adminDataClient.addLeadCall(id, input.kind, input.durationMinutes, input.notes);
     setLeadHeat((values) => ({ ...values, [id]: input.heat }));
     setCrmContacts((contacts) => contacts.map((contact) => contact.id === id ? { ...contact, contactRole: input.contactRole, heat: input.heat } : contact));
     moveLead(id, "Contactado");

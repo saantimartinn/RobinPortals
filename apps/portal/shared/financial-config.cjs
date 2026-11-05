@@ -8,7 +8,7 @@ const APPLICATION_TOTALS = Object.freeze({
   general: Object.freeze({ 1: 1999, 2: 2399, 3: 2499 }),
   delft: 2999,
   llegada: 1700,
-  mentoria: 450,
+  mentoria: 666.33,
   international: 2700,
 });
 
@@ -200,8 +200,20 @@ function pricingVersionForNewUser(tipo) {
 }
 
 function applyFirstPaymentPromo(user, installments) {
+  if (user?.contract_data?.mentoria_upgrade) return installments;
   if (String(user?.email || '').trim().toLowerCase() !== 'manuelvillamuriel@gmail.com') return installments;
   return installments.map((row) => row.installment === 1 ? { ...row, amount: 1 } : row);
+}
+
+function applyMentoriaUpgradeCredit(user, installments) {
+  // La transacción SQL solo crea este marcador tras verificar un pago real.
+  // El descuento afecta a la primera cuota; las posteriores no cambian.
+  const upgrade = user?.contract_data?.mentoria_upgrade;
+  const credit = Number(upgrade?.credit_eur || 0);
+  if (!upgrade || upgrade.target_type !== String(user?.tipo || '').toLowerCase() || credit !== APPLICATION_TOTALS.mentoria) return installments;
+  return installments.map((row, index) => index === 0
+    ? { ...row, amount: Math.max(0, Math.round((row.amount - credit) * 100) / 100) }
+    : row);
 }
 
 /** Los perfiles sin contrato firmado siempre reciben las tarifas vigentes. */
@@ -212,16 +224,16 @@ function applicationPlanForUser(user) {
   const isInternational = usesInternational2700Plan(source);
   // Conserva el plan histórico únicamente para expedientes ya firmados.
   if (source.contract_signed && key === 'general' && !isInternational && pricingVersion !== GENERAL_PRICE_VERSION) {
-    return applyFirstPaymentPromo(source, generalPlan(HISTORICAL_GENERAL_TOTALS, source.num_carreras));
+    return applyMentoriaUpgradeCredit(source, applyFirstPaymentPromo(source, generalPlan(HISTORICAL_GENERAL_TOTALS, source.num_carreras)));
   }
   if (key === 'delft' && source.contract_signed && pricingVersion !== DELFT_PRICE_VERSION) {
-    return applyFirstPaymentPromo(source, [
+    return applyMentoriaUpgradeCredit(source, applyFirstPaymentPromo(source, [
       { installment: 1, amount: 933 },
       { installment: 2, amount: 933 },
       { installment: 3, amount: 933 },
-    ]);
+    ]));
   }
-  return applyFirstPaymentPromo(source, applicationPlan(source.tipo, source.num_carreras, source.origin, source.has_eu_id, source.pais));
+  return applyMentoriaUpgradeCredit(source, applyFirstPaymentPromo(source, applicationPlan(source.tipo, source.num_carreras, source.origin, source.has_eu_id, source.pais)));
 }
 
 module.exports = {

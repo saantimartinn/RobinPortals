@@ -92,6 +92,22 @@
   to = "/.netlify/functions/admin-sales-test"
   status = 200
 [[redirects]]
+  from = "/api/admin/tests/run"
+  to = "/.netlify/functions/admin-tests-run"
+  status = 200
+[[redirects]]
+  from = "/api/admin/tests/payment"
+  to = "/.netlify/functions/admin-tests-payment"
+  status = 200
+[[redirects]]
+  from = "/api/admin/developer-logs"
+  to = "/.netlify/functions/admin-developer-logs"
+  status = 200
+[[redirects]]
+  from = "/api/admin/platform-logs"
+  to = "/.netlify/functions/admin-platform-logs"
+  status = 200
+[[redirects]]
   from = "/api/web/collect"
   to = "/.netlify/functions/web-collect"
   status = 200
@@ -323,6 +339,10 @@
 [[redirects]]
   from = "/api/bookings"
   to = "/.netlify/functions/bookings-list"
+  status = 200
+[[redirects]]
+  from = "/api/admin/client-folders"
+  to = "/.netlify/functions/admin-client-folders"
   status = 200
 [[redirects]]
   from = "/api/admin/clients/all"

@@ -9,8 +9,11 @@ Typed browser clients for backend APIs and data normalization.
 | File | Responsibility |
 |---|---|
 | [`admin-data.ts`](../../../../src/services/admin-data.ts) | CRM client normalization and lead, note, call, and email operations. |
+| [`client-folders.ts`](../../../../src/services/client-folders.ts) | Browser service/API client: client folders. |
+| [`developer-logs.ts`](../../../../src/services/developer-logs.ts) | Browser service/API client: developer logs. |
 | [`integrations.ts`](../../../../src/services/integrations.ts) | Typed clients for finance, sales, Meta, payment, and integration analytics. |
 | [`portal.ts`](../../../../src/services/portal.ts) | Same-origin client for shared identity, admin, profile, snapshot, and developer APIs. |
+| [`release-tests.ts`](../../../../src/services/release-tests.ts) | Browser service/API client: release tests. |
 | [`supabase.ts`](../../../../src/services/supabase.ts) | Browser service/API client: supabase. |
 | [`web-analytics.ts`](../../../../src/services/web-analytics.ts) | Browser service/API client: web analytics. |
 

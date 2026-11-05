@@ -13,6 +13,7 @@ const { sendAccountAccessEmail } = require('../../lib/account-access-email');
 const { contractedAmountForUser } = require('../../lib/finance-dashboard');
 const { resolveCrmOwner, syncCrmIdentity } = require('../../lib/crm-identity');
 const { pricingVersionForNewUser } = require('../../../robinjr/shared/financial-config.cjs');
+const { loadCrmClientNotes } = require('../../lib/crm-client-notes');
 
 const PORTALS = new Set(['alumno', 'robinjr', 'community']);
 
@@ -48,10 +49,11 @@ exports.handler = async (event) => {
 
     const crm = getAdminSupabase();
     const { data: lead, error: leadError } = await crm.from('crm_leads')
-      .select('id,notion_numeric_id,name,email,lead_type,owner_names,source_payload,is_test').eq('id', body.leadId).single();
+      .select('id,notion_numeric_id,name,email,lead_type,owner_names,source_payload,is_test,comment,body_text,source_created_at').eq('id', body.leadId).single();
     if (leadError || !lead) return json({ error: 'lead_not_found' }, { statusCode: 404 });
     if (lead.is_test || lead.source_payload?.simulated === true) return json({ error: 'test_lead_not_convertible' }, { statusCode: 400 });
     if (!lead.email) return json({ error: 'lead_email_required' }, { statusCode: 400 });
+    const crmNotes = await loadCrmClientNotes(crm, lead);
 
     const leadId = String(lead.notion_numeric_id || lead.id);
     // Imported Notion rows use their Notion page UUID as the CRM id. Native
@@ -62,6 +64,9 @@ exports.handler = async (event) => {
     const salesAgent = String(lead.owner_names?.[0] || admin.nombre || admin.email || '').trim();
     const targetDb = targetPortal === 'alumno' ? portal : targetPortal === 'robinjr' ? getJuniorSupabase() : getSubscriptionsSupabase();
     const table = targetPortal === 'community' ? 'subscribers' : 'users';
+    const { error: notesSchemaError } = await targetDb.from('crm_client_notes').select('user_id').limit(1);
+    if (['42P01', 'PGRST205'].includes(notesSchemaError?.code)) return json({ error: 'portal_notes_schema_missing', detail: 'Falta aplicar la migración de notas comerciales en el portal.' }, { statusCode: 503 });
+    if (notesSchemaError) throw notesSchemaError;
     let result = 'created';
     let userId;
     let emailSent = false;
@@ -112,6 +117,10 @@ exports.handler = async (event) => {
       if (portalPaymentsError) throw portalPaymentsError;
       contractedAmount = contractedAmountForUser(portalUser, portalPayments || []);
     }
+    const { error: notesError } = await targetDb.from('crm_client_notes').upsert({
+      user_id: userId, lead_id: leadId, notes: crmNotes, synced_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+    if (notesError) throw notesError;
     const actor = await syncCrmIdentity(crm, admin);
     const owner = await resolveCrmOwner({ portal, crm, ownerName: salesAgent });
     const crmUpdate = {
@@ -121,6 +130,7 @@ exports.handler = async (event) => {
         sales_agent: salesAgent || null,
         advisor_email: assignedTo || lead.source_payload?.advisor_email || null,
         converted_by: admin.id,
+        crm_notes: crmNotes,
         portal_accounts: {
           ...(lead.source_payload?.portal_accounts || {}),
           ...(lead.source_payload?.target_portal && lead.source_payload?.target_user_id

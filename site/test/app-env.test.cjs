@@ -9,7 +9,7 @@ process.env.ROBINJR__SUPABASE_URL = 'https://robinjr.example';
 process.env.PORTAL__REVOLUT_MERCHANT_SECRET_KEY = 'shared-test-key';
 process.env.ROBINJR__REVOLUT_MERCHANT_SECRET_KEY = 'old-sandbox-key';
 process.env.SITE_LEVEL = 'shared';
-const { wrapFunction, wrapScheduled, toModern } = require('../app-env.cjs');
+const { wrapFunction, wrapScheduled, toModern, runInApp, runInAppWithEnv } = require('../app-env.cjs');
 
 const probe = () => ({
   handler: async () => {
@@ -35,6 +35,22 @@ test('each app sees only its own variables, also when invocations overlap', asyn
 test('module-level reads happen inside the app environment', () => {
   const mod = wrapFunction('robinjr', () => ({ loadedWith: process.env.SUPABASE_URL }));
   assert.equal(mod.loadedWith, 'https://robinjr.example');
+});
+
+test('sandbox credentials do not change the normal Portal environment', async () => {
+  const [sandbox, normal] = await Promise.all([
+    runInAppWithEnv('portal', { REVOLUT_API_BASE: 'https://sandbox-merchant.revolut.com', CONTEXT: 'dev' }, async () => {
+      await new Promise((done) => setTimeout(done, 5));
+      return [process.env.REVOLUT_API_BASE, process.env.CONTEXT];
+    }),
+    runInApp('portal', async () => {
+      await new Promise((done) => setTimeout(done, 5));
+      return process.env.REVOLUT_API_BASE;
+    }),
+  ]);
+  assert.deepEqual(sandbox, ['https://sandbox-merchant.revolut.com', 'dev']);
+  assert.notEqual(normal, sandbox[0]);
+  assert.notEqual(runInApp('portal', () => process.env.REVOLUT_API_BASE), sandbox[0]);
 });
 
 test('scheduled jobs only run when the site enables them', async () => {

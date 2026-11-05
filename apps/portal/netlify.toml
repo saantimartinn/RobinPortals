@@ -265,8 +265,17 @@
   to = "/.netlify/functions/admin-developer-clients"
   status = 200
 [[redirects]]
+  from = "/api/admin/client-folders"
+  to = "/.netlify/functions/admin-client-folders"
+  status = 200
+[[redirects]]
   from = "/api/admin/clients/assign"
   to = "/.netlify/functions/admin-client-assign"
+  status = 200
+
+[[redirects]]
+  from = "/api/admin/clients/convert-mentoria"
+  to = "/.netlify/functions/admin-client-convert-mentoria"
   status = 200
 [[redirects]]
   from = "/api/admin/clients"

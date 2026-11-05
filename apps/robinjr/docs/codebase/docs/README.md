@@ -26,7 +26,7 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`AUTHORIZATION.md`](../../AUTHORIZATION.md) | Documenta: Autenticación y autorización. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`BOOKING_CONFIGURATION.md`](../../BOOKING_CONFIGURATION.md) | Documenta: Booking availability. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`BROWSER_SECURITY.md`](../../BROWSER_SECURITY.md) | Documenta: Browser security. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
-| [`CLOUDFLARE_ROUTING.md`](../../CLOUDFLARE_ROUTING.md) | Documenta: Cloudflare y enrutamiento de Project Robin. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`CLOUDFLARE_ROUTING.md`](../../CLOUDFLARE_ROUTING.md) | Documenta: Cloudflare y enrutamiento — Robin Jr. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`COMPONENT_MAP.md`](../../COMPONENT_MAP.md) | Documenta: Frontend component map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`CONFIGURATION_MODEL.md`](../../CONFIGURATION_MODEL.md) | Documenta: Configuration and content model. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`DATABASE_CURRENT.md`](../../DATABASE_CURRENT.md) | Documenta: Datos usados por la plataforma. | — | Al actualizar la decisión, contrato o procedimiento descrito. |

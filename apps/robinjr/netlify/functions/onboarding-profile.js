@@ -4,6 +4,7 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { email: normalizeEmail } = require('../../lib/validation');
 const { sanitizeAcademicProfile } = require('../../shared/academic-systems.cjs');
+const { isReleaseTestUser } = require('../../../../packages/auth/release-test.cjs');
 
 const VALID_INTERESTS = [
   'ciencias',
@@ -131,7 +132,9 @@ exports.handler = async (event) => {
 
     // Garantiza que el cliente aparece en la hoja al completar el onboarding.
     // El upsert materializa el plan de pagos y evita filas duplicadas por PR.
-    await require('../../lib/integration-sync').syncGoogleSheets(sb, session.uid);
+    const { data: integrationUser, error: integrationUserError } = await sb.from('users').select('lead_id,email').eq('id', session.uid).single();
+    if (integrationUserError) throw integrationUserError;
+    if (!isReleaseTestUser(integrationUser)) await require('../../lib/integration-sync').syncGoogleSheets(sb, session.uid);
 
     return json({ ok: true });
   } catch (e) {

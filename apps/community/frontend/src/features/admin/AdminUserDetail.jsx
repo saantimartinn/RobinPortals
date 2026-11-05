@@ -45,6 +45,14 @@ function AdminUserDetail({ u, requests, onChanged, onClose }) {
         <Btn disabled={saving} onClick={saveUser}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar cambios</Btn>
 
         <Divider />
+        <div className="text-xs font-semibold text-slate-500">Notas comerciales</div>
+        {!(u.crm_notes || []).length && <div className="text-sm text-slate-400">No hay notas comerciales.</div>}
+        {(u.crm_notes || []).map((note) => <div key={note.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <div className="text-xs font-medium text-slate-500">{note.authorName || "Equipo Robin"}{note.createdAt ? ` · ${formatDate(note.createdAt)}` : ""}</div>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{note.body}</p>
+        </div>)}
+
+        <Divider />
         <div className="text-xs font-semibold text-slate-500 ">Robin Progress</div>
         <div className="rounded-xl border border-slate-100 p-4 space-y-2">
           <div className="flex items-center justify-between gap-2">

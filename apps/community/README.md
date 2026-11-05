@@ -1,7 +1,9 @@
 # Robin Subscriptions · The Robin Plan
 
-Portal independiente de suscripción de Project Robin (The Robin Plan). React/Vite en el navegador,
-Netlify Functions en el servidor y un proyecto Supabase propio. No incluye el portal de alumnos.
+App de suscripción y comunidad de Project Robin (The Robin Plan), publicada
+con las otras tres apps en el sitio Netlify unificado. React/Vite se ejecuta
+en el navegador, Netlify Functions en el servidor y el dominio de datos de
+suscripción usa un proyecto Supabase propio.
 
 ## Estructura
 
@@ -35,12 +37,12 @@ npm run verify        # arquitectura, tests, build y documentación
 npm run docs:generate # actualizar mapas al cambiar archivos o rutas
 ```
 
-Netlify publica **solo `dist/`**. El build produce `dist/therobinplan/`; el backend se
-empaqueta aparte. No subir compilados, dependencias, credenciales o exports de datos.
+El build de raíz incorpora `dist/therobinplan/` al sitio unificado y empaqueta
+las Functions por separado. No subir compilados, dependencias, credenciales o
+exports de datos.
 
 ## Documentación
 
-- [Referencia de datos y métricas](docs/REFERENCIA_DATOS_METRICAS.md): fuentes, campos, fórmulas, ejemplos y límites conocidos de las estadísticas de Robin.
 
 - [READMELONG](READMELONG.md): proyecto, contratos, flujos y runtimes con contexto técnico extendido.
 - [USERGUIDE](USERGUIDE.md): índice de lectura por módulos, endpoints y repos conectados.
@@ -52,10 +54,10 @@ empaqueta aparte. No subir compilados, dependencias, credenciales o exports de d
 - [Despliegue y operación](docs/OPERATIONS.md) y [pruebas](docs/TESTING.md).
 - [Riesgos y trabajo pendiente](docs/KNOWN_LIMITATIONS.md).
 
-## Repos relacionados
+## Apps relacionadas
 
-- [Robin Platform cliente](https://github.com/RobinManuV/Robin-platform-cliente): portal de aplicación y proveedor validado para SSO.
-- [Robin Admin](https://github.com/RobinManuV/Robin-Admin): administración principal y CRM.
+- [Robin Platform cliente](../portal/README.md): portal de aplicación y proveedor validado para SSO.
+- [Robin Admin](../admin/README.md): administración principal y CRM.
 
 Las tres entradas principales son `README.md`, `READMELONG.md` y `USERGUIDE.md`;
 las guías técnicas y los mapas navegables se mantienen bajo `docs/`.

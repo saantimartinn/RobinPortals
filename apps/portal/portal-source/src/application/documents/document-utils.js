@@ -51,6 +51,47 @@ export function statusLabel(status) {
   return { tone: 'slate', label: 'Pendiente subir' };
 }
 
+function normalizeDocumentName(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase('es');
+}
+
+export function groupStudentDocumentsByCareer(documents = [], careers = []) {
+  const groups = (careers || []).filter((career) => career?.id).map((career) => ({
+    career,
+    label: [career.name, career.university].filter(Boolean).join(' · '),
+    requiredNames: new Set((career.required_docs || [])
+      .filter((requirement) => requirement?.type !== 'event')
+      .map((requirement) => normalizeDocumentName(requirement?.name))
+      .filter(Boolean)),
+    documents: [],
+  }));
+  const ungrouped = [];
+  const statusOrder = { required: 0, rejected: 0, pending_review: 1, validated: 2 };
+
+  for (const document of documents || []) {
+    const name = normalizeDocumentName(document.name);
+    const matchingGroups = groups.filter(({ career, requiredNames }) =>
+      career.id === document.career_template_id || (name && requiredNames.has(name)));
+    const entry = { document, careerNames: matchingGroups.map((group) => group.label) };
+    if (!matchingGroups.length) ungrouped.push(entry);
+    else matchingGroups.forEach((group) => group.documents.push(entry));
+  }
+
+  const byStatus = (a, b) => (statusOrder[a.document.status] ?? 3) - (statusOrder[b.document.status] ?? 3);
+  return {
+    groups: groups.filter((group) => group.documents.length).map(({ requiredNames, ...group }) => ({
+      ...group,
+      documents: group.documents.sort(byStatus),
+    })),
+    ungrouped: ungrouped.sort(byStatus),
+  };
+}
+
 export function newCareerRequirement(type = 'document') {
   return {
     id: '',

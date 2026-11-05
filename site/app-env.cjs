@@ -105,6 +105,12 @@ function runInApp(appId, fn) {
   return storage.run(scopeFor(appId), fn);
 }
 
+// Execute an isolated integration test with temporary provider credentials.
+// The normal app scope is never modified, even when requests overlap.
+function runInAppWithEnv(appId, overrides, fn) {
+  return storage.run({ ...scopeFor(appId), ...overrides }, fn);
+}
+
 // Scheduled jobs (birthday emails, retries, transcripts…) only run where the site
 // sets ROBIN_RUN_SCHEDULED=true, so a deploy that is not yet live does not repeat
 // the jobs the current production sites still run.
@@ -157,4 +163,4 @@ function serve(appId, load, { scheduled = false } = {}) {
   return toModern((scheduled ? wrapScheduled : wrapFunction)(appId, load).handler);
 }
 
-module.exports = { wrapFunction, wrapScheduled, serve, toModern, runInApp, prefix, APP_IDS };
+module.exports = { wrapFunction, wrapScheduled, serve, toModern, runInApp, runInAppWithEnv, prefix, APP_IDS };

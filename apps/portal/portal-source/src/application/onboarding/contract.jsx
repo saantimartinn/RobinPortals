@@ -90,6 +90,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
             ? "Tus datos personales se han extraído automáticamente de tu documento de identidad. Revisa el contrato y fírmalo para continuar."
             : <>Los datos del <strong>alumno</strong> (nombre, DNI y dirección) se han extraído automáticamente del DNI. El <strong>cliente</strong> (tutor legal) sólo introduce su nombre y su propio DNI.</>}
         </div>
+        {user.mentoria_credit_eur && <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-2 text-sm">Se descontarán {Number(user.mentoria_credit_eur).toLocaleString('es-ES', { minimumFractionDigits: 2 })} € ya abonados por Mentoría de la primera cuota de este programa.</div>}
 
         <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -228,9 +229,7 @@ const CONTRACT_VARIANTS = {
   mentoria: {
     titulo: "Contrato — Mentoría",
     short: "Mentoría y adaptación durante el curso académico",
-    extras: [
-      { id: "revision_candidaturas", label: "Revisión de candidaturas", price: 150 },
-    ],
+    extras: [],
   },
 };
 

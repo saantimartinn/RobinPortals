@@ -14,7 +14,7 @@ Contenido mantenido de `portal-source/src/api/`.
 |---|---|---|---|
 | [`admin-clients.js`](../../../../../portal-source/src/api/admin-clients.js) | Módulo frontend de admin clients. | `./core.js` | Al cambiar esa parte de la experiencia React. |
 | [`admin-operations.js`](../../../../../portal-source/src/api/admin-operations.js) | Módulo frontend de admin operations. | `./core.js` | Al cambiar esa parte de la experiencia React. |
-| [`auth-onboarding.js`](../../../../../portal-source/src/api/auth-onboarding.js) | Módulo frontend de auth onboarding. | `./core.js` | Al cambiar esa parte de la experiencia React. |
+| [`auth-onboarding.js`](../../../../../portal-source/src/api/auth-onboarding.js) | Módulo frontend de auth onboarding. | `./core.js`<br>`../../../../../packages/auth/change-password-client.mjs` | Al cambiar esa parte de la experiencia React. |
 | [`bookings.js`](../../../../../portal-source/src/api/bookings.js) | Módulo frontend de bookings. | `./core.js` | Al cambiar esa parte de la experiencia React. |
 | [`careers.js`](../../../../../portal-source/src/api/careers.js) | Módulo frontend de careers. | `./core.js`<br>`./uploads.js` | Al cambiar esa parte de la experiencia React. |
 | [`chat.js`](../../../../../portal-source/src/api/chat.js) | Módulo frontend de chat. | `./core.js` | Al cambiar esa parte de la experiencia React. |

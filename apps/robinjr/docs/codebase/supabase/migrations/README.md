@@ -26,6 +26,9 @@ Contenido mantenido de `supabase/migrations/`.
 | [`202610210002_set_robin_jr_phases.sql`](../../../../supabase/migrations/202610210002_set_robin_jr_phases.sql) | Archivo mantenido del repositorio: 202610210002_set_robin_jr_phases.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610210003_add_wrap_up_phase.sql`](../../../../supabase/migrations/202610210003_add_wrap_up_phase.sql) | Archivo mantenido del repositorio: 202610210003_add_wrap_up_phase.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610210004_detach_career_documents.sql`](../../../../supabase/migrations/202610210004_detach_career_documents.sql) | Archivo mantenido del repositorio: 202610210004_detach_career_documents.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610260001_booking_mentor_gap.sql`](../../../../supabase/migrations/202610260001_booking_mentor_gap.sql) | Archivo mantenido del repositorio: 202610260001_booking_mentor_gap.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610280001_holded_invoice_claims.sql`](../../../../supabase/migrations/202610280001_holded_invoice_claims.sql) | Archivo mantenido del repositorio: 202610280001_holded_invoice_claims.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202611050002_create_crm_client_notes.sql`](../../../../supabase/migrations/202611050002_create_crm_client_notes.sql) | Archivo mantenido del repositorio: 202611050002_create_crm_client_notes.sql. | — | Cuando cambie la responsabilidad indicada. |
 
 ---
 

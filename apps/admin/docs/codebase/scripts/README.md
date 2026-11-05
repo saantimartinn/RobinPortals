@@ -8,6 +8,7 @@ Historical CRM import and documentation maintenance utilities.
 
 | File | Responsibility |
 |---|---|
+| [`backfill-crm-client-notes.cjs`](../../../scripts/backfill-crm-client-notes.cjs) | Operator or maintenance script: backfill-crm-client-notes. |
 | [`generate-docs.cjs`](../../../scripts/generate-docs.cjs) | Operator or maintenance script: generate-docs. |
 | [`generate-historical-crm-seed.mjs`](../../../scripts/generate-historical-crm-seed.mjs) | Operator or maintenance script: generate-historical-crm-seed. |
 | [`import-historical-crm-metrics.mjs`](../../../scripts/import-historical-crm-metrics.mjs) | Operator or maintenance script: import-historical-crm-metrics. |

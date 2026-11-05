@@ -6,24 +6,32 @@
 
 ## Propósito y límites
 
-Este repositorio mantiene el panel interno de administración que se publica en `https://project-robin.com/admin/`. Incluye su frontend, handlers serverless, adaptadores a proveedores y funciones administrativas de negocio. Comparte el punto de entrada de identidad con Robin Platform; The Robin Plan está desplegado como un servicio hermano independiente.
+Esta app del monorepo mantiene el panel interno que se publica en
+`https://project-robin.com/admin/`. Incluye frontend, Functions, adaptadores a
+proveedores y operaciones de negocio. Comparte la identidad del Portal del
+Alumno; Robin Community conserva sus datos de suscripción por separado.
 
-El proyecto no es un monorepo: Robin Platform y Robin Subscriptions tienen sus propios despliegues, configuración, funciones, credenciales y bases de datos. El código repetido en los repos sigue siendo una copia independiente, no una dependencia npm compartida.
+Las cuatro apps se construyen con `site/build.mjs` y se publican en un único
+sitio Netlify. Cada app mantiene su configuración, Functions y datos de dominio;
+la configuración combinada de rutas se genera en el `netlify.toml` de raíz.
 
 ## Runtime de extremo a extremo
 
 ```mermaid
 flowchart LR
   B[Browser] --> CF[Cloudflare Worker]
-  CF -->|/admin/* y /api/admin/*| N[Netlify Admin]
-  CF -->|/portal/api/me y auth| P[Netlify Platform]
+  CF -->|rutas de las apps| N[Netlify unificado]
+  N -->|/portal/api/me y auth| P[Portal del Alumno]
   N --> H[Netlify Functions]
   H --> L[lib domain services]
   L --> DB[(Supabase / Storage)]
   L --> X[Holded · Google · Notion · Stripe · Anthropic · email]
 ```
 
-En local, `npm run dev` inicia Vite y el servidor Netlify Dev que expone las Functions en el mismo origen. En producción, el Worker de Cloudflare vive en el repo Robin Platform y enruta `/admin/` a este despliegue de Netlify. El detalle normativo está en [CLOUDFLARE_ROUTING.md](docs/CLOUDFLARE_ROUTING.md).
+Desde la raíz, `npm run dev` inicia las cuatro apps y Netlify Dev en el mismo
+origen. En producción, el Worker vigente está en
+[`infra/cloudflare/`](../../infra/cloudflare/) y envía `/admin/` al sitio unificado.
+El detalle de rutas está en [CLOUDFLARE_ROUTING.md](docs/CLOUDFLARE_ROUTING.md).
 
 ## Frontend
 
@@ -70,9 +78,13 @@ npm run docs:check       # verificar que el material generado está actualizado
 
 Los dos últimos comandos se añaden con esta documentación. El mapa generado es un índice navegable; las guías de dominio explican relaciones y contratos que no se pueden deducir solo por nombres de archivo.
 
-## Repos conectados
+## Apps conectadas
 
-- [Robin Platform — READMELONG](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/READMELONG.md), [USERGUIDE](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md), [enrutamiento](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/CLOUDFLARE_ROUTING.md).
-- [Robin Subscriptions — READMELONG](https://github.com/saantimartinn/robin-subscriptions/blob/main/READMELONG.md), [USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md), [arquitectura](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/ARCHITECTURE.md).
+- [Portal del Alumno](../portal/READMELONG.md) y su
+  [guía](../portal/USERGUIDE.md): identidad y expediente de aplicación.
+- [Robin Community](../community/READMELONG.md): suscripción y comunidad.
+- [Robin Jr](../robinjr/READMELONG.md): programa Junior.
 
-El mapa global de hostnames, prefijos de URL y despliegues está documentado en cada `docs/CLOUDFLARE_ROUTING.md`; Robin Platform contiene la referencia principal del Worker.
+La referencia del Worker vigente es
+[`infra/cloudflare/README.md`](../../infra/cloudflare/README.md); las rutas del
+sitio se combinan desde los `netlify.toml` de las cuatro apps.
