@@ -13,9 +13,15 @@ const { AsyncLocalStorage } = require('node:async_hooks');
 const SEPARATOR = '__';
 // Must list every app id in site/apps.mjs (site/env.mjs checks it).
 const APP_IDS = ['portal', 'robinjr', 'community', 'admin'];
-const storage = new AsyncLocalStorage();
-const siteEnv = process.env;
-const scopes = new Map();
+// A Netlify bundle can load this CommonJS runtime through both its ESM wrapper
+// and a traced app module. Both copies must use the same async scope and raw
+// site environment; otherwise the second copy captures the first copy's Proxy
+// and cross-app calls silently inherit the Admin credentials.
+const STATE_KEY = Symbol.for('project-robin.app-env.state.v1');
+const shared = globalThis[STATE_KEY] || (globalThis[STATE_KEY] = {
+  storage: new AsyncLocalStorage(), siteEnv: process.env, scopes: new Map(), scopedEnv: null,
+});
+const { storage, siteEnv, scopes } = shared;
 
 function prefix(appId) {
   return `${appId.toUpperCase()}${SEPARATOR}`;
@@ -51,7 +57,7 @@ function visibleKeys(scope) {
   return [...keys];
 }
 
-const scopedEnv = new Proxy(siteEnv, {
+const scopedEnv = shared.scopedEnv || new Proxy(siteEnv, {
   get(target, key) {
     const scope = storage.getStore();
     if (!scope || typeof key !== 'string') return Reflect.get(target, key);
@@ -87,6 +93,7 @@ const scopedEnv = new Proxy(siteEnv, {
   },
 });
 
+shared.scopedEnv = scopedEnv;
 if (process.env !== scopedEnv) process.env = scopedEnv;
 
 /** Loads an app's function module inside that app's environment and runs each

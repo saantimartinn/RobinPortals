@@ -37,6 +37,17 @@ test('module-level reads happen inside the app environment', () => {
   assert.equal(mod.loadedWith, 'https://robinjr.example');
 });
 
+test('a second runtime copy shares app scopes instead of inheriting Admin', () => {
+  const modulePath = require.resolve('../app-env.cjs');
+  delete require.cache[modulePath];
+  const second = require('../app-env.cjs');
+  const readFromSecond = wrapFunction('admin', () => ({
+    handler: () => second.runInApp('robinjr', () => process.env.SUPABASE_URL),
+  }));
+  assert.equal(readFromSecond.handler(), 'https://robinjr.example');
+  assert.equal(second.runInApp('portal', () => process.env.SUPABASE_URL), 'https://portal.example');
+});
+
 test('sandbox credentials do not change the normal Portal environment', async () => {
   const [sandbox, normal] = await Promise.all([
     runInAppWithEnv('portal', { REVOLUT_API_BASE: 'https://sandbox-merchant.revolut.com', CONTEXT: 'dev' }, async () => {
