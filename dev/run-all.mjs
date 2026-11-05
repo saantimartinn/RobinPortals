@@ -56,7 +56,7 @@ start('build', process.execPath, ['site/build.mjs', '--watch'], {
   onLine(line) {
     if (appsStarted || !line.includes('functions written')) return;
     appsStarted = true;
-    start('apps', 'netlify', ['dev', '--offline', '--port', String(APPS_PORT), '--no-open']);
+    start('apps', 'netlify', ['dev', '--offline', '--port', String(APPS_PORT), '--no-open'], { env: { ROBIN_LOCAL_TESTS: 'true' } });
   },
 });
 

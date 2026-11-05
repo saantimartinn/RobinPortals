@@ -5,6 +5,8 @@
  *   signature_content (data:image/png;base64,...)
  * }
  * Guarda la firma en Storage, persiste únicamente su ruta y marca el contrato firmado.
+ * Al convertir desde Mentoría conserva el contrato anterior y aplica el crédito;
+ * si cubre toda la primera cuota, cierra el pago sin crear un checkout de 0 €.
  * Además genera un PDF del contrato completo (con los datos rellenos + firma) y
  * lo envía por email a hello@project-robin.com y al correo del cliente.
  */
@@ -17,10 +19,12 @@ const {
   contractPricingVersion,
   pricingVersionForNewUser,
   usesInternational2700Plan,
+  applicationPlanForUser,
 } = require('../../shared/financial-config.cjs');
 const storage = require('../../lib/storage');
 const { variantKey } = require('../../shared/contract-content.cjs');
 const { isIsolatedSandbox } = require('../../lib/sandbox-mode');
+const { isReleaseTestUser } = require('../../../../packages/auth/release-test.cjs');
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -79,22 +83,24 @@ exports.handler = async (event) => {
     return json({ error: 'missing_signature' }, { statusCode: 400 });
   }
   const allowedExtras = new Set(['revision_candidaturas', 'housing_piso']);
-  const extrasList = Array.isArray(extras) ? extras.filter((x) => allowedExtras.has(x)) : [];
+  const requestedExtras = Array.isArray(extras) ? extras.filter((x) => allowedExtras.has(x)) : [];
 
   try {
     const sb = getSupabase();
     const isolatedSandbox = isIsolatedSandbox();
     const { data: u, error: e1 } = await sb
       .from('users')
-      .select('id, lead_id, email, nombre, apellidos, dni_numero, direccion, dni_completed, tipo, origin, pais, application_level, has_eu_id, num_carreras, contract_data')
+      .select('id, lead_id, email, nombre, apellidos, dni_numero, direccion, dni_completed, profile_completed, tipo, origin, pais, application_level, has_eu_id, num_carreras, contract_data')
       .eq('id', session.uid)
       .single();
     if (e1 || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    const releaseTestUser = isReleaseTestUser(u);
     if (!u.dni_completed) return json({ error: 'dni_not_completed' }, { statusCode: 409 });
 
     const nowIso = new Date().toISOString();
     const fechaStr = fmtFecha(nowIso);
     const tipo = (u.tipo || 'general').toLowerCase();
+    const extrasList = tipo === 'mentoria' ? [] : requestedExtras;
     const esOtros = (u.origin || '') === 'otros';
     const contrato2700 = usesInternational2700Plan(u);
     const esMaestria = contrato2700 && (u.application_level || '') === 'maestria';
@@ -102,7 +108,7 @@ exports.handler = async (event) => {
     const signatureMime = (/^data:([^;,]+)/.exec(String(signature_content)) || [])[1] || 'image/png';
     const existingPricingVersion = contractPricingVersion(u.contract_data);
     const pricingVersion = pricingVersionForNewUser(tipo) || existingPricingVersion;
-    const uploadedSignature = isolatedSandbox
+    const uploadedSignature = isolatedSandbox || releaseTestUser
       ? { path: null }
       : await storage.uploadDataUrl(sb, signature_content, {
           keyPrefix: `${u.id}/contracts`,
@@ -110,6 +116,10 @@ exports.handler = async (event) => {
           contentType: signatureMime,
         });
 
+    // El RPC de conversión archivó el contrato anterior y dejó el crédito en
+    // contract_data. La nueva firma debe conservar ambos datos.
+    const previousContractData = u.contract_data || {};
+    const mentoriaUpgrade = previousContractData.mentoria_upgrade || null;
     const contract_data = {
       version_template: 'contratos-2027-revision-integrada',
       pricing_version: pricingVersion,
@@ -129,7 +139,14 @@ exports.handler = async (event) => {
       extras: extrasList,
       signature_path: uploadedSignature.path,
       signature_mime: signatureMime,
+      ...(mentoriaUpgrade ? { mentoria_upgrade: mentoriaUpgrade } : {}),
+      ...(previousContractData.previous_contracts ? { previous_contracts: previousContractData.previous_contracts } : {}),
     };
+
+    // General estándar queda a cero. Los demás planes siguen cobrando la
+    // diferencia tras la nueva firma.
+    const firstAmount = applicationPlanForUser({ ...u, contract_data, contract_signed: true })[0]?.amount;
+    const coveredByMentoria = !!mentoriaUpgrade && firstAmount === 0;
 
     const { error: e2 } = await sb
       .from('users')
@@ -137,6 +154,12 @@ exports.handler = async (event) => {
         contract_signed: true,
         contract_signed_at: nowIso,
         contract_data,
+        ...(coveredByMentoria ? {
+          pago_completed: true,
+          pago_completed_at: nowIso,
+          pago_data: { source: 'mentoria_credit', source_payment_id: mentoriaUpgrade.source_payment_id, amount: 0 },
+          ...(u.profile_completed ? { requires_onboarding: false } : {}),
+        } : {}),
       })
       .eq('id', session.uid);
     if (e2) {
@@ -144,12 +167,12 @@ exports.handler = async (event) => {
       throw e2;
     }
     const previousSignaturePath = u.contract_data && u.contract_data.signature_path;
-    if (previousSignaturePath && previousSignaturePath !== uploadedSignature.path && !isolatedSandbox) {
+    if (previousSignaturePath && !mentoriaUpgrade && previousSignaturePath !== uploadedSignature.path && !isolatedSandbox && !releaseTestUser) {
       await storage.removeObject(sb, previousSignaturePath);
     }
 
     // Best-effort: generar PDF y enviar por email — no bloquea la respuesta.
-    if (!isolatedSandbox) try {
+    if (!isolatedSandbox && !releaseTestUser) try {
       const pdfBuffer = await buildContractPdf({
         tipo,
         esOtros,
@@ -162,6 +185,7 @@ exports.handler = async (event) => {
         fechaStr,
         signatureDataUrl: signature_content,
         pricingVersion,
+        mentoriaCreditEur: mentoriaUpgrade?.credit_eur || null,
       });
 
       const clienteNombre = contract_data.cliente.nombre || 'Cliente';
@@ -190,7 +214,11 @@ exports.handler = async (event) => {
     }
 
     // Reflejar el cliente en la hoja de control de pagos (best-effort, no bloquea).
-    await require('../../lib/integration-sync').syncGoogleSheets(sb, session.uid);
+    if (!releaseTestUser) await require('../../lib/integration-sync').syncGoogleSheets(sb, session.uid);
+    if (coveredByMentoria && !isolatedSandbox && !releaseTestUser) {
+      try { await require('../../lib/onboarding-fulfill').syncDriveForUser(sb, session.uid); }
+      catch (driveError) { console.error('mentoria upgrade Drive sync error', driveError); }
+    }
     return json({ ok: true, contract_signed_at: nowIso });
   } catch (e) {
     console.error('onboarding-contract error', e);

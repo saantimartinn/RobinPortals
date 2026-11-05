@@ -92,7 +92,7 @@ Para pantalla vacía, inspecciona consola, JS/CSS, base `/therobinplan/`, salida
 - [API contracts](docs/API_CONTRACTS.md) y [operations](docs/OPERATIONS.md).
 - [Dataflow](docs/DATAFLOW.md) · sesión/SSO, billing, comunidad, administración e integraciones.
 - [Referencia por archivo de la USERGUIDE](docs/userguide/07-source-file-reference.md).
-- [Robin Platform USERGUIDE](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md) · sesión de origen, portal cliente y Worker.
-- [Robin Admin USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md) · panel interno y APIs administrativas.
+- [Robin Platform USERGUIDE](../portal/USERGUIDE.md) · sesión de origen, portal cliente y Worker.
+- [Robin Admin USERGUIDE](../admin/USERGUIDE.md) · panel interno y APIs administrativas.
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)

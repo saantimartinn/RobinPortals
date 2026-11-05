@@ -22,7 +22,7 @@ flowchart LR
   CF -->|/portal/* or /admin/*| OtherProducts[Platform / Admin origins]
 ```
 
-Frontend, Netlify Functions, JWT secret, cookie y Supabase de suscriptores pertenecen a este producto. Platform aporta una comprobación de identidad para el SSO, pero Subscriptions crea un principal/cookie local y utiliza sus cuentas/datos propios. Las reglas URL están en [CLOUDFLARE_ROUTING.md](CLOUDFLARE_ROUTING.md) y el Worker versionado se encuentra en [Robin Platform](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/infrastructure/cloudflare/project-robin-router.js).
+Frontend, Netlify Functions, JWT secret, cookie y Supabase de suscriptores pertenecen a este producto. Platform aporta una comprobación de identidad para el SSO, pero Subscriptions crea un principal/cookie local y utiliza sus cuentas/datos propios. Las reglas URL están en [CLOUDFLARE_ROUTING.md](CLOUDFLARE_ROUTING.md) y el Worker versionado se encuentra en [Robin Platform](../../portal/infrastructure/cloudflare/project-robin-router.js).
 
 ## Capas y ruta de una petición
 
@@ -36,7 +36,11 @@ frontend/src/main.jsx → frontend/src/app.jsx
   → JSON/cookie/status → API client → component state
 ```
 
-El cliente aplica `credentials: same-origin`, mapea errores HTTP y adapta path a `/therobinplan/api/*` cuando la app corre bajo el dominio común. El Worker elimina ese prefijo para llegar al API path que conoce Netlify. En el hostname Netlify directo el URL puede permanecer `/api/*`. Consulta [`frontend/src/api/index.js`](../frontend/src/api/index.js), [`netlify.toml`](../netlify.toml) y [API_INVENTORY](API_INVENTORY.md).
+El cliente aplica `credentials: same-origin`, mapea errores HTTP y usa
+`/therobinplan/api/*` bajo el dominio común. El Worker vigente conserva el path;
+el `netlify.toml` generado del sitio unificado lo asigna a la Function de
+Community. Consulta [`frontend/src/api/index.js`](../frontend/src/api/index.js),
+[`netlify.toml`](../netlify.toml) y [API_INVENTORY](API_INVENTORY.md).
 
 Cada handler es una frontera HTTP: método/origen/parsing, sesión, autorización, validación, side effects y respuesta. La lógica reutilizable vive en `backend/lib/`. El navegador no determina el permiso efectivo.
 
@@ -63,7 +67,7 @@ Cuando no hay cookie local, `app.jsx` intenta el exchange SSO tras una respuesta
 4. Emite una sesión local con el secret/cookie de Subscriptions.
 5. La UI vuelve a pedir `/api/me` y muestra portal local si la sesión ya existe.
 
-El browser no puede escoger el rol ni forzar el enlace por datos enviados en el body. El modelo de principal y permisos se puede seguir por [`backend/lib/application-permissions.js`](../backend/lib/application-permissions.js). Para la mitad proveedora consulta [Platform DATAFLOW](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/DATAFLOW.md); para navegación compartida consulta [Admin DATAFLOW](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/DATAFLOW.md).
+El browser no puede escoger el rol ni forzar el enlace por datos enviados en el body. El modelo de principal y permisos se puede seguir por [`backend/lib/application-permissions.js`](../backend/lib/application-permissions.js). Para la mitad proveedora consulta [Platform DATAFLOW](../../portal/docs/DATAFLOW.md); para navegación compartida consulta [Admin DATAFLOW](../../admin/docs/DATAFLOW.md).
 
 ## 2. Perfil de suscriptor y funcionalidades
 
@@ -161,5 +165,5 @@ Coordina cambios a sesión/perfil con Platform; coordina cambios a rutas compart
 - [Cloudflare routing](CLOUDFLARE_ROUTING.md) y [Operations](OPERATIONS.md).
 - [FILE_MAP](FILE_MAP.md) y [codebase index](codebase/README.md).
 - [Privacy data map](PRIVACY_DATA_MAP.md).
-- [Platform DATAFLOW](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/DATAFLOW.md) · identidad de aplicación.
-- [Admin DATAFLOW](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/DATAFLOW.md) · portal administrativo.
+- [Platform DATAFLOW](../../portal/docs/DATAFLOW.md) · identidad de aplicación.
+- [Admin DATAFLOW](../../admin/docs/DATAFLOW.md) · portal administrativo.

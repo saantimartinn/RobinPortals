@@ -37,6 +37,11 @@ email son side effects; nunca deben convertir un fallo externo en un cobro o con
 ficticio. Calendar es la excepción en reservas: si no se puede crear el evento, no se
 confirma el booking.
 
+En una conversión de Mentoría se conserva la factura del pago original. La cuota
+de General estándar cubierta a 0 € no genera un segundo cobro ni factura en
+Holded. El PDF del nuevo contrato se guarda en Drive con un nombre distinto para
+conservar la versión de Mentoría. Véase [Mentoría y conversión](MENTORIA_CONVERSION.md).
+
 Los reintentos permitidos se guardan en `webhook_log` con `source=integration_retry`.
 El job programado procesa hasta 20 pendientes por ejecución y solo despacha las dos
 operaciones allowlisted `google_sheets/upsert_client` y `holded/invoice_payment`. No hay

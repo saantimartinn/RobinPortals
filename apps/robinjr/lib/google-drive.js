@@ -25,6 +25,7 @@ const DRIVE_API = 'https://www.googleapis.com/drive/v3';
 const DRIVE_UPLOAD = 'https://www.googleapis.com/upload/drive/v3';
 const OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const FOLDER_MIME = 'application/vnd.google-apps.folder';
+const crypto = require('node:crypto');
 
 let _cachedToken = null;
 let _cachedTokenExp = 0;
@@ -152,6 +153,40 @@ async function uploadFile(file, parentId, token) {
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw new Error('drive_upload_failed: ' + ((data.error && data.error.message) || resp.status));
   return data; // { id, name, webViewLink }
+}
+
+/** Reutiliza el documento de onboarding si la sincronización se repite. */
+async function upsertFile(file, parentId, token) {
+  const name = file.name || 'archivo.bin';
+  const q = "name = '" + escapeQueryString(name) + "' and '" + parentId + "' in parents and trashed = false";
+  const searchUrl = DRIVE_API + '/files?q=' + encodeURIComponent(q)
+    + '&fields=files(id,name,md5Checksum)&orderBy=createdTime&pageSize=100&supportsAllDrives=true&includeItemsFromAllDrives=true';
+  const found = await fetch(searchUrl, { headers: { Authorization: 'Bearer ' + token } });
+  const result = await found.json().catch(() => ({}));
+  if (!found.ok) throw new Error('drive_find_file_failed: ' + ((result.error && result.error.message) || found.status));
+  const existing = (result.files || [])[0];
+  if (!existing) return uploadFile(file, parentId, token);
+
+  const buffer = file.buffer
+    ? (Buffer.isBuffer(file.buffer) ? file.buffer : Buffer.from(file.buffer))
+    : file.base64 ? Buffer.from(file.base64, 'base64') : null;
+  if (!buffer) throw new Error('drive_upload_missing_content');
+  if (existing.md5Checksum === crypto.createHash('md5').update(buffer).digest('hex')) {
+    return { id: existing.id, name: existing.name, unchanged: true };
+  }
+  const response = await fetch(DRIVE_UPLOAD + '/files/' + encodeURIComponent(existing.id)
+    + '?uploadType=media&fields=id,name&supportsAllDrives=true', {
+    method: 'PATCH',
+    headers: {
+      Authorization: 'Bearer ' + token,
+      'Content-Type': file.mimeType || 'application/octet-stream',
+      'Content-Length': String(buffer.length),
+    },
+    body: buffer,
+  });
+  const updated = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error('drive_update_failed: ' + ((updated.error && updated.error.message) || response.status));
+  return updated;
 }
 
 /**
@@ -321,6 +356,7 @@ module.exports = {
   findOrCreateFolder,
   createFolder,
   uploadFile,
+  upsertFile,
   ensureClientFolders,
   ensureCareerFolder,
   ensureTranscriptsFolder,

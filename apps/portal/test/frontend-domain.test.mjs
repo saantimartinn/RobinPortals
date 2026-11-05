@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dniExtract } from '../portal-source/src/api.js';
-import { buildDefaultDocs, statusLabel } from '../portal-source/src/application/documents/document-utils.js';
+import { buildDefaultDocs, groupStudentDocumentsByCareer, statusLabel } from '../portal-source/src/application/documents/document-utils.js';
 import { isAdminUser } from '../portal-source/src/session.js';
 
 test('los documentos por defecto conservan grado y máster separados', () => {
@@ -12,6 +12,31 @@ test('los documentos por defecto conservan grado y máster separados', () => {
   assert.equal(master.length, 5);
   assert.equal(master.find((document) => document.name.startsWith('Examen')).required, false);
   assert.deepEqual(statusLabel('validated'), { tone: 'green', label: 'Validado' });
+});
+
+test('agrupa documentos por todas las carreras que los requieren sin duplicar la solicitud', () => {
+  const careers = [
+    { id: 'career-a', name: 'Psicología', university: 'Universidad A', required_docs: [{ name: 'CV' }, { name: 'Carta de motivación' }] },
+    { id: 'career-b', name: 'Psicología', university: 'Universidad B', required_docs: [{ name: '  cv  ' }, { type: 'event', name: 'Entrevista' }] },
+  ];
+  const documents = [
+    { id: 'cv', name: 'C.V.', career_template_id: 'career-a', status: 'validated' },
+    { id: 'shared', name: 'CV', career_template_id: 'career-a', status: 'required' },
+    { id: 'letter', name: 'Carta de motivación', career_template_id: 'career-a', status: 'pending_review' },
+    { id: 'event-name', name: 'Entrevista', status: 'required' },
+    { id: 'manual', name: 'Pasaporte', status: 'validated' },
+  ];
+
+  const result = groupStudentDocumentsByCareer(documents, careers);
+  assert.deepEqual(result.groups.map((group) => group.documents.map((entry) => entry.document.id)), [
+    ['shared', 'letter', 'cv'],
+    ['shared'],
+  ]);
+  assert.deepEqual(result.groups[0].documents[0].careerNames, [
+    'Psicología · Universidad A',
+    'Psicología · Universidad B',
+  ]);
+  assert.deepEqual(result.ungrouped.map((entry) => entry.document.id), ['event-name', 'manual']);
 });
 
 test('el frontend dirige admin y supervisor al mismo portal', () => {

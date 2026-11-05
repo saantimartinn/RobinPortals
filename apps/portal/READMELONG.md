@@ -6,18 +6,25 @@
 
 ## Rol del repositorio
 
-Robin Platform contiene el portal de alumnos y la superficie administrativa del producto de aplicación, además del backend de Functions que sirve esas experiencias. Construye el frontend de `portal-source/` en `deploy/portal/`; las Netlify Functions y Edge Functions se empaquetan como runtime de servidor. La capa pública de `project-robin.com` está definida en `infrastructure/cloudflare/project-robin-router.js` y enruta por prefijos a tres proyectos Netlify distintos.
+Robin Platform contiene el Portal del Alumno, su administración de aplicación y
+las Functions que sirven esas experiencias. Es una app del monorepo; el build
+unificado en `site/build.mjs` publica sus archivos y Functions con las otras
+tres apps en un único sitio Netlify. El Worker vigente está en
+[`infra/cloudflare/project-robin-router.js`](../../infra/cloudflare/project-robin-router.js)
+y envía los prefijos de las apps a ese sitio sin cambiar la ruta.
 
-Este repo participa como proveedor principal de identidad y datos de aplicación. Robin Admin comparte su login desde el dominio público; The Robin Plan implementa identidad de suscriptor y almacenamiento por separado, con un endpoint SSO validado contra Platform.
+Portal del Alumno participa como proveedor principal de identidad y datos de aplicación. Robin Admin comparte su login desde el dominio público; Robin Community mantiene identidad de suscriptor y almacenamiento propios, con un endpoint SSO validado contra Portal.
 
 ## Arquitectura de runtime
 
 ```mermaid
 flowchart LR
   Browser --> CF[Cloudflare Worker]
-  CF -->|/login, /portal/*| Platform[Netlify Robin Platform]
-  CF -->|/admin/*| Admin[Netlify Robin Admin]
-  CF -->|/therobinplan/*| Subs[Netlify Robin Subscriptions]
+  CF -->|rutas de las cuatro apps| Site[Netlify unificado]
+  Site --> Platform[Portal del Alumno]
+  Site --> Admin[Admin]
+  Site --> Subs[Robin Community]
+  Site --> Jr[Robin Jr]
   Platform --> Edge[Netlify Edge rate limits]
   Edge --> Functions[Netlify Functions]
   Functions --> Lib[lib domain services]
@@ -26,7 +33,7 @@ flowchart LR
   Lib --> Providers[Revolut · Google · Holded · Notion · Anthropic · Resend]
 ```
 
-Cloudflare conserva el origen WordPress para paths no reconocidos. Robin Platform posee un despliegue Netlify, no un API gateway propio; la ruta `/api/*` se resuelve en el proyecto origin a través de redirects de `netlify.toml`.
+Cloudflare conserva la web pública para rutas no reconocidas. Las rutas de las apps llegan al sitio Netlify unificado; las API se resuelven con el `netlify.toml` generado en la raíz a partir de la configuración de cada app.
 
 ## Estructura y propiedad
 
@@ -34,7 +41,7 @@ Cloudflare conserva el origen WordPress para paths no reconocidos. Robin Platfor
 
 Aplicación React/Vite. `src/main.jsx` arranca React, `src/app.jsx` gestiona sesión, selección de administrador/alumno y onboarding, `src/api.js` es la fachada pública del cliente HTTP y reexporta módulos de `src/api/`. Las pantallas principales están separadas en `src/application/`, onboarding por pasos en `src/application/onboarding/`, administración en `src/application/admin/` y funciones de producto dentro de `src/application/` y `src/application/careers/`. Las reglas de permisos del menú se mantienen en `src/admin-permissions.js`; los controles de servidor siguen siendo autoridad.
 
-Vite construye con base `/portal/`; Netlify publica `deploy/portal/` y copia los recursos descargables públicos. Las APIs usan same-origin cookies, excepto las subidas de binarios que reciben URLs firmadas desde el backend.
+Vite construye con base `/portal/`; `site/build.mjs` incorpora esa salida al directorio publicado del sitio unificado. Las APIs usan same-origin cookies, excepto las subidas de binarios que reciben URLs firmadas desde el backend.
 
 ### `netlify/functions/`, `netlify/edge-functions/`, `lib/`, `shared/`
 
@@ -53,9 +60,15 @@ La asignación completa route → handler y handler → servicio está en [API_I
 4. Cada paso llama endpoint de `/api/onboarding/*`; Functions accede a Supabase, firma URL de storage y usa proveedores según el paso.
 5. El shell del portal muestra estado, perfil, pagos, carreras, documentos, reservas y FAQs de acuerdo con los flags y permisos actuales.
 
+Mentoría tiene una cuota única de 666,33 €. Un admin puede convertir una cuenta
+abonada a General, Delft o Llegada desde la ficha. El pago anterior se conserva
+y se descuenta de la primera cuota nueva; General estándar queda cubierto sin
+otro checkout. El alumno firma el contrato del nuevo programa. El detalle está
+en [Mentoría y conversión](docs/MENTORIA_CONVERSION.md).
+
 ## Flujo de administración
 
-El usuario administrativo se resuelve en `portal-source/src/app.jsx` y entra a `AdminPortal` si `isAdminUser()` lo confirma. Los componentes `Admin*` consultan datos por la misma fachada API; `portal-source/src/admin-permissions.js` delimita visibilidad de áreas y el backend verifica rol, alcance y ownership en cada Function. Robin Admin es otra superficie y otro despliegue: su UI de `/admin` consume identidad común vía `/portal/api/*` y API de gestión propia desde `/api/admin/*`.
+El usuario administrativo se resuelve en `portal-source/src/app.jsx` y entra a `AdminPortal` si `isAdminUser()` lo confirma. Los componentes `Admin*` consultan datos por la misma fachada API; `portal-source/src/admin-permissions.js` delimita visibilidad de áreas y el backend verifica rol, alcance y ownership en cada Function. Robin Admin es otra app del mismo monorepo y sitio; su UI de `/admin` consume identidad común vía `/portal/api/*` y API de gestión propia desde `/api/admin/*`.
 
 ## Identidad, persistencia e integraciones
 
@@ -76,7 +89,9 @@ El usuario administrativo se resuelve en `portal-source/src/app.jsx` y entra a `
 
 | Proyecto | Flujo compartido | Guías |
 |---|---|---|
-| [Robin Admin](https://github.com/RobinManuV/Robin-Admin) | Login, perfiles administrativos, leads, clientes e integraciones administrativas. | [README largo](https://github.com/RobinManuV/Robin-Admin/blob/main/READMELONG.md), [USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md), [arquitectura](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/ARCHITECTURE.md). |
-| [Robin Subscriptions](https://github.com/saantimartinn/robin-subscriptions) | Acceso cross-portal y SSO desde sesión de aplicación; usuario, cookie y base de datos de suscripción siguen separados. | [README largo](https://github.com/saantimartinn/robin-subscriptions/blob/main/READMELONG.md), [USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md), [arquitectura](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/ARCHITECTURE.md). |
+| [Robin Admin](../admin/README.md) | Login, perfiles administrativos, leads, clientes e integraciones administrativas. | [README largo](../admin/READMELONG.md), [USERGUIDE](../admin/USERGUIDE.md), [arquitectura](../admin/docs/ARCHITECTURE.md). |
+| [Robin Subscriptions](../community/README.md) | Acceso cross-portal y SSO desde sesión de aplicación; usuario, cookie y base de datos de suscripción siguen separados. | [README largo](../community/READMELONG.md), [USERGUIDE](../community/USERGUIDE.md), [arquitectura](../community/docs/ARCHITECTURE.md). |
 
-Los repos no comparten build, lockfile ni paquete de código. Los cambios de roles, shape de identidad, API o rutas requieren compatibilidad durante los despliegues independientes.
+Las cuatro apps comparten el build del sitio, pero conservan Functions, variables
+de entorno y reglas de dominio propias. Los cambios de identidad, API o rutas
+requieren comprobar todos los consumidores y regenerar `netlify.toml` de raíz.

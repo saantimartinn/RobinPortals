@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5AEA871B0B5391D42FB53441 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16669C47865736CA9B5F3216 /* Assets.xcassets */; };
+		D922A934ABCD4B0F9A9B6631 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D922A934ABCD4B0F9A9B6632 /* PrivacyInfo.xcprivacy */; };
 		BD02FB582B8ABE23C4D8CCDE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299681F53C660F0F2079A50A /* ContentView.swift */; };
 		DBA8BC5FE8ACD108076940CE /* RobinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457041A2E8F752AEA6236C4D /* RobinApp.swift */; };
 /* End PBXBuildFile section */
@@ -17,7 +18,8 @@
 		299681F53C660F0F2079A50A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		457041A2E8F752AEA6236C4D /* RobinApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinApp.swift; sourceTree = "<group>"; };
 		C5EC5E40723A5184B83DE4CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		FB76E59A7154998AEA2DEA8E /* Robin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Robin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D922A934ABCD4B0F9A9B6632 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		FB76E59A7154998AEA2DEA8E /* Robin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Robin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -27,6 +29,7 @@
 				16669C47865736CA9B5F3216 /* Assets.xcassets */,
 				299681F53C660F0F2079A50A /* ContentView.swift */,
 				C5EC5E40723A5184B83DE4CD /* Info.plist */,
+				D922A934ABCD4B0F9A9B6632 /* PrivacyInfo.xcprivacy */,
 				457041A2E8F752AEA6236C4D /* RobinApp.swift */,
 			);
 			path = Robin;
@@ -77,8 +80,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 636FE875653DB363969A3D5C /* Build configuration list for PBXProject "Robin" */;
 			developmentRegion = en;
@@ -105,6 +106,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEA871B0B5391D42FB53441 /* Assets.xcassets in Resources */,
+				D922A934ABCD4B0F9A9B6631 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +131,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GWRMHMM34D;
 				INFOPLIST_FILE = Robin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -148,6 +151,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GWRMHMM34D;
 				INFOPLIST_FILE = Robin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

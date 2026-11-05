@@ -32,6 +32,22 @@ verifies the resulting object before using it. Existing identifiers are not
 forced to UUID until the real schema contract has been verified without touching the
 production database.
 
+## Conversión de Mentoría
+
+`POST /api/admin/clients/convert-mentoria` recibe
+`{ "user_id": "<uuid>", "target_type": "general|delft|llegada" }` y devuelve
+`{ "ok": true, "user_id": "<uuid>", "target_type": "...", "credit_eur": 666.33,
+"source_payment_id": "<uuid>" }`. Requiere cookie, origen válido, admin con acceso
+al Portal del Alumno y expediente asignado, salvo el admin desarrollador.
+
+Los conflictos `409` incluyen `client_not_mentoria`, `mentoria_payment_required`
+y `paid_mentoria_installment_missing`. La Function llama a una única transacción
+SQL que conserva el pago y el contrato anteriores; una repetición tras convertir
+devuelve conflicto. `/api/me` expone `mentoria_credit_eur` y
+`first_payment_amount` al alumno convertido. La firma del nuevo contrato es
+obligatoria antes de cobrar la diferencia. Véase
+[Mentoría y conversión](MENTORIA_CONVERSION.md).
+
 ## Inventory maintenance
 
 Run:

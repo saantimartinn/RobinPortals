@@ -44,12 +44,14 @@ const IELTS_CLASS = 'Clase de preparación de inglés/IELTS';
 // Cuenta contable (Categorización · Cuenta Contable) según el tipo de servicio.
 // Valor = ID interno de la cuenta del plan contable de Holded (la v2 lo exige y lo
 // respeta). Los números del PGC quedan como fallback documental.
-const ACCOUNT_BY_TIPO = {
-  general:  process.env.HOLDED_ACCOUNT_GENERAL  || '70500001', // Asesoramiento completo
-  delft:    process.env.HOLDED_ACCOUNT_DELFT    || '70500002', // Cliente Delft
-  mentoria: process.env.HOLDED_ACCOUNT_MENTORIA || '70500003', // Cliente de mentoría
-  llegada:  process.env.HOLDED_ACCOUNT_LLEGADA  || '70500004', // Cliente Pack Llegada
-};
+function accountByTipo() {
+  return {
+    general: process.env.HOLDED_ACCOUNT_GENERAL || '70500001',
+    delft: process.env.HOLDED_ACCOUNT_DELFT || '70500002',
+    mentoria: process.env.HOLDED_ACCOUNT_MENTORIA || '70500003',
+    llegada: process.env.HOLDED_ACCOUNT_LLEGADA || '70500004',
+  };
+}
 
 function pat() {
   return String(process.env.HOLDED_API_PAT || '').trim();
@@ -84,7 +86,8 @@ function accountFor(tipo, user, payment) {
   if (user && !isEU(user) && (norm(tipo) || 'general') === 'general') {
     return process.env.HOLDED_ACCOUNT_LATAM_PLANS || '70500007';
   }
-  return ACCOUNT_BY_TIPO[norm(tipo) || 'general'] || ACCOUNT_BY_TIPO.general;
+  const accounts = accountByTipo();
+  return accounts[norm(tipo) || 'general'] || accounts.general;
 }
 
 function parseContractData(user) {
@@ -301,6 +304,11 @@ async function generateInvoiceForPaymentRow(sb, paymentId) {
     const { data: p, error } = await sb.from('payments').select('*').eq('id', paymentId).single();
     if (error || !p) return { ok: false, reason: 'payment_not_found' };
     const pd = p.payment_data || {};
+    // El pago real de Mentoría ya tiene su factura: una cuota cubierta a 0 €
+    // solo representa el crédito en el plan nuevo.
+    if (pd.source === 'mentoria_credit' || Number(p.amount) <= 0) {
+      return { skipped: true, reason: 'covered_by_mentoria_credit' };
+    }
     // Nunca emitir documentación fiscal real por un cobro de Sandbox.
     if (pd.simulated === true) {
       try {
@@ -372,7 +380,7 @@ module.exports = {
   generateInvoiceForPaymentRow,
   taxCodesFor,
   CONCEPTO,
-  ACCOUNT_BY_TIPO,
+  get ACCOUNT_BY_TIPO() { return accountByTipo(); },
   billingHolderName,
   shortLeadId,
   invoiceConcept,

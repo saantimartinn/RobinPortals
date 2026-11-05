@@ -14,6 +14,8 @@ Protecciones ligeras ejecutadas antes de determinadas rutas API.
 |---|---|---|---|
 | [`rate-limit-expensive.mjs`](../../../../netlify/edge-functions/rate-limit-expensive.mjs) | Protección Edge para rate limit expensive. | — | Al cambiar la protección Edge de las rutas asociadas. |
 | [`rate-limit-identity.mjs`](../../../../netlify/edge-functions/rate-limit-identity.mjs) | Protección Edge para rate limit identity. | — | Al cambiar la protección Edge de las rutas asociadas. |
+| [`rate-limit-password-reset.mjs`](../../../../netlify/edge-functions/rate-limit-password-reset.mjs) | Protección Edge para rate limit password reset. | — | Al cambiar la protección Edge de las rutas asociadas. |
+| [`rate-limit-reports.mjs`](../../../../netlify/edge-functions/rate-limit-reports.mjs) | Protección Edge para rate limit reports. | — | Al cambiar la protección Edge de las rutas asociadas. |
 
 ---
 

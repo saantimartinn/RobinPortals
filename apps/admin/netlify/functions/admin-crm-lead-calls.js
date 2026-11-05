@@ -16,7 +16,8 @@ function toCall(row) {
   return {
     id: row.id,
     leadId: row.lead_id,
-    durationMinutes: Number(row.duration_minutes),
+    kind: row.kind || 'call',
+    durationMinutes: row.duration_minutes == null ? null : Number(row.duration_minutes),
     notes: String(row.notes || ''),
     authorName: String(row.author_name || 'Administrador'),
     occurredAt: row.occurred_at,
@@ -34,7 +35,7 @@ exports.handler = async (event) => {
       const leadId = String(event.queryStringParameters?.leadId || '').trim();
       if (!leadId) return json({ error: 'lead_id_required', detail: 'Falta identificar el lead.' }, { statusCode: 400 });
       const { data, error } = await crm.from('crm_lead_calls')
-        .select('id,lead_id,duration_minutes,notes,author_name,occurred_at')
+        .select('id,lead_id,kind,duration_minutes,notes,author_name,occurred_at')
         .eq('lead_id', leadId)
         .order('occurred_at', { ascending: false });
       if (error) throw error;
@@ -44,10 +45,14 @@ exports.handler = async (event) => {
     const body = parseJsonBody(event);
     if (!body) return json({ error: 'invalid_json', detail: 'La llamada no tiene un formato válido.' }, { statusCode: 400 });
     const leadId = String(body.leadId || '').trim();
-    const durationMinutes = Number(body.durationMinutes);
+    const kind = body.kind || 'call';
+    const durationMinutes = kind === 'message' ? null : Number(body.durationMinutes);
     const notes = String(body.notes || '').trim().slice(0, 4000);
     if (!leadId) return json({ error: 'lead_id_required', detail: 'Falta identificar el lead.' }, { statusCode: 400 });
-    if (!Number.isInteger(durationMinutes) || durationMinutes < 1 || durationMinutes > 1440) {
+    if (!['call', 'message'].includes(kind)) {
+      return json({ error: 'invalid_kind', detail: 'Selecciona llamada o mensaje.' }, { statusCode: 400 });
+    }
+    if (kind === 'call' && (!Number.isInteger(durationMinutes) || durationMinutes < 1 || durationMinutes > 1440)) {
       return json({ error: 'invalid_duration', detail: 'Introduce una duración entre 1 y 1440 minutos.' }, { statusCode: 400 });
     }
 
@@ -60,11 +65,12 @@ exports.handler = async (event) => {
       lead_id: leadId,
       actor_id: actor.available ? admin.id : null,
       author_name: displayName(admin),
+      kind,
       duration_minutes: durationMinutes,
       notes: notes || null,
     };
     const { data, error } = await crm.from('crm_lead_calls').insert(insert)
-      .select('id,lead_id,duration_minutes,notes,author_name,occurred_at').single();
+      .select('id,lead_id,kind,duration_minutes,notes,author_name,occurred_at').single();
     if (error) throw error;
     return json({ call: toCall(data) }, { statusCode: 201 });
   } catch (error) {

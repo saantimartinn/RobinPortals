@@ -36,7 +36,7 @@ Antes de escribir SQL, identifica el proyecto y schema de destino, el consumidor
 
 Los adaptadores externalizan detalles de API y credenciales. Mantén el token en server-side, valida responses incompletas y limita requests con timeout/paginación. Un webhook debe verificar firma, deduplicar eventos y tolerar repetición; una tarea de sync debe permitir reintento sin producir duplicados.
 
-Si cambias datos de identidad o perfil, localiza al menos: writer, reader, UI, API de `/me`, migración/RLS y los repos que usan esa identidad. Usa la [USERGUIDE Admin](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md) y [USERGUIDE Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md) para identificar consumidores.
+Si cambias datos de identidad o perfil, localiza al menos: writer, reader, UI, API de `/me`, migración/RLS y los repos que usan esa identidad. Usa la [USERGUIDE Admin](../../../admin/USERGUIDE.md) y [USERGUIDE Subscriptions](../../../community/USERGUIDE.md) para identificar consumidores.
 
 ---
 

@@ -6,7 +6,10 @@
 
 ## Rol y límites
 
-Este repositorio implementa The Robin Plan, una experiencia de suscripción independiente con frontend React/Vite, Netlify Functions y un proyecto Supabase propio. El portal se sirve públicamente bajo `/therobinplan/` en `project-robin.com`. Robin Platform es el proveedor de identidad de aplicación para el handshake SSO; Robin Admin es un producto hermano, no una dependencia de runtime de este proyecto.
+Esta app del monorepo implementa The Robin Plan con frontend React/Vite,
+Functions y un proyecto Supabase propio. Comparte el sitio Netlify con las
+otras apps y se sirve bajo `/therobinplan/` en `project-robin.com`. El Portal
+del Alumno provee la identidad de origen para SSO; Admin es otra app del sitio.
 
 El modelo de cuentas, sesiones, DB, secretos JWT y checkout de suscriptor es independiente. No usar la tabla `users` ni el `JWT_SECRET` de Robin Platform como fallback.
 
@@ -15,7 +18,7 @@ El modelo de cuentas, sesiones, DB, secretos JWT y checkout de suscriptor es ind
 ```mermaid
 flowchart LR
   Browser --> CF[Cloudflare Worker]
-  CF -->|/therobinplan/*| Netlify[Subscriptions Netlify]
+  CF -->|rutas de las cuatro apps| Netlify[Netlify unificado]
   Netlify --> SPA[frontend React/Vite]
   Browser -->|/therobinplan/api/* + cookie| Netlify
   Netlify --> Functions[backend/functions]
@@ -26,7 +29,9 @@ flowchart LR
   Platform[Robin Platform session] -->|SSO validation| Functions
 ```
 
-El router versionado se encuentra en [Robin Platform](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/infrastructure/cloudflare/project-robin-router.js). Detalles de URL y rewrite en [CLOUDFLARE_ROUTING.md](docs/CLOUDFLARE_ROUTING.md).
+El router vigente se encuentra en
+[`infra/cloudflare/project-robin-router.js`](../../infra/cloudflare/project-robin-router.js).
+Detalles de rutas en [CLOUDFLARE_ROUTING.md](docs/CLOUDFLARE_ROUTING.md).
 
 ## Estructura
 
@@ -84,7 +89,7 @@ El catálogo de contratos está en [API_INVENTORY](docs/API_INVENTORY.md), funci
 
 ## Repos relacionados
 
-- [Robin Platform cliente](https://github.com/RobinManuV/Robin-platform-cliente): identity provider / aplicación de origen; [READMELONG](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/READMELONG.md), [USERGUIDE](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md), [Cloudflare paths](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/CLOUDFLARE_ROUTING.md).
-- [Robin Admin](https://github.com/RobinManuV/Robin-Admin): panel interno; [READMELONG](https://github.com/RobinManuV/Robin-Admin/blob/main/READMELONG.md), [USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md), [API mapping](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/API_INVENTORY.md).
+- [Robin Platform cliente](../portal/README.md): identity provider / aplicación de origen; [READMELONG](../portal/READMELONG.md), [USERGUIDE](../portal/USERGUIDE.md), [Cloudflare paths](../portal/docs/CLOUDFLARE_ROUTING.md).
+- [Robin Admin](../admin/README.md): panel interno; [READMELONG](../admin/READMELONG.md), [USERGUIDE](../admin/USERGUIDE.md), [API mapping](../admin/docs/API_INVENTORY.md).
 
 Los proyectos se despliegan individualmente. Si cambia SSO, roles, rutas, scopes, producto/checkout o navegación, mantener contrato hacia atrás y coordinar los repos en cambios separados.

@@ -2,7 +2,7 @@
 
 Mapa funcional de cómo se mueven los datos por el portal de aplicación: navegador, API de mismo origen, Functions, reglas de dominio, persistencia e integraciones. Incluye los puntos donde Robin Admin y Robin Subscriptions consumen identidad o rutas de Platform. Para una ruta o campo concreto, confirma siempre el handler y su configuración.
 
-> **Alcance:** sigue el flujo del software, no constituye una declaración legal de privacidad. Para categorías de datos, minimización, retención y borrado consulta [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md). No se consultaron datos de producción.
+> **Alcance:** sigue el flujo del software, no constituye una declaración legal de privacidad. Para categorías de datos, minimización, retención y borrado consulta [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md). Los importes y transiciones se documentan desde el código y la migración versionada.
 
 ## Vista general
 
@@ -54,8 +54,8 @@ No trates un campo `is_admin`, capability o nombre de rol enviado por el navegad
 
 ### Identidad consumida por otros productos
 
-- **Robin Admin:** en el dominio compartido, las rutas de identidad se sirven bajo `/portal/api/*`; Cloudflare las resuelve hacia Platform. Los endpoints administrativos CRM/datos permanecen en el origin Admin. Ver [Admin DATAFLOW](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/DATAFLOW.md).
-- **Robin Subscriptions:** su handler `auth-sso` consulta la identidad de aplicación desde backend, enlaza una cuenta local de suscriptor y crea una sesión local propia. No se comparte JWT secret, tabla de sesión ni base de Subscriptions. Ver [Subscriptions DATAFLOW](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/DATAFLOW.md).
+- **Robin Admin:** en el dominio compartido, las rutas de identidad se sirven bajo `/portal/api/*`; el sitio unificado las asigna a Portal. Los endpoints CRM y de datos de Admin viven en sus Functions del mismo sitio. Ver [Admin DATAFLOW](../../admin/docs/DATAFLOW.md).
+- **Robin Community:** su handler `auth-sso` consulta la identidad de aplicación desde backend, enlaza una cuenta de suscriptor y crea una sesión propia. Su dominio de datos sigue separado. Ver [Community DATAFLOW](../../community/docs/DATAFLOW.md).
 
 Cambiar respuesta de `/api/me`, roles, capabilities, IDs, expiración o cookie es un cambio de contrato. Sigue todos los consumidores antes de retirar o renombrar campos.
 
@@ -103,6 +103,21 @@ Checkout UI → API client → payments/onboarding Function
 ```
 
 La URL de retorno no es la confirmación autoritativa. Sigue el evento autenticado del proveedor hasta el cambio persistente y las tareas de sincronización (por ejemplo, Holded/Sheets según handler/configuración). Para revisar finanzas/admin, traza también quién agrega los datos y qué campo se deriva de cada proveedor. Nunca confíes en un importe calculado solo en React.
+
+### Mentoría → General, Delft o Llegada
+
+```text
+AdminPerfil / lista de clientes → POST /api/admin/clients/convert-mentoria
+  → sesión + rol + asignación → función SQL transaccional en Supabase
+  → pago original conservado + crédito en contract_data + tipo nuevo
+  → alumno firma contrato nuevo → primera cuota reducida
+  → checkout solo si queda importe pendiente
+```
+
+El pago de Mentoría se factura una sola vez. Si el crédito cubre la primera cuota
+de General estándar, el portal la marca cubierta sin checkout y sin factura de 0 €.
+Los otros destinos cobran solo la diferencia. Consulta
+[Mentoría y conversión](MENTORIA_CONVERSION.md) para importes y excepciones.
 
 ## 5. Carreras, reservas, chat y comunicación
 

@@ -24,3 +24,6 @@ deno.lock
 
 # Shared site build output
 site/.output/
+
+# Supabase CLI linkage and cached version
+supabase/.temp/

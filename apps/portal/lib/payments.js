@@ -5,7 +5,8 @@
  *   - general existente: conserva 566,67 € iniciales + el plan histórico 1700/2000/2100
  *   - delft   : 3 cuotas · total 2999 (999 + 1000 + 1000)
  *   - llegada : 2 cuotas iguales · total 1700 (850 c/u)
- *   - mentoria: 1 cuota · total 450
+ *   - mentoria: 1 cuota · total 666,33; al convertirla, ese pago queda como
+ *     histórico y reduce solo la primera cuota del nuevo programa
  *   - 'otros' (internacional): 3 cuotas de 900 · total 2700
  */
 
@@ -163,12 +164,15 @@ async function ensurePayments(sb, user) {
 }
 
 /**
- * Genera un número de factura simple por cuota.
+ * Genera un identificador local por cuota. U01 distingue la primera cuota del
+ * programa nuevo de la factura 01 ya emitida por la Mentoría original.
  */
 function invoiceNumber(user, payment) {
   const yr = new Date(payment.paid_at || payment.created_at || new Date()).getFullYear();
   const lid = (user.lead_id || user.id || '').toString().replace(/[^a-z0-9]/gi, '').slice(-6).toUpperCase();
-  return `PR-${yr}-${lid}-${String(payment.installment).padStart(2, '0')}`;
+  const installment = String(payment.installment).padStart(2, '0');
+  const upgradedFirst = user.contract_data?.mentoria_upgrade && Number(payment.installment) === 1;
+  return `PR-${yr}-${lid}-${upgradedFirst ? 'U' : ''}${installment}`;
 }
 
 module.exports = { plan, splitEqual, ensurePayments, invoiceNumber, latamPlanWithPaidAmounts };

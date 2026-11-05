@@ -32,11 +32,14 @@ Server-side domain services and provider integrations consumed by Netlify Functi
 | [`career-suggestions.js`](../../../lib/career-suggestions.js) | Backend domain service or provider adapter for career suggestions. |
 | [`careers-data.json`](../../../lib/careers-data.json) | Backend domain service or provider adapter for careers data. |
 | [`careers-recommender.js`](../../../lib/careers-recommender.js) | Backend domain service or provider adapter for careers recommender. |
+| [`client-folders.js`](../../../lib/client-folders.js) | Backend domain service or provider adapter for client folders. |
 | [`contract-pdf.js`](../../../lib/contract-pdf.js) | Backend domain service or provider adapter for contract pdf. |
+| [`crm-client-notes.js`](../../../lib/crm-client-notes.js) | Backend domain service or provider adapter for crm client notes. |
 | [`crm-historical-metrics.js`](../../../lib/crm-historical-metrics.js) | Backend domain service or provider adapter for crm historical metrics. |
 | [`crm-identity.js`](../../../lib/crm-identity.js) | Backend domain service or provider adapter for crm identity. |
 | [`crm-lead-ingest.js`](../../../lib/crm-lead-ingest.js) | Backend domain service or provider adapter for crm lead ingest. |
 | [`crm-performance.js`](../../../lib/crm-performance.js) | Backend domain service or provider adapter for crm performance. |
+| [`developer-logs.js`](../../../lib/developer-logs.js) | Backend domain service or provider adapter for developer logs. |
 | [`dni-upload.js`](../../../lib/dni-upload.js) | Backend domain service or provider adapter for dni upload. |
 | [`document-drive.js`](../../../lib/document-drive.js) | Backend domain service or provider adapter for document drive. |
 | [`email.js`](../../../lib/email.js) | Backend domain service or provider adapter for email. |
@@ -53,7 +56,9 @@ Server-side domain services and provider integrations consumed by Netlify Functi
 | [`http.js`](../../../lib/http.js) | Backend domain service or provider adapter for http. |
 | [`identity.js`](../../../lib/identity.js) | Backend domain service or provider adapter for identity. |
 | [`integration-sync.js`](../../../lib/integration-sync.js) | Backend domain service or provider adapter for integration sync. |
+| [`junior-supabase.js`](../../../lib/junior-supabase.js) | Backend domain service or provider adapter for junior supabase. |
 | [`meet-transcript.js`](../../../lib/meet-transcript.js) | Backend domain service or provider adapter for meet transcript. |
+| [`netlify-logs.js`](../../../lib/netlify-logs.js) | Backend domain service or provider adapter for netlify logs. |
 | [`notion.js`](../../../lib/notion.js) | Backend domain service or provider adapter for notion. |
 | [`observability.js`](../../../lib/observability.js) | Backend domain service or provider adapter for observability. |
 | [`ocr.js`](../../../lib/ocr.js) | Backend domain service or provider adapter for ocr. |
@@ -61,7 +66,14 @@ Server-side domain services and provider integrations consumed by Netlify Functi
 | [`onboarding-welcome.js`](../../../lib/onboarding-welcome.js) | Backend domain service or provider adapter for onboarding welcome. |
 | [`operational-config.js`](../../../lib/operational-config.js) | Backend domain service or provider adapter for operational config. |
 | [`payments.js`](../../../lib/payments.js) | Backend domain service or provider adapter for payments. |
+| [`platform-logs.js`](../../../lib/platform-logs.js) | Backend domain service or provider adapter for platform logs. |
 | [`privacy.js`](../../../lib/privacy.js) | Backend domain service or provider adapter for privacy. |
+| [`release-checks.js`](../../../lib/release-checks.js) | Backend domain service or provider adapter for release checks. |
+| [`release-dni-fixture.cjs`](../../../lib/release-dni-fixture.cjs) | Backend domain service or provider adapter for release dni fixture. |
+| [`release-live-flow.cjs`](../../../lib/release-live-flow.cjs) | Backend domain service or provider adapter for release live flow. |
+| [`release-payment-runner.cjs`](../../../lib/release-payment-runner.cjs) | Backend domain service or provider adapter for release payment runner. |
+| [`release-payment-sandbox.cjs`](../../../lib/release-payment-sandbox.cjs) | Backend domain service or provider adapter for release payment sandbox. |
+| [`release-results.cjs`](../../../lib/release-results.cjs) | Backend domain service or provider adapter for release results. |
 | [`sales-dashboard.js`](../../../lib/sales-dashboard.js) | Backend domain service or provider adapter for sales dashboard. |
 | [`sales-personal-scope.js`](../../../lib/sales-personal-scope.js) | Backend domain service or provider adapter for sales personal scope. |
 | [`sales-test-mode.js`](../../../lib/sales-test-mode.js) | Backend domain service or provider adapter for sales test mode. |

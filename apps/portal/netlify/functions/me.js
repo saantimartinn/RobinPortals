@@ -61,6 +61,7 @@ exports.handler = async (event) => {
       tipo: u.tipo || 'general',
       num_carreras: u.num_carreras || 1,
       first_payment_amount: firstPayment ? firstPayment.amount : null,
+      mentoria_credit_eur: u.contract_data?.mentoria_upgrade?.credit_eur || null,
       pricing_version: contractPricingVersion(u.contract_data),
       payment_currency: firstPayment ? 'EUR' : null,
       origin: u.origin || null,

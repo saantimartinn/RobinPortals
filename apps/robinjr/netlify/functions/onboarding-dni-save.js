@@ -4,6 +4,7 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 const { missingPhoneColumn } = require('../../lib/student-phone');
 const { isIsolatedSandbox } = require('../../lib/sandbox-mode');
+const { isReleaseTestUser } = require('../../../../packages/auth/release-test.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -48,9 +49,9 @@ exports.handler = async (event) => {
     if (!isIsolatedSandbox()) try {
       const drive = require('../../lib/google-drive');
       const { data: u2 } = await sb.from('users')
-        .select('id, lead_id, nombre, apellidos, gdrive_folders')
+        .select('id, lead_id, email, nombre, apellidos, gdrive_folders')
         .eq('id', session.uid).single();
-      if (u2) await drive.renameClientFolder(sb, u2);
+      if (u2 && !isReleaseTestUser(u2)) await drive.renameClientFolder(sb, u2);
     } catch (e) { console.error('dni-save drive rename warn:', e && e.message); }
 
     return json({ ok: true, next_step: 'profile' });

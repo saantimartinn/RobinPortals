@@ -2,13 +2,17 @@
 
 ## Resumen
 
-Aplicación web de administración desplegada en Netlify: SPA React/Vite, Functions Node para `/api/*`, Edge Functions para límites de tráfico y librerías de dominio en `lib/`. Cloudflare aporta el hostname público y el proxy por prefijos; su Worker está versionado en [Robin Platform](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/infrastructure/cloudflare/project-robin-router.js).
+App de administración del sitio Netlify unificado: SPA React/Vite, Functions
+Node para sus API, Edge Functions para límites de tráfico y librerías de dominio
+en `lib/`. El Worker vigente está versionado en
+[`infra/cloudflare/project-robin-router.js`](../../../infra/cloudflare/project-robin-router.js)
+y conserva los paths de las cuatro apps.
 
 ```mermaid
 flowchart LR
   Browser --> CF[Cloudflare Worker]
-  CF -->|/admin UI, /api/admin, /api/internal| Netlify[Robin Admin Netlify]
-  CF -->|/portal/api identity| Platform[Robin Platform Netlify]
+  CF -->|rutas de las apps| Netlify[Netlify unificado]
+  Netlify -->|/portal/api identity| Platform[Portal del Alumno]
   Netlify --> Edge[Netlify Edge Functions]
   Edge --> Functions[Netlify Functions]
   Functions --> Lib[lib domain services]
@@ -20,7 +24,7 @@ flowchart LR
 
 | Capa | Directorio/archivo | Dirección de dependencia |
 |---|---|---|
-| Build y hosting | `vite.config.mjs`, `netlify.toml`, `package.json` | Define salida `dist`, rutas, cabeceras, functions y schedules. |
+| Build y hosting | `vite.config.mjs`, `netlify.toml`, `site/build.mjs` de raíz | Define bundle, rutas, cabeceras, Functions y schedules del sitio unificado. |
 | Navegador | `src/main.jsx`, `src/App.jsx`, `src/components/` | Usa componentes y clientes `src/services/`; no usa secretos de backend. |
 | Funcionalidades | `src/features/admin/` | Se cargan desde `feature-modules.tsx`; reciben acciones y datos desde `AdminApp`. |
 | API cliente | `src/services/`, `src/lib/api-path.ts` | Llama a `/api/*` con cookies same-origin y traduce respuestas a tipos de UI. |
@@ -84,7 +88,7 @@ El [árbol de carpetas y archivos](codebase/README.md) incluye carpetas internas
 
 | Repositorio | Responsabilidad | Enlace técnico |
 |---|---|---|
-| Robin Platform cliente | Portal de alumnos, administración de aplicación, funciones de negocio e identidad principal. | [README largo](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/READMELONG.md) · [arquitectura](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/ARCHITECTURE.md). |
-| Robin Subscriptions | The Robin Plan con su propia sesión, esquema y cuenta Supabase. | [README largo](https://github.com/saantimartinn/robin-subscriptions/blob/main/READMELONG.md) · [arquitectura](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/ARCHITECTURE.md). |
+| Robin Platform cliente | Portal de alumnos, administración de aplicación, funciones de negocio e identidad principal. | [README largo](../../portal/READMELONG.md) · [arquitectura](../../portal/docs/ARCHITECTURE.md). |
+| Robin Subscriptions | The Robin Plan con su propia sesión, esquema y cuenta Supabase. | [README largo](../../community/READMELONG.md) · [arquitectura](../../community/docs/ARCHITECTURE.md). |
 
 No existe paquete compartido ni despliegue atómico entre repos. Los contratos compartidos deben evolucionar de forma compatible y coordinarse por cambios en cada proyecto.

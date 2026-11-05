@@ -10,6 +10,7 @@ import { portalClient } from "@/services/portal";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, Title, ContactDrawer, contactRoleOptions, contactRoleLabels, lostReasonOptions } from './feature-shared';
 import { EmailComposer } from "./email-composer";
+import { ClientFolderBrowser } from "./client-folders";
 
 export { LeadInbox } from "./lead-inbox";
 import { leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
@@ -47,6 +48,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
   const [qualificationContactRole, setQualificationContactRole] = useState<LeadContactRole | "">("");
   const [qualificationHeat, setQualificationHeat] = useState(50);
   const [qualificationInitialHeat, setQualificationInitialHeat] = useState(50);
+  const [qualificationKind, setQualificationKind] = useState<"call" | "message">("call");
   const [qualificationDuration, setQualificationDuration] = useState("");
   const [qualificationNotes, setQualificationNotes] = useState("");
   const [qualifying, setQualifying] = useState(false);
@@ -91,6 +93,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
     setQualificationContactRole(contact.contactRole || "");
     setQualificationHeat(currentHeat);
     setQualificationInitialHeat(currentHeat);
+    setQualificationKind("call");
     setQualificationDuration("");
     setQualificationNotes("");
     setQualificationError("");
@@ -98,14 +101,14 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
 
   async function confirmQualification() {
     const leadId = pendingQualificationId;
-    const durationMinutes = Number(qualificationDuration);
+    const durationMinutes = qualificationKind === "call" ? Number(qualificationDuration) : null;
     if (!leadId || !qualificationContactRole) return;
     if (qualificationHeat === qualificationInitialHeat) { setQualificationError("Ajusta el heat antes de continuar."); return; }
-    if (!Number.isInteger(durationMinutes) || durationMinutes < 1 || durationMinutes > 1440) { setQualificationError("Introduce la duración de la llamada en minutos."); return; }
+    if (qualificationKind === "call" && (durationMinutes === null || !Number.isInteger(durationMinutes) || durationMinutes < 1 || durationMinutes > 1440)) { setQualificationError("Introduce la duración de la llamada en minutos."); return; }
     setQualifying(true);
     setQualificationError("");
     try {
-      await onQualifyLead(leadId, { contactRole: qualificationContactRole, heat: qualificationHeat, durationMinutes, notes: qualificationNotes.trim() });
+      await onQualifyLead(leadId, { contactRole: qualificationContactRole, heat: qualificationHeat, kind: qualificationKind, durationMinutes, notes: qualificationNotes.trim() });
       const contact = contacts.find((item) => item.id === leadId);
       setPendingQualificationId(null);
       notify(`${contact?.name || "El lead"} ha pasado a Contactado`);
@@ -291,30 +294,45 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
         </div>
       )}
 
-      {path === "/crm/clientes" && <div className="personal-leads">
-        {owned.filter((contact) => leadStages[contact.id] === "Cliente").map((contact) => {
+      {path === "/crm/clientes" && <ClientFolderBrowser clients={[
+        ...owned.filter((contact) => leadStages[contact.id] === "Cliente").map((contact) => {
           const portals = [...new Set([
             ...Object.keys(contact.portalAccounts || {}),
             ...(recentPortalAccounts[contact.id] || []),
-            ...(portalSnapshot?.clients.some((client) => client.email?.toLowerCase() === contact.email?.toLowerCase()) ? ["alumno"] : []),
+            ...(portalSnapshot?.clients.some((client) => client.lead_id === contact.id || client.id === contact.portalAccounts?.alumno) ? ["alumno"] : []),
           ])];
-          return <article className="lead-card" key={contact.id}>
+          return { source: "crm" as const, id: contact.id, name: contact.name, content: <article className="lead-card" key={contact.id}>
             <small>{categories[contact.id] || "Cliente"}</small>
             <h3>{contact.name}</h3><p>{contact.email}</p>
+            <div><span>Notas comerciales</span><strong>{contact.crmNotes?.length ? `${contact.crmNotes.length} notas` : contact.comment ? "1 comentario" : "Sin notas"}</strong></div>
+            {(contact.crmNotes?.length || contact.comment) && <p className="client-note-preview">{contact.crmNotes?.at(-1)?.body || contact.comment}</p>}
             <div><span>Portales</span><strong>{portals.map((key) => portalLabels[key] || key).join(" · ") || "Destino no registrado"}</strong></div>
-            <footer><Button type="button" variant="outline" onClick={() => beginPortalConversion(contact.id)}>Añadir portal</Button></footer>
-          </article>;
-        })}
-        {portalSnapshot?.clients.filter((client) => (isDeveloperAdmin || client.assigned_to === portalSnapshot.admin.email)
-          && !contacts.some((contact) => leadStages[contact.id] === "Cliente" && contact.email?.toLowerCase() === client.email?.toLowerCase()))
-          .map((client) => <a className="lead-card" key={client.id} href={`${portalSnapshot.portalUrl}/portal/`} target="_blank" rel="noreferrer"><small>{client.tipo || "general"}</small><h3>{[client.nombre, client.apellidos].filter(Boolean).join(" ") || client.email}</h3><p>{client.email}</p><div><span>Fase {client.application_phase || 1}</span><strong>{client.pago_completed ? "Al corriente" : "Onboarding"}</strong></div><footer>Abrir portal<ChevronRight /></footer></a>)}
-      </div>}
+            <footer><Button type="button" variant="outline" onClick={() => openContact(contact)}>Ver notas</Button><Button type="button" variant="outline" onClick={() => beginPortalConversion(contact.id)}>Añadir portal</Button></footer>
+          </article> };
+        }),
+        ,...(portalSnapshot?.clients.filter((client) => (isDeveloperAdmin || client.assigned_to === portalSnapshot.admin.email)
+          && !contacts.some((contact) => leadStages[contact.id] === "Cliente" && (contact.id === client.lead_id || contact.portalAccounts?.alumno === client.id))
+          && `${client.nombre || ""} ${client.apellidos || ""} ${client.email || ""}`.toLowerCase().includes(query.toLowerCase()))
+          .map((client) => ({ source: "alumno" as const, id: client.id, lead_id: client.lead_id, name: [client.nombre, client.apellidos].filter(Boolean).join(" ") || client.email || "Cliente", content: <a className="lead-card" key={client.id} href={`${portalSnapshot.portalUrl}/portal/`} target="_blank" rel="noreferrer"><small>{client.tipo || "general"}</small><h3>{[client.nombre, client.apellidos].filter(Boolean).join(" ") || client.email}</h3><p>{client.email}</p><div><span>Fase {client.application_phase || 1}</span><strong>{client.pago_completed ? "Al corriente" : "Onboarding"}</strong></div><footer>Abrir portal<ChevronRight /></footer></a> })) || []),
+      ]} />}
 
       {path === "/crm/lost" && <><div className="lost-filters"><label>Desde<input type="date" value={lostFrom} onChange={(event) => setLostFrom(event.target.value)} /></label><label>Hasta<input type="date" value={lostTo} onChange={(event) => setLostTo(event.target.value)} /></label><label>Categoría<select value={lostCategory} onChange={(event) => setLostCategory(event.target.value)}><option value="">Todas</option>{leadCategories.map((category) => <option key={category}>{category}</option>)}</select></label><label>Heat mínimo<input type="number" min="0" max="100" value={lostHeat} onChange={(event) => setLostHeat(event.target.value)} /></label></div><div className="data-table panel"><table><thead><tr><th>Lead</th><th>Categoría</th><th>Heat final</th><th>Origen</th><th>Motivo</th><th>Fecha Lost</th></tr></thead><tbody>{owned.filter((contact) => { const lostDate = (leadLostDates[contact.id] || "").slice(0, 10); return leadStages[contact.id] === "Lost" && (!lostCategory || categories[contact.id] === lostCategory) && leadHeat[contact.id] >= Number(lostHeat || 0) && (!lostFrom || lostDate >= lostFrom) && (!lostTo || lostDate <= lostTo); }).map((contact) => <tr key={contact.id} onClick={() => openContact(contact)}><td><b>{contact.name}</b><small>{contact.email}</small></td><td>{categories[contact.id]}</td><td>{leadHeat[contact.id]}</td><td>{contact.source}</td><td>{lostReasonLabel(contact.lostReason)}{contact.lostReasonDetail && <small>{contact.lostReasonDetail}</small>}</td><td>{leadLostDates[contact.id]?.slice(0, 10) || "—"}</td></tr>)}</tbody></table></div></>}
 
       {selected && <ContactDrawer contact={selected} admins={admins} leadMode heat={leadHeat[selected.id]} onHeatChange={(value) => onSetLeadHeat(selected.id, value)} onOwnerChange={(owner) => { onAssignLead(selected.id, owner); notify(`${selected.name} asignado a ${owner}`); }} onContactRoleChange={(value) => onSetLeadContactRole(selected.id, value)} onDeleteLead={async (id) => { await onDeleteLead(id); notify(`${selected.name} eliminado correctamente`); }} onClose={() => setSelected(null)} />}
       {emailComposerOpen && path === "/crm" && <EmailComposer contacts={porContactarLeads} notify={notify} onClose={() => setEmailComposerOpen(false)} />}
-      {pendingQualificationId && <div className="drawer-wrap outcome-dialog-wrap"><form className="manual-lead-card crm-outcome-card qualification-dialog" onSubmit={(event) => { event.preventDefault(); void confirmQualification(); }}><button className="drawer-close" type="button" disabled={qualifying} onClick={() => setPendingQualificationId(null)}>×</button><span>Pasar a contactado</span><h2>Completa el primer contacto</h2><p>Antes de continuar debes identificar a la persona, ajustar el heat y registrar la primera llamada.</p><label>Contacto principal<select required autoFocus value={qualificationContactRole} onChange={(event) => setQualificationContactRole(event.target.value as LeadContactRole | "")}><option value="">Seleccionar…</option>{contactRoleOptions.map((role) => <option key={role} value={role}>{contactRoleLabels[role]}</option>)}</select></label><label>Nuevo heat <strong className="qualification-heat-value">{qualificationHeat}</strong><input type="range" min="0" max="100" value={qualificationHeat} onChange={(event) => setQualificationHeat(Number(event.target.value))} /></label><small className={qualificationHeat === qualificationInitialHeat ? "qualification-pending" : "qualification-complete"}>{qualificationHeat === qualificationInitialHeat ? `Debes cambiar el valor actual (${qualificationInitialHeat}).` : `Heat ajustado de ${qualificationInitialHeat} a ${qualificationHeat}.`}</small><label>Duración de la llamada (minutos)<input type="number" min="1" max="1440" step="1" required value={qualificationDuration} onChange={(event) => setQualificationDuration(event.target.value)} placeholder="Ej. 20" /></label><label>Notas de la llamada<textarea maxLength={4000} value={qualificationNotes} onChange={(event) => setQualificationNotes(event.target.value)} placeholder="Opcional" /></label>{qualificationError && <small className="team-note-error" role="alert">{qualificationError}</small>}<div className="manual-lead-actions"><Button type="button" variant="outline" disabled={qualifying} onClick={() => setPendingQualificationId(null)}>Cancelar</Button><Button type="submit" disabled={qualifying || !qualificationContactRole || qualificationHeat === qualificationInitialHeat || !qualificationDuration}>{qualifying ? "Guardando…" : "Guardar y pasar a Contactado"}</Button></div></form></div>}
+      {pendingQualificationId && <div className="drawer-wrap outcome-dialog-wrap"><form className="manual-lead-card crm-outcome-card qualification-dialog" onSubmit={(event) => { event.preventDefault(); void confirmQualification(); }}>
+        <button className="drawer-close" type="button" disabled={qualifying} onClick={() => setPendingQualificationId(null)}>×</button>
+        <span>Pasar a contactado</span><h2>Completa el primer contacto</h2>
+        <p>Antes de continuar debes identificar a la persona, ajustar el heat y registrar una llamada o un mensaje.</p>
+        <label>Contacto principal<select required autoFocus value={qualificationContactRole} onChange={(event) => setQualificationContactRole(event.target.value as LeadContactRole | "")}><option value="">Seleccionar…</option>{contactRoleOptions.map((role) => <option key={role} value={role}>{contactRoleLabels[role]}</option>)}</select></label>
+        <label>Nuevo heat <strong className="qualification-heat-value">{qualificationHeat}</strong><input type="range" min="0" max="100" value={qualificationHeat} onChange={(event) => setQualificationHeat(Number(event.target.value))} /></label>
+        <small className={qualificationHeat === qualificationInitialHeat ? "qualification-pending" : "qualification-complete"}>{qualificationHeat === qualificationInitialHeat ? `Debes cambiar el valor actual (${qualificationInitialHeat}).` : `Heat ajustado de ${qualificationInitialHeat} a ${qualificationHeat}.`}</small>
+        <label>Tipo de contacto<select value={qualificationKind} onChange={(event) => setQualificationKind(event.target.value as "call" | "message")}><option value="call">Registrar llamada</option><option value="message">Registrar mensaje</option></select></label>
+        {qualificationKind === "call" && <label>Duración de la llamada (minutos)<input type="number" min="1" max="1440" step="1" required value={qualificationDuration} onChange={(event) => setQualificationDuration(event.target.value)} placeholder="Ej. 20" /></label>}
+        <label>{qualificationKind === "message" ? "Notas del mensaje" : "Notas de la llamada"}<textarea maxLength={4000} value={qualificationNotes} onChange={(event) => setQualificationNotes(event.target.value)} placeholder="Opcional" /></label>
+        {qualificationError && <small className="team-note-error" role="alert">{qualificationError}</small>}
+        <div className="manual-lead-actions"><Button type="button" variant="outline" disabled={qualifying} onClick={() => setPendingQualificationId(null)}>Cancelar</Button><Button type="submit" disabled={qualifying || !qualificationContactRole || qualificationHeat === qualificationInitialHeat || (qualificationKind === "call" && !qualificationDuration)}>{qualifying ? "Guardando…" : "Guardar y pasar a Contactado"}</Button></div>
+      </form></div>}
       {pendingClientId && <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget && !convertingId) setPendingClientId(null); }}>
         <form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmClientConversion(); }}>
           <button className="drawer-close" type="button" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>×</button>

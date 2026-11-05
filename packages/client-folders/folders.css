@@ -1,0 +1,31 @@
+.client-folder-browser{display:grid;gap:1rem;margin-top:1rem}
+.client-folder-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1rem;border:1px solid #dfded2;border-radius:.9rem;background:#fffdf5}
+.client-folder-bar nav,.client-folder-bar nav span{display:flex;align-items:center;gap:.3rem;min-width:0}
+.client-folder-bar nav{flex-wrap:wrap}
+.client-folder-bar nav svg{width:.9rem;height:.9rem;color:#687088}
+.client-folder-bar nav button{border:1px solid transparent;border-radius:.5rem;background:transparent;padding:.4rem .55rem;color:#2d3a64;font-weight:700;cursor:pointer}
+.client-folder-bar nav button:hover,.client-folder-bar nav button[data-drop-active=true]{border-color:#ecb450;background:#fcf2d3}
+.client-folder-bar form{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.client-folder-bar input{min-width:9rem;padding:.55rem .7rem;border:1px solid #dfded2;border-radius:.5rem;background:white;color:#2d3a64}
+.client-folder-bar form button{display:inline-flex;align-items:center;gap:.35rem;padding:.55rem .7rem;border:1px solid #dfded2;border-radius:.5rem;background:white;color:#2d3a64;font-weight:700;cursor:pointer}
+.client-folder-bar form button[type=submit]{background:#2d3a64;border-color:#2d3a64;color:white}
+.client-folder-bar form button:disabled{opacity:.5;cursor:not-allowed}
+.client-folder-bar form svg{width:1rem;height:1rem}
+.client-folder-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.65rem}
+.client-folder-tile{display:flex;align-items:center;gap:.25rem;min-width:0;border:1px solid #dfded2;border-radius:.7rem;background:#fffdf5;padding:.4rem}
+.client-folder-tile[data-drop-active=true]{border-color:#ecb450;background:#fcf2d3;box-shadow:0 0 0 2px #ecb45055}
+.client-folder-tile button{border:0;background:transparent;color:#2d3a64;cursor:pointer}
+.client-folder-tile>button:not(.client-folder-open){display:grid;place-items:center;flex:none;width:1.8rem;height:1.8rem;border-radius:.35rem}
+.client-folder-tile>button:not(.client-folder-open):hover{background:#f6f3e0}
+.client-folder-tile>button svg{width:.95rem;height:.95rem}
+.client-folder-open{display:flex;align-items:center;gap:.5rem;min-width:0;flex:1;text-align:left;padding:.45rem}
+.client-folder-open>svg{flex:none;color:#d59b32}
+.client-folder-open span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.client-folder-open small{margin-left:auto;white-space:nowrap;color:#687088;font-size:.7rem}
+.client-folder-client-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));gap:.75rem}
+.client-folder-client{min-width:0;cursor:grab}
+.client-folder-client:active{cursor:grabbing}
+.client-folder-client-content>*{height:100%}
+.client-folder-error{margin:0;padding:.7rem .9rem;border:1px solid #e0a7ae;border-radius:.6rem;background:#fff7f8;color:#a43f4a}
+.client-folder-empty{margin:0;padding:1.5rem;border:1px dashed #dfded2;border-radius:.7rem;color:#687088;text-align:center}
+@media(max-width:700px){.client-folder-bar{align-items:stretch}.client-folder-bar nav,.client-folder-bar form{width:100%}.client-folder-bar form input{flex:1}.client-folder-client-grid{grid-template-columns:1fr}}

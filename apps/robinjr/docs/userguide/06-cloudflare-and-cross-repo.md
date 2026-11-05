@@ -1,35 +1,28 @@
-# 06 · Cloudflare y contratos entre repos
+# 06 · Rutas y flujos entre apps — Robin Jr
 
-## Rutas públicas
+Project Robin reúne **Portal del Alumno, Robin Jr, Robin Community y Robin Admin** en este monorepo. `site/build.mjs` publica las cuatro apps en un sitio Netlify. Cada app conserva sus Functions y reglas de negocio; Community mantiene su dominio de datos de suscripción. Los contratos de identidad y API se revisan entre apps aunque compartan despliegue.
 
-El Worker versionado en `infrastructure/cloudflare/project-robin-router.js` conoce `/admin`, `/login`, `/portal` y `/therobinplan`. Para rutas de API elimina el prefijo del producto donde se implementa el API same-origin. La guía [CLOUDFLARE_ROUTING](../CLOUDFLARE_ROUTING.md) es la referencia completa de paths, origins, headers y reescritura de assets.
+## Entrada pública
 
-## Admin login y datos
+El [Worker vigente](../../../../infra/cloudflare/project-robin-router.js) pasa `/portal/*`, `/robinjr/*`, `/therobinplan/*`, `/admin/*`, `/login`, `/api/admin/*` y `/api/internal/*` al sitio unificado sin reescribir la ruta. Todo lo demás queda en la web pública. Algunas URL de webhooks firmados siguen temporalmente en sus receptores antiguos; consulta la [guía de enrutamiento](../CLOUDFLARE_ROUTING.md).
 
-En `/admin`, Robin Admin llama identidad mediante `/portal/api/auth/*` y `/portal/api/me`, para que la cookie/session la gestione esta plataforma. Sus datos de negocio llaman `/api/admin/*`, que Cloudflare manda al origin de Robin Admin. Evitar mover ambos grupos al mismo upstream por accidente.
+El [`netlify.toml` de raíz](../../../../netlify.toml) se genera desde `apps/*/netlify.toml` con `npm run site:config`. Las rutas de una app deben cambiarse en su propia configuración y verificarse después en el archivo generado. `npm run dev` desde la raíz sirve las cuatro apps en local.
 
-## SSO para The Robin Plan
+## Identidad y datos
 
-Robin Subscriptions consulta su API propia bajo `/therobinplan/api/*`. `exchangeApplicationSession()` usa `/api/auth/sso` desde el origin de suscripción; el backend consulta sesión Platform a través de API publicada. Una sesión Platform no prueba que el usuario tenga suscripción. Subscriptions valida coincidencia por identidad válida y crea JWT/cookie independiente.
+- El Portal del Alumno sirve identidad compartida. Admin usa `/portal/api/*` para las operaciones de sesión que pertenecen a Portal.
+- Robin Jr sirve su experiencia en `/robinjr/*` y mantiene sus propias Functions.
+- Robin Community sirve `/therobinplan/*` y crea una sesión de suscriptor propia tras validar la identidad de origen.
+- Robin Admin sirve `/admin/*` y sus APIs CRM/operativas; las integraciones internas usan `/api/internal/*` con autenticación de backend.
 
-## Interfaces de cambio coordinado
+Al cambiar un campo de `/api/me`, una cookie, un rol o una ruta, busca consumidores en las cuatro apps y comprueba tanto el redirect del sitio como la autorización de la Function. Un menú visible no concede acceso a un endpoint.
 
-Cambios de ruta, role key, permisos de menú, profile fields, cookies, sesión, formato de cliente/pago o upload afectan interfaces fuera del repo. Usar:
+## Mentoría
 
-- [Robin Admin README largo](https://github.com/RobinManuV/Robin-Admin/blob/main/READMELONG.md) y [USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md).
-- [Robin Subscriptions README largo](https://github.com/saantimartinn/robin-subscriptions/blob/main/READMELONG.md) y [USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md).
+La conversión de Mentoría abonada a General, Delft o Llegada se ejecuta **solo en el Portal del Alumno**. La cuota de 666,33 € queda como pago histórico y se acredita a la primera cuota del nuevo programa. Robin Jr y el CRM Admin no ofrecen esa acción. Véase [Mentoría y conversión](../../../portal/docs/MENTORIA_CONVERSION.md).
 
-No existe release atómico ni package compartido: cambios deben mantener consumidores antiguos durante integración/deploy por etapas. La fuente de verdad de tablas y permisos pertenece al repo que posee ese entorno de datos.
-
-
-## Cómo leer y modificar el WorkerCómo leer y modificar el Worker
-
-Resuelve la ruta en el orden en que ejecuta el Worker: hostname, pathname, regla seleccionada, transformación de URL/método/headers/body y fetch del origin. Luego inspecciona cómo reescribe la respuesta (por ejemplo, HTML o referencias de assets) y qué pasa cuando ninguna regla coincide. No supongas que un route observado en la ficha del servicio y un route configurado en la zona sean el mismo dato.
-
-El código versionado explica intención; [CLOUDFLARE_ROUTING.md](../CLOUDFLARE_ROUTING.md) registra el snapshot consultado en el dashboard y su discrepancia con la vista general de Routes. Si el dashboard cambia, actualiza fecha, alcance y observación concreta, no presentes una lectura anterior como live state.
-
-Antes de cambiar un patrón, construye una tabla de path y destino para `/admin`, `/portal`, `/therobinplan`, `/login` y las rutas API. Comprueba UI con prefijo retenido, API con su eventual prefijo eliminado, query string y el fallback no gestionado. Coordina con las guías de [Admin](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/userguide/06-cross-repository-flows.md) y [Subscriptions](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/userguide/06-cloudflare-cross-repo.md).
+Para la topología del sitio consulta el [README de raíz](../../../../README.md) y la [guía del Worker](../../../../infra/cloudflare/README.md).
 
 ---
 
-**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./05-data-integrations-security.md) · [Siguiente documento de lectura →](./07-source-file-reference.md) · [READMELONG](../../READMELONG.md)
+**USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./05-data-integrations-security.md) · [Siguiente →](./07-source-file-reference.md)

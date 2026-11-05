@@ -5,6 +5,7 @@ import { NAVY } from "../../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../ui.jsx";
 import { adminCareerSuggestions, adminCareerSuggestionsRegenerate, adminCareerSuggestionFeedback } from "../../api.js";
 import { LivedAbroadCard } from "../StudentProfile.jsx";
+import { ConvertMentoria } from "./ConvertMentoria.jsx";
 
 export function AdminPerfil({ client, onRefresh }) {
   // --- Sugerencias de carreras (IA) ---
@@ -93,6 +94,13 @@ export function AdminPerfil({ client, onRefresh }) {
 
   return (
     <div className="space-y-5">
+      {String(client.tipo || '').toLowerCase() === 'mentoria' && <Card>
+        <CardHeader title="Mentoría" subtitle="Cuota única de 666,33 €" icon={User} />
+        <CardContent className="flex items-center justify-between gap-3">
+          <span className="text-sm text-slate-600">{client.pago_completed ? 'Mentoría abonada. Puedes convertir este expediente a otro programa.' : 'La conversión estará disponible tras el pago de Mentoría.'}</span>
+          <ConvertMentoria client={client} onConverted={onRefresh} />
+        </CardContent>
+      </Card>}
       <Card>
         <CardHeader title="Cumpleaños" icon={PartyPopper}
           subtitle="Fecha recuperada del DNI durante el onboarding" />
@@ -124,6 +132,17 @@ export function AdminPerfil({ client, onRefresh }) {
               <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 min-h-10">{value || "—"}</div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader title="Notas comerciales" subtitle="Información interna del lead, visible solo para administración" icon={FileText} />
+        <CardContent className="space-y-3">
+          {!(client.crm_notes || []).length && <p className="text-sm text-slate-400">No hay notas comerciales.</p>}
+          {(client.crm_notes || []).map((note) => <div key={note.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="text-xs font-medium text-slate-500">{note.authorName || "Equipo Robin"}{note.createdAt ? ` · ${fmtDate(note.createdAt)}` : ""}</div>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{note.body}</p>
+          </div>)}
         </CardContent>
       </Card>
 

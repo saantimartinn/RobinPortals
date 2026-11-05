@@ -4,7 +4,7 @@ import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, S
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
 import { SOFT, GOLD, NAVY } from "../theme.js";
 import { eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
-import { statusLabel } from "./documents/document-utils.js";
+import { groupStudentDocumentsByCareer, statusLabel } from "./documents/document-utils.js";
 import { Factura } from "./payments/InvoiceReceipt.jsx";
 import { CareerRequirementsTimeline } from "./careers/CareerRequirementsTimeline.jsx";
 import { portalApiUrl } from "../api/core.js";
@@ -84,7 +84,7 @@ export function PagosCliente() {
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length)} · {eur(p.amount)}</div>
                       <div className="text-xs text-slate-400">
-                        {isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
+                        {isPaid && p.payment_data?.source === 'mentoria_credit' ? 'Cubierta por el pago de Mentoría' : isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
                         {isUnlocked && p.unlocked_at && `Disponible desde el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
                         {isLocked && `Se desbloqueará cuando tu asesor lo indique`}
                       </div>
@@ -94,7 +94,7 @@ export function PagosCliente() {
                     </div>
                     <PaymentStatusBadge status={p.status} />
                     <div className="flex gap-1 flex-shrink-0">
-                      {isPaid && (
+                      {isPaid && p.amount > 0 && (
                         <Btn variant="secondary" size="sm" onClick={() => openInvoice(p)}><FileText className="h-3.5 w-3.5" /> {p.payment_data?.holded_invoice_id ? "Factura" : "Justificante"}</Btn>
                       )}
                       {isUnlocked && (
@@ -179,15 +179,24 @@ export function CarrerasCliente() {
 
 export function DocumentosCliente() {
   const [docs, setDocs] = useState([]);
+  const [careers, setCareers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [careerError, setCareerError] = useState("");
   const [uploadingId, setUploadingId] = useState(null);
 
   async function refresh() {
     setLoading(true); setError("");
     try {
-      const res = await documentsList();
-      setDocs(res.documents || []);
+      const [documentsResult, careersResult] = await Promise.allSettled([documentsList(), careersListMine()]);
+      if (documentsResult.status === "rejected") throw documentsResult.reason;
+      setDocs(documentsResult.value.documents || []);
+      if (careersResult.status === "fulfilled") {
+        setCareers(careersResult.value.careers || []);
+        setCareerError("");
+      } else {
+        setCareerError("No se pudieron cargar las carreras. Los documentos se muestran sin agrupar.");
+      }
     } catch (e) { setError(e.message || "Error."); }
     finally { setLoading(false); }
   }
@@ -216,14 +225,22 @@ export function DocumentosCliente() {
     window.open(full.document.file_url, "_blank", "noopener,noreferrer");
   }
 
-  const pending = docs.filter((d) => d.status === "required" || d.status === "rejected");
-  const inReview = docs.filter((d) => d.status === "pending_review");
-  const validated = docs.filter((d) => d.status === "validated");
+  const { groups, ungrouped } = groupStudentDocumentsByCareer(docs, careerError ? [] : careers);
+  const documentGroups = [
+    ...groups.map((group) => ({ ...group, key: group.career.id })),
+    ...(ungrouped.length ? [{
+      key: "other",
+      label: careerError ? "Documentos sin clasificar" : "Otros documentos",
+      career: null,
+      documents: ungrouped,
+    }] : []),
+  ];
 
-  function renderDoc(d) {
+  function renderDoc({ document: d, careerNames }, groupKey) {
     const info = statusLabel(d.status);
+    const inputId = `upload-input-${groupKey}-${d.id}`;
     return (
-      <div key={d.id} className="rounded-xl border border-slate-100 bg-white px-3 py-2.5">
+      <div key={`${groupKey}-${d.id}`} className="rounded-xl border border-slate-100 bg-white px-3 py-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="text-sm font-medium text-slate-900">{d.name}</div>
@@ -232,6 +249,12 @@ export function DocumentosCliente() {
               {d.uploaded_at && ` · subido ${new Date(d.uploaded_at).toLocaleDateString("es-ES")}`}
               {d.rejection_reason && ` · ${d.rejection_reason}`}
             </div>
+            {careerNames.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1 text-xs text-slate-600">
+                <span className="font-semibold">Carreras:</span>
+                {careerNames.map((name) => <span key={name} className="rounded-md bg-slate-100 px-2 py-0.5">{name}</span>)}
+              </div>
+            )}
           </div>
           <Badge tone={info.tone}>{info.label}</Badge>
         </div>
@@ -243,8 +266,8 @@ export function DocumentosCliente() {
           )}
           {(d.status === "required" || d.status === "rejected") && (
             <>
-              <input id={`upload-input-${d.id}`} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(d, f); e.target.value = ""; }} />
-              <Btn size="sm" disabled={uploadingId === d.id} onClick={() => document.getElementById(`upload-input-${d.id}`)?.click()}>
+              <input id={inputId} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(d, f); e.target.value = ""; }} />
+              <Btn size="sm" disabled={uploadingId === d.id} onClick={() => document.getElementById(inputId)?.click()}>
                 {uploadingId === d.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}
                 Subir
               </Btn>
@@ -263,9 +286,10 @@ export function DocumentosCliente() {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Mis documentos" subtitle="Sube los archivos solicitados por tu asesor" icon={FileText} />
+        <CardHeader title="Mis documentos" subtitle="Cada documento compartido sirve para todas las carreras indicadas: súbelo una sola vez" icon={FileText} />
         <CardContent>
           {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2 mb-3">{error}</div>}
+          {careerError && <div className="text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-3">{careerError}</div>}
           {loading ? (
             <div className="text-sm text-slate-400 text-center py-8 flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" /> Cargando…
@@ -275,25 +299,19 @@ export function DocumentosCliente() {
               Aún no tienes documentos solicitados. Aparecerán aquí cuando tu asesor te asigne una carrera.
             </div>
           ) : (
-            <div className="space-y-4">
-              {pending.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500 ">Pendientes ({pending.length})</div>
-                  {pending.map(renderDoc)}
-                </div>
-              )}
-              {inReview.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500 ">En revisión ({inReview.length})</div>
-                  {inReview.map(renderDoc)}
-                </div>
-              )}
-              {validated.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-xs font-semibold text-slate-500 ">Validados ({validated.length})</div>
-                  {validated.map(renderDoc)}
-                </div>
-              )}
+            <div className="space-y-5">
+              {documentGroups.map((group) => (
+                <section key={group.key} className="space-y-3 border-t border-slate-100 pt-5 first:border-t-0 first:pt-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <div>
+                      <h2 className="text-base font-semibold text-slate-900">{group.career?.name || group.label}</h2>
+                      {group.career?.university && <p className="mt-0.5 text-xs text-slate-500">{group.career.university}{group.career.city ? ` · ${group.career.city}` : ""}</p>}
+                    </div>
+                    <span className="text-xs text-slate-500">{group.documents.length} {group.documents.length === 1 ? "documento" : "documentos"}</span>
+                  </div>
+                  <div className="space-y-2">{group.documents.map((entry) => renderDoc(entry, group.key))}</div>
+                </section>
+              ))}
             </div>
           )}
         </CardContent>

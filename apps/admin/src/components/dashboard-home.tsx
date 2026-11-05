@@ -62,8 +62,9 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
     ["Ventas este año", holded ? `${Math.round(holded.currentYear.sales).toLocaleString("es-ES")} €` : "—", holded ? `${holded.currentYear.invoices} facturas en Holded` : "Holded no disponible", CircleDollarSign, "red", dashboardReportUrl("facturacion", period)],
   ] as const;
   const visibleDays = Math.max(1, Math.floor((today.getTime() - rangeStart.getTime()) / 86400000) + 1);
-  const chartData = acquisition?.buckets.map((bucket) => ({ day: bucket.tick || bucket.label, leads: bucket.leads, clients: bucket.clients }))
+  const chartData = acquisition?.buckets.map((bucket) => ({ key: bucket.key, day: bucket.label, tick: bucket.tick, leads: bucket.leads, clients: bucket.clients }))
     || (period === "all" ? monthlySeries(rangeStart, today, contacts, clients) : dailySeries(rangeStart, visibleDays, contacts, clients));
+  const chartLabels = new Map(chartData.map((point) => [point.key, point]));
   const chartHasValues = chartData.some((point) => point.leads > 0 || point.clients > 0);
   const hotLeads = contacts.filter((lead) => (isDeveloperAdmin || lead.owner === currentUser) && (lead.heat || 0) >= 80 && !["Cliente", "Lost"].includes(leadStages[lead.id] || lead.stage || "Por contactar"));
   const funnelStages: Array<[string, CrmStage]> = [["Por contactar", "Por contactar"], ["Contactados", "Contactado"], ["Llamadas", "Llamada programada"], ["Propuestas", "Propuesta enviada"], ["Clientes", "Cliente"]];
@@ -87,7 +88,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
           <header className="phead"><div><h2>Nuevos leads y clientes</h2><p>Altas diarias · {periodLabel.toLowerCase()}</p></div><span className="report-hint">Ver informe <ExternalLink /></span></header>
           <div className="chart-legend"><span className="leads">Leads</span><span className="clients">Clientes</span></div>
           {chartHasValues ? <ResponsiveContainer width="100%" height={270}>
-            <LineChart data={chartData} margin={{ top: 18, left: -16, right: 18, bottom: 4 }}><CartesianGrid vertical={false} stroke="#EDECDB" /><XAxis dataKey="day" axisLine={false} tickLine={false} /><YAxis allowDecimals={false} axisLine={false} tickLine={false} padding={{ top: 12 }} /><Tooltip /><Line type="monotone" dataKey="leads" name="Leads" stroke="#2D3A64" strokeWidth={3} dot={{ r: 3, fill: "#2D3A64" }} activeDot={{ r: 5 }} /><Line type="monotone" dataKey="clients" name="Clientes" stroke="#ECB450" strokeWidth={3} dot={{ r: 3, fill: "#ECB450" }} activeDot={{ r: 5 }} /></LineChart>
+            <LineChart data={chartData} margin={{ top: 18, left: -16, right: 18, bottom: 4 }}><CartesianGrid vertical={false} stroke="#EDECDB" /><XAxis dataKey="key" tickFormatter={(key: string) => chartLabels.get(key)?.tick || chartLabels.get(key)?.day || ""} axisLine={false} tickLine={false} /><YAxis allowDecimals={false} axisLine={false} tickLine={false} padding={{ top: 12 }} /><Tooltip labelFormatter={(key: string) => { const point = chartLabels.get(key); return point ? `${point.day} ${key.slice(0, 4)}` : key; }} /><Line type="monotone" dataKey="leads" name="Leads" stroke="#2D3A64" strokeWidth={3} dot={{ r: 3, fill: "#2D3A64" }} activeDot={{ r: 5 }} /><Line type="monotone" dataKey="clients" name="Clientes" stroke="#ECB450" strokeWidth={3} dot={{ r: 3, fill: "#ECB450" }} activeDot={{ r: 5 }} /></LineChart>
           </ResponsiveContainer> : <EmptyChartBar className="dashboard-empty-chart" />}
         </a>
 
@@ -119,7 +120,8 @@ function dailySeries(startDate: Date, days: number, contacts: Contact[], clients
     const start = new Date(startDate); start.setDate(startDate.getDate() + index);
     const end = new Date(start); end.setDate(start.getDate() + 1);
     const inDay = (value?: string) => Boolean(value && new Date(value) >= start && new Date(value) < end);
-    return { day: start.toLocaleDateString("es-ES", { day: "2-digit", month: "short" }).replace(".", ""), leads: contacts.filter((lead) => inDay(lead.createdAt)).length, clients: clients.filter((client) => inDay(client.created_at)).length };
+    const day = start.toLocaleDateString("es-ES", { day: "2-digit", month: "short" }).replace(".", "");
+    return { key: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`, day, tick: day, leads: contacts.filter((lead) => inDay(lead.createdAt)).length, clients: clients.filter((client) => inDay(client.created_at)).length };
   });
 }
 
@@ -130,6 +132,7 @@ function monthlySeries(startDate: Date, endDate: Date, contacts: Contact[], clie
     const start = new Date(first.getFullYear(), first.getMonth() + index, 1);
     const end = new Date(first.getFullYear(), first.getMonth() + index + 1, 1);
     const inMonth = (value?: string) => Boolean(value && new Date(value) >= start && new Date(value) < end);
-    return { day: start.toLocaleDateString("es-ES", { month: "short", year: "2-digit" }).replace(".", ""), leads: contacts.filter((lead) => inMonth(lead.createdAt)).length, clients: clients.filter((client) => inMonth(client.created_at)).length };
+    const day = start.toLocaleDateString("es-ES", { month: "short", year: "2-digit" }).replace(".", "");
+    return { key: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-01`, day, tick: day, leads: contacts.filter((lead) => inMonth(lead.createdAt)).length, clients: clients.filter((client) => inMonth(client.created_at)).length };
   });
 }

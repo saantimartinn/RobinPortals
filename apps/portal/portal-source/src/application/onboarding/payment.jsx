@@ -9,6 +9,7 @@ import { OnboardingShell } from './onboarding-shared.jsx';
 
 export function OnboardingPayment({ user, onLogout, onDone }) {
   const amount = Number(user.first_payment_amount);
+  const isMentoria = String(user.tipo || '').toLowerCase() === 'mentoria';
 
   const [busy, setBusy]   = useState(false);
   const [error, setError] = useState("");
@@ -44,7 +45,7 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
 
   return (
     <OnboardingShell user={user}
-      title="Realiza el primer pago"
+      title={isMentoria ? "Abona la Mentoría" : "Realiza el primer pago"}
       subtitle={amountStr ? `Pago seguro con tarjeta · Importe: ${amountStr} €` : "Pago seguro con tarjeta"}
       stepNumber={5}
       onLogout={onLogout}
@@ -67,7 +68,8 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
             <CreditCard className="h-5 w-5 text-white/70" />
           </div>
           <div className="text-3xl font-bold mt-4 tracking-tight">{amountStr ? `${amountStr} €` : "Importe calculado al continuar"}</div>
-          <div className="mt-2 text-xs text-white/60">Primera cuota del programa</div>
+          <div className="mt-2 text-xs text-white/60">{isMentoria ? 'Pago único de Mentoría' : 'Primera cuota del programa'}</div>
+          {!isMentoria && user.mentoria_credit_eur && <div className="mt-2 text-xs text-white/80">Incluye el descuento de {Number(user.mentoria_credit_eur).toLocaleString('es-ES', { minimumFractionDigits: 2 })} € ya abonados por Mentoría.</div>}
         </div>
 
         {error && (
@@ -81,7 +83,7 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
         </Btn>
 
         <div className="text-[11px] text-slate-400 text-center">
-          Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor.
+          {isMentoria ? 'Serás redirigido a la pasarela de pago segura para abonar la cuota única de Mentoría.' : 'Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor.'}
         </div>
       </div>
     </OnboardingShell>

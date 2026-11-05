@@ -38,6 +38,13 @@ exports.handler = async (event) => {
     const discount_codes = dcRes.error ? [] : (dcRes.data || []);
 
     const users = (uRes.data || []).filter((u) => u.role !== 'subscriber_admin'); // los admin no aparecen como usuarios
+    const userIds = users.map((u) => u.id);
+    let notesByUser = new Map();
+    if (userIds.length) {
+      const { data: noteRows, error: notesError } = await sb.from('crm_client_notes').select('user_id,notes').in('user_id', userIds);
+      if (notesError && !['42P01', 'PGRST205'].includes(notesError.code)) throw notesError;
+      notesByUser = new Map((noteRows || []).map((row) => [row.user_id, row.notes]));
+    }
     const requests = rRes.data || [];
     const rsvps = rsvpRes.data || [];
 
@@ -57,6 +64,7 @@ exports.handler = async (event) => {
       nameById[u.id] = name;
       return {
         ...u,
+        crm_notes: notesByUser.get(u.id) || [],
         name,
         requests_total: reqByUser[u.id] || 0,
         requests_open: openByUser[u.id] || 0,

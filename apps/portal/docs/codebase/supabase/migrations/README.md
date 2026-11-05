@@ -22,6 +22,11 @@ Contenido mantenido de `supabase/migrations/`.
 | [`202610060001_create_payment_attempts.sql`](../../../../supabase/migrations/202610060001_create_payment_attempts.sql) | Archivo mantenido del repositorio: 202610060001_create_payment_attempts.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610060002_add_academic_profile.sql`](../../../../supabase/migrations/202610060002_add_academic_profile.sql) | Archivo mantenido del repositorio: 202610060002_add_academic_profile.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610060003_create_birthday_notifications.sql`](../../../../supabase/migrations/202610060003_create_birthday_notifications.sql) | Archivo mantenido del repositorio: 202610060003_create_birthday_notifications.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610230001_booking_cancellation_requests.sql`](../../../../supabase/migrations/202610230001_booking_cancellation_requests.sql) | Archivo mantenido del repositorio: 202610230001_booking_cancellation_requests.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610260001_booking_mentor_gap.sql`](../../../../supabase/migrations/202610260001_booking_mentor_gap.sql) | Archivo mantenido del repositorio: 202610260001_booking_mentor_gap.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202610280001_holded_invoice_claims.sql`](../../../../supabase/migrations/202610280001_holded_invoice_claims.sql) | Archivo mantenido del repositorio: 202610280001_holded_invoice_claims.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202611050002_create_crm_client_notes.sql`](../../../../supabase/migrations/202611050002_create_crm_client_notes.sql) | Archivo mantenido del repositorio: 202611050002_create_crm_client_notes.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`202611050003_convert_paid_mentoria_client.sql`](../../../../supabase/migrations/202611050003_convert_paid_mentoria_client.sql) | Archivo mantenido del repositorio: 202611050003_convert_paid_mentoria_client.sql. | — | Cuando cambie la responsabilidad indicada. |
 
 ---
 

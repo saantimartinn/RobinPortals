@@ -22,6 +22,7 @@ const {
 const storage = require('../../lib/storage');
 const { contractVariant, schoolYearForDate } = require('../../shared/contract-content.cjs');
 const { isIsolatedSandbox } = require('../../lib/sandbox-mode');
+const { isReleaseTestUser } = require('../../../../packages/auth/release-test.cjs');
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -92,6 +93,7 @@ exports.handler = async (event) => {
       .eq('id', session.uid)
       .single();
     if (e1 || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    const releaseTestUser = isReleaseTestUser(u);
     if (!u.dni_completed) return json({ error: 'dni_not_completed' }, { statusCode: 409 });
 
     const nowIso = new Date().toISOString();
@@ -106,7 +108,7 @@ exports.handler = async (event) => {
     const pricingVersion = existingPricingVersion || (tipo === 'delft' ? DELFT_PRICE_VERSION : null);
     const isRobinJr = pricingVersion === ROBIN_JR_PRICE_VERSION;
     const contractKind = contractVariant(tipo, contrato2700, pricingVersion).key;
-    const uploadedSignature = isolatedSandbox
+    const uploadedSignature = isolatedSandbox || releaseTestUser
       ? { path: null }
       : await storage.uploadDataUrl(sb, signature_content, {
           keyPrefix: `${u.id}/contracts`,
@@ -150,12 +152,12 @@ exports.handler = async (event) => {
       throw e2;
     }
     const previousSignaturePath = u.contract_data && u.contract_data.signature_path;
-    if (previousSignaturePath && previousSignaturePath !== uploadedSignature.path && !isolatedSandbox) {
+    if (previousSignaturePath && previousSignaturePath !== uploadedSignature.path && !isolatedSandbox && !releaseTestUser) {
       await storage.removeObject(sb, previousSignaturePath);
     }
 
     // Best-effort: generar PDF y enviar por email — no bloquea la respuesta.
-    if (!isolatedSandbox) try {
+    if (!isolatedSandbox && !releaseTestUser) try {
       const pdfBuffer = await buildContractPdf({
         tipo,
         esOtros,
@@ -197,7 +199,7 @@ exports.handler = async (event) => {
     }
 
     // Reflejar el cliente en la hoja de control de pagos (best-effort, no bloquea).
-    await require('../../lib/integration-sync').syncGoogleSheets(sb, session.uid);
+    if (!releaseTestUser) await require('../../lib/integration-sync').syncGoogleSheets(sb, session.uid);
     return json({ ok: true, contract_signed_at: nowIso });
   } catch (e) {
     console.error('onboarding-contract error', e);

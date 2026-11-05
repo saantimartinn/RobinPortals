@@ -41,7 +41,7 @@ exports.handler = async (event) => {
     let clientsQuery = sb
       .from('users')
       .select(
-        'id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, application_phase, created_at, updated_at'
+        'id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, pago_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, application_phase, created_at, updated_at'
       );
     if (!isDeveloperAdmin(admin)) clientsQuery = clientsQuery.eq('assigned_to', adminEmail);
     const { data: clients, error: e2 } = await clientsQuery.order('created_at', { ascending: false });
@@ -49,6 +49,13 @@ exports.handler = async (event) => {
 
     // Por seguridad, nunca devolver otro admin/supervisor como cliente.
     const list = await attachStudentPhones(sb, (clients || []).filter((client) => !hasApplicationAdminRole(client)));
+    const ids = list.map((client) => client.id);
+    let notesByUser = new Map();
+    if (ids.length) {
+      const { data: noteRows, error: notesError } = await sb.from('crm_client_notes').select('user_id,notes').in('user_id', ids);
+      if (notesError && !['42P01', 'PGRST205'].includes(notesError.code)) throw notesError;
+      notesByUser = new Map((noteRows || []).map((row) => [row.user_id, row.notes]));
+    }
 
     return json({
       admin: {
@@ -58,7 +65,7 @@ exports.handler = async (event) => {
         nombre: admin.nombre,
         apellidos: admin.apellidos,
       },
-      clients: list,
+      clients: list.map((client) => ({ ...client, crm_notes: notesByUser.get(client.id) || [] })),
     });
   } catch (e) {
     console.error('admin-clients-list error', e);

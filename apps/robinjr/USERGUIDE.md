@@ -5,7 +5,7 @@ Guía técnica de incorporación al portal Robin Jr. Está organizada para segui
 El alumno consulta su progreso en nueve fases, sus carreras asignadas como tarjetas, Mi plan,
 documentos, pagos y reservas. El admin gestiona alumnos, carreras (ficha con imagen,
 asignaturas y requisitos), deadlines de documentos, pagos y calendario. Una carrera no
-contiene documentos. Las cuotas son de 500 €, 500 € y 499,99 €; las llamadas usan eventos
+contiene documentos. Las altas nuevas pagan 500 €, 500 € y 499 €; las llamadas usan eventos
 `RobinJr` de una hora en Google Calendar. La segunda cuota se habilita desde fase 6 y la
 última desde fase 9 Wrap up. Consulta [BOOKING_CONFIGURATION](docs/BOOKING_CONFIGURATION.md)
 para preparar la disponibilidad del calendario.
@@ -97,7 +97,7 @@ Para un fallo de UI vacía, examina respuesta de documento, bundle JS/CSS, base 
 - [Dataflow](docs/DATAFLOW.md) · sesión, onboarding, archivos, pagos, integraciones y consumidores vecinos.
 - [FILE_MAP](docs/FILE_MAP.md) · mapa explicativo mantenido.
 - [Referencia por archivo de la USERGUIDE](docs/userguide/07-source-file-reference.md).
-- [Robin Admin USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md).
-- [Robin Subscriptions USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md).
+- [Robin Admin USERGUIDE](../admin/USERGUIDE.md).
+- [Robin Subscriptions USERGUIDE](../community/USERGUIDE.md).
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)

@@ -30,6 +30,14 @@ Secuencia dentro de un handler:
 
 `shared/` contiene fuentes CommonJS consumibles en browser y backend con contratos de roles, contenido contractual, política de contraseña y configuración financiera. Antes de cambiar un módulo shared, revisar importadores en ambos runtimes y mantener la semántica identical.
 
+La conversión de Mentoría entra por `admin-client-convert-mentoria.js` y ejecuta
+`convert_paid_mentoria_client` en Supabase. La Function verifica rol y asignación;
+la función SQL conserva el pago y el contrato anteriores en una sola transacción.
+`shared/financial-config.cjs` calcula el crédito de 666,33 € sobre la primera
+cuota del nuevo programa. El contrato se firma de nuevo antes del cobro restante.
+El contrato HTTP está en [API_CONTRACTS](../API_CONTRACTS.md) y el flujo completo
+en [Mentoría y conversión](../MENTORIA_CONVERSION.md).
+
 ## Edge Functions
 
 `netlify/edge-functions/rate-limit-identity.mjs` y `rate-limit-expensive.mjs` ejecutan límites antes del compute de Function para grupos de rutas. La asignación concreta a endpoint se encuentra en `netlify.toml`; revisar rate-limit y Function conjuntamente para no confiar en middleware aislado.
@@ -41,7 +49,7 @@ Considera cada Function un límite independiente: el redirect define cómo llega
 
 Pasos para seguir un endpoint: resuelve la ruta pública en `netlify.toml`; abre el handler bajo `netlify/functions/`; recorre imports hasta el servicio; encuentra la tabla/migración o API externa; vuelve al API client para comprender cómo interpreta fallos. Si es una ruta servida con prefijo, sigue también el Worker y verifica si elimina o conserva el prefijo.
 
-Los endpoints que consume otro repositorio son contratos públicos aunque no sean una API externa. Antes de cambiar una clave del JSON, rol o cookie busca consumidor en Admin y Subscriptions. Revisa [API_INVENTORY](../API_INVENTORY.md), pero valida en source porque los inventarios se generan a partir del código.
+Los endpoints que consume otra app del monorepo son contratos compartidos aunque no sean una API externa. Antes de cambiar una clave del JSON, rol o cookie busca consumidores en Admin, Robin Jr y Community. Revisa [API_INVENTORY](../API_INVENTORY.md), pero valida en source porque los inventarios se generan a partir del código.
 
 ---
 

@@ -60,7 +60,7 @@ test('cada categoría mantiene sus servicios e importes propios', () => {
   assert.match(contractText('delft'), /Ingeniería Aeroespacial en Delft/);
   assert.match(contractText('delft'), /2\.999 €/);
   assert.match(contractText('llegada'), /Extra Housing en Piso: 450 €/);
-  assert.match(contractText('mentoria'), /El precio de la mentoría es de 800 €/);
+  assert.match(contractText('mentoria'), /El precio de la mentoría es de 666,33 €/);
   assert.doesNotMatch(contractText('mentoria'), /correspondientes al programa Pack Llegada Robin/);
   assert.doesNotMatch(contractText('mentoria'), /El pago del Pack Llegada/);
 });

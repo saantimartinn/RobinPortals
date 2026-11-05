@@ -12,6 +12,13 @@ El onboarding se compone en `application/onboarding/OnboardingFlow.jsx` y delega
 
 `admin-permissions.js` expresa claves visibles. La Function correspondiente vuelve a comprobar admin/pro scope y el target user/record. En Robin Admin, `src/features/admin/settings.tsx` administra permisos expuestos; preservar compatibilidad de claves entre repos.
 
+Una ficha de cliente de tipo Mentoría muestra **Convertir a cliente** tras pagar
+la cuota única de 666,33 €. `ConvertMentoria.jsx` ofrece General, Delft o Llegada;
+`admin-clients.js` envía la acción al backend y `AdminPortal.jsx` recarga la lista.
+El alumno vuelve al contrato para aceptar el nuevo programa. En General estándar,
+el crédito cubre la primera cuota y el flujo omite el checkout. Véase
+[Mentoría y conversión](../MENTORIA_CONVERSION.md).
+
 ## API/servidor que apoya la UI
 
 - Clientes/alumnos → `/api/admin/clients*`, `/api/profile*`, `/api/me`.

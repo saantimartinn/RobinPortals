@@ -31,8 +31,8 @@ Cuando cambies una ruta, módulo o export, revisa sus enlaces en este árbol, [F
 
 - [USERGUIDE principal](../../USERGUIDE.md)
 - [06 · Cloudflare y relaciones cross-repo](06-cloudflare-cross-repo.md)
-- [Robin Platform · índice por archivo](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/docs/userguide/07-source-file-reference.md)
-- [Robin Admin · índice por archivo](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/userguide/07-source-file-reference.md)
+- [Robin Platform · índice por archivo](../../../portal/docs/userguide/07-source-file-reference.md)
+- [Robin Admin · índice por archivo](../../../admin/docs/userguide/07-source-file-reference.md)
 
 **Volver al inicio:** [USERGUIDE](../../USERGUIDE.md) · [READMELONG](../../READMELONG.md)
 

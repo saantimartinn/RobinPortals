@@ -25,6 +25,7 @@ function buildContractPdf({
   fechaStr,      // "DD de Mes de YYYY"
   signatureDataUrl, // data:image/png;base64,...
   pricingVersion,
+  mentoriaCreditEur,
 }) {
   return new Promise((resolve, reject) => {
     try {
@@ -112,6 +113,14 @@ function buildContractPdf({
             // ignorar tipos desconocidos
             break;
         }
+      }
+
+      if (mentoriaCreditEur) {
+        doc.moveDown(0.5);
+        doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(11).text('Crédito de Mentoría');
+        doc.moveDown(0.2);
+        doc.fillColor(SLATE).font('Helvetica').fontSize(10)
+          .text(`Se descuentan ${Number(mentoriaCreditEur).toFixed(2).replace('.', ',')} € ya abonados por la Mentoría Robin de la primera cuota de este programa.`, { align: 'justify', lineGap: 2 });
       }
 
       // ----- Firmas -----

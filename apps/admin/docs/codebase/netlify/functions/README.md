@@ -15,9 +15,11 @@ HTTP and scheduled Netlify Function entrypoints.
 | [`admin-careers-delete.js`](../../../../netlify/functions/admin-careers-delete.js) | Netlify Function handler for admin-careers-delete; route(s): /api/admin/careers/delete. |
 | [`admin-chat.js`](../../../../netlify/functions/admin-chat.js) | Netlify Function handler for admin-chat; route(s): /api/admin/chat. |
 | [`admin-client-assign.js`](../../../../netlify/functions/admin-client-assign.js) | Netlify Function handler for admin-client-assign; route(s): /api/admin/clients/assign. |
+| [`admin-client-folders.js`](../../../../netlify/functions/admin-client-folders.js) | Netlify Function handler for admin-client-folders; route(s): /api/admin/client-folders. |
 | [`admin-clients-all.js`](../../../../netlify/functions/admin-clients-all.js) | Netlify Function handler for admin-clients-all; route(s): /api/admin/clients/all. |
 | [`admin-clients-export.js`](../../../../netlify/functions/admin-clients-export.js) | Netlify Function handler for admin-clients-export; route(s): /api/admin/clients/export. |
 | [`admin-clients-list.js`](../../../../netlify/functions/admin-clients-list.js) | Netlify Function handler for admin-clients-list; route(s): /api/admin/clients. |
+| [`admin-crm-bookings.js`](../../../../netlify/functions/admin-crm-bookings.js) | Netlify Function handler for admin-crm-bookings; route(s): /api/admin/crm/bookings. |
 | [`admin-crm-email.js`](../../../../netlify/functions/admin-crm-email.js) | Netlify Function handler for admin-crm-email; route(s): /api/admin/crm/email. |
 | [`admin-crm-future-leads.js`](../../../../netlify/functions/admin-crm-future-leads.js) | Netlify Function handler for admin-crm-future-leads; route(s): /api/admin/crm/future-leads. |
 | [`admin-crm-heartbeat.js`](../../../../netlify/functions/admin-crm-heartbeat.js) | Netlify Function handler for admin-crm-heartbeat; route(s): /api/admin/crm/heartbeat. |
@@ -28,6 +30,7 @@ HTTP and scheduled Netlify Function entrypoints.
 | [`admin-database.js`](../../../../netlify/functions/admin-database.js) | Netlify Function handler for admin-database; route(s): /api/admin/database. |
 | [`admin-developer-clients.js`](../../../../netlify/functions/admin-developer-clients.js) | Netlify Function handler for admin-developer-clients; route(s): /api/admin/developer-clients. |
 | [`admin-developer-leads.js`](../../../../netlify/functions/admin-developer-leads.js) | Netlify Function handler for admin-developer-leads; route(s): /api/admin/developer-leads. |
+| [`admin-developer-logs.js`](../../../../netlify/functions/admin-developer-logs.js) | Netlify Function handler for admin-developer-logs; route(s): /api/admin/developer-logs. |
 | [`admin-documents-add.js`](../../../../netlify/functions/admin-documents-add.js) | Netlify Function handler for admin-documents-add; route(s): /api/admin/documents/add. |
 | [`admin-documents-delete.js`](../../../../netlify/functions/admin-documents-delete.js) | Netlify Function handler for admin-documents-delete; route(s): /api/admin/documents/delete. |
 | [`admin-documents-review.js`](../../../../netlify/functions/admin-documents-review.js) | Netlify Function handler for admin-documents-review; route(s): /api/admin/documents/review. |
@@ -48,9 +51,12 @@ HTTP and scheduled Netlify Function entrypoints.
 | [`admin-payments-set-carreras.js`](../../../../netlify/functions/admin-payments-set-carreras.js) | Netlify Function handler for admin-payments-set-carreras; route(s): /api/admin/payments/set-carreras. |
 | [`admin-payments-unlock.js`](../../../../netlify/functions/admin-payments-unlock.js) | Netlify Function handler for admin-payments-unlock; route(s): /api/admin/payments/unlock. |
 | [`admin-phase-set.js`](../../../../netlify/functions/admin-phase-set.js) | Netlify Function handler for admin-phase-set; route(s): /api/admin/phase. |
+| [`admin-platform-logs.js`](../../../../netlify/functions/admin-platform-logs.js) | Netlify Function handler for admin-platform-logs; route(s): /api/admin/platform-logs. |
 | [`admin-sales-dashboard.js`](../../../../netlify/functions/admin-sales-dashboard.js) | Netlify Function handler for admin-sales-dashboard; route(s): /api/admin/sales/dashboard. |
 | [`admin-sales-test.js`](../../../../netlify/functions/admin-sales-test.js) | Netlify Function handler for admin-sales-test; route(s): /api/admin/sales/test. |
 | [`admin-tasks.js`](../../../../netlify/functions/admin-tasks.js) | Netlify Function handler for admin-tasks; route(s): /api/admin/tasks. |
+| [`admin-tests-payment.js`](../../../../netlify/functions/admin-tests-payment.js) | Netlify Function handler for admin-tests-payment; route(s): /api/admin/tests/payment. |
+| [`admin-tests-run.js`](../../../../netlify/functions/admin-tests-run.js) | Netlify Function handler for admin-tests-run; route(s): /api/admin/tests/run. |
 | [`admin-users.js`](../../../../netlify/functions/admin-users.js) | Netlify Function handler for admin-users; route(s): /api/admin/users. |
 | [`admin-web-analytics.js`](../../../../netlify/functions/admin-web-analytics.js) | Netlify Function handler for admin-web-analytics; route(s): /api/admin/web/analytics. |
 | [`admin-web-blog.js`](../../../../netlify/functions/admin-web-blog.js) | Netlify Function handler for admin-web-blog; route(s): /api/admin/web/blog. |

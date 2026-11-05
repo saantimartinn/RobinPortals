@@ -32,8 +32,8 @@ Después de añadir o reubicar archivos, consulta `package.json` para regenerar 
 
 - [USERGUIDE principal](../../USERGUIDE.md)
 - [06 · Cloudflare y flujos cross-repo](06-cloudflare-and-cross-repo.md)
-- [Robin Admin · índice por archivo](https://github.com/RobinManuV/Robin-Admin/blob/main/docs/userguide/07-source-file-reference.md)
-- [Robin Subscriptions · índice por archivo](https://github.com/saantimartinn/robin-subscriptions/blob/main/docs/userguide/07-source-file-reference.md)
+- [Robin Admin · índice por archivo](../../../admin/docs/userguide/07-source-file-reference.md)
+- [Robin Subscriptions · índice por archivo](../../../community/docs/userguide/07-source-file-reference.md)
 
 **Volver al inicio:** [USERGUIDE](../../USERGUIDE.md) · [READMELONG](../../READMELONG.md)
 

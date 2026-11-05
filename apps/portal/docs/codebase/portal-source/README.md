@@ -23,8 +23,8 @@ Proyecto frontend independiente que genera el portal publicado en `/portal/`.
 | [`package-lock.json`](../../../portal-source/package-lock.json) | Resolución reproducible de dependencias del frontend. | — | Solo como resultado de un cambio intencional de dependencias. |
 | [`package.json`](../../../portal-source/package.json) | Dependencias y comandos Vite del frontend. | — | Al cambiar dependencias, scripts o requisitos de Node.js. |
 | [`postcss.config.js`](../../../portal-source/postcss.config.js) | Transformaciones CSS aplicadas durante el build. | — | Cuando cambie la responsabilidad indicada. |
-| [`tailwind.config.js`](../../../portal-source/tailwind.config.js) | Rutas de contenido y tema de Tailwind CSS. | — | Cuando cambie la responsabilidad indicada. |
-| [`vite.config.js`](../../../portal-source/vite.config.js) | Configuración de compilación y desarrollo de Vite. | — | Cuando cambie la responsabilidad indicada. |
+| [`tailwind.config.js`](../../../portal-source/tailwind.config.js) | Rutas de contenido y tema de Tailwind CSS. | `../../../packages/brand/tailwind-preset.cjs` | Cuando cambie la responsabilidad indicada. |
+| [`vite.config.js`](../../../portal-source/vite.config.js) | Configuración de compilación y desarrollo de Vite. | `../../../dev/vite-legacy-cjs.mjs` | Cuando cambie la responsabilidad indicada. |
 
 ---
 

@@ -25,6 +25,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Robin necesita la cámara para fotografiar el DNI o pasaporte del alumno.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Robin usa Face ID para acceder de forma segura a la contraseña guardada en este iPhone.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIUserInterfaceStyle</key>

@@ -11,6 +11,7 @@ Methods are statically inferred and should be confirmed in the handler; schedule
 | `/api/notion/webhook` | [`notion-webhook`](../netlify/functions/notion-webhook.js) | POST |
 | `/api/internal/crm/convert` | [`crm-convert`](../netlify/functions/crm-convert.js) | POST |
 | `/api/admin/crm/leads` | [`admin-crm-leads`](../netlify/functions/admin-crm-leads.js) | DELETE, GET, POST |
+| `/api/admin/crm/bookings` | [`admin-crm-bookings`](../netlify/functions/admin-crm-bookings.js) | GET |
 | `/api/admin/crm/lead-notes` | [`admin-crm-lead-notes`](../netlify/functions/admin-crm-lead-notes.js) | GET |
 | `/api/admin/crm/lead-calls` | [`admin-crm-lead-calls`](../netlify/functions/admin-crm-lead-calls.js) | GET |
 | `/api/admin/crm/future-leads` | [`admin-crm-future-leads`](../netlify/functions/admin-crm-future-leads.js) | POST |
@@ -23,6 +24,10 @@ Methods are statically inferred and should be confirmed in the handler; schedule
 | `/api/admin/finance/dashboard` | [`admin-finance-dashboard`](../netlify/functions/admin-finance-dashboard.js) | GET |
 | `/api/admin/sales/dashboard` | [`admin-sales-dashboard`](../netlify/functions/admin-sales-dashboard.js) | GET |
 | `/api/admin/sales/test` | [`admin-sales-test`](../netlify/functions/admin-sales-test.js) | GET, POST |
+| `/api/admin/tests/run` | [`admin-tests-run`](../netlify/functions/admin-tests-run.js) | GET, POST |
+| `/api/admin/tests/payment` | [`admin-tests-payment`](../netlify/functions/admin-tests-payment.js) | GET, POST |
+| `/api/admin/developer-logs` | [`admin-developer-logs`](../netlify/functions/admin-developer-logs.js) | GET |
+| `/api/admin/platform-logs` | [`admin-platform-logs`](../netlify/functions/admin-platform-logs.js) | GET |
 | `/api/web/collect` | [`web-collect`](../netlify/functions/web-collect.js) | POST |
 | `/api/admin/web/analytics` | [`admin-web-analytics`](../netlify/functions/admin-web-analytics.js) | GET |
 | `/api/admin/web/heatmap` | [`admin-web-heatmap`](../netlify/functions/admin-web-heatmap.js) | GET |
@@ -80,6 +85,7 @@ Methods are statically inferred and should be confirmed in the handler; schedule
 | `/api/bookings/availability` | [`bookings-availability`](../netlify/functions/bookings-availability.js) | GET |
 | `/api/bookings/create` | [`bookings-create`](../netlify/functions/bookings-create.js) | POST |
 | `/api/bookings` | [`bookings-list`](../netlify/functions/bookings-list.js) | GET |
+| `/api/admin/client-folders` | [`admin-client-folders`](../netlify/functions/admin-client-folders.js) | GET, POST |
 | `/api/admin/clients/all` | [`admin-clients-all`](../netlify/functions/admin-clients-all.js) | GET |
 | `/api/admin/clients/export` | [`admin-clients-export`](../netlify/functions/admin-clients-export.js) | GET |
 | `/api/admin/clients/assign` | [`admin-client-assign`](../netlify/functions/admin-client-assign.js) | POST |

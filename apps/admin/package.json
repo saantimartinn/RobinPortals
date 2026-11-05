@@ -10,7 +10,9 @@
     "docs:generate": "node scripts/generate-docs.cjs",
     "docs:check": "node scripts/generate-docs.cjs --check",
     "crm-history:preview": "node scripts/import-historical-crm-metrics.mjs",
-    "crm-history:import": "node scripts/import-historical-crm-metrics.mjs --apply"
+    "crm-history:import": "node scripts/import-historical-crm-metrics.mjs --apply",
+    "crm-notes:preview": "node scripts/backfill-crm-client-notes.cjs",
+    "crm-notes:backfill": "node scripts/backfill-crm-client-notes.cjs --apply"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.58.0",

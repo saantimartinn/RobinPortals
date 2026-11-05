@@ -74,6 +74,7 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
         onSaved={() => onUserRefresh && onUserRefresh()}
       />
       <ChangePasswordCard />
+      <a className="inline-block text-sm text-slate-600 underline" href="/admin/politica-de-privacidad.html">Política de privacidad</a>
     </div>
   );
 }
@@ -94,6 +95,7 @@ function ChangePasswordCard() {
     setBusy(true);
     try {
       await changePassword(current, next);
+      try { window.webkit?.messageHandlers?.robinAuth?.postMessage({ action: "passwordChanged", password: next }); } catch (_) {}
       setCurrent(""); setNext(""); setConfirm(""); setOpen(false); setSuccess(true);
     } catch (submitError) {
       setError(submitError.status === 401

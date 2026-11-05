@@ -128,6 +128,17 @@ export function AdminPerfil({ client, onRefresh }) {
       </Card>
 
       <Card>
+        <CardHeader title="Notas comerciales" subtitle="Información interna del lead, visible solo para administración" icon={FileText} />
+        <CardContent className="space-y-3">
+          {!(client.crm_notes || []).length && <p className="text-sm text-slate-400">No hay notas comerciales.</p>}
+          {(client.crm_notes || []).map((note) => <div key={note.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <div className="text-xs font-medium text-slate-500">{note.authorName || "Equipo Robin"}{note.createdAt ? ` · ${fmtDate(note.createdAt)}` : ""}</div>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{note.body}</p>
+          </div>)}
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader title="Intereses de carrera" subtitle="Sólo lectura · los marca el alumno en su onboarding" icon={BookOpen} />
         <CardContent>
           <div className="flex flex-wrap gap-2">

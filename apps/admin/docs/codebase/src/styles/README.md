@@ -8,6 +8,7 @@ Maintained files in this directory and links to their responsibilities.
 
 | File | Responsibility |
 |---|---|
+| [`brand-shell.css`](../../../../src/styles/brand-shell.css) | Global or feature stylesheet. |
 | [`global.css`](../../../../src/styles/global.css) | Global or feature stylesheet. |
 | [`web-analytics.css`](../../../../src/styles/web-analytics.css) | Global or feature stylesheet. |
 

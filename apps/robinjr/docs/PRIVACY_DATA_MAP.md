@@ -43,5 +43,5 @@ request procedures.
 - CI rejects known PII fields in persistent log payloads.
 
 Historical rows may still contain data written by older code. They were not inspected,
-changed or deleted because no Supabase operation is authorized. Retention and cleanup
+changed or deleted during this documentation update. Retention and cleanup
 must be approved with an exact scope and recovery plan.

@@ -15,6 +15,8 @@ Servicios y utilidades del servidor compartidos por handlers.
 - [partner-logo.js](../../../../backend/lib/partner-logo.js): Servicio servidor: partner-logo.
 - [password-reset.js](../../../../backend/lib/password-reset.js): Servicio servidor: password-reset.
 - [principal.js](../../../../backend/lib/principal.js): Servicio servidor: principal.
+- [revolut-subscription-sync.js](../../../../backend/lib/revolut-subscription-sync.js): Servicio servidor: revolut-subscription-sync.
+- [revolut-subscriptions.js](../../../../backend/lib/revolut-subscriptions.js): Servicio servidor: revolut-subscriptions.
 - [social.js](../../../../backend/lib/social.js): Servicio servidor: social.
 - [stripe.js](../../../../backend/lib/stripe.js): Servicio servidor: stripe.
 - [subscription-billing.js](../../../../backend/lib/subscription-billing.js): Servicio servidor: subscription-billing.

@@ -6,7 +6,10 @@ Guía de incorporación técnica para quien empieza a trabajar en el panel de ad
 
 ## Qué es este repositorio
 
-Robin Admin es una aplicación React/Vite servida como SPA, con endpoints en Netlify Functions y lógica reutilizable de backend en `lib/`. Contiene el panel interno (CRM, alumnos, analítica, finanzas, configuración e integraciones) y algunos flujos de aplicación. La identidad de aplicación procede de Robin Platform cuando se usa el dominio común. The Robin Plan es otro despliegue, con backend y datos propios.
+Robin Admin es una app React/Vite del monorepo y se publica con las otras tres
+en el sitio Netlify unificado. Sus endpoints son Netlify Functions y la lógica
+backend reutilizable vive en `lib/`. La identidad de aplicación procede del
+Portal del Alumno; Robin Community conserva su dominio de suscripción propio.
 
 No hay un paquete compartido ni un despliegue atómico entre estos repositorios. Cambiar un contrato que cruza repos requiere revisar los dos extremos y desplegar los cambios en un orden compatible.
 
@@ -111,7 +114,7 @@ Al reproducir un bug, anota URL completa, pathname y query, host, identidad/rol 
 - [Cloudflare y rutas](docs/CLOUDFLARE_ROUTING.md) · rutas públicas, proxy y transformaciones.
 - [API inventory](docs/API_INVENTORY.md) · rutas conocidas y handler candidato.
 - [Dataflow](docs/DATAFLOW.md) · recorridos de identidad, CRM, documentos, pagos y proveedores.
-- [Robin Platform USERGUIDE](https://github.com/RobinManuV/Robin-platform-cliente/blob/main/USERGUIDE.md) · identidad de aplicación, portal y Worker.
-- [Robin Subscriptions USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md) · cuenta, billing y comunidad de The Robin Plan.
+- [Robin Platform USERGUIDE](../portal/USERGUIDE.md) · identidad de aplicación, portal y Worker.
+- [Robin Subscriptions USERGUIDE](../community/USERGUIDE.md) · cuenta, billing y comunidad de The Robin Plan.
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)

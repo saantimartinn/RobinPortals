@@ -137,6 +137,10 @@
 
 # ---------- Panel admin de suscriptores (role subscriber_admin) ----------
 [[redirects]]
+  from = "/api/sub-admin/client-folders"
+  to = "/.netlify/functions/sub-admin-client-folders"
+  status = 200
+[[redirects]]
   from = "/api/sub-admin/data"
   to = "/.netlify/functions/sub-admin-data"
   status = 200

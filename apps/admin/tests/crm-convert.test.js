@@ -15,6 +15,7 @@ function database(tables) {
         eq(field, value) { filters.push((row) => row[field] === value); return query; },
         limit() { return query; },
         insert(row) { operation = 'insert'; values = row; return query; },
+        upsert(row) { operation = 'upsert'; values = row; return query; },
         update(row) { operation = 'update'; values = row; return query; },
         async single() { return resolve(true); },
         async maybeSingle() { return resolve(true); },
@@ -25,6 +26,12 @@ function database(tables) {
           const inserted = { id: table + '-' + (rows.length + 1), ...values };
           rows.push(inserted);
           return { data: one ? inserted : [inserted], error: null };
+        }
+        if (operation === 'upsert') {
+          const existing = rows.find((row) => row.user_id === values.user_id);
+          if (existing) Object.assign(existing, values);
+          else rows.push({ ...values });
+          return { data: null, error: null };
         }
         const found = rows.filter((row) => filters.every((match) => match(row)));
         if (operation === 'update') found.forEach((row) => Object.assign(row, values));
@@ -39,11 +46,11 @@ test('CRM crea accesos en bases separadas y conserva ambos portales del mismo le
   const previousPassword = process.env.CRM_BOOTSTRAP_PASSWORD;
   process.env.CRM_BOOTSTRAP_PASSWORD = 'test-bootstrap-password#';
   const admin = { id: 'admin-1', email: 'admin@robin.test', username: 'admin', nombre: 'Admin', role: 'admin' };
-  const lead = { id: 'lead-1', name: 'Ana López', email: 'ana@example.test', lead_type: 'General', owner_names: ['Admin'], source_payload: {} };
+  const lead = { id: 'lead-1', name: 'Ana López', email: 'ana@example.test', lead_type: 'General', owner_names: ['Admin'], comment: 'Necesita apoyo con la solicitud.', source_payload: {} };
   const portal = database({ users: [admin], payments: [] });
   const junior = database({ users: [] });
   const community = database({ subscribers: [] });
-  const crm = database({ crm_leads: [lead] });
+  const crm = database({ crm_leads: [lead], crm_lead_events: [{ id: 'note-1', lead_id: lead.id, event_type: 'team_note', metadata: { body: 'Llamar a la madre', author_name: 'Equipo' }, created_at: '2026-11-04T10:00:00Z' }], crm_lead_calls: [] });
   const sent = [];
   const modules = {
     '../../lib/supabase': { getSupabase: () => portal },
@@ -117,10 +124,18 @@ test('CRM crea accesos en bases separadas y conserva ambos portales del mismo le
     community.tables.subscribers[0].email,
   ], [lead.email, lead.email, lead.email]);
   assert.deepEqual(Object.keys(lead.source_payload.portal_accounts).sort(), ['alumno', 'community', 'robinjr']);
+  for (const db of [portal, junior, community]) {
+    assert.equal(db.tables.crm_client_notes.length, 1);
+    assert.deepEqual(db.tables.crm_client_notes[0].notes.map((note) => note.body), ['Necesita apoyo con la solicitud.', 'Llamar a la madre']);
+  }
+  assert.equal(lead.source_payload.crm_notes.length, 2);
 
+  crm.tables.crm_lead_events.push({ id: 'note-2', lead_id: lead.id, event_type: 'team_note', metadata: { body: 'Enviar resumen', author_name: 'Equipo' }, created_at: '2026-11-05T10:00:00Z' });
   const repeat = await convert('community', '');
   assert.equal(repeat.result, 'exists');
   assert.equal(community.tables.subscribers.length, 1);
+  assert.equal(community.tables.crm_client_notes[0].notes.length, 3);
+  assert.equal(community.tables.crm_client_notes.length, 1);
   assert.equal(sent.length, 3);
   assert.ok(sent.every((message) => message.username === lead.email && message.password === 'test-bootstrap-password#'));
   if (previousPassword === undefined) delete process.env.CRM_BOOTSTRAP_PASSWORD;

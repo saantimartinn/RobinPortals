@@ -18,4 +18,5 @@ export const ROBIN_LINKS = [
   [`${origin}/therobinplan/`, 'Robin Community', 'subscriptions'],
   [`${origin}/admin/crm`, 'CRM', 'admin-crm'],
   [`${origin}/admin/analiticas/ventas`, 'Otras métricas', 'admin-analytics'],
+  [`${origin}/admin/desarrolladores/tests`, 'Desarrolladores', 'admin-developers'],
 ];

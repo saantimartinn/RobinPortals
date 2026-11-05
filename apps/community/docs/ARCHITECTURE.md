@@ -24,18 +24,18 @@ servicios comunes a `backend/lib/`.
 - El shell selecciona una vista según la sesión local. La UI no concede acceso: el backend aplica roles y ownership, y los niveles mostrados no sustituyen autorización.
 - Precios, pagos confirmados y estado de suscripción se verifican en el backend y Stripe; los assets y componentes compartidos no contienen secretos.
 
-El portal público vive bajo `/therobinplan/`, con rutas `/api/` en el origin Netlify
-que el Worker expone bajo `/therobinplan/api/`. `frontend/vite.config.js` usa base
-`/therobinplan/`, crea `dist/therobinplan/` y escribe un redirect adicional para
-`/api/sub-admin/db`. El único directorio publicado es `dist/`. No existe un servidor
-Express ni una API independiente que desplegar: las Functions son el backend.
+El portal público vive bajo `/therobinplan/`. El Worker vigente conserva esa ruta
+y el `netlify.toml` generado de raíz entrega `/therobinplan/api/*` a las Functions
+de Community. `frontend/vite.config.js` usa base `/therobinplan/`; `site/build.mjs`
+incorpora el bundle al sitio unificado. No existe un servidor Express adicional:
+las Functions son el backend.
 
 La base de datos no debe reutilizarse con el portal de alumnos. Los únicos roles
 aceptados en sesiones son `subscriber` y `subscriber_admin`. No hay fallback a `users`.
 Al abrir The Robin Plan desde una sesión activa del portal de aplicación, `/api/auth/sso`
 valida esa sesión a través de su API y crea una cookie propia únicamente para una cuenta
 de suscriptor coincidente por email o `lead_id`. El cierre de sesión elimina las cookies
-de los dos portales; no se comparte el secreto JWT entre despliegues.
+de los dos portales; cada app mantiene su propio contrato de sesión.
 
 ## Contenido por carpeta
 

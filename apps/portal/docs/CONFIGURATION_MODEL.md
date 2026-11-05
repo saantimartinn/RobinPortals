@@ -16,7 +16,9 @@ constant belongs in a database, and secrets never belong in source control.
 
 ## Decisions in this phase
 
-- `shared/financial-config.cjs` remains the only financial/fiscal rule source.
+- `shared/financial-config.cjs` defines current plans and fiscal rules. The
+  conversion RPC also checks the paid Mentoría amount; a future price change
+  must update both sources and define how historical payments are treated.
   Google Sheets now derives its net tax factor from `FISCAL.iva` instead of a second
   hard-coded `1.21`.
 - Operational support recipients use `SUPPORT_INBOXES` (CSV) and `TEAM_EMAIL`.
@@ -30,10 +32,15 @@ constant belongs in a database, and secrets never belong in source control.
 - Tareas, carreras, documentos, pagos y notificaciones permanecen gestionados por backend.
 - Booking settings remain environment configuration and are audited in Phase 27.
 
-## Known inconsistency
+## Mentoría
 
-The Mentoría contract text states 800 EUR while the canonical charge is 450 EUR.
-This is a business/legal decision already recorded in Phase 14 and is not silently
-resolved by code cleanup.
+El contrato y el plan de pagos del Portal del Alumno fijan una cuota única de
+**666,33 €** para Mentoría. El crédito por conversión se aplica únicamente a un
+pago de esa cuantía que conste como abonado y no anulado. La primera cuota de
+General estándar queda cubierta; Delft, Llegada y General internacional pueden
+tener un importe pendiente.
 
-No Supabase query or database change was made for this classification.
+La migración `202611050003_convert_paid_mentoria_client.sql` instala la función
+transaccional que conserva el pago original y cambia el tipo de cliente. No altera
+cuentas hasta que un administrador ejecuta la conversión. Consulta
+[Mentoría y conversión](MENTORIA_CONVERSION.md) para importes, estados y alcance.

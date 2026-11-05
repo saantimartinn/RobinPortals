@@ -1,12 +1,13 @@
 # Operaciones
 
-GitHub es la fuente de versiones y Netlify despliega los commits. Los cambios de código no
-deben hacerse únicamente en el editor de Netlify: se implementan en una rama, pasan CI,
-se revisan y después se despliegan desde el repositorio.
+GitHub versiona el monorepo y Netlify publica las cuatro apps en un único sitio.
+El `netlify.toml` de raíz se genera desde las configuraciones de cada app con
+`npm run site:config`; el build de producción usa `site/build.mjs --install`.
 
 ## Preparación y gates
 
-Requisitos: Node.js 20 o posterior. Instalar con los lockfiles:
+Requisitos del sitio unificado: Node.js 22 (véase `netlify.toml` de raíz).
+Para comprobar esta app de forma aislada, instalar con sus lockfiles:
 
 ```bash
 npm ci
@@ -32,14 +33,16 @@ npm --prefix portal-source run build
 ```
 
 Las pruebas usan fakes y no deben contactar Supabase ni ningún proveedor de producción.
-CI repite estos gates y comprueba que los tres inventarios generados estén actualizados.
+Desde la raíz, `npm test` cubre las cuatro apps y `npm run site:build` comprueba
+el build que se publica. No hay actualmente un workflow de CI versionado.
 
 ## Despliegue
 
 1. Revisar el diff, especialmente rutas, autorización, variables y migraciones.
 2. Hacer commit y push de la rama; abrir/actualizar el pull request.
-3. Exigir CI verde antes de integrar en `main`.
-4. Netlify instala y construye el frontend, publica `deploy/portal` y empaqueta Functions.
+3. Ejecutar las comprobaciones locales y revisar sus resultados antes de integrar en `main`.
+4. Netlify ejecuta el build unificado y publica `site/.output/public`, con las
+   Functions bajo `site/.output/functions`.
 5. Revisar el deploy log; después ejecutar los checks de producción siguientes.
 
 Checklist posterior:
@@ -60,6 +63,14 @@ migración. Ningún cambio de código autoriza modificar producción. Toda evolu
 necesita SQL versionado, revisión independiente, backup/plan de rollback y validación de
 RLS/consumidores. No ejecutar `db push`, migraciones o comandos destructivos como parte de
 los gates normales.
+
+La conversión de Mentoría requiere
+[`202611050003_convert_paid_mentoria_client.sql`](../supabase/migrations/202611050003_convert_paid_mentoria_client.sql)
+en la base de cada entorno antes de publicar la Function. La migración solo crea
+el RPC y concede ejecución a `service_role`; no convierte cuentas al aplicarse.
+Después del despliegue, comprobar una conversión controlada de un expediente de
+prueba pagado, la nueva firma, el historial del pago original y la primera cuota
+cubierta de General. Véase [Mentoría y conversión](MENTORIA_CONVERSION.md).
 
 ## Rollback
 

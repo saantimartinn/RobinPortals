@@ -15,6 +15,7 @@ const {
 } = require('../shared/financial-config.cjs');
 const storage = require('./storage');
 const { isIsolatedSandbox } = require('./sandbox-mode');
+const { isReleaseTestUser } = require('../../../packages/auth/release-test.cjs');
 
 function fmtFecha(iso) {
   try {
@@ -63,7 +64,7 @@ async function syncDriveForUser(sb, userId) {
         const fname = esPasaporte
           ? (nameBase + ' - Pasaporte' + ext)
           : (nameBase + ' - DNI anverso' + ext);
-        const r = await drive.uploadFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
+        const r = await drive.upsertFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
         out.uploads.push({ kind: 'dni_anverso', id: r.id });
       }
     }
@@ -77,7 +78,7 @@ async function syncDriveForUser(sb, userId) {
                    : ext === '.gif'  ? 'image/gif'
                    : 'image/jpeg';
         const fname = nameBase + ' - DNI reverso' + ext;
-        const r = await drive.uploadFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
+        const r = await drive.upsertFile({ name: fname, mimeType: mime, buffer: buf }, folders.dni, token);
         out.uploads.push({ kind: 'dni_reverso', id: r.id });
       }
     }
@@ -115,9 +116,12 @@ async function syncDriveForUser(sb, userId) {
         fechaStr,
         signatureDataUrl,
         pricingVersion,
+        mentoriaCreditEur: cd.mentoria_upgrade?.credit_eur || null,
       });
-      const fname = 'Contrato Robin - ' + nameBase + '.pdf';
-      const r = await drive.uploadFile(
+      // La nueva firma no debe sustituir en Drive el PDF de Mentoría.
+      const fname = 'Contrato Robin - ' + nameBase
+        + (cd.mentoria_upgrade ? ' - ' + tipoContrato : '') + '.pdf';
+      const r = await drive.upsertFile(
         { name: fname, mimeType: 'application/pdf', buffer: pdf },
         folders.contrato,
         token
@@ -149,7 +153,7 @@ async function markOnboardingPaid(sb, userId, pagoData) {
   if (!userId) return { ok: false, reason: 'no_user_id' };
   const { data: u, error } = await sb
     .from('users')
-    .select('id, pago_completed, contract_signed')
+    .select('id, lead_id, email, pago_completed, contract_signed')
     .eq('id', userId)
     .single();
   if (error || !u) return { ok: false, reason: 'user_not_found' };
@@ -174,12 +178,16 @@ async function markOnboardingPaid(sb, userId, pagoData) {
     justCompleted = !!(flipped && flipped.length);
   }
 
-  let gdrive = null;
-  try {
-    gdrive = await syncDriveForUser(sb, userId);
-  } catch (driveErr) {
-    console.error('[drive] sync error:', driveErr && driveErr.message);
-    gdrive = { skipped: true, reason: 'error', detail: driveErr && driveErr.message };
+  // Solo quien gana la transición a pagado inicia la sincronización automática.
+  // La sincronización manual sigue disponible y reutiliza los archivos existentes.
+  let gdrive = { skipped: true, reason: 'already_completed' };
+  if (justCompleted && !isReleaseTestUser(u)) {
+    try {
+      gdrive = await syncDriveForUser(sb, userId);
+    } catch (driveErr) {
+      console.error('[drive] sync error:', driveErr && driveErr.message);
+      gdrive = { skipped: true, reason: 'error', detail: driveErr && driveErr.message };
+    }
   }
 
   // Factura de Holded para la 1.ª cuota (best-effort, idempotente).
@@ -200,10 +208,10 @@ async function markOnboardingPaid(sb, userId, pagoData) {
   }
 
   // Reflejar el cliente en la hoja de control de pagos (best-effort, no bloquea).
-  await require('./integration-sync').syncGoogleSheets(sb, userId);
+  if (!isReleaseTestUser(u)) await require('./integration-sync').syncGoogleSheets(sb, userId);
 
   // Correo de bienvenida con los recursos (best-effort, solo en la transición a completado).
-  if (justCompleted) {
+  if (justCompleted && !isReleaseTestUser(u)) {
     try { await require('./onboarding-welcome').sendWelcomeEmail(sb, userId); }
     catch (welcomeErr) { console.error('[welcome] error:', welcomeErr && welcomeErr.message); }
   }

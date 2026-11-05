@@ -26,10 +26,11 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`AUTHORIZATION.md`](../../AUTHORIZATION.md) | Documenta: Autenticación y autorización. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`BOOKING_CONFIGURATION.md`](../../BOOKING_CONFIGURATION.md) | Documenta: Booking availability. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`BROWSER_SECURITY.md`](../../BROWSER_SECURITY.md) | Documenta: Browser security. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
-| [`CLOUDFLARE_ROUTING.md`](../../CLOUDFLARE_ROUTING.md) | Documenta: Cloudflare y enrutamiento de Project Robin. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`CLOUDFLARE_ROUTING.md`](../../CLOUDFLARE_ROUTING.md) | Documenta: Cloudflare y enrutamiento — Portal del Alumno. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`COMPONENT_MAP.md`](../../COMPONENT_MAP.md) | Documenta: Frontend component map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`CONFIGURATION_MODEL.md`](../../CONFIGURATION_MODEL.md) | Documenta: Configuration and content model. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`DATABASE_CURRENT.md`](../../DATABASE_CURRENT.md) | Documenta: Datos usados por la plataforma. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`DATAFLOW.md`](../../DATAFLOW.md) | Documenta: Dataflow — Robin Platform cliente. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`ENVIRONMENT.md`](../../ENVIRONMENT.md) | Documenta: Environment configuration. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`ERROR_HANDLING.md`](../../ERROR_HANDLING.md) | Documenta: Error-handling policy. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`FILE_INDEX.generated.md`](../../FILE_INDEX.generated.md) | Documenta: File map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
@@ -37,6 +38,7 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`FRONTEND_DEVELOPMENT.md`](../../FRONTEND_DEVELOPMENT.md) | Documenta: Portal Robin. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`IDENTITY_MODEL.md`](../../IDENTITY_MODEL.md) | Documenta: Modelo de identidad. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`INTEGRATIONS.md`](../../INTEGRATIONS.md) | Documenta: Integraciones externas. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`MENTORIA_CONVERSION.md`](../../MENTORIA_CONVERSION.md) | Documenta: Mentoría y conversión a cliente. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`OBSERVABILITY.md`](../../OBSERVABILITY.md) | Documenta: Observability. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`OPERATIONS.md`](../../OPERATIONS.md) | Documenta: Operaciones. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`PASSWORD_POLICY.md`](../../PASSWORD_POLICY.md) | Documenta: Password policy. | — | Al actualizar la decisión, contrato o procedimiento descrito. |

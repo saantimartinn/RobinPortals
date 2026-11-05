@@ -41,7 +41,7 @@ Considera cada Function un límite independiente: el redirect define cómo llega
 
 Pasos para seguir un endpoint: resuelve la ruta pública en `netlify.toml`; abre el handler bajo `netlify/functions/`; recorre imports hasta el servicio; encuentra la tabla/migración o API externa; vuelve al API client para comprender cómo interpreta fallos. Si es una ruta servida con prefijo, sigue también el Worker y verifica si elimina o conserva el prefijo.
 
-Los endpoints que consume otro repositorio son contratos públicos aunque no sean una API externa. Antes de cambiar una clave del JSON, rol o cookie busca consumidor en Admin y Subscriptions. Revisa [API_INVENTORY](../API_INVENTORY.md), pero valida en source porque los inventarios se generan a partir del código.
+Los endpoints que consume otra app del monorepo son contratos compartidos aunque no sean una API externa. Antes de cambiar una clave del JSON, rol o cookie busca consumidores en Portal, Admin y Community. Revisa [API_INVENTORY](../API_INVENTORY.md), pero valida en source porque los inventarios se generan a partir del código.
 
 ---
 

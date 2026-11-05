@@ -6,9 +6,14 @@ Guía técnica de incorporación al portal de aplicación y alumnos. Está organ
 
 ## Papel de Robin Platform
 
-Este repositorio implementa el portal cliente/alumno, los flujos de aplicación y onboarding, APIs de perfil y operaciones relacionadas, y la identidad de aplicación que consume Robin Admin y que puede validar Robin Subscriptions durante su SSO. El Worker de Cloudflare para las rutas públicas de los tres productos también está versionado aquí, bajo `infrastructure/cloudflare/`.
+Esta app del monorepo implementa el Portal del Alumno, el onboarding, el
+expediente y la identidad que consumen Admin y Community. El Worker vigente
+para las cuatro apps está versionado en `infra/cloudflare/` de la raíz.
 
-La UI principal está bajo `portal-source/src/`; el build de Netlify publica `deploy/portal`. Los entrypoints HTTP, lógica server-side, shared helpers, SQL y configuración tienen sus propios límites: la estructura actual está resumida en [ARCHITECTURE](docs/ARCHITECTURE.md) y el [FILE_MAP](docs/FILE_MAP.md). Revisa `netlify.toml` y `package.json` para el contrato vigente de build y dev.
+La UI principal está bajo `portal-source/src/`; `site/build.mjs` la incorpora
+al despliegue Netlify unificado. Los entrypoints HTTP, lógica backend, SQL y
+configuración tienen sus propios límites: consulta [ARCHITECTURE](docs/ARCHITECTURE.md),
+[FILE_MAP](docs/FILE_MAP.md) y el `netlify.toml` generado en la raíz.
 
 ## Cómo empezar a investigar
 
@@ -57,6 +62,7 @@ El helper de sesión y el flujo de login son una ruta lateral importante: una AP
 | Entender sesión y SSO | [01 · Runtime e identidad](docs/userguide/01-runtime-and-identity.md) → `session.js`, `api/auth-onboarding.js`, auth handlers y permisos. |
 | Cambiar portal cliente | [02 · Frontend cliente](docs/userguide/02-client-frontend.md) → `app.jsx` → feature/shared UI → `api.js`. |
 | Cambiar aplicación o admin | [03 · Application y admin UI](docs/userguide/03-application-and-admin-ui.md) → shell/feature → API → permiso backend. |
+| Cambiar Mentoría o convertir un cliente | [Mentoría y conversión](docs/MENTORIA_CONVERSION.md) → ficha admin → Function → transacción → nuevo contrato y cuotas. |
 | Cambiar endpoint | [04 · API, Functions y servicios](docs/userguide/04-api-functions-and-services.md) → redirects → Function → lib/shared → datos. |
 | Cambiar datos/proveedor o seguridad | [05 · Datos, integraciones y seguridad](docs/userguide/05-data-integrations-security.md). |
 | Cambiar ingress, SSO o interacción entre productos | [06 · Cloudflare y flujos cross-repo](docs/userguide/06-cloudflare-and-cross-repo.md). |
@@ -89,7 +95,7 @@ Para un fallo de UI vacía, examina respuesta de documento, bundle JS/CSS, base 
 - [Dataflow](docs/DATAFLOW.md) · sesión, onboarding, archivos, pagos, integraciones y consumidores vecinos.
 - [FILE_MAP](docs/FILE_MAP.md) · mapa explicativo mantenido.
 - [Referencia por archivo de la USERGUIDE](docs/userguide/07-source-file-reference.md).
-- [Robin Admin USERGUIDE](https://github.com/RobinManuV/Robin-Admin/blob/main/USERGUIDE.md).
-- [Robin Subscriptions USERGUIDE](https://github.com/saantimartinn/robin-subscriptions/blob/main/USERGUIDE.md).
+- [Robin Admin USERGUIDE](../admin/USERGUIDE.md).
+- [Robin Subscriptions USERGUIDE](../community/USERGUIDE.md).
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)

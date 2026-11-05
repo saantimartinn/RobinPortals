@@ -2,7 +2,7 @@
  * POST /api/admin/payments/delete
  * Body: { user_id, payment_id }
  * Elimina un pago extra (installment >= 4). NUNCA elimina las cuotas estándar
- * (installment 1, 2 o 3): para esas la respuesta es 403.
+ * (installment 1, 2 o 3) ni el pago original de una Mentoría convertida.
  */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
@@ -33,13 +33,16 @@ exports.handler = async (event) => {
     // Verificar que el pago pertenece al cliente y es un extra (installment >= 4).
     const { data: p, error: e1 } = await sb
       .from('payments')
-      .select('id, user_id, installment, status')
+      .select('id, user_id, installment, status, payment_data')
       .eq('id', payment_id)
       .single();
     if (e1 || !p) return json({ error: 'not_found' }, { statusCode: 404 });
     if (p.user_id !== user_id) return json({ error: 'mismatch' }, { statusCode: 403 });
     if (Number(p.installment) < 4) {
       return json({ error: 'cannot_delete_standard', detail: 'Las 3 cuotas estándar no se pueden eliminar.' }, { statusCode: 403 });
+    }
+    if (p.payment_data?.mentoria_credit_source) {
+      return json({ error: 'cannot_delete_mentoria_credit', detail: 'El pago original de Mentoría debe conservarse.' }, { statusCode: 403 });
     }
 
     const { error: e2 } = await sb.from('payments').delete().eq('id', payment_id);
