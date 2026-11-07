@@ -40,8 +40,11 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255)
+            Color.white
                 .ignoresSafeArea()
+
+            Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255)
+                .ignoresSafeArea(edges: .bottom)
 
             RobinWebView(
                 startURL: RobinAddress.start,
