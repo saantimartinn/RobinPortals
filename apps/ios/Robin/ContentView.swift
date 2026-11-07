@@ -13,10 +13,19 @@ private enum RobinAddress {
         #endif
     }()
 
+    static func isInternalSite(_ url: URL) -> Bool {
+        if url.scheme == "https" && (url.host == "project-robin.com" || url.host == "www.project-robin.com") {
+            return true
+        }
+        #if DEBUG && targetEnvironment(simulator)
+        return url.scheme == "http" && url.host == "localhost" && url.port == 8888
+        #else
+        return false
+        #endif
+    }
+
     static func isTrustedPortal(_ url: URL) -> Bool {
-        let trustedOrigin = (url.scheme == "https" && (url.host == "project-robin.com" || url.host == "www.project-robin.com"))
-            || (url.scheme == "http" && url.host == "localhost" && url.port == 8888)
-        return trustedOrigin && (url.path == "/login" || url.path == "/portal" || url.path.hasPrefix("/portal/"))
+        return isInternalSite(url) && (url.path == "/login" || url.path == "/portal" || url.path.hasPrefix("/portal/"))
     }
 }
 
@@ -321,6 +330,24 @@ private struct RobinWebView: UIViewRepresentable {
         }
 
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            reportNavigationError(error)
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            reportNavigationError(error)
+        }
+
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            if webView.url != nil {
+                webView.reload()
+            } else {
+                webView.load(URLRequest(url: RobinAddress.start))
+            }
+        }
+
+        private func reportNavigationError(_ error: Error) {
+            let navigationError = error as NSError
+            if navigationError.domain == NSURLErrorDomain && navigationError.code == NSURLErrorCancelled { return }
             onError(error)
         }
 
@@ -329,7 +356,7 @@ private struct RobinWebView: UIViewRepresentable {
                 decisionHandler(.cancel)
                 return
             }
-            if url.host == webView.url?.host || url.host == "localhost" || url.host == "project-robin.com" || url.host == "www.project-robin.com" {
+            if RobinAddress.isInternalSite(url) {
                 decisionHandler(.allow)
                 return
             }
@@ -339,7 +366,7 @@ private struct RobinWebView: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
             if let url = action.request.url {
-                if url.host == webView.url?.host || url.host == "localhost" || url.host == "project-robin.com" || url.host == "www.project-robin.com" {
+                if RobinAddress.isInternalSite(url) {
                     webView.load(action.request)
                 } else {
                     UIApplication.shared.open(url)
