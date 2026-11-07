@@ -1,7 +1,7 @@
 // Admin interface component for admin app; composed by the shell or a feature module.
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiPath } from "@/lib/api-path";
 import {
   Activity,
@@ -139,6 +139,16 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   const path = window.location.pathname.replace(/^\/admin(?=\/|$)/, "") || "/";
   const area = getArea(path);
   const [open, setOpen] = useState(false);
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!workspaceOpen) return;
+    const closeOutside = (event: PointerEvent) => { if (!workspaceRef.current?.contains(event.target as Node)) setWorkspaceOpen(false); };
+    const closeEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setWorkspaceOpen(false); };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", closeEscape);
+    return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", closeEscape); };
+  }, [workspaceOpen]);
   const [notice, setNotice] = useState("");
   const [admins, setAdmins] = useState(() => ["Noel", "Manuel", "María", ...(isDeveloperAdminEmail(authUser.email) ? ["Santi"] : [])]);
   const isProAdmin = isProAdminEmail(permissionProfile.email) || permissionProfile.is_pro_admin === true;
@@ -361,41 +371,47 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
       <div className="work">
         <header className="top">
           <button className="menub" onClick={() => setOpen(true)} aria-label="Abrir menú"><Menu /></button>
-          <nav className="workspace-tabs" aria-label="Áreas del gestor">
-            {workspaceTabs.map(([href, label, tabArea]) => {
-              // Links to the other portals (and Inicio) are already full site paths.
-              const external = /^https?:\/\//.test(href) || ROBIN_LINKS.some(([link]) => link === href);
-              const destination = external ? href : adminPath(href);
-              const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-                if (tabArea === "robinjr") {
-                  event.preventDefault();
-                  void (async () => {
-                    try {
-                      const response = await fetch("/portal/api/auth/sso-ticket", {
-                        method: "POST",
-                        credentials: "same-origin",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ target: "robinjr" }),
-                        cache: "no-store",
-                      });
-                      const result = await response.json().catch(() => ({}));
-                      if (!response.ok || !result.ticket) throw new Error("No se pudo validar la sesión.");
-                      window.location.assign(href + "?sso_ticket=" + encodeURIComponent(result.ticket));
-                    } catch (_) {
-                      setNotice("No se ha podido validar tu acceso a RobinJr.");
-                    }
-                  })();
-                  return;
-                }
-                if (!external) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  window.location.assign(destination);
-                }
-              };
-              return <a href={destination} key={href} className={area === tabArea ? "active" : ""} rel={external ? "noreferrer" : undefined} onClick={onClick}>{label}</a>;
-            })}
-          </nav>
+          <div className="workspace-menu" ref={workspaceRef}>
+            <button className="workspace-menu-toggle" type="button" aria-expanded={workspaceOpen} aria-controls="workspace-links" onClick={() => setWorkspaceOpen((value) => !value)}>
+              <span>{workspaceTabs.find(([, , tabArea]) => tabArea === area)?.[1] || "Portales"}</span><ChevronDown aria-hidden="true" />
+            </button>
+            <nav id="workspace-links" className={workspaceOpen ? "workspace-tabs is-open" : "workspace-tabs"} aria-label="Áreas del gestor">
+              {workspaceTabs.map(([href, label, tabArea]) => {
+                // Links to the other portals (and Inicio) are already full site paths.
+                const external = /^https?:\/\//.test(href) || ROBIN_LINKS.some(([link]) => link === href);
+                const destination = external ? href : adminPath(href);
+                const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+                  setWorkspaceOpen(false);
+                  if (tabArea === "robinjr") {
+                    event.preventDefault();
+                    void (async () => {
+                      try {
+                        const response = await fetch("/portal/api/auth/sso-ticket", {
+                          method: "POST",
+                          credentials: "same-origin",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ target: "robinjr" }),
+                          cache: "no-store",
+                        });
+                        const result = await response.json().catch(() => ({}));
+                        if (!response.ok || !result.ticket) throw new Error("No se pudo validar la sesión.");
+                        window.location.assign(href + "?sso_ticket=" + encodeURIComponent(result.ticket));
+                      } catch (_) {
+                        setNotice("No se ha podido validar tu acceso a RobinJr.");
+                      }
+                    })();
+                    return;
+                  }
+                  if (!external) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.location.assign(destination);
+                  }
+                };
+                return <a href={destination} key={href} className={area === tabArea ? "active" : ""} rel={external ? "noreferrer" : undefined} onClick={onClick}>{label}</a>;
+              })}
+            </nav>
+          </div>
           <div className="top-actions">
             <span className="authenticated-user">{currentUser}</span>
             <button aria-label="Cerrar sesión" onClick={() => void logout()}><LogOut /></button>
