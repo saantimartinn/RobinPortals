@@ -3,7 +3,7 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { sendEmail } = require('../../lib/email');
 const { json, methodNotAllowed, parseJsonBody, verifyOrigin } = require('../../lib/http');
 
-const SUPPORT_EMAIL = 'santiago.martin.ab@gmail.com';
+const SUPPORT_EMAIL = 'hello@project-robin.com';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 exports.handler = async (event) => {
