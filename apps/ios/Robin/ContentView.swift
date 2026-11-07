@@ -40,12 +40,6 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255)
-                .ignoresSafeArea()
-
-            Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255)
-                .ignoresSafeArea(edges: .bottom)
-
             RobinWebView(
                 startURL: RobinAddress.start,
                 onLoaded: { error = nil },
@@ -53,7 +47,7 @@ struct ContentView: View {
                 onCreated: { webViewBox.value = $0 },
                 onAuthMessage: handleAuthMessage
             )
-            .padding(.top, -12)
+            .padding(.top, -24)
             .id(reloadNumber)
 
             if let error {
@@ -75,6 +69,7 @@ struct ContentView: View {
                 .background(Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255))
             }
         }
+        .background(Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255).ignoresSafeArea())
         .alert("Guardar contraseña en este iPhone", isPresented: $showsSavePrompt) {
             Button("Ahora no", role: .cancel) { pendingCredential = nil }
             Button("Guardar") { savePendingCredential() }
@@ -299,7 +294,8 @@ private struct RobinWebView: UIViewRepresentable {
         context.coordinator.webView = webView
         webView.allowsBackForwardNavigationGestures = true
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(red: 254 / 255, green: 251 / 255, blue: 229 / 255, alpha: 1)
+        webView.backgroundColor = UIColor(red: 255 / 255, green: 253 / 255, blue: 245 / 255, alpha: 1)
+        webView.scrollView.backgroundColor = webView.backgroundColor
         webView.load(URLRequest(url: startURL))
         onCreated(webView)
         return webView
