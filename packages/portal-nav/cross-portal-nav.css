@@ -30,7 +30,7 @@
 .robin-cross-notice button{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border:0;border-radius:8px;background:var(--robin-on-navy-line);color:var(--robin-on-navy);font-size:20px;line-height:1;cursor:pointer}
 @media(max-width:1320px){.robin-cross-nav nav a{padding:0 .6rem}.robin-cross-nav nav a::after{left:.6rem;right:.6rem}}
 @media(max-width:1000px){.robin-cross-account{display:none}}
-@media(max-width:800px){.robin-cross-nav{grid-template-columns:auto minmax(0,1fr) auto;height:4rem;padding:0 .75rem}.robin-cross-brand{width:auto;padding:0}.robin-cross-brand img{width:60px;height:34px}.robin-cross-brand span{display:none}.robin-cross-nav nav{padding-left:.5rem}.robin-cross-nav nav a{font-size:.8125rem;padding:0 .5rem}.robin-cross-nav nav a::after{left:.5rem;right:.5rem}}
+@media(max-width:800px){.robin-cross-nav{grid-template-columns:auto minmax(0,1fr) auto;height:3rem;padding:0 .75rem}.robin-cross-brand{width:auto;padding:0}.robin-cross-brand img{width:60px;height:34px}.robin-cross-brand span{display:none}.robin-cross-nav nav{padding-left:.5rem}.robin-cross-nav nav a{font-size:.8125rem;padding:0 .5rem}.robin-cross-nav nav a::after{left:.5rem;right:.5rem}}
 @media(max-width:800px){
   .robin-cross-menu{position:relative;align-self:center;justify-content:center;min-width:0;padding:0 .45rem}
   .robin-cross-menu-toggle{display:flex;align-items:center;justify-content:space-between;gap:.35rem;width:100%;max-width:12rem;min-height:2.4rem;margin:auto;padding:.35rem .65rem;border:var(--robin-line);border-radius:var(--robin-radius-control);background:var(--robin-paper);color:var(--robin-navy);font:600 .8125rem var(--robin-font-text);cursor:pointer}
