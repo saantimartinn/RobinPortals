@@ -29,7 +29,7 @@ test('envía un reporte anónimo al buzón indicado por Robin', async () => {
   }));
   assert.equal(response.statusCode, 200);
   assert.equal(delivered.length, 1);
-  assert.equal(delivered[0].to, 'santiago.martin.ab@gmail.com');
+  assert.equal(delivered[0].to, 'hello@project-robin.com');
   assert.equal(delivered[0].reply_to, 'alumna@example.org');
   assert.match(delivered[0].text, /Al subir el DNI/);
 });
