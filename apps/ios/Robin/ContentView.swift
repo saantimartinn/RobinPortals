@@ -40,7 +40,7 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            Color.white
+            Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255)
                 .ignoresSafeArea()
 
             Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255)
