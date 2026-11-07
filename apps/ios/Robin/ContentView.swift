@@ -53,6 +53,7 @@ struct ContentView: View {
                 onCreated: { webViewBox.value = $0 },
                 onAuthMessage: handleAuthMessage
             )
+            .padding(.top, -12)
             .id(reloadNumber)
 
             if let error {
