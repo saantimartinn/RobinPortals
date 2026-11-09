@@ -17,7 +17,7 @@ function norm(value) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-async function holdedFetch(path, { method = 'GET', body, raw = false } = {}) {
+async function holdedFetch(path, { method = 'GET', body, raw = false, signal } = {}) {
   if (!isConfigured()) throw new Error('holded_not_configured');
   const res = await fetch(HOLDED_BASE + path, {
     method,
@@ -27,6 +27,7 @@ async function holdedFetch(path, { method = 'GET', body, raw = false } = {}) {
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
+    signal,
   });
   if (raw) {
     if (!res.ok) {

@@ -19,42 +19,58 @@
  * Diseño "best-effort" idéntico al de Drive: si Sheets falla, los flujos de
  * asignación/pago/contrato NO se rompen; solo se loguea el error.
  *
- * Layout de la hoja (columnas A..P, cabecera en la fila con "Asesor"):
+ * Layout de la hoja 26-27 (columnas A..N, cabecera en la fila con "Asesor"):
  *   A Asesor · B PR · C alumno · D Pago1 · E Estado1 · F Pago2 · G Estado2 ·
- *   H Pago3 · I Estado3 · J Total Pagado(*) · K Restante(*) · L Cobro Inicial ·
- *   M Cobro Real · N Facturación Inicial neto(*) · O Facturación Real neto(*) ·
- *   P Contrato
+ *   H Pago3 · I Estado3 · J Pagado(*) · K Restante(*) · L Cobros ·
+ *   M Sin IVA(*) · N Contrato
  *   (*) columnas con FÓRMULA en las filas plantilla: NO se sobreescriben cuando
  *       reutilizamos una fila existente; se dejan recalcular solas.
  */
 
 const SHEETS_API = 'https://sheets.googleapis.com/v4/spreadsheets';
 const OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const CHANGES_SHEET_GID = 288896043;
 const { FISCAL } = require('../shared/financial-config.cjs');
+const { isLatamClient, usesInternational2700Plan } = require('../../portal/shared/financial-config.cjs');
+const { buildChangesRow } = require('../../../packages/cash-sheet/rows.cjs');
+const { attributionForUser } = require('../../../packages/cash-sheet/attribution.cjs');
+const { runInApp } = require('../../../site/app-env.cjs');
 const { isPaymentAnnulled } = require('./payments');
 const TAX_FACTOR = 1 + (FISCAL.iva / 100);
 
 let _cachedToken = null;
 let _cachedTokenExp = 0;
-let _cachedTabTitle = null; // resolución gid -> título (cacheada por proceso)
+const _cachedTabTitles = new Map();
+
+function googleCredentials() {
+  const own = {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+  };
+  if (own.clientId && own.clientSecret && own.refreshToken) return own;
+  return runInApp('portal', () => ({
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+  }));
+}
 
 function isConfigured() {
-  return !!(
-    process.env.GOOGLE_CLIENT_ID &&
-    process.env.GOOGLE_CLIENT_SECRET &&
-    process.env.GOOGLE_REFRESH_TOKEN &&
-    process.env.GOOGLE_SHEETS_SPREADSHEET_ID
-  );
+  const credentials = googleCredentials();
+  return !!(credentials.clientId && credentials.clientSecret && credentials.refreshToken &&
+    process.env.GOOGLE_SHEETS_SPREADSHEET_ID);
 }
 
 async function getAccessToken() {
   if (!isConfigured()) throw new Error('google_sheets_not_configured');
+  const credentials = googleCredentials();
   const now = Date.now();
   if (_cachedToken && now < _cachedTokenExp - 60000) return _cachedToken;
   const body = new URLSearchParams({
-    client_id: String(process.env.GOOGLE_CLIENT_ID || '').trim(),
-    client_secret: String(process.env.GOOGLE_CLIENT_SECRET || '').trim(),
-    refresh_token: String(process.env.GOOGLE_REFRESH_TOKEN || '').trim(),
+    client_id: String(credentials.clientId || '').trim(),
+    client_secret: String(credentials.clientSecret || '').trim(),
+    refresh_token: String(credentials.refreshToken || '').trim(),
     grant_type: 'refresh_token',
   });
   const resp = await fetch(OAUTH_TOKEN_URL, {
@@ -77,18 +93,17 @@ function spreadsheetId() {
 
 // Devuelve el título de la pestaña destino. Prioridad: GOOGLE_SHEETS_TAB ->
 // resolver por GID (default 2041257143) contra la API.
-async function resolveTabTitle(token) {
-  if (process.env.GOOGLE_SHEETS_TAB) return String(process.env.GOOGLE_SHEETS_TAB).trim();
-  if (_cachedTabTitle) return _cachedTabTitle;
-  const gid = Number(process.env.GOOGLE_SHEETS_GID || 2041257143);
+async function resolveTabTitle(token, gid = Number(process.env.GOOGLE_SHEETS_GID || 2041257143)) {
+  if (gid !== CHANGES_SHEET_GID && process.env.GOOGLE_SHEETS_TAB) return String(process.env.GOOGLE_SHEETS_TAB).trim();
+  if (_cachedTabTitles.has(gid)) return _cachedTabTitles.get(gid);
   const url = `${SHEETS_API}/${spreadsheetId()}?fields=sheets(properties(sheetId,title))`;
   const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw new Error('sheets_meta_failed: ' + (data.error && data.error.message || resp.status));
   const match = (data.sheets || []).find((s) => s.properties && s.properties.sheetId === gid);
   if (!match) throw new Error('sheets_tab_not_found_for_gid_' + gid);
-  _cachedTabTitle = match.properties.title;
-  return _cachedTabTitle;
+  _cachedTabTitles.set(gid, match.properties.title);
+  return match.properties.title;
 }
 
 function a1(tab, range) {
@@ -121,8 +136,8 @@ async function batchUpdate(token, tab, updates) {
   return data;
 }
 
-async function appendRow(token, tab, rowValues) {
-  const url = `${SHEETS_API}/${spreadsheetId()}/values/${encodeURIComponent(a1(tab, 'A:P'))}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+async function appendRow(token, tab, rowValues, lastColumn = 'N') {
+  const url = `${SHEETS_API}/${spreadsheetId()}/values/${encodeURIComponent(a1(tab, `A:${lastColumn}`))}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
   const resp = await fetch(url, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -232,16 +247,109 @@ function locateRow(values, headerOffset, pr) {
   return { found, emptyRow };
 }
 
+async function upsertChangesRow(token, user, payments, paymentRow, options = {}) {
+  const tab = await resolveTabTitle(token, CHANGES_SHEET_GID);
+  const values = await getRange(token, tab, 'A1:AB');
+  const header = values[0] || [];
+  if (header[19] !== 'Contrato' || header[22] !== 'Canal de captación' ||
+      header[23] !== 'Campaña' || header[24] !== 'Mercado') {
+    throw new Error('cash_changes_layout_mismatch');
+  }
+  const { found, emptyRow } = locateRow(values, 1, paymentRow.pr);
+  const row = found || emptyRow;
+  const c = buildChangesRow(user, payments, paymentRow, {
+    ...options,
+    isLatam: isLatamClient(user),
+    international: usesInternational2700Plan(user),
+  });
+  if (!row) {
+    await appendRow(token, tab, [
+      c.asesor, c.pr, c.alumno, c.pago1, c.estado1, c.slots[0].date, c.slots[0].invoice,
+      c.pago2, c.estado2, c.slots[1].date, c.slots[1].invoice,
+      c.pago3, c.estado3, c.slots[2].date, c.slots[2].invoice,
+      c.totalPagado, c.restante, c.cobroInicial, c.facInicial, c.contrato,
+      c.signatureDate, c.type, c.channel, c.campaign, c.market,
+    ], 'AB');
+    return;
+  }
+  const updates = [
+    { range: `A${row}:E${row}`, values: [[c.asesor, c.pr, c.alumno, c.pago1, c.estado1]] },
+    { range: `H${row}:I${row}`, values: [[c.pago2, c.estado2]] },
+    { range: `L${row}:M${row}`, values: [[c.pago3, c.estado3]] },
+    { range: `R${row}:R${row}`, values: [[c.cobroInicial]] },
+    { range: `T${row}:T${row}`, values: [[c.contrato]] },
+    { range: `V${row}:V${row}`, values: [[c.type]] },
+  ];
+  for (const [column, value] of [
+    ['F', c.slots[0].date], ['G', c.slots[0].invoice],
+    ['J', c.slots[1].date], ['K', c.slots[1].invoice],
+    ['N', c.slots[2].date], ['O', c.slots[2].invoice],
+    ['U', c.signatureDate], ['W', c.channel], ['X', c.campaign], ['Y', c.market],
+  ]) {
+    if (value || (column === 'X' && c.channel)) {
+      updates.push({ range: `${column}${row}:${column}${row}`, values: [[value]] });
+    }
+  }
+  await batchUpdate(token, tab, updates);
+}
+
+// Rellena únicamente números reales emitidos por Holded; las celdas con un
+// número o introducidas a mano se respetan. Los borradores se revisan de nuevo
+// en la siguiente ejecución programada.
+async function syncIssuedInvoiceNumbers(entries, readInvoice) {
+  if (!isConfigured()) throw new Error('google_sheets_not_configured');
+  const token = await getAccessToken();
+  const tab = await resolveTabTitle(token, CHANGES_SHEET_GID);
+  const values = await getRange(token, tab, 'A1:O');
+  if (values[0]?.[6] !== 'Nº factura 1' || values[0]?.[10] !== 'Nº factura 2' ||
+      values[0]?.[14] !== 'Nº factura 3') throw new Error('cash_changes_invoice_layout_mismatch');
+  const rows = new Map();
+  for (let i = 1; i < values.length; i++) {
+    const leadId = String(values[i]?.[1] || '').trim();
+    if (leadId) rows.set(leadId, i + 1);
+  }
+  const updates = [];
+  let pending = 0;
+  let missingRows = 0;
+  let failed = 0;
+  const candidates = [];
+  for (const entry of entries) {
+    const row = rows.get(String(entry.leadId || '').trim());
+    if (!row) { missingRows++; continue; }
+    const columnIndex = { 1: 6, 2: 10, 3: 14 }[Number(entry.installment)];
+    if (columnIndex === undefined || values[row - 1]?.[columnIndex]) continue;
+    candidates.push({ entry, row, columnIndex });
+  }
+  await Promise.all(Array.from({ length: Math.min(5, candidates.length) }, async (_, worker) => {
+    for (let i = worker; i < candidates.length; i += 5) {
+      const { entry, row, columnIndex } = candidates[i];
+    try {
+      const invoice = await readInvoice(entry);
+      const number = String(invoice?.document_number || invoice?.docNumber || '').trim();
+      if (!number) { pending++; continue; }
+      const column = { 6: 'G', 10: 'K', 14: 'O' }[columnIndex];
+      updates.push({ range: `${column}${row}:${column}${row}`, values: [[number]] });
+      values[row - 1][columnIndex] = number;
+    } catch (error) {
+      failed++;
+      console.warn('[sheets] Holded invoice lookup failed:', error?.message || error);
+    }
+    }
+  }));
+  if (updates.length) await batchUpdate(token, tab, updates);
+  return { checked: entries.length, updated: updates.length, pending, missingRows, failed };
+}
+
 /**
  * Escribe/actualiza la fila del cliente en la hoja. Best-effort: nunca lanza.
  * @returns {Promise<{ok:boolean, action?:string, row?:number, reason?:string}>}
  */
-async function upsertClientRow(sb, userId) {
+async function upsertClientRow(sb, userId, options = {}) {
   try {
     if (!isConfigured()) return { ok: false, reason: 'not_configured' };
     const { data: user, error } = await sb
       .from('users')
-      .select('id, lead_id, nombre, apellidos, assigned_to, contract_signed')
+      .select('id, lead_id, notion_page_id, nombre, apellidos, assigned_to, contract_signed, contract_signed_at, tipo, origin, pais, has_eu_id')
       .eq('id', userId)
       .single();
     if (error || !user) return { ok: false, reason: 'user_not_found' };
@@ -250,30 +358,32 @@ async function upsertClientRow(sb, userId) {
 
     const { data: payments } = await sb
       .from('payments')
-      .select('installment, amount, status, payment_data')
+      .select('installment, amount, status, paid_at, invoice_number, payment_data')
       .eq('user_id', userId)
       .order('installment', { ascending: true });
 
+    const attribution = await attributionForUser(user, options.attribution);
     const r = buildRow(user, payments || []);
     const token = await getAccessToken();
     const tab = await resolveTabTitle(token);
 
     // Leemos una ventana amplia (cabecera + zona de clientes) para localizar la fila.
     const headerOffset = 1; // empezamos a leer desde la fila 1
-    const values = await getRange(token, tab, 'A1:P120');
+    const values = await getRange(token, tab, 'A1:N');
+    if (values[0]?.[13] !== 'Contrato') throw new Error('cash_main_layout_mismatch');
     const { found, emptyRow } = locateRow(values, headerOffset, r.pr);
     const targetRow = found || emptyRow;
 
-    // Segmentos que preservan las columnas de fórmula (J,K,N,O) cuando la fila
-    // ya existe/es plantilla: escribimos A:I, L:M y P por separado.
+    // Conserva las fórmulas J, K y M; el selector de contrato está en N.
     const segFor = (row) => ([
       { range: `A${row}:I${row}`, values: [[r.asesor, r.pr, r.alumno, r.pago1, r.estado1, r.pago2, r.estado2, r.pago3, r.estado3]] },
-      { range: `L${row}:M${row}`, values: [[r.cobroInicial, r.cobroReal]] },
-      { range: `P${row}:P${row}`, values: [[r.contrato]] },
+      { range: `L${row}:L${row}`, values: [[r.cobroInicial]] },
+      { range: `N${row}:N${row}`, values: [[r.contrato]] },
     ]);
 
     if (targetRow) {
       await batchUpdate(token, tab, segFor(targetRow));
+      await upsertChangesRow(token, user, payments || [], r, { ...options, attribution });
       return { ok: true, action: found ? 'updated' : 'filled', row: targetRow };
     }
 
@@ -282,10 +392,10 @@ async function upsertClientRow(sb, userId) {
     const fullRow = [
       r.asesor, r.pr, r.alumno,
       r.pago1, r.estado1, r.pago2, r.estado2, r.pago3, r.estado3,
-      r.totalPagado, r.restante, r.cobroInicial, r.cobroReal,
-      r.facInicial, r.facReal, r.contrato,
+      r.totalPagado, r.restante, r.cobroInicial, r.facInicial, r.contrato,
     ];
     await appendRow(token, tab, fullRow);
+    await upsertChangesRow(token, user, payments || [], r, { ...options, attribution });
     return { ok: true, action: 'appended' };
   } catch (e) {
     console.error('[sheets] upsertClientRow error:', e && e.message);
@@ -293,4 +403,4 @@ async function upsertClientRow(sb, userId) {
   }
 }
 
-module.exports = { isConfigured, upsertClientRow, buildRow, advisorName };
+module.exports = { isConfigured, upsertClientRow, syncIssuedInvoiceNumbers, buildRow, advisorName };
