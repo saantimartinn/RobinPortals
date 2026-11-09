@@ -8,6 +8,7 @@ import { integrationClient } from "@/services/integrations";
 import { adminDataClient } from "@/services/admin-data";
 import { FutureAcademicYear, LeadCall, LeadTeamNote, RecommenderHistory } from "@/services/admin-data";
 import { PortalAdmin, PortalSnapshot } from "@/services/portal";
+import { RecommenderModal } from "./recommender-modal";
 
 export type FeatureModuleProps = {
   path: string;
@@ -77,6 +78,7 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
   const [recommenderHistory, setRecommenderHistory] = useState<RecommenderHistory | null>(null);
   const [recommenderLoading, setRecommenderLoading] = useState(false);
   const [recommenderError, setRecommenderError] = useState("");
+  const [recommenderOpen, setRecommenderOpen] = useState(false);
   const [phoneCopyStatus, setPhoneCopyStatus] = useState("");
   const [message, setMessage] = useState("");
   const [messageStatus, setMessageStatus] = useState("");
@@ -102,6 +104,7 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
     let active = true;
     setRecommenderHistory(null);
     setRecommenderError("");
+    setRecommenderOpen(false);
     setRecommenderLoading(true);
     adminDataClient.recommenderHistory(contact.id)
       .then((history) => { if (active) setRecommenderHistory(history); })
@@ -212,7 +215,7 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
           {recommenderError && <p role="alert">{recommenderError}</p>}
           {recommenderHistory && <dl><div><dt>Veces que ha hecho el formulario</dt><dd>{recommenderHistory.count}</dd></div>
             <div><dt>Último test</dt><dd>{recommenderHistory.latest
-              ? <a href={recommenderHistory.latest.url} target="_blank" rel="noopener noreferrer">Ver respuestas del {new Date(recommenderHistory.latest.createdAt).toLocaleDateString("es-ES")}</a>
+              ? <button type="button" className="lead-recommender-open" aria-haspopup="dialog" onClick={() => setRecommenderOpen(true)}>Ver respuestas del {new Date(recommenderHistory.latest.createdAt).toLocaleDateString("es-ES")}</button>
               : "—"}</dd></div></dl>}
         </section>}
         <section className="heat-control"><h3><Flame /> Heat del lead <b>{localHeat}</b></h3><input type="range" min="0" max="100" value={localHeat} onChange={(event) => { const value = Number(event.target.value); setLocalHeat(value); onHeatChange?.(value); }} /><div><span>Frío</span><span>Caliente</span></div></section>
@@ -235,6 +238,7 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
         {leadMode && onDeleteLead && <section className="lead-delete-section"><Button type="button" variant="outline" className="delete-lead" disabled={deleting} onClick={deleteLead}><Trash2 />{deleting ? "Eliminando…" : "Eliminar lead"}</Button>{deleteError && <small role="alert">{deleteError}</small>}</section>}
         {!leadMode && <><section><h3>Información académica</h3><dl><div><dt>Universidad</dt><dd>{contact.university}</dd></div><div><dt>Curso</dt><dd>{contact.course}</dd></div><div><dt>País</dt><dd>{contact.country}</dd></div></dl></section><section><h3>Próxima acción</h3><p>{contact.nextAction}</p></section></>}
       </aside>
+      {recommenderOpen && recommenderHistory?.latest && <RecommenderModal session={recommenderHistory.latest} contact={contact} onClose={() => setRecommenderOpen(false)} />}
     </div>
   );
 }

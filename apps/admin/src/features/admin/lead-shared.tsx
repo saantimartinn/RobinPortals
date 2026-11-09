@@ -33,6 +33,7 @@ export function formatLeadEntry(value?: string) {
 }
 
 export function campaignOrOrigin(contact: Contact) {
+  if (contact.campaign?.trim().toLowerCase() === "recomendador") return "Recomendador";
   if (contact.source === "Meta Ads") {
     return contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Campaña pendiente";
   }
@@ -41,6 +42,7 @@ export function campaignOrOrigin(contact: Contact) {
 }
 
 export function inboxCampaignLabel(contact: Contact) {
+  if (contact.campaign?.trim().toLowerCase() === "recomendador") return "Recomendador";
   if (contact.source === "Meta Ads") {
     return contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Campaña pendiente";
   }

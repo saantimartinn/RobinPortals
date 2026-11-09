@@ -18,7 +18,7 @@ test('el historial del recomendador exige sesión y usa el email real del lead',
   assert.equal(emailRequested, 'student@example.com');
   assert.deepEqual(JSON.parse(result.body), {
     count: 3,
-    latest: { id: 'session-3', createdAt: '2026-11-09T12:00:00Z', url: 'https://project-robin.com/rbmt/admin/?session=session-3' },
+    latest: { id: 'session-3', createdAt: '2026-11-09T12:00:00Z' },
   });
 });
 

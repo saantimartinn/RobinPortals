@@ -12,7 +12,22 @@ export type CrmEmailTemplate = { id: string; name: string; subject: string; body
 export type WebBooking = { eventId: string; start: string; end?: string; emails: string[]; name?: string | null; meetUrl?: string | null };
 export type LeadTeamNote = { id: string; leadId: string; body: string; authorName: string; createdAt: string };
 export type LeadCall = { id: string; leadId: string; kind: "call" | "message"; durationMinutes: number | null; notes: string; authorName: string; occurredAt: string };
-export type RecommenderHistory = { count: number; latest: { id: string; createdAt: string; url: string } | null };
+export type RecommenderSession = {
+  id: string;
+  createdAt: string;
+  firstName: string;
+  lastName: string;
+  school: string;
+  originCity: string;
+  originCountry: string;
+  selectedArea: string;
+  academicSystem: string;
+  academicSubjects: Array<{ name: string; level?: string }>;
+  course: string;
+  blocks: Array<{ title: string; items: Array<{ q: string; a: unknown }> }>;
+  recommendations: Array<{ career_name: string; university: string; city: string; compatibility: number; reason?: string }>;
+};
+export type RecommenderHistory = { count: number; latest: RecommenderSession | null };
 export type FutureAcademicYear = "2027-28" | "2028-29";
 type LeadPatch = { owner?: string; source?: string; category?: LeadCategory | ""; stage?: CrmStage; heat?: number; notes?: string; contactRole?: LeadContactRole | ""; lostAt?: string; lostReason?: LostReason | ""; lostReasonDetail?: string };
 
