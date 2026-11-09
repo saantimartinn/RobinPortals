@@ -12,6 +12,7 @@ export type CrmEmailTemplate = { id: string; name: string; subject: string; body
 export type WebBooking = { eventId: string; start: string; end?: string; emails: string[]; name?: string | null; meetUrl?: string | null };
 export type LeadTeamNote = { id: string; leadId: string; body: string; authorName: string; createdAt: string };
 export type LeadCall = { id: string; leadId: string; kind: "call" | "message"; durationMinutes: number | null; notes: string; authorName: string; occurredAt: string };
+export type RecommenderHistory = { count: number; latest: { id: string; createdAt: string; url: string } | null };
 export type FutureAcademicYear = "2027-28" | "2028-29";
 type LeadPatch = { owner?: string; source?: string; category?: LeadCategory | ""; stage?: CrmStage; heat?: number; notes?: string; contactRole?: LeadContactRole | ""; lostAt?: string; lostReason?: LostReason | ""; lostReasonDetail?: string };
 
@@ -153,6 +154,12 @@ export const adminDataClient = {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.detail || "No se pudieron cargar las llamadas");
     return payload.calls || [];
+  },
+  async recommenderHistory(leadId: string): Promise<RecommenderHistory> {
+    const response = await apiFetch(`/api/admin/crm/recommender?leadId=${encodeURIComponent(leadId)}`, { credentials: "include" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.detail || "No se pudo cargar el historial del recomendador");
+    return payload as RecommenderHistory;
   },
   async addLeadCall(leadId: string, kind: "call" | "message", durationMinutes: number | null, notes = ""): Promise<LeadCall> {
     const response = await apiFetch("/api/admin/crm/lead-calls", { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ leadId, kind, durationMinutes, notes }) });

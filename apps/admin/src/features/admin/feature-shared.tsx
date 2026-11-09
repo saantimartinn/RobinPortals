@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Contact, CrmStage, LeadCategory, LeadContactRole, LostReason } from "@/types/domain";
 import { integrationClient } from "@/services/integrations";
 import { adminDataClient } from "@/services/admin-data";
-import { FutureAcademicYear, LeadCall, LeadTeamNote } from "@/services/admin-data";
+import { FutureAcademicYear, LeadCall, LeadTeamNote, RecommenderHistory } from "@/services/admin-data";
 import { PortalAdmin, PortalSnapshot } from "@/services/portal";
 
 export type FeatureModuleProps = {
@@ -74,6 +74,9 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
   const [leadCallNotes, setLeadCallNotes] = useState("");
   const [leadCallSaving, setLeadCallSaving] = useState(false);
   const [leadCallError, setLeadCallError] = useState("");
+  const [recommenderHistory, setRecommenderHistory] = useState<RecommenderHistory | null>(null);
+  const [recommenderLoading, setRecommenderLoading] = useState(false);
+  const [recommenderError, setRecommenderError] = useState("");
   const [phoneCopyStatus, setPhoneCopyStatus] = useState("");
   const [message, setMessage] = useState("");
   const [messageStatus, setMessageStatus] = useState("");
@@ -92,6 +95,18 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
       .then((items) => { if (active) setTeamNotes(items); })
       .catch((error) => { if (active) setTeamNotesError(error instanceof Error ? error.message : "No se pudieron cargar las notas del equipo"); })
       .finally(() => { if (active) setTeamNotesLoading(false); });
+    return () => { active = false; };
+  }, [contact.id, leadMode]);
+  useEffect(() => {
+    if (!leadMode) return;
+    let active = true;
+    setRecommenderHistory(null);
+    setRecommenderError("");
+    setRecommenderLoading(true);
+    adminDataClient.recommenderHistory(contact.id)
+      .then((history) => { if (active) setRecommenderHistory(history); })
+      .catch((error) => { if (active) setRecommenderError(error instanceof Error ? error.message : "No se pudo cargar el recomendador"); })
+      .finally(() => { if (active) setRecommenderLoading(false); });
     return () => { active = false; };
   }, [contact.id, leadMode]);
   useEffect(() => {
@@ -192,6 +207,14 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
         <div className="detail-kpis"><article><small>{leadMode ? "Tipo" : "Progreso"}</small><strong>{leadMode ? contact.category || "—" : `${contact.probability}%`}</strong></article><article><small>Responsable</small><strong>{localOwner || "Sin asignar"}</strong></article></div>
         {!leadMode && <section className="whatsapp-detail"><h3><MessageCircle /> WhatsApp</h3><p>{contact.phone}</p><textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Escribe un mensaje…" /><Button variant="outline" onClick={sendMessage} disabled={sending || !message.trim()}>{sending ? "Enviando…" : "Enviar por WhatsApp"}</Button>{messageStatus && <small>{messageStatus}</small>}</section>}
         {leadMode && <section className="lead-information"><h3>Información del lead</h3><dl><div><dt>ID</dt><dd>{contact.displayId || "—"}</dd></div><div><dt>Correo electrónico</dt><dd>{contact.email || "—"}</dd></div><div><dt>Teléfono</dt><dd className="lead-phone-value"><span>{contact.phone || "—"}</span><Button type="button" size="sm" variant="outline" aria-label={`Copiar teléfono ${contact.phone || ""}`} title="Copiar teléfono" onClick={() => void copyLeadPhone()} disabled={!contact.phone}>{phoneCopyStatus === "Copiado" ? <Check /> : <Copy />}{phoneCopyStatus || "Copiar"}</Button></dd></div><div><dt>Contacto principal</dt><dd><select className="lead-contact-role" value={localContactRole} onChange={(event) => { const value = event.target.value as LeadContactRole; setLocalContactRole(value); if (value) onContactRoleChange?.(value); }}><option value="">Sin indicar</option>{contactRoleOptions.map((role) => <option key={role} value={role}>{contactRoleLabels[role]}</option>)}</select></dd></div><div><dt>Origen</dt><dd>{contact.source || "—"}</dd></div><div><dt>Campaña</dt><dd>{contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Sin identificar"}</dd></div><div><dt>Curso</dt><dd>{contact.course || "—"}</dd></div><div><dt>Interés</dt><dd>{contact.interest || "—"}</dd></div><div><dt>Estado</dt><dd>{contact.stage || "Por contactar"}</dd></div>{contact.stage === "Lost" && <><div><dt>Motivo Lost</dt><dd>{lostReasonLabel(contact.lostReason)}</dd></div>{contact.lostReasonDetail && <div><dt>Detalle</dt><dd>{contact.lostReasonDetail}</dd></div>}</>}<div><dt>Agente de venta</dt><dd><select className="owner-select lead-owner-select" value={localOwner} onChange={(event) => { const owner = event.target.value; setLocalOwner(owner); if (owner) onOwnerChange?.(owner); }}><option value="">Sin asignar</option>{admins.map((admin) => <option key={admin} value={admin}>{admin}</option>)}</select></dd></div><div><dt>Fecha de alta</dt><dd>{contact.createdAt ? new Date(contact.createdAt).toLocaleDateString("es-ES") : "—"}</dd></div></dl></section>}
+        {leadMode && <section className="lead-information"><h3>Recomendador</h3>
+          {recommenderLoading && <p>Consultando formularios…</p>}
+          {recommenderError && <p role="alert">{recommenderError}</p>}
+          {recommenderHistory && <dl><div><dt>Veces que ha hecho el formulario</dt><dd>{recommenderHistory.count}</dd></div>
+            <div><dt>Último test</dt><dd>{recommenderHistory.latest
+              ? <a href={recommenderHistory.latest.url} target="_blank" rel="noopener noreferrer">Ver respuestas del {new Date(recommenderHistory.latest.createdAt).toLocaleDateString("es-ES")}</a>
+              : "—"}</dd></div></dl>}
+        </section>}
         <section className="heat-control"><h3><Flame /> Heat del lead <b>{localHeat}</b></h3><input type="range" min="0" max="100" value={localHeat} onChange={(event) => { const value = Number(event.target.value); setLocalHeat(value); onHeatChange?.(value); }} /><div><span>Frío</span><span>Caliente</span></div></section>
         {leadMode && <section className="lead-calls">
           <h3><PhoneCall /> Llamadas y mensajes</h3>
