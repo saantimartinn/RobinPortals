@@ -31,15 +31,7 @@ function createHandler({
       const email = String(lead.email || '').trim().toLowerCase();
       if (!email) return json({ count: 0, latest: null });
       const history = await queryHistory(email);
-      const recent = history.sessions[0];
-      return json({
-        count: history.count,
-        latest: recent ? {
-          id: recent.id,
-          createdAt: recent.createdAt,
-          url: `https://project-robin.com/rbmt/admin/?session=${encodeURIComponent(recent.id)}`,
-        } : null,
-      });
+      return json({ count: history.count, latest: history.sessions[0] || null });
     } catch (error) {
       return serverError(error, 'admin_crm_recommender');
     }
