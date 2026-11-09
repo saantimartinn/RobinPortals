@@ -48,11 +48,13 @@ exports.handler = async (event) => {
     .join('\n');
   const formNotes = [message, remainingDetails].filter(Boolean).filter((value, index, all) => all.indexOf(value) === index).join('\n');
   if (!email && !phone) return json({ error: 'email_or_phone_required' }, { statusCode: 400 });
+  const submittedAt = body.createdAt || body.created_at;
+  const createdAt = submittedAt && !Number.isNaN(Date.parse(submittedAt)) ? new Date(submittedAt).toISOString() : undefined;
   try {
     const result = await ingestCrmLead({
       source: 'website', externalId: body.submissionId || body.id || body.meta?.submission_id, name,
       createOnlyEmail: body.createOnlyEmail === true,
-      email, phone, summary: body.summary,
+      email, phone, createdAt, summary: body.summary,
       comment: formNotes, bodyText: formNotes, leadType, course, school,
       campaign: body.campaign || body.utm_campaign,
       payload: { form_name: formName, questionnaire: body.questionnaire || body.cuestionario || null, course: course || null, school_name: school || null, origin_city: city || null, origin_country: country || null, selected_area: area || null, service: service || null, utm_source: body.utm_source || null, utm_medium: body.utm_medium || null, page_url: body.pageUrl || body.page_url || body.meta?.page_url || null },
