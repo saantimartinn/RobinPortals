@@ -28,7 +28,7 @@ body,.work,.page{background:var(--robin-cream)!important;font-family:var(--robin
 .side nav a{height:2.6rem;padding:0 .9rem;border-radius:var(--robin-radius-control);color:var(--robin-on-navy-muted);font:500 .9375rem var(--robin-font-text);margin:.08rem 0}
 .side nav a svg{width:1.1rem}
 .side nav a:hover{background:var(--robin-on-navy-line);color:var(--robin-on-navy)}
-.side nav a.active{background:var(--robin-on-navy-line);color:var(--robin-on-navy);font-weight:600;box-shadow:inset 4px 0 var(--robin-orange)}
+.side nav a.active{background:var(--robin-on-navy-line);color:var(--robin-on-navy);font-weight:600;box-shadow:none}
 .side nav b{background:var(--robin-orange);color:var(--robin-navy)}
 
 /* Top bar */

@@ -72,7 +72,7 @@ function SubscriberAdmin({ applicationIdentity }) {
             {nav.map(({ key, label, icon: Icon }) => {
               const isAct = section === key;
               return <button key={key} onClick={() => setSection(key)} aria-current={isAct ? "page" : undefined} className={`student-nav-item ${isAct ? "is-active" : ""}`}>
-                <Icon size={19} /><span>{label}</span>{isAct && <span className="student-nav-dot" />}
+                <Icon size={19} /><span>{label}</span>
               </button>;
             })}
           </div>

@@ -7,7 +7,7 @@ import type { Contact, LostReason } from "@/types/domain";
 import { adminDataClient, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, lostReasonOptions, Title, ContactDrawer } from './feature-shared';
-import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
+import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel } from "./lead-shared";
 
 export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
   const [query, setQuery] = useState("");
@@ -36,9 +36,9 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     if (stage !== "Por contactar" || leadOwners[contact.id]) return false;
     if (view === "reservas" && contact.formName !== "reserva") return false;
     if (view !== "reservas" && contact.formName === "reserva") return false;
-    if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
+    if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${inboxCampaignLabel(contact)} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
-    if (campaignFilter !== "all" && contact.campaign !== campaignFilter) return false;
+    if (campaignFilter !== "all" && inboxCampaignLabel(contact) !== campaignFilter) return false;
     if (courseFilter !== "all" && contact.course !== courseFilter) return false;
     return view === "all" || view === "reservas" || (contact.country || "Otros") === view;
   }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view]);
@@ -70,7 +70,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     return selected;
   }, [bookings]);
   const sources = useMemo(() => [...new Set(contacts.map((contact) => contact.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
-  const campaigns = useMemo(() => [...new Set(contacts.map((contact) => contact.campaign).filter((campaign) => campaign && campaign !== "Pendiente de identificar"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
+  const campaigns = useMemo(() => [...new Set(contacts.map(inboxCampaignLabel).filter((campaign) => campaign !== "—" && campaign !== "Campaña pendiente" && campaign !== "Página no registrada"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
   const courses = useMemo(() => [...new Set(contacts.map((contact) => contact.course?.trim()).filter((course): course is string => Boolean(course)))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })), [contacts]);
   const activeFilters = [sourceFilter, campaignFilter, courseFilter].filter((value) => value !== "all").length;
   function openLost(contact: Contact) {
@@ -105,7 +105,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     const rows = list;
     const csvCell = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
     const headers = ["Nombre", "Email", "Teléfono", "Origen", "Campaña", "Curso", "País", "Interés", "Responsable", "Días sin contactar", "Heat", "Motivo Lost", "Detalle Lost", "Comentario", "Fecha de alta"];
-    const body = rows.map((contact) => [contact.name, contact.email, contact.phone, contact.source, contact.campaign, contact.course || "", contact.country || "Otros", contact.interest || "", leadOwners[contact.id] || "Sin asignar", leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id])) ?? "", contact.heat ?? "", lostReasonLabel(contact.lostReason), contact.lostReasonDetail || "", contact.comment || "", contact.createdAt || ""].map(csvCell).join(","));
+    const body = rows.map((contact) => [contact.name, contact.email, contact.phone, contact.source, inboxCampaignLabel(contact), contact.course || "", contact.country || "Otros", contact.interest || "", leadOwners[contact.id] || "Sin asignar", leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id])) ?? "", contact.heat ?? "", lostReasonLabel(contact.lostReason), contact.lostReasonDetail || "", contact.comment || "", contact.createdAt || ""].map(csvCell).join(","));
     const blob = new Blob([`\uFEFF${headers.map(csvCell).join(",")}\n${body.join("\n")}`], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -134,15 +134,16 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
       <section className="panel inbox-panel">
         <div className="data-table">
           <table>
-            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Campaña / origen</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th><th>Marcar como Lost</th></tr></thead>
+            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Origen</th><th>Campaña</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th><th>Marcar como Lost</th></tr></thead>
             <tbody>
-              {list.length === 0 && <tr><td colSpan={view === "reservas" ? 10 : 9} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
+              {list.length === 0 && <tr><td colSpan={view === "reservas" ? 11 : 10} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
               {list.map((contact) => (
                 <tr key={contact.id} className="unassigned-lead" onClick={() => setSelected(contact)}>
                   <td><button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
                   <td><time className="lead-entry-time" dateTime={contact.createdAt}>{formatLeadEntry(contact.createdAt)}</time></td>
                   {view === "reservas" && <td>{bookings === null ? "Cargando…" : bookingError ? "No disponible" : <BookingDate booking={bookingByEmail.get(contact.email.trim().toLowerCase())} />}</td>}
-                  <td><span className="lead-source-readonly">{campaignOrOrigin(contact)}</span>{["Meta Ads", "Página web"].includes(contact.source) && <small className="lead-source-kind">{contact.source}</small>}</td>
+                  <td><span className="lead-source-readonly">{contact.source || "—"}</span></td>
+                  <td><span className="lead-source-readonly">{inboxCampaignLabel(contact)}</span></td>
                   <td>{contact.course || ""}</td>
                   <td>{contact.country || "Otros"}</td>
                   <td>{contact.interest || ""}</td>

@@ -40,6 +40,23 @@ export function campaignOrOrigin(contact: Contact) {
   return contact.source || "—";
 }
 
+export function inboxCampaignLabel(contact: Contact) {
+  if (contact.source === "Meta Ads") {
+    return contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Campaña pendiente";
+  }
+  if (contact.pageUrl !== undefined) {
+    if (!contact.pageUrl) return "Página no registrada";
+    try {
+      const url = new URL(contact.pageUrl);
+      if (url.protocol === "http:" || url.protocol === "https:") return `${url.hostname}${url.pathname}`;
+    } catch (_error) {
+      if (contact.pageUrl.startsWith("/")) return contact.pageUrl;
+    }
+    return "Página no registrada";
+  }
+  return "—";
+}
+
 export function webFormLabel(formName?: string) {
   const normalized = String(formName || "").trim().toLowerCase();
   const labels: Record<string, string> = {

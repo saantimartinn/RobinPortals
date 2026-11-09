@@ -119,7 +119,7 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
           </div>
           <p className="student-nav-caption">Tu espacio</p>
           <div className="student-nav-items">
-            {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{label}</span>{active === key && <span className="student-nav-dot" />}</button>)}
+            {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{label}</span></button>)}
           </div>
           <div className="student-support"><span className="student-eyebrow">Vamos contigo</span><h3>Un equipo detrás de cada paso.</h3><p>Habla con tu asesor y prepara lo que viene.</p><button onClick={() => setActive("reservas")}>Reservar una llamada <ArrowUpRight size={16} /></button></div>
         </nav>
