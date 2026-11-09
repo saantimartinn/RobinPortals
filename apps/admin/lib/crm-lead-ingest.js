@@ -133,23 +133,23 @@ async function storeDirectFutureLead(crm, { row, source, externalId, course, exi
   return { result: existingFuture ? 'updated_future' : 'routed_future', lead: null, futureLead: data };
 }
 
-  async function ingestCrmLead(input, crm = getAdminSupabase()) {
+async function ingestCrmLead(input, crm = getAdminSupabase()) {
   const source = clean(input.source || 'website', 40).toLowerCase();
   const externalId = clean(input.externalId, 160) || null;
   const email = clean(input.email, 320).toLowerCase() || null;
   const phone = clean(input.phone, 80) || null;
   const name = clean(input.name, 240) || email || phone || 'Lead sin nombre';
   if (isBlockedLeadName(name)) return { result: 'ignored', lead: null };
-    if (input.createOnlyEmail && await findExistingEmail(crm, email)) {
-      return { result: 'skipped_existing', lead: null };
-    }
-    const existing = input.createOnlyEmail ? null : await findExisting(crm, { source, externalId, email, phone });
+  if (input.createOnlyEmail && await findExistingEmail(crm, email)) {
+    return { result: 'skipped_existing', lead: null };
+  }
+  const existing = input.createOnlyEmail ? null : await findExisting(crm, { source, externalId, email, phone });
   const course = detectedCourse(input);
-    const payload = { ...(existing?.source_payload || {}), ...(input.payload || {}), ...(course ? { course } : {}), ...(input.campaign ? { campaign_name: clean(input.campaign, 500) } : {}), source, external_id: externalId, received_at: new Date().toISOString() };
+  const payload = { ...(existing?.source_payload || {}), ...(input.payload || {}), ...(course ? { course } : {}), ...(input.campaign ? { campaign_name: clean(input.campaign, 500) } : {}), source, external_id: externalId, received_at: new Date().toISOString() };
   const sourceComment = clean(input.comment || input.bodyText || input.summary, 10000) || null;
   const row = {
     name, email, phone,
-      school_name: clean(input.school, 160) || existing?.school_name || null,
+    school_name: clean(input.school, 160) || existing?.school_name || null,
     summary: clean(input.summary, 2000) || null,
     body_text: clean(input.bodyText, 10000) || null,
     comment: existing?.comment || sourceComment,
@@ -174,7 +174,7 @@ async function storeDirectFutureLead(crm, { row, source, externalId, course, exi
       if (error) throw error;
       return { result: 'moved_future', lead: null, futureLead: { id: data, academic_year: '2028-29' } };
     }
-      const existingFuture = input.createOnlyEmail ? null : await findExistingFuture(crm, { source, externalId, email, phone });
+    const existingFuture = input.createOnlyEmail ? null : await findExistingFuture(crm, { source, externalId, email, phone });
     return storeDirectFutureLead(crm, { row, source, externalId, course, existingFuture });
   }
   if (existing) {
