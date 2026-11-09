@@ -56,6 +56,9 @@ schedule = "0 3 * * *"
 [functions.admin-integration-retry]
 schedule = "*/10 * * * *"
 
+[functions.admin-holded-invoice-numbers]
+schedule = "0 */3 * * *"
+
 [functions.admin-finance-treasury-snapshot]
 schedule = "59 * * * *"
 

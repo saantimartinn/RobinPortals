@@ -7,13 +7,13 @@ function isAnalyticsConfigured() {
   return !!analyticsKey();
 }
 
-async function listDocuments(docType, { start, end } = {}) {
+async function listDocuments(docType, { start, end, signal } = {}) {
   if (!isAnalyticsConfigured()) throw new Error('holded_analytics_not_configured');
   const url = new URL(`https://api.holded.com/api/invoicing/v1/documents/${encodeURIComponent(docType)}`);
   if (start) url.searchParams.set('starttmp', String(start));
   if (end) url.searchParams.set('endtmp', String(end));
   url.searchParams.set('sort', 'created-desc');
-  const res = await fetch(url, { headers: { key: analyticsKey(), Accept: 'application/json' } });
+  const res = await fetch(url, { headers: { key: analyticsKey(), Accept: 'application/json' }, signal });
   const text = await res.text();
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch (_) { data = { raw: text }; }

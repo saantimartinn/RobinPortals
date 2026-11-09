@@ -151,6 +151,13 @@ exports.handler = async (event) => {
       const accessEmail = await sendAccountAccessEmail({ email: lead.email, name: lead.name, username: lead.email.trim().toLowerCase(), password, targetPortal });
       emailSent = !!accessEmail.sent;
     }
+    if (targetPortal !== 'community') {
+      const sheet = await require('../../lib/google-sheets').upsertClientRow(targetDb, userId, {
+        portalKind: targetPortal,
+        attribution: lead.source_payload || {},
+      });
+      if (!sheet.ok) console.error('crm-convert sheets sync:', sheet.reason);
+    }
     return json({ ok: true, result, userId, emailSent, loginUrl: '/portal/', targetPortal, assignedTo, salesAgent: salesAgent || null });
   } catch (error) {
     console.error('crm-convert error', error);

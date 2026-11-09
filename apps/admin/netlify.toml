@@ -435,6 +435,10 @@
 [functions."integration-retry"]
   schedule = "*/10 * * * *"
 
+# Consulta periódica de números asignados a facturas de Holded antes en borrador.
+[functions."holded-invoice-numbers"]
+  schedule = "0 */3 * * *"
+
 # ---------- Histórico diario de Tesorería (23:59 Europe/Madrid, CET/CEST) ----------
 [functions."finance-treasury-snapshot"]
   schedule = "59 * * * *"
