@@ -21,6 +21,7 @@ test('website webhook maps recommender contact and create-only instructions to C
       body: JSON.stringify({
         form_name: 'recomendador', campaign: 'Recomendador', createOnlyEmail: true,
         submissionId: 'matching-session-1', page_url: 'https://project-robin.com/rbmt/',
+        createdAt: '2026-10-12T10:00:00.000Z',
         fields: {
           name: 'Ana García', email: 'ana@example.com', phone: '+34 600 000 000',
           course: '2º de Bachillerato', colegio: 'Colegio Robin', ciudad: 'Madrid', pais: 'España',
@@ -35,6 +36,7 @@ test('website webhook maps recommender contact and create-only instructions to C
     assert.equal(captured.course, '2º de Bachillerato');
     assert.equal(captured.campaign, 'Recomendador');
     assert.equal(captured.externalId, 'matching-session-1');
+    assert.equal(captured.createdAt, '2026-10-12T10:00:00.000Z');
     assert.equal(captured.payload.form_name, 'recomendador');
     assert.equal(captured.payload.page_url, 'https://project-robin.com/rbmt/');
     assert.match(captured.comment, /pa[ií]s: España/i);
