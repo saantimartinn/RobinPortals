@@ -54,7 +54,7 @@ components:
     width: 16.5rem
     backgroundColor: "{colors.navy}"
     textColor: "{colors.on-navy-muted}"
-    activeMarker: "inset 4px 0 {colors.orange}"
+    activeBackground: "{colors.on-navy-line}"
   identity-stamp:
     backgroundColor: "{colors.paper}"
     edge: perforated
@@ -195,7 +195,7 @@ Portal del alumno, RobinJr, Robin Community y admin (no la web, que es un proyec
   - La pestaña activa se marca con una barra naranja debajo.
 - **Menú lateral:**
   - Azul marino con texto amarillo claro, 16.5rem de ancho y sin scroll: en menús largos las filas se compactan y la nota del pie se oculta.
-  - La opción activa lleva fondo translúcido y una barra naranja a la izquierda.
+  - La opción activa lleva fondo translúcido.
   - Quién ha entrado se muestra como un **sello** apaisado (borde dentado, elemento de viaje de la marca) con su foto o iniciales, nombre y papel. En el admin también; no se muestra el espacio en el que está.
   - Al pie, una nota con el Robin de la etapa centrado.
 - **Robin de cada etapa:** la misma serie de ilustraciones (línea azul marino, pecho naranja) marca cada portal en la nota del menú y junto a su pestaña en la barra superior, en el admin y en los portales.

@@ -50,7 +50,7 @@ exports.handler = async (event) => {
       email, phone, summary: body.summary,
       comment: formNotes, bodyText: formNotes, leadType, course,
       campaign: body.campaign || body.utm_campaign,
-      payload: { form_name: formName, questionnaire: body.questionnaire || body.cuestionario || null, course: course || null, service: service || null, utm_source: body.utm_source || null, utm_medium: body.utm_medium || null, page_url: body.pageUrl || body.page_url || body.meta?.page_url || 'https://project-robin.com/contacto/' },
+      payload: { form_name: formName, questionnaire: body.questionnaire || body.cuestionario || null, course: course || null, service: service || null, utm_source: body.utm_source || null, utm_medium: body.utm_medium || null, page_url: body.pageUrl || body.page_url || body.meta?.page_url || null },
     });
     // Elementor treats every status other than exactly 200 as a failed form,
     // including the otherwise valid 201 Created response.

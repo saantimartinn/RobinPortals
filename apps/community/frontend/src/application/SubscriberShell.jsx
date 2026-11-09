@@ -107,7 +107,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
               const isAct = active === key;
               return <button key={key} onClick={() => setActive(key)} aria-current={isAct ? "page" : undefined} className={`student-nav-item ${isAct ? "is-active" : ""}`}>
                 <Icon size={19} /><span>{label}</span>
-                {key === "social" && unreadMsgs > 0 ? <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] px-1.5 py-0.5">{unreadMsgs}</span> : isAct && <span className="student-nav-dot" />}
+                {key === "social" && unreadMsgs > 0 && <span className="ml-auto rounded-full bg-rose-500 text-white text-[10px] px-1.5 py-0.5">{unreadMsgs}</span>}
               </button>;
             })}
           </div>
