@@ -27,6 +27,11 @@ const CHANNELS = Object.freeze([
   { key: 'schools', label: 'Colegios' },
 ]);
 
+const ACQUISITION_EXCLUDED_CLIENT_KEYS = new Set([
+  'user:e8438ed6-0836-40b6-8fac-a2fb2bfeeba2', // Noel Cortes Cordoba
+  'user:365a2045-718e-43d7-a40f-6cf91bfc4a89', // Marta Pérez Raya
+]);
+
 const leadDate = (lead) => lead.source_created_at || null;
 const NATIVE_SOURCES = new Set(['meta', 'facebook', 'instagram', 'website', 'organic', 'organico', 'organic_social', 'organico_rrss', 'rrss', 'social_organic', 'referral', 'referido', 'referidos', 'schools', 'school', 'colegio', 'colegios', 'other', 'otros', 'otro', 'manual']);
 
@@ -135,7 +140,7 @@ function buildSalesDashboard({ period, bounds: suppliedBounds, leads, users, pay
   const acquisitionClientsByKey = new Map();
   const acquisitionClientIdentityKeys = new Set();
   const addAcquisitionClient = (key, date) => {
-    if (!key || !date) return;
+    if (!key || !date || ACQUISITION_EXCLUDED_CLIENT_KEYS.has(key)) return;
     if (acquisitionClientIdentityKeys.has(key)) return;
     acquisitionClientIdentityKeys.add(key);
     const parsedDate = new Date(date);
