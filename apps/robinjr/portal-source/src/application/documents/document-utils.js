@@ -67,3 +67,5 @@ export function normalizeCareerRequirement(requirement = {}) {
     required: type === 'document' ? requirement.required !== false : false,
   };
 }
+
+export { groupStudentDocumentsByCareer, studentDocumentProgress, formatDocumentDeadline } from "../../../../../../packages/student-documents/document-groups.mjs";

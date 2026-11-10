@@ -1,0 +1,76 @@
+.student-document-group {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+.student-document-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.student-document-summary::-webkit-details-marker { display: none; }
+.student-document-summary > div { min-width: 0; }
+.student-document-summary:hover { background: #fffdf5; }
+.student-document-summary:focus-visible { outline: 2px solid #2d3a64; outline-offset: -3px; border-radius: 12px; }
+.student-document-summary-actions { display: flex; flex-shrink: 0; align-items: center; gap: 10px; }
+.student-document-chevron {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #f6f3e0;
+  color: #2d3a64;
+}
+.student-document-chevron svg { transition: transform .18s ease; }
+.student-document-group[open] > summary .student-document-chevron svg { transform: rotate(180deg); }
+.student-document-group[open] > summary { border-bottom: 1px solid #f1f3f5; }
+.student-document-list { padding: 12px; }
+.student-document-card { background: #fff; }
+.student-document-card[data-document-state="pending_review"] {
+  background: linear-gradient(110deg, #ecb45030 0%, #fef3c770 55%, #fffbebc7 100%);
+  border-color: #e8ce83;
+}
+.student-document-card[data-document-state="validated"] {
+  background: #f1f3f5;
+  border-color: #e1e5ea;
+}
+@media (max-width: 520px) {
+  .student-document-summary { padding: 12px; gap: 8px; }
+  .student-document-summary-actions { gap: 6px; }
+  .student-document-summary-actions > span:first-child { max-width: 80px; text-align: right; }
+  .student-document-list { padding: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .student-document-chevron svg { transition: none; }
+}
+.student-document-progress {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px 9px;
+  border: 1px solid #bfe0ca;
+  border-radius: 999px;
+  background: #e6f4ea;
+  color: #27643c;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.student-document-deadline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 5px 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.student-document-deadline > svg { flex-shrink: 0; }
