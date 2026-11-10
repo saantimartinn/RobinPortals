@@ -1,10 +1,11 @@
 // Portal view or navigation module for client sections; the application shell owns session state.
 import React, { useEffect, useState } from "react";
-import { BookOpen, CheckCircle2, CreditCard, Download, Eye, FileText, Loader2, Shield, UploadCloud } from "lucide-react";
+import "../../../../../packages/student-documents/documents.css";
+import { BookOpen, CalendarDays, CheckCircle2, ChevronDown, CreditCard, Download, Eye, FileText, Loader2, Shield, UploadCloud } from "lucide-react";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
 import { SOFT, GOLD, NAVY } from "../theme.js";
 import { eur, PaymentStatusBadge, paymentTitle } from "./payments/payment-utils.jsx";
-import { groupStudentDocumentsByCareer, statusLabel } from "./documents/document-utils.js";
+import { groupStudentDocumentsByCareer, studentDocumentProgress, formatDocumentDeadline, statusLabel } from "./documents/document-utils.js";
 import { Factura } from "./payments/InvoiceReceipt.jsx";
 import { CareerRequirementsTimeline } from "./careers/CareerRequirementsTimeline.jsx";
 import { portalApiUrl } from "../api/core.js";
@@ -179,6 +180,7 @@ export function CarrerasCliente() {
 
 export function DocumentosCliente() {
   const [docs, setDocs] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState({});
   const [careers, setCareers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -236,14 +238,18 @@ export function DocumentosCliente() {
     }] : []),
   ];
 
-  function renderDoc({ document: d, careerNames }, groupKey) {
+  function renderDoc({ document: d, careerNames, deadline }, groupKey) {
+    const dueDate = formatDocumentDeadline(deadline);
     const info = statusLabel(d.status);
     const inputId = `upload-input-${groupKey}-${d.id}`;
     return (
-      <div key={`${groupKey}-${d.id}`} className="rounded-xl border border-slate-100 bg-white px-3 py-2.5">
+      <div key={`${groupKey}-${d.id}`} className="student-document-card rounded-xl border border-slate-100 px-3 py-2.5" data-document-state={d.status}>
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="text-sm font-medium text-slate-900">{d.name}</div>
+            <div className="student-document-deadline"><CalendarDays size={13} aria-hidden="true" />
+              {dueDate ? <span>Fecha límite: <time dateTime={deadline}>{dueDate}</time></span> : <span>Sin fecha asignada</span>}
+            </div>
             <div className="text-xs text-slate-400">
               {d.required ? "Obligatorio" : "Opcional"}
               {d.uploaded_at && ` · subido ${new Date(d.uploaded_at).toLocaleDateString("es-ES")}`}
@@ -300,18 +306,28 @@ export function DocumentosCliente() {
             </div>
           ) : (
             <div className="space-y-5">
-              {documentGroups.map((group) => (
-                <section key={group.key} className="space-y-3 border-t border-slate-100 pt-5 first:border-t-0 first:pt-0">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+              {documentGroups.map((group) => {
+                const progress = studentDocumentProgress(group.documents);
+                return (
+                <details key={group.key} className="student-document-group" open={Boolean(expandedGroups[group.key])}
+                  onToggle={(event) => {
+                    const isOpen = event.currentTarget.open;
+                    setExpandedGroups((previous) => previous[group.key] === isOpen ? previous : { ...previous, [group.key]: isOpen });
+                  }}>
+                  <summary className="student-document-summary">
                     <div>
                       <h2 className="text-base font-semibold text-slate-900">{group.career?.name || group.label}</h2>
                       {group.career?.university && <p className="mt-0.5 text-xs text-slate-500">{group.career.university}{group.career.city ? ` · ${group.career.city}` : ""}</p>}
                     </div>
-                    <span className="text-xs text-slate-500">{group.documents.length} {group.documents.length === 1 ? "documento" : "documentos"}</span>
-                  </div>
-                  <div className="space-y-2">{group.documents.map((entry) => renderDoc(entry, group.key))}</div>
-                </section>
-              ))}
+                    <span className="student-document-summary-actions">
+                      <span className="student-document-progress" title="Documentos aprobados" aria-label={`${progress.approved} de ${progress.total} documentos aprobados`}>{progress.approved}/{progress.total}</span>
+                      <span className="student-document-chevron"><ChevronDown className="h-4 w-4" aria-hidden="true" /></span>
+                    </span>
+                  </summary>
+                  <div className="student-document-list space-y-2">{group.documents.map((entry) => renderDoc(entry, group.key))}</div>
+                </details>
+                );
+              })}
             </div>
           )}
         </CardContent>

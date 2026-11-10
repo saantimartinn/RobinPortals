@@ -1,6 +1,18 @@
 // Admin feature module for lead shared; the feature registry connects it to the authenticated shell.
 import type { Contact } from "@/types/domain";
 
+export type InboxView = "all" | "España" | "Portugal" | "recomendador" | "reservas";
+
+export function matchesInboxView(contact: Pick<Contact, "source" | "campaign" | "formName" | "country">, view: InboxView) {
+  if (view === "reservas") return contact.formName === "reserva";
+  if (contact.formName === "reserva") return false;
+  if (view === "recomendador") {
+    return [contact.campaign, contact.formName, contact.source]
+      .some((value) => String(value || "").trim().toLowerCase() === "recomendador");
+  }
+  return view === "all" || (contact.country || "Otros") === view;
+}
+
 export type LeadGroupRow = { name: string; email: string; phone: string; schoolName: string; area: string; leadType: string; lifecycle: string; taskStatus: string; heat: string; source: string; campaign: string; notes: string; owner: string };
 
 export const emptyLeadGroupRow = (): LeadGroupRow => ({ name: "", email: "", phone: "", schoolName: "", area: "", leadType: "", lifecycle: "", taskStatus: "", heat: "50", source: "", campaign: "", notes: "", owner: "" });

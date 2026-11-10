@@ -7,7 +7,7 @@ import type { Contact, LostReason } from "@/types/domain";
 import { adminDataClient, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, lostReasonOptions, Title, ContactDrawer } from './feature-shared';
-import { LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel } from "./lead-shared";
+import { type InboxView, LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel, matchesInboxView } from "./lead-shared";
 
 export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
   const [query, setQuery] = useState("");
@@ -34,13 +34,12 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
     // Al asignarlo, el lead pasa al CRM personal y sale de la bandeja.
     if (stage !== "Por contactar" || leadOwners[contact.id]) return false;
-    if (view === "reservas" && contact.formName !== "reserva") return false;
-    if (view !== "reservas" && contact.formName === "reserva") return false;
+    if (!matchesInboxView(contact, view)) return false;
     if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${inboxCampaignLabel(contact)} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
     if (campaignFilter !== "all" && inboxCampaignLabel(contact) !== campaignFilter) return false;
     if (courseFilter !== "all" && contact.course !== courseFilter) return false;
-    return view === "all" || view === "reservas" || (contact.country || "Otros") === view;
+    return true;
   }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view]);
   useEffect(() => {
     if (view !== "reservas") return;
@@ -130,6 +129,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
         {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>{label}</button>)}
       </nav>
       {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
+      {view === "recomendador" && <p className="assignment-note">Leads procedentes del recomendador de carreras. También aparecen en la bandeja General.</p>}
       {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario ({bookingError}). <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
       <section className="panel inbox-panel">
         <div className="data-table">
@@ -231,5 +231,4 @@ function BookingDate({ booking }: { booking?: WebBooking }) {
   return <time className="lead-entry-time" dateTime={booking.start}>{bookingDateFormatter.format(date)} · {bookingTimeFormatter.format(date)}</time>;
 }
 
-type InboxView = "all" | "España" | "Portugal" | "reservas";
-const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["reservas", "Reservas"]];
+const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["recomendador", "Recomendador"], ["reservas", "Reservas"]];
