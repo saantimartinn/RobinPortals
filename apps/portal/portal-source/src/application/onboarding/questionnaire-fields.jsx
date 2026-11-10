@@ -2,6 +2,7 @@
 import { CheckCircle2 } from "lucide-react";
 import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL } from "../../questionnaire-data.js";
 import { GOLD, NAVY } from "../../theme.js";
+import { SubjectRanking } from "./subject-ranking.jsx";
 
 export function initQuestionnaireAnswers() {
   const a = {};
@@ -24,24 +25,25 @@ export function qFmtSlider(def, val) {
   return val + "/" + def.max;
 }
 
-export function QuestionField({ def, value, onChange }) {
+export function QuestionField({ def, value, onChange, hideLabel = false, academicSystem }) {
   return (
     <div className="q-field">
-      <div className="q-label text-[13px] font-semibold text-slate-700 mb-2">
+      <div className={`q-label text-[13px] font-semibold text-slate-700 mb-2${hideLabel ? " sr-only" : ""}`}>
         {def.q}
         {def.optional && <span className="text-slate-400 font-normal"> (opcional)</span>}
         {def.type === "multi" && def.max && <span className="text-slate-400 font-normal"> · máx. {def.max}</span>}
       </div>
+      {def.type === "subject-ranking" && <SubjectRanking value={value} onChange={onChange} system={academicSystem} />}
       {def.type === "text" && (
-        <input type="text" value={value || ""} onChange={(e) => onChange(e.target.value)}
+        <input type="text" value={value || ""} onChange={(e) => onChange(e.target.value)} aria-label={def.q}
           className="q-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
       )}
       {def.type === "textarea" && (
-        <textarea rows={3} value={value || ""} onChange={(e) => onChange(e.target.value)}
+        <textarea rows={3} value={value || ""} onChange={(e) => onChange(e.target.value)} aria-label={def.q}
           className="q-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
       )}
       {def.type === "slider" && (
-        <QSlider value={value} min={def.min} max={def.max} step={def.step}
+        <QSlider label={def.q} value={value} min={def.min} max={def.max} step={def.step}
           left={def.left} right={def.right} suffix={def.suffix} onChange={onChange} />
       )}
       {(def.type === "single" || def.type === "multi") && (
@@ -51,11 +53,11 @@ export function QuestionField({ def, value, onChange }) {
   );
 }
 
-function QSlider({ value, min, max, step, left, right, suffix, onChange }) {
+function QSlider({ label, value, min, max, step, left, right, suffix, onChange }) {
   const v = value == null ? min : value;
   return (
     <div className="q-slider">
-      <input type="range" min={min} max={max} step={step} value={v}
+      <input type="range" min={min} max={max} step={step} value={v} aria-label={label}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full" style={{ accentColor: NAVY }} />
       <div className="flex items-center justify-between mt-1">
@@ -84,7 +86,7 @@ function QChoiceGrid({ options, value, multi, max, onChange }) {
         const ol = typeof o === "string" ? o : o.label;
         const on = multi ? arr.includes(ov) : value === ov;
         return (
-          <button key={ov} type="button" onClick={() => pick(ov)}
+          <button key={ov} type="button" onClick={() => pick(ov)} aria-pressed={on}
             className="q-choice flex items-center gap-2 rounded-xl border px-3 py-2 text-[13px] font-medium text-left transition"
             style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
             <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"

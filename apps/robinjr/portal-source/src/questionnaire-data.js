@@ -1,23 +1,6 @@
 // Declarative onboarding questionnaire content. Kept separate from the UI
 // so wording and form structure can be reviewed without traversing app.jsx.
 
-const Q_SUBJECTS = [
-  { label: "Matemáticas", value: "matematicas" },
-  { label: "Física", value: "fisica" },
-  { label: "Química", value: "quimica" },
-  { label: "Biología", value: "biologia" },
-  { label: "Informática / Programación", value: "informatica" },
-  { label: "Economía", value: "economia" },
-  { label: "Lengua y Literatura", value: "lengua" },
-  { label: "Historia", value: "historia" },
-  { label: "Geografía", value: "geografia" },
-  { label: "Filosofía", value: "filosofia" },
-  { label: "Idiomas", value: "idiomas" },
-  { label: "Arte y Dibujo", value: "arte" },
-  { label: "Música", value: "musica" },
-  { label: "Tecnología", value: "tecnologia" },
-  { label: "Educación Física", value: "efisica" },
-];
 const Q_TRAITS = [
   { label: "Analítico/a", value: "analitico" },
   { label: "Creativo/a", value: "creativo" },
@@ -48,12 +31,14 @@ const Q_GENERAL = {
     { id: "g_ciudad", type: "text", q: "Ciudad y país donde resides actualmente" },
     { id: "g_colegio", type: "text", q: "Nombre de tu colegio actual" },
     { id: "g_sistema", type: "single", q: "¿Qué sistema educativo estás cursando?", options: ["Bachillerato español", "Bachillerato Internacional (IB)", "A-Levels (británico)", "Sistema americano", "Bac francés", "Otro"] },
+    { id: "g_modalidad", type: "text", q: "¿Qué modalidad de Bachillerato estás cursando, si aplica a tu caso? (Por ejemplo: Ciencias y Tecnología, Humanidades o Artes)", hint: "Escribe tu modalidad. Si no aplica a tu caso, puedes indicarlo o dejar la respuesta en blanco.", optional: true },
+    { id: "g_asignaturas", type: "subject-ranking", q: "¿Qué asignaturas has cursado en tu último curso? Ordénalas de la que más te gusta a la que menos.", hint: "Añade las asignaturas de tu último curso, ordénalas y, si quieres, marca con el pulgar arriba las que te gustan y con el pulgar abajo las que no." },
     { id: "g_nota", type: "slider", q: "¿Cuál es tu nota media del año pasado?", min: 0, max: 10, step: 0.5, def: 7, left: "0", right: "10" },
-    { id: "g_fav", type: "multi", q: "¿Qué asignaturas te gustan MÁS?", options: Q_SUBJECTS },
-    { id: "g_menos", type: "multi", q: "¿Qué asignaturas disfrutas MENOS?", options: Q_SUBJECTS },
     { id: "g_estilo", type: "slider", q: "¿Cómo prefieres aprender?", min: 0, max: 10, step: 1, def: 5, left: "Práctica", right: "Teoría" },
     { id: "g_valora", type: "multi", q: "¿Qué valoras MÁS en una carrera universitaria?", options: Q_VALORA, max: 3 },
     { id: "g_ingles", type: "single", q: "¿Qué nivel de inglés tienes?", options: ["A2 o inferior", "B1", "B2", "C1", "C2 / Nativo"] },
+    { id: "g_certificado", type: "single", q: "¿Tienes alguna certificación de inglés?", options: ["Sí", "No"] },
+    { id: "g_certificado_nombre", type: "single", q: "¿Qué nivel tiene tu certificación de inglés?", hint: "Si tienes varias certificaciones, indica la de mayor nivel.", options: ["B1", "B2", "C1", "C2"], when: { id: "g_certificado", value: "Sí" } },
     { id: "g_fuera", type: "single", q: "¿Has vivido o estudiado fuera de tu país?", options: ["Sí", "No"] },
     { id: "g_rasgos", type: "multi", q: "¿Cómo te describirías? Elige los rasgos que más te representan", options: Q_TRAITS },
     { id: "g_descripcion", type: "textarea", q: "Cuéntanos algo más sobre cómo eres", optional: true },
@@ -73,7 +58,6 @@ const Q_VOCACIONAL = {
     { id: "v_carreras", type: "textarea", q: "¿Qué carreras universitarias te llaman más la atención actualmente?" },
     { id: "v_trabajo10", type: "textarea", q: "¿Qué tipo de trabajo te imaginas teniendo en 10 años?" },
     { id: "v_prioridad", type: "single", q: "¿Qué es lo más importante para ti?", options: ["Salario", "Pasión", "Impacto", "Estabilidad"] },
-    { id: "v_paises", type: "multi", q: "¿Qué países te interesaría considerar para estudiar?", options: ["Países Bajos", "Reino Unido", "España", "Estados Unidos", "Alemania", "Francia", "Irlanda", "Italia", "Otro"] },
     { id: "v_expectativas", type: "textarea", q: "¿Qué expectativas tienes de tu experiencia universitaria internacional?", optional: true },
   ],
 };
@@ -171,6 +155,8 @@ const Q_MASTER_FORMACION = {
     { id: "m_asignaturas_fuertes", type: "textarea", q: "¿En qué asignaturas o materias has obtenido tus mejores resultados?", optional: true },
     { id: "m_tfg", type: "textarea", q: "Tema de tu Trabajo de Fin de Grado (TFG) o proyecto final, si aplica", optional: true },
     { id: "m_ingles", type: "single", q: "¿Qué nivel de inglés tienes?", options: ["B1", "B2", "C1", "C2 / Nativo"] },
+    { id: "m_certificado", type: "single", q: "¿Tienes alguna certificación de inglés?", options: ["Sí", "No"] },
+    { id: "m_certificado_nombre", type: "single", q: "¿Qué nivel tiene tu certificación de inglés?", hint: "Si tienes varias certificaciones, indica la de mayor nivel.", options: ["B1", "B2", "C1", "C2"], when: { id: "m_certificado", value: "Sí" } },
   ],
 };
 
@@ -202,4 +188,12 @@ const Q_MASTER_OBJETIVO = {
 
 const Q_MASTER_BLOCKS = [Q_MASTER_FORMACION, Q_MASTER_EXPERIENCIA, Q_MASTER_OBJETIVO];
 
-export { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL };
+// The displayed flow and the saved profile must use the same visible questions.
+function visibleQuestionnaireBlocks(blocks, answers) {
+  return blocks.map((block) => ({
+    ...block,
+    questions: block.questions.filter((question) => !question.when || answers[question.when.id] === question.when.value),
+  }));
+}
+
+export { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL, visibleQuestionnaireBlocks };

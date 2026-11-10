@@ -1,22 +1,31 @@
 // Onboarding step or helper for profile; OnboardingFlow owns the step sequence.
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Plus, Trash2, ChevronRight, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
 import { initQuestionnaireAnswers, QuestionField, qOptLabel, qFmtSlider } from "./questionnaire-fields.jsx";
-import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL } from "../../questionnaire-data.js";
+import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL, visibleQuestionnaireBlocks } from "../../questionnaire-data.js";
 import { GOLD, NAVY } from "../../theme.js";
 import academicSystemsConfig from "../../../../shared/academic-systems.cjs";
 import { Btn, Field } from "../../ui.jsx";
 import { profileSave } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
 import { useOnboardingNav } from './onboarding-nav.js';
+import { ProfileConversation } from './profile-conversation.jsx';
+import { formatSubjectRanking, subjectRankingSignals } from './subject-ranking.js';
+import { OnboardingThanks } from './thanks.jsx';
+import { sectionIntroduction } from './conversation-sections.js';
 
 const { ACADEMIC_SYSTEMS, MAX_ACADEMIC_SUBJECTS, academicSystemByValue } = academicSystemsConfig;
+const SYSTEM_VALUES = {
+  "Bachillerato español": "bachillerato_espanol", "Bachillerato Internacional (IB)": "ib",
+  "A-Levels (británico)": "a_levels", "Sistema americano": "high_school_diploma",
+  "Bac francés": "baccalaureat_frances", "Otro": "otro",
+};
 
 export function OnboardingProfile({ user, onLogout, onDone }) {
   const nav = useOnboardingNav();
   const [email, setEmail] = useState(user.email || "");
   const [intereses, setIntereses] = useState(user.intereses || []);
-  const [answers, setAnswers] = useState(initQuestionnaireAnswers);
+  const [answers, setAnswers] = useState(() => ({ ...initQuestionnaireAnswers(), g_asignaturas: (Array.isArray(user.academic_subjects) ? user.academic_subjects : []).filter((subject) => subject.name?.trim()).map((subject) => ({ name: subject.name.trim(), level: subject.level || "", preference: null })) }));
   const [academicSystem, setAcademicSystem] = useState(user.academic_system || "");
   const [academicSubjects, setAcademicSubjects] = useState(() => {
     const existing = Array.isArray(user.academic_subjects)
@@ -29,6 +38,21 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
   const [screen, setScreen] = useState(0); // index into screens (0 = correo + intereses)
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const conversationFrame = useRef(null);
+  const scrollPosition = useRef(null);
+  const [conversationHeight, setConversationHeight] = useState(0);
+  useLayoutEffect(() => {
+    if (scrollPosition.current == null) return;
+    window.scrollTo({ top: scrollPosition.current, behavior: "instant" });
+    scrollPosition.current = null;
+  }, [screen]);
+
+  function preservePagePosition() {
+    scrollPosition.current = window.scrollY;
+    setConversationHeight(conversationFrame.current?.getBoundingClientRect().height || 0);
+  }
 
   const options = [
     { value: "ciencias", label: "Ciencias" },
@@ -47,14 +71,15 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       : [Q_GENERAL, ...intereses.map((i) => Q_AREAS[i]).filter(Boolean), Q_VOCACIONAL],
     [intereses, esMaestria]
   );
+  const activeBlocks = useMemo(() => visibleQuestionnaireBlocks(blocks, answers), [blocks, answers]);
   // One screen per question, between the intro (correo + intereses) and the academic system.
   const screens = useMemo(() => [
     { kind: "intro" },
-    ...blocks.flatMap((block) => block.questions.map((q) => ({ kind: "question", block, q }))),
-    { kind: "academic" },
-  ], [blocks]);
-  const questionCount = screens.length - 2;
-  const academicScreen = screens.length - 1;
+    ...activeBlocks.flatMap((block) => block.questions.map((q) => ({ kind: "question", block, q }))),
+    ...(esMaestria ? [{ kind: "academic" }] : []),
+  ], [activeBlocks, esMaestria]);
+  const questionCount = screens.filter((entry) => entry.kind === "question").length;
+  const academicScreen = esMaestria ? screens.length - 1 : -1;
   const totalScreens = screens.length;
   const selectedAcademicSystem = academicSystemByValue(academicSystem);
 
@@ -62,7 +87,18 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     setIntereses((arr) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]));
     setError("");
   }
-  function setAns(id, val) { setAnswers((a) => ({ ...a, [id]: val })); setError(""); }
+  function setAns(id, val) {
+    setAnswers((a) => {
+      if (id === "g_sistema") {
+        const system = academicSystemByValue(SYSTEM_VALUES[val]);
+        const subjects = (a.g_asignaturas || []).map((subject) => ({ ...subject, level: system?.levels.some((level) => level.value === subject.level) ? subject.level : "" }));
+        return { ...a, [id]: val, g_asignaturas: subjects };
+      }
+      return { ...a, [id]: val };
+    });
+    if (id === "g_sistema") setAcademicSystem(SYSTEM_VALUES[val] || "otro");
+    setError("");
+  }
 
   function selectAcademicSystem(value) {
     const system = academicSystemByValue(value);
@@ -109,6 +145,11 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     const q = screens[idx]?.q;
     if (!q || q.optional || q.type === "slider") return "";
     const v = answers[q.id];
+    if (q.type === "subject-ranking") {
+      if (!Array.isArray(v) || !v.length) return "Añade al menos una asignatura antes de continuar.";
+      if (selectedAcademicSystem?.levels.length && v.some((subject) => !subject.level)) return "Indica el nivel de cada asignatura antes de continuar.";
+      return "";
+    }
     const ok = q.type === "multi"
       ? Array.isArray(v) && v.length > 0
       : v != null && String(v).trim() !== "";
@@ -116,12 +157,14 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
   }
 
   function buildQuestionnaire() {
-    const outBlocks = blocks.map((blk) => ({
+    const outBlocks = activeBlocks.map((blk) => ({
       title: blk.title,
       items: blk.questions
         .map((q) => {
           let a = answers[q.id];
-          if (q.type === "multi") {
+          if (q.type === "subject-ranking") {
+            a = formatSubjectRanking(a);
+          } else if (q.type === "multi") {
             a = (Array.isArray(a) ? a : []).map((v) => qOptLabel(q.options, v));
           } else if (q.type === "slider") {
             a = qFmtSlider(q, a == null ? q.def : a);
@@ -137,13 +180,15 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       estilo_aprendizaje: answers.g_estilo,
       independencia: answers.g_independencia,
       presupuesto_mensual: answers.g_presupuesto,
-      nivel_ingles: answers.g_ingles || "",
-      asignaturas_fav: answers.g_fav || [],
-      asignaturas_menos: answers.g_menos || [],
+      nivel_ingles: answers.g_ingles || answers.m_ingles || "",
+      modalidad_bachillerato: answers.g_modalidad || "",
+      tiene_certificacion_ingles: answers[esMaestria ? "m_certificado" : "g_certificado"] === "Sí",
+      certificacion_ingles: answers[esMaestria ? "m_certificado" : "g_certificado"] === "Sí"
+        ? (answers[esMaestria ? "m_certificado_nombre" : "g_certificado_nombre"] || "").trim() : "",
+      ...subjectRankingSignals(esMaestria ? [] : answers.g_asignaturas),
       rasgos: answers.g_rasgos || [],
       valora: answers.g_valora || [],
       prioridad: answers.v_prioridad || "",
-      paises: answers.v_paises || [],
       areas: intereses,
     };
     return { version: 1, blocks: outBlocks, signals };
@@ -157,9 +202,9 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
         intereses,
         questionnaire: buildQuestionnaire(),
         academic_system: academicSystem,
-        academic_subjects: academicSubjects.filter((subject) => subject.name.trim()),
+        academic_subjects: (esMaestria ? academicSubjects : answers.g_asignaturas || []).filter((subject) => subject.name.trim()).map(({ name, level }) => ({ name, level })),
       });
-      await onDone();
+      setProfileSaved(true);
     } catch (e) {
       if (e.status === 409) setError("Ese correo ya está en uso por otra cuenta.");
       else if (e.data?.error === "invalid_email") setError("El correo no es válido.");
@@ -175,8 +220,17 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     if (err) { setError(err); return; }
     setError("");
     if (screen < totalScreens - 1) {
+      preservePagePosition();
+      const q = screens[screen]?.q;
+      const value = q ? answers[q.id] : null;
+      const answer = screen === 0
+        ? `${email.trim()}\n${options.filter((option) => intereses.includes(option.value)).map((option) => option.label).join(", ")}`
+        : q?.type === "subject-ranking" ? formatSubjectRanking(value).join("\n")
+          : q?.type === "slider" ? qFmtSlider(q, value ?? q.def)
+          : q?.type === "multi" ? (value || []).map((item) => qOptLabel(q.options, item)).join(", ")
+            : q ? qOptLabel(q.options, value) : "";
+      setHistory((previous) => [...previous.filter((entry) => entry.screen < screen), { screen, question: currentQuestion, sectionIntro, answer: String(answer || "Prefiero dejar esta respuesta en blanco.") }]);
       setScreen((s) => s + 1);
-      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       submit();
     }
@@ -184,20 +238,38 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
   function back() {
     setError("");
     if (screen === 0) { nav?.goBack?.(); return; } // first screen: back to the previous step
+    preservePagePosition();
+    setHistory((previous) => previous.filter((entry) => entry.screen < screen - 1));
     setScreen((s) => Math.max(0, s - 1));
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const current = screens[screen];
+  const sectionIntro = sectionIntroduction(current, screens[screen - 1]);
   const subtitle = screen === 0
     ? "Tu correo será tu usuario para entrar al portal."
     : screen === academicScreen
       ? "Última sección · sistema y asignaturas"
       : `Cuestionario de orientación · pregunta ${screen} de ${questionCount}`;
   const isLast = screen === totalScreens - 1;
+  const conversationalQuestions = { g_ciudad: "¿En qué ciudad y país vives actualmente?", g_colegio: "¿Cómo se llama tu colegio actual?" };
+  const currentQuestion = current?.kind === "question" ? conversationalQuestions[current.q.id] || current.q.q
+    : screen === academicScreen ? "¿Qué sistema educativo estás cursando?"
+      : "Para empezar, confirma tu correo y cuéntame qué áreas te interesan.";
+  const questionMeta = current?.kind === "question"
+    ? `Pregunta ${screen} de ${questionCount}`
+    : screen === academicScreen ? "PERFIL · ÚLTIMA SECCIÓN" : "PERFIL · TUS INTERESES";
+  const blockTitle = current?.kind === "question" ? current.block.title.replace(/^Bloque \d+ · /, "")
+    : screen === academicScreen ? "Información académica" : "Tus intereses";
+  const questionHint = current?.kind === "question"
+    ? current.q.hint || `${current.q.optional ? "Respuesta opcional. " : ""}${current.q.type === "multi" ? `Puedes elegir varias opciones${current.q.max ? `, máximo ${current.q.max}` : ""}.` : current.q.type === "single" ? "Elige una opción." : current.q.type === "slider" ? "Desliza para indicar tu respuesta." : "Escribe tu respuesta."}`
+    : screen === academicScreen ? "Añade tus asignaturas actuales y sus niveles cuando corresponda."
+      : "Selecciona al menos un área. Adaptaremos las preguntas a tus intereses.";
+
+  if (profileSaved) return <OnboardingThanks user={user} onLogout={onLogout} onDone={onDone} />;
 
   return (
-    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={4} onLogout={onLogout} fullscreen>
+    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={4} onLogout={onLogout} fullscreen conversation>
+      <ProfileConversation history={history} question={currentQuestion} hint={questionHint} meta={questionMeta} blockTitle={blockTitle} sectionIntro={sectionIntro} containerRef={conversationFrame} minimumHeight={conversationHeight}>
       <div className="onboarding-question-flow" onKeyDown={(event) => { if (event.key === "Enter" && event.target.tagName === "INPUT" && !busy) { event.preventDefault(); next(); } }}>
         {/* Progreso interno del cuestionario */}
         <div className="onboarding-progress" role="progressbar" aria-valuemin={1} aria-valuemax={totalScreens} aria-valuenow={screen + 1}>
@@ -215,14 +287,14 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
                 {options.map((o) => {
                   const on = intereses.includes(o.value);
                   return (
-                    <button key={o.value} type="button" onClick={() => toggle(o.value)}
-                      className="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition text-left"
+                    <button key={o.value} type="button" onClick={() => toggle(o.value)} aria-pressed={on}
+                      className="q-choice portal-area-choice flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition text-left"
                       style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
-                      <span className="h-4 w-4 rounded grid place-items-center flex-shrink-0"
+                      <span>{o.label}</span>
+                      <span className="portal-area-tick h-4 w-4 rounded grid place-items-center flex-shrink-0"
                         style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
                         {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}
                       </span>
-                      {o.label}
                     </button>
                   );
                 })}
@@ -233,8 +305,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
 
         {current?.kind === "question" && (
           <div className="onboarding-question">
-            <p className="onboarding-question-section">{current.block.title}</p>
-            <QuestionField key={current.q.id} def={current.q} value={answers[current.q.id]} onChange={(v) => setAns(current.q.id, v)} />
+            <QuestionField key={current.q.id} def={current.q} value={answers[current.q.id]} onChange={(v) => setAns(current.q.id, v)} academicSystem={selectedAcademicSystem} hideLabel />
             {screen === 1 && (
               <p className="onboarding-question-hint">
                 {esMaestria
@@ -324,6 +395,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
           </Btn>
         </div>
       </div>
+      </ProfileConversation>
     </OnboardingShell>
   );
 }

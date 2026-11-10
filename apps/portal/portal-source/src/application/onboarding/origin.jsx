@@ -1,24 +1,11 @@
 // Onboarding step or helper for origin; OnboardingFlow owns the step sequence.
 import { useState } from "react";
-import { FileText, CheckCircle2, ChevronRight, Earth, Loader2, AlertCircle, ChevronLeft, GraduationCap } from "lucide-react";
-import { GOLD, NAVY } from "../../theme.js";
+import { CheckCircle2, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { Btn, Field } from "../../ui.jsx";
 import { originSave } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
-import { useOnboardingNav } from './onboarding-nav.js';
-
-// Spanish flag (rojo, amarillo, rojo in 1:2:1 bands) for the "España" choice.
-function SpainFlag({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 30 20" aria-hidden="true">
-      <rect width="30" height="20" rx="2" fill="#AA151B" />
-      <rect y="5" width="30" height="10" fill="#F1BF00" />
-    </svg>
-  );
-}
 
 export function OnboardingOrigin({ user, onLogout, onDone }) {
-  const nav = useOnboardingNav();
   const [origin, setOrigin] = useState(user.origin || "");
   const [level, setLevel]   = useState(user.application_level || "");
   const [pais, setPais]     = useState(user.pais || "");
@@ -63,74 +50,63 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
     if (hasEu == null) { setError("Indica si posees un documento de identidad europeo."); return; }
     save();
   }
-  function back() {
-    setError("");
-    if (screen === 0) { nav?.goBack?.(); return; } // first screen: back to the previous step
-    setScreen((s) => Math.max(0, s - 1));
-  }
 
-  const Choice = ({ active, onClick, title, desc, icon: Ic, flag = false }) => (
-    <button type="button" onClick={onClick}
-      className="q-choice flex items-start gap-3 rounded-xl border px-4 py-3.5 text-left transition w-full"
-      style={active ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
-      <span className="h-12 w-12 rounded-lg grid place-items-center flex-shrink-0"
-        style={flag ? undefined : active ? { background: GOLD } : { background: "#F6F3E0" }}>
-        {Ic && <Ic className={flag ? "h-8 w-12" : "h-7 w-7"} style={flag ? undefined : { color: NAVY }} strokeWidth={flag ? undefined : 1.75} />}
-      </span>
-      <span className="min-w-0">
-        <span className="block font-semibold text-sm">{title}</span>
-        {desc && <span className={"block text-xs mt-0.5 " + (active ? "text-white/70" : "text-slate-400")}>{desc}</span>}
-      </span>
+  const Choice = ({ active, onClick, title, desc }) => (
+    <button type="button" onClick={onClick} aria-pressed={active} className="q-choice portal-origin-choice w-full text-left">
+      <span className="portal-origin-label"><strong>{title}</strong>{desc && <small>{desc}</small>}</span>
+      <span className="portal-origin-tick" aria-hidden="true">{active && <CheckCircle2 size={15} />}</span>
     </button>
   );
 
   const subtitle = screen === 0
     ? "Cuéntanos desde dónde realizas tu solicitud."
     : "Solicitud internacional · " + screen + " de 3";
+  const questions = [
+    "¿Desde dónde realizas tu solicitud de acceso a la universidad?",
+    "¿A qué tipo de programa universitario vas a aplicar?",
+    "¿Desde qué país realizas tu solicitud?",
+    "¿Posees un documento de identidad europeo (DNI o NIE de un país de la UE)?",
+  ];
 
   return (
-    <OnboardingShell user={user} title="Bienvenido a Robin" subtitle={subtitle} stepNumber={1} totalSteps={5} onLogout={onLogout} fullscreen>
+    <OnboardingShell user={user} title="Bienvenido a Robin" subtitle={subtitle} question={questions[screen]} questionMeta={`ORIGEN · PREGUNTA ${screen + 1} DE ${totalScreens}`} stepNumber={1} onLogout={onLogout} fullscreen>
       <div className="onboarding-question-flow" onKeyDown={(event) => { if (event.key === "Enter" && event.target.tagName === "INPUT" && !busy) { event.preventDefault(); next(); } }}>
         <div className="onboarding-question-body">
         {screen === 0 && (
           <>
-            <h2 className="onboarding-q-title">¿Desde dónde realizas tu solicitud de acceso a la universidad?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={origin === "espana"} onClick={() => { setOrigin("espana"); setError(""); }}
-                title="España" desc="Resido en España y solicito plaza desde aquí." icon={SpainFlag} flag />
+                title="España" desc="Resido en España y solicito plaza desde aquí." />
               <Choice active={origin === "otros"} onClick={() => { setOrigin("otros"); setError(""); }}
-                title="Otro país" desc="Solicito desde fuera de España (estudiante internacional)." icon={Earth} />
+                title="Otro país" desc="Solicito desde fuera de España (estudiante internacional)." />
             </div>
           </>
         )}
 
         {screen === 1 && (
           <>
-            <h2 className="onboarding-q-title">¿A qué tipo de programa universitario vas a aplicar?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={level === "grado"} onClick={() => { setLevel("grado"); setError(""); }}
-                title="Grado" desc="Estudios universitarios de grado (Bachelor's)." icon={GraduationCap} />
+                title="Grado" desc="Estudios universitarios de grado (Bachelor's)." />
               <Choice active={level === "maestria"} onClick={() => { setLevel("maestria"); setError(""); }}
-                title="Maestría" desc="Programa de máster (Master's)." icon={GraduationCap} />
+                title="Maestría" desc="Programa de máster (Master's)." />
             </div>
           </>
         )}
 
         {screen === 2 && (
           <>
-            <h2 className="onboarding-q-title">¿Desde qué país realizas tu solicitud?</h2>
             <Field label="País" value={pais} onChange={setPais} placeholder="Ej. México, Colombia, Argentina…" />
           </>
         )}
 
         {screen === 3 && (
           <>
-            <h2 className="onboarding-q-title">¿Posees un documento de identidad europeo (DNI o NIE de un país de la UE)?</h2>
             <div className="grid grid-cols-1 gap-2.5">
               <Choice active={hasEu === true} onClick={() => { setHasEu(true); setError(""); }}
-                title="Sí" desc="Dispongo de un documento de identidad europeo." icon={CheckCircle2} />
+                title="Sí" desc="Dispongo de un documento de identidad europeo." />
               <Choice active={hasEu === false} onClick={() => { setHasEu(false); setError(""); }}
-                title="No" desc="Verificaremos tu identidad con el pasaporte." icon={FileText} />
+                title="No" desc="Verificaremos tu identidad con el pasaporte." />
             </div>
           </>
         )}
@@ -143,10 +119,7 @@ export function OnboardingOrigin({ user, onLogout, onDone }) {
           </div>
         )}
 
-        <div className="onboarding-question-nav flex items-center gap-3">
-          <Btn variant="secondary" onClick={back} disabled={busy || (screen === 0 && !nav?.goBack)}>
-            <ChevronLeft className="h-4 w-4" /> Atrás
-          </Btn>
+        <div className="onboarding-question-nav onboarding-origin-nav flex items-center gap-3">
           <Btn className="flex-1" size="lg" onClick={next} disabled={busy}>
             {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</>
               : isLast ? <>Continuar <ChevronRight className="h-4 w-4" /></>

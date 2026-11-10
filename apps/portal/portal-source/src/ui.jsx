@@ -42,7 +42,7 @@ export const Btn = ({ children, onClick, variant = "primary", className = "", di
     : variant === "gold" ? { background: GOLD } : undefined;
 
   return (
-    <button type={type} disabled={disabled} onClick={onClick} style={inlineStyle}
+    <button type={type} disabled={disabled} onClick={onClick} style={inlineStyle} data-variant={variant}
       className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}>
       {children}
     </button>

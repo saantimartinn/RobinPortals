@@ -109,3 +109,28 @@
 }
 @media (prefers-reduced-motion: reduce) { .admin-workspace *, .admin-workspace *::before, .admin-workspace *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 @media (max-height: 600px) { .admin-client-context { position: static; } }
+.admin-client-phase-label { display:flex; flex-wrap:wrap; align-items:center; gap:5px 8px; max-width:240px; margin-left:auto; }
+.admin-client-phase-label > span:last-child { color:var(--robin-ink-600); font-size:11px; line-height:1.4; }
+.admin-profile-form { display:grid; gap:20px; }
+.admin-profile-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.admin-profile-fields label { min-width:0; }
+.admin-profile-form :is(input:not([type=checkbox]),select,textarea),.admin-note-editor textarea { width:100%; min-height:42px; padding:10px 12px; border:var(--robin-line); border-radius:10px; background:var(--robin-paper); color:var(--robin-navy); font:400 14px var(--robin-font-text); }
+.admin-profile-fields .is-wide { grid-column:1/-1; }
+.admin-profile-interests { display:flex; flex-wrap:wrap; gap:10px 18px; }
+.admin-profile-interests label { display:flex; align-items:center; gap:7px; font-size:13px; }
+.admin-profile-interests input { accent-color:var(--robin-navy); }
+.admin-profile-save { position:sticky; bottom:0; z-index:5; display:flex; align-items:center; justify-content:flex-end; gap:12px; padding:14px; border:var(--robin-line); border-radius:12px; background:var(--robin-paper); }
+.admin-profile-status { margin-right:auto; font-size:12px; }
+.admin-profile-status.is-error { color:var(--robin-danger); }
+.admin-profile-status.is-success { color:var(--robin-success); }
+.admin-profile-question { display:grid; gap:6px; margin-top:14px; font-size:12px; color:var(--robin-ink-600); }
+.admin-profile-form textarea,.admin-note-editor textarea { resize:vertical; min-height:90px; }
+.admin-note-editor { display:grid; gap:10px; }
+.admin-note-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+@media(max-width:700px){.admin-profile-fields { grid-template-columns:minmax(0,1fr); }.admin-client-phase-label { width:100%; max-width:none; margin:4px 0 0 60px; }.admin-profile-save { flex-wrap:wrap; }.admin-profile-status { flex-basis:100%; }}
+.admin-client-phase-label > .admin-phase-chip { display:inline-flex; border:1px solid; border-radius:8px; padding:6px 9px; font-size:11px; font-weight:600; line-height:1.4; }
+
+@media (max-width: 640px) {
+  .admin-questionnaire > .ui-card-header { flex-direction: column; align-items: stretch; }
+  .admin-questionnaire > .ui-card-header > :last-child { align-self: flex-start; }
+}

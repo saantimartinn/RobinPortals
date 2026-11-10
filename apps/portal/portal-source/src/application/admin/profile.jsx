@@ -1,11 +1,12 @@
 // Admin workspace module for profile; AdminPortal composes these views.
 import { useState, useEffect } from "react";
-import { User, FileText, CheckCircle2, BookOpen, Loader2, AlertCircle, Sparkles, RefreshCw, ExternalLink, GraduationCap, ChevronDown, PartyPopper, XCircle } from "lucide-react";
+import { User, FileText, CheckCircle2, BookOpen, Loader2, AlertCircle, Sparkles, RefreshCw, ExternalLink, GraduationCap, PartyPopper, XCircle } from "lucide-react";
 import { NAVY } from "../../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../ui.jsx";
 import { adminCareerSuggestions, adminCareerSuggestionsRegenerate, adminCareerSuggestionFeedback } from "../../api.js";
 import { LivedAbroadCard } from "../StudentProfile.jsx";
 import { ConvertMentoria } from "./ConvertMentoria.jsx";
+import { AdminProfileEditor, CommercialNotesEditor, INTERESTS, OnboardingQuestionnaire } from "./profile-editors.jsx";
 
 export function AdminPerfil({ client, onRefresh }) {
   // --- Sugerencias de carreras (IA) ---
@@ -14,11 +15,10 @@ export function AdminPerfil({ client, onRefresh }) {
   const [suggErr, setSuggErr] = useState("");
   const [regening, setRegening] = useState(false);
   const [feedbackBusy, setFeedbackBusy] = useState("");
-  const [showQ, setShowQ] = useState(false);
 
   useEffect(() => {
     let cancel = false;
-    setSuggLoading(true); setSuggErr(""); setSugg(null); setShowQ(false);
+    setSuggLoading(true); setSuggErr(""); setSugg(null);
     (async () => {
       try {
         const r = await adminCareerSuggestions(client.id);
@@ -30,7 +30,7 @@ export function AdminPerfil({ client, onRefresh }) {
       }
     })();
     return () => { cancel = true; };
-  }, [client.id]);
+  }, [client.id, client.updated_at]);
 
   async function regenerate() {
     setRegening(true); setSuggErr("");
@@ -56,16 +56,6 @@ export function AdminPerfil({ client, onRefresh }) {
     }
   }
 
-  const opts = [
-    { value: "ciencias", label: "Ciencias" },
-    { value: "tecnologia_y_programacion", label: "Tecnología y programación" },
-    { value: "business", label: "Business" },
-    { value: "ciencias_de_la_salud", label: "Ciencias de la salud" },
-    { value: "ingenierias", label: "Ingenierías" },
-    { value: "ciencias_sociales", label: "Ciencias sociales" },
-    { value: "artes", label: "Artes" },
-  ];
-
   const AREA_ES = {
     "Technology & Computer Science": "Tecnología",
     "Engineering": "Ingeniería",
@@ -84,13 +74,10 @@ export function AdminPerfil({ client, onRefresh }) {
     catch (_) { return ""; }
   }
 
-  const esPasaporte = (client.origin === "otros") && (client.has_eu_id === false);
-  const docLabel = esPasaporte ? "Pasaporte" : "DNI";
   const items = (sugg && sugg.suggestions && Array.isArray(sugg.suggestions.items)) ? sugg.suggestions.items : [];
   const feedbackByCode = Object.fromEntries(((sugg && sugg.feedback) || []).map((entry) => [entry.program_code, entry.decision]));
   const hasQ = sugg && sugg.has_questionnaire;
   const aiDisabled = !!(sugg && sugg.ai_disabled);
-  const qBlocks = (hasQ && sugg.questionnaire && Array.isArray(sugg.questionnaire.blocks)) ? sugg.questionnaire.blocks : [];
 
   return (
     <div className="space-y-5">
@@ -103,7 +90,7 @@ export function AdminPerfil({ client, onRefresh }) {
       </Card>}
       <Card>
         <CardHeader title="Cumpleaños" icon={PartyPopper}
-          subtitle="Fecha recuperada del DNI durante el onboarding" />
+          subtitle="Puedes corregirla en los datos personales del alumno" />
         <CardContent>
           <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
             <div>
@@ -115,52 +102,14 @@ export function AdminPerfil({ client, onRefresh }) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader title="Datos personales" subtitle="Solo lectura · datos persistidos en Supabase" icon={User} />
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {[
-            ["Nombre", client.nombre],
-            ["Apellidos", client.apellidos],
-            ["Email", client.email],
-            ["Número de " + docLabel.toLowerCase(), client.dni_numero],
-            ["Dirección", client.direccion],
-            ["Fecha de nacimiento", client.fecha_nacimiento],
-            ["Teléfono del alumno", client.telefono_alumno],
-          ].map(([label, value]) => (
-            <div key={label} className={label === "Dirección" ? "md:col-span-2" : ""}>
-              <div className="text-xs font-medium text-slate-600 mb-1">{label}</div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 min-h-10">{value || "—"}</div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <AdminProfileEditor client={client} onRefresh={onRefresh} personalOnly />
+      <CommercialNotesEditor client={client} onRefresh={onRefresh} />
 
       <Card>
-        <CardHeader title="Notas comerciales" subtitle="Información interna del lead, visible solo para administración" icon={FileText} />
-        <CardContent className="space-y-3">
-          {!(client.crm_notes || []).length && <p className="text-sm text-slate-400">No hay notas comerciales.</p>}
-          {(client.crm_notes || []).map((note) => <div key={note.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-            <div className="text-xs font-medium text-slate-500">{note.authorName || "Equipo Robin"}{note.createdAt ? ` · ${fmtDate(note.createdAt)}` : ""}</div>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{note.body}</p>
-          </div>)}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader title="Intereses de carrera" subtitle="Sólo lectura · los marca el alumno en su onboarding" icon={BookOpen} />
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {(client.intereses || []).length === 0
-              ? <span className="text-sm text-slate-400">El alumno aún no ha indicado intereses.</span>
-              : client.intereses.map((v) => {
-                  const lbl = (opts.find((o) => o.value === v) || {}).label || v;
-                  return (
-                    <span key={v} className="rounded-full px-3 py-1.5 text-xs font-medium border"
-                      style={{ background: NAVY, color: "#FEFBE5", borderColor: NAVY }}>{lbl}</span>
-                  );
-                })}
-          </div>
-        </CardContent>
+        <CardHeader title="Intereses de carrera" subtitle="Los marca el alumno en su onboarding · puedes cambiarlos en Modificar formulario" icon={BookOpen} />
+        <CardContent><div className="flex flex-wrap gap-2">
+          {!(client.intereses || []).length ? <span className="text-sm text-slate-400">El alumno aún no ha indicado intereses.</span> : client.intereses.map(value => <span key={value} className="rounded-full px-3 py-1.5 text-xs font-medium border" style={{background:NAVY,color:'#FEFBE5',borderColor:NAVY}}>{INTERESTS.find(([id])=>id===value)?.[1] || value}</span>)}
+        </div></CardContent>
       </Card>
 
       <LivedAbroadCard
@@ -282,36 +231,7 @@ export function AdminPerfil({ client, onRefresh }) {
         </CardContent>
       </Card>
 
-      {/* === CUESTIONARIO DEL ALUMNO === */}
-      {hasQ && (
-        <Card>
-          <CardHeader title="Cuestionario de orientación" icon={FileText}
-            subtitle="Respuestas del alumno en el onboarding"
-            right={
-              <Btn variant="ghost" size="sm" onClick={() => setShowQ((x) => !x)}>
-                {showQ ? "Ocultar" : "Ver respuestas"}
-                <ChevronDown className="h-3.5 w-3.5" style={{ transform: showQ ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
-              </Btn>
-            } />
-          {showQ && (
-            <CardContent className="space-y-4">
-              {qBlocks.map((blk, bi) => (
-                <div key={bi}>
-                  <div className="text-xs font-bold mb-2" style={{ color: NAVY }}>{blk.title}</div>
-                  <div className="space-y-2">
-                    {(blk.items || []).map((it, ii) => (
-                      <div key={ii} className="text-sm">
-                        <div className="text-slate-500 text-xs">{it.q}</div>
-                        <div className="text-slate-800">{Array.isArray(it.a) ? it.a.join(", ") : String(it.a)}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          )}
-        </Card>
-      )}
+      <OnboardingQuestionnaire client={client} questionnaire={client.questionnaire || sugg?.questionnaire} onRefresh={onRefresh} />
     </div>
   );
 }

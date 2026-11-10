@@ -17,7 +17,8 @@ const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { attachStudentPhones } = require('../../lib/student-phone');
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
+  if (event.httpMethod === 'POST') return require('../../lib/admin-client-profile-handler').handler(event);
+  if (event.httpMethod !== 'GET') return methodNotAllowed(['GET', 'POST']);
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
 
@@ -52,9 +53,9 @@ exports.handler = async (event) => {
     const ids = list.map((client) => client.id);
     let notesByUser = new Map();
     if (ids.length) {
-      const { data: noteRows, error: notesError } = await sb.from('crm_client_notes').select('user_id,notes').in('user_id', ids);
+      const { data: noteRows, error: notesError } = await sb.from('crm_client_notes').select('user_id,notes,synced_at').in('user_id', ids);
       if (notesError && !['42P01', 'PGRST205'].includes(notesError.code)) throw notesError;
-      notesByUser = new Map((noteRows || []).map((row) => [row.user_id, row.notes]));
+      notesByUser = new Map((noteRows || []).map((row) => [row.user_id, row]));
     }
 
     return json({
@@ -65,7 +66,7 @@ exports.handler = async (event) => {
         nombre: admin.nombre,
         apellidos: admin.apellidos,
       },
-      clients: list.map((client) => ({ ...client, crm_notes: notesByUser.get(client.id) || [] })),
+      clients: list.map((client) => ({ ...client, crm_notes: notesByUser.get(client.id)?.notes || [], crm_notes_updated_at: notesByUser.get(client.id)?.synced_at || null })),
     });
   } catch (e) {
     console.error('admin-clients-list error', e);

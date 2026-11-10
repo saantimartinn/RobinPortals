@@ -235,7 +235,6 @@ export function AdminPortal({ user }) {
                 searchQ={searchQ}
                 onSearch={setSearchQ}
                 onSelect={selectClient}
-                onConverted={reloadAssigned}
                 loading={loadingClients}
                 loadError={loadError}
                 onOpenAssign={openAssignModal}
@@ -261,7 +260,7 @@ export function AdminPortal({ user }) {
               <AdminReservas client={selectedClient} />
             )}
             {active === "academico" && selectedClient && (
-              <AdminPerfilAcademico client={selectedClient} />
+              <AdminPerfilAcademico client={selectedClient} onRefresh={reloadAssigned} />
             )}
             {active === "pagos" && selectedClient && (
               <AdminPagos client={selectedClient} />
