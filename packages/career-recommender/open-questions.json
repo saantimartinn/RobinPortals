@@ -1,0 +1,86 @@
+[
+  {
+    "id": "g_descripcion",
+    "q": "Cuéntanos algo más sobre cómo eres"
+  },
+  {
+    "id": "g_futuro",
+    "q": "¿Qué idea tienes ahora mismo sobre tu futuro?"
+  },
+  {
+    "id": "g_algo",
+    "q": "¿Hay algo importante que deberíamos saber sobre ti?"
+  },
+  {
+    "id": "v_carreras",
+    "q": "¿Qué carreras universitarias te llaman más la atención actualmente?"
+  },
+  {
+    "id": "v_trabajo10",
+    "q": "¿Qué tipo de trabajo te imaginas teniendo en 10 años?"
+  },
+  {
+    "id": "v_expectativas",
+    "q": "¿Qué expectativas tienes de tu experiencia universitaria internacional?"
+  },
+  {
+    "id": "c_inspira",
+    "q": "¿Qué científicos, descubrimientos o temas científicos te inspiran?"
+  },
+  {
+    "id": "t_herramientas",
+    "q": "¿Qué herramientas o lenguajes de programación conoces actualmente?"
+  },
+  {
+    "id": "b_negocios",
+    "q": "¿Qué tipo de negocios o sectores te interesan más?"
+  },
+  {
+    "id": "i_problemas",
+    "q": "¿Qué tipo de problemas disfrutas resolver?"
+  },
+  {
+    "id": "so_problemas",
+    "q": "¿Qué problemas sociales te gustaría ayudar a resolver?"
+  },
+  {
+    "id": "a_inspira",
+    "q": "¿Qué artistas o marcas creativas te inspiran?"
+  },
+  {
+    "id": "m_asignaturas_fav",
+    "q": "¿Qué asignaturas o áreas de tu grado has disfrutado más?"
+  },
+  {
+    "id": "m_asignaturas_fuertes",
+    "q": "¿En qué asignaturas o materias has obtenido tus mejores resultados?"
+  },
+  {
+    "id": "m_tfg",
+    "q": "Tema de tu Trabajo de Fin de Grado (TFG) o proyecto final, si aplica"
+  },
+  {
+    "id": "m_exp_desc",
+    "q": "Describe brevemente tu experiencia profesional: puestos, responsabilidades y logros"
+  },
+  {
+    "id": "m_exp_otros",
+    "q": "Prácticas, voluntariado, investigación u otros proyectos relevantes"
+  },
+  {
+    "id": "m_master_interes",
+    "q": "¿Qué máster(es) o áreas de especialización te interesan?"
+  },
+  {
+    "id": "m_motivacion",
+    "q": "¿Por qué quieres cursar un máster ahora y qué esperas conseguir?"
+  },
+  {
+    "id": "m_objetivo_pro",
+    "q": "¿Qué objetivo profesional persigues a medio plazo?"
+  },
+  {
+    "id": "m_algo",
+    "q": "¿Hay algo más que debamos saber sobre tu perfil?"
+  }
+]

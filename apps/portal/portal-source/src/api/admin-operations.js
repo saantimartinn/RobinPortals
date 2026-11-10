@@ -1,6 +1,13 @@
 // Browser API client for admin operations; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
+export async function adminClientProfileSave(userId, data, expectedUpdatedAt) {
+  return api.post("/api/admin/clients", { user_id: userId, action: "profile", data, expected_updated_at: expectedUpdatedAt || null });
+}
+export async function adminClientNoteSave(userId, data, expectedVersion) {
+  return api.post("/api/admin/clients", { user_id: userId, action: "notes", data, expected_version: expectedVersion || null });
+}
+
 // ----- FASE APLICACIÓN -----
 export async function adminPhaseSet(userId, phase) { return api.post("/api/admin/phase", { user_id: userId, phase }); }
 

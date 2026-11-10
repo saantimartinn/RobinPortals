@@ -5,11 +5,25 @@ import { Badge, Btn, Card, CardContent, CardHeader } from "../../ui.jsx";
 import { ClientAvatar } from "./ClientAvatar.jsx";
 import { useDebounced } from "./useDebounced.js";
 import { api } from "../../api/core.js";
-import { ConvertMentoria } from "./ConvertMentoria.jsx";
+import { APP_STEPS } from "../../application-steps.js";
 import { clientsInFolder, folderPath } from "../../../../../../packages/client-folders/model.mjs";
 import "../../../../../../packages/client-folders/folders.css";
 
-function FolderedClients({ clients, totalCount, onSelect, onConverted }) {
+const PHASE_COLORS = [
+  ["#e5f0ff", "#254e87"], ["#f0e9fc", "#6743a0"], ["#fff1d8", "#865610"],
+  ["#fce9ed", "#9a3c55"], ["#e0f3ef", "#286a60"], ["#fff0e3", "#94551f"],
+  ["#e8ebfa", "#465396"], ["#e7f4e8", "#397441"], ["#ddf3e6", "#22633f"],
+];
+function ClientPhaseBadge({ client }) {
+  const phase = APP_STEPS.find((step) => step.key === Number(client.application_phase || 1)) || APP_STEPS[0];
+  const [background, color] = PHASE_COLORS[phase.key - 1];
+  return <div className="admin-client-phase-label">
+    {client.requires_onboarding && <Badge tone="amber">Registro pendiente</Badge>}
+    <span className="admin-phase-chip" style={{ background, color, borderColor: `${color}30` }}>Fase {phase.key} · {phase.label}</span>
+  </div>;
+}
+
+function FolderedClients({ clients, totalCount, onSelect }) {
   const [data, setData] = useState({ folders: [], items: [] });
   const [selectedId, setSelectedId] = useState(() => sessionStorage.getItem('robin_client_folder_open'));
   const [name, setName] = useState('');
@@ -37,13 +51,25 @@ function FolderedClients({ clients, totalCount, onSelect, onConverted }) {
     <div className="client-folder-bar"><nav aria-label="Ruta de carpetas"><button type="button" {...dropProps(null)} onClick={() => open(null)}>Todos los clientes</button>{folderPath(folders, selectedId).map((folder) => <span key={folder.id}><ChevronRight /><button type="button" {...dropProps(folder.id)} onClick={() => open(folder.id)}>{folder.name}</button></span>)}</nav><form onSubmit={(event) => { event.preventDefault(); if (name.trim()) void change({ action: 'create', name: name.trim(), parentId: selectedId }).then(() => setName('')); }}><input aria-label="Nombre de nueva carpeta" value={name} maxLength={80} onChange={(event) => setName(event.target.value)} placeholder="Nueva carpeta" /><button type="submit" disabled={busy || !name.trim()}><FolderPlus />Crear carpeta</button></form></div>
     {error && <p role="alert" className="client-folder-error">{error}</p>}
     <div className="client-folder-tiles">{children.map((folder) => <div className="client-folder-tile" key={folder.id} {...dropProps(folder.id)}><button type="button" className="client-folder-open" onClick={() => open(folder.id)}><Folder /><span>{folder.name}</span><small>{items.filter((item) => item.folder_id === folder.id).length} clientes</small></button><button type="button" title="Renombrar" aria-label={`Renombrar ${folder.name}`} onClick={() => { const value = window.prompt('Nombre de la carpeta', folder.name); if (value?.trim()) void change({ action: 'rename', folderId: folder.id, name: value.trim() }); }}><Pencil /></button><button type="button" title="Eliminar carpeta vacía" aria-label={`Eliminar ${folder.name}`} onClick={() => { if (window.confirm(`¿Eliminar la carpeta vacía «${folder.name}»?`)) void change({ action: 'delete', folderId: folder.id }); }}><Trash2 /></button></div>)}</div>
-    <div className="client-folder-client-grid">{visible.map((c) => <div className="client-folder-client" key={c.id} draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('application/x-robin-client', JSON.stringify({ source: 'alumno', id: c.id })); }}><button onClick={() => onSelect(c)} className="admin-client-row w-full flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 hover:border-slate-300 hover:bg-slate-50 transition text-left"><ClientAvatar nombre={c.nombre} apellidos={c.apellidos} size="lg" /><div className="min-w-0 flex-1"><div className="text-sm font-semibold text-slate-900 truncate">{c.nombre} {c.apellidos}</div><div className="text-xs text-slate-400 truncate">{c.email || c.username} · {c.lead_id}</div>{(c.crm_notes || []).length > 0 && <div className="mt-1 text-xs text-slate-600 truncate">Notas comerciales ({c.crm_notes.length}): {c.crm_notes.at(-1)?.body}</div>}</div><Badge tone={c.requires_onboarding ? 'amber' : 'green'}>{c.requires_onboarding ? 'Registro pendiente' : `Paso ${c.application_phase || 1}`}</Badge><ChevronRight className="h-4 w-4 text-slate-300 flex-shrink-0" /></button><div className="mt-2"><ConvertMentoria client={c} onConverted={onConverted} /></div></div>)}</div>
+    <div className="client-folder-client-grid">{visible.map((c) => (
+      <div className="client-folder-client" key={c.id} draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('application/x-robin-client', JSON.stringify({ source: 'alumno', id: c.id })); }}>
+        <button onClick={() => onSelect(c)} className="admin-client-row w-full flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 hover:border-slate-300 hover:bg-slate-50 transition text-left">
+          <ClientAvatar nombre={c.nombre} apellidos={c.apellidos} size="lg" />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold text-slate-900 truncate">{c.nombre} {c.apellidos}</div>
+            <div className="text-xs text-slate-400 truncate">{c.email && `${c.email} · `}ID: {c.lead_id || c.id}</div>
+          </div>
+          <ClientPhaseBadge client={c} />
+          <ChevronRight className="h-4 w-4 text-slate-300 flex-shrink-0" />
+        </button>
+      </div>
+    ))}</div>
 
     {!children.length && !visible.length && <p className="client-folder-empty">{totalCount === 0 ? 'Aún no tienes clientes asignados.' : 'No hay clientes en esta carpeta o búsqueda.'}</p>}
   </div>;
 }
 
-export function AdminClientesList({ clients, totalCount, searchQ, onSearch, onSelect, onConverted, loading, loadError, onOpenAssign }) {
+export function AdminClientesList({ clients, totalCount, searchQ, onSearch, onSelect, loading, loadError, onOpenAssign }) {
   return (
     <div className="space-y-5">
       <Card>
@@ -76,7 +102,7 @@ export function AdminClientesList({ clients, totalCount, searchQ, onSearch, onSe
             </div>
           ) : loadError ? (
             <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-3 text-center">{loadError}</div>
-          ) : <FolderedClients clients={clients} totalCount={totalCount} onSelect={onSelect} onConverted={onConverted} />}
+          ) : <FolderedClients clients={clients} totalCount={totalCount} onSelect={onSelect} />}
         </CardContent>
       </Card>
     </div>

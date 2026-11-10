@@ -19,7 +19,8 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
-const { generateSuggestions } = require('../../lib/career-suggestions');
+const { generateSuggestions, ENGINE_VERSION } = require('../../lib/career-suggestions');
+const { loadFeedbackHistory } = require('../../../../packages/career-recommender/history.cjs');
 
 async function requireAdmin(sb, session) {
   const { data: admin } = await getSessionUser(sb, session, 'id, email, username, role');
@@ -57,7 +58,7 @@ exports.handler = async (event) => {
 
     const { data: user, error: e1 } = await sb
       .from('users')
-      .select('id, nombre, apellidos, intereses, origin, application_level, questionnaire, questionnaire_completed_at, career_suggestions, career_suggestions_at')
+      .select('id, nombre, apellidos, intereses, origin, application_level, questionnaire, questionnaire_completed_at, academic_system, academic_subjects, career_suggestions, career_suggestions_at')
       .eq('id', userId)
       .single();
     if (e1 || !user) return json({ error: 'client_not_found' }, { statusCode: 404 });
@@ -121,8 +122,9 @@ exports.handler = async (event) => {
     let suggestions = user.career_suggestions || null;
 
     // Generacion perezosa: si no hay sugerencias o se fuerza, generar ahora.
-    if (force || !suggestions || !Array.isArray(suggestions.items) || !suggestions.items.length) {
-      suggestions = await generateSuggestions(user, feedback || []);
+    if (force || suggestions?.engine_version !== ENGINE_VERSION || !Array.isArray(suggestions.items) || !suggestions.items.length) {
+      const history = await loadFeedbackHistory(sb, user);
+      suggestions = await generateSuggestions(user, feedback || [], history);
       const { error: e2 } = await sb
         .from('users')
         .update({

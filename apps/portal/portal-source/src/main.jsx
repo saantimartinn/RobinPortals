@@ -7,6 +7,7 @@ import App from "./app.jsx";
 import "./index.css";
 // Last, so the shared admin look (navy sidebar, typography) wins over the app styles.
 import "../../../../packages/portal-nav/robin-shell.css";
+import "./application/onboarding/onboarding.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -1,0 +1,12 @@
+const test=require('node:test');const assert=require('node:assert/strict');
+const load=()=>import('../portal-source/src/application/admin/profile-edit-model.js');
+test('editar respuestas actualiza sus señales y conserva los datos desconocidos',async()=>{
+ const {profileDraft,profilePayload}=await load();const {Q_GENERAL}=await import('../portal-source/src/questionnaire-data.js');
+ const question=id=>Q_GENERAL.questions.find(q=>q.id===id).q;
+ const client={nombre:'Ana',intereses:['business'],academic_system:'ib',academic_subjects:[{name:'Math',level:'hl'},{name:'History',level:'sl'}],questionnaire:{version:1,blocks:[{title:'General',items:[{q:question('g_nota'),a:'7/10'},{q:question('g_certificado'),a:'Sí'},{q:question('g_certificado_nombre'),a:'B2'},{q:question('g_asignaturas'),a:['1. Math','2. History']}]}],signals:{custom:'conservar',nota_media:7,tiene_certificacion_ingles:true,certificacion_ingles:'B2',asignaturas_ordenadas:[{name:'Math',preference:'like'},{name:'History',preference:'dislike'}]}}};
+ const draft=profileDraft(client);draft.nombre='Cambio';draft.questionnaire.blocks[0].items[0].a='8,5';draft.questionnaire.blocks[0].items[1].a='No';draft.academic_subjects.reverse();
+ const payload=profilePayload(draft,client);assert.equal(payload.questionnaire.signals.nota_media,8.5);assert.equal(payload.questionnaire.signals.certificacion_ingles,'');assert.equal(payload.questionnaire.signals.custom,'conservar');assert.deepEqual(payload.questionnaire.signals.asignaturas_fav,['Math']);assert.equal(payload.academic_subjects[0].level,'sl');assert.equal(payload.questionnaire.blocks[0].items[3].a[0],'1. History — No me gusta');assert.equal(client.nombre,'Ana');assert.equal(client.questionnaire.blocks[0].items[0].a,'7/10');
+});
+test('un perfil antiguo sin asignaturas no pierde sus preferencias al corregir un nombre',async()=>{
+ const {profileDraft,profilePayload}=await load();const client={nombre:'Antes',intereses:[],questionnaire:{blocks:[{title:'General',items:[]}],signals:{asignaturas_fav:['matematicas'],asignaturas_menos:['historia']}}};const draft=profileDraft(client);draft.nombre='Después';const payload=profilePayload(draft,client);assert.deepEqual(payload.questionnaire.signals.asignaturas_fav,['matematicas']);assert.deepEqual(payload.questionnaire.signals.asignaturas_menos,['historia']);assert.equal(payload.role,undefined);assert.equal(payload.pago_completed,undefined);
+});

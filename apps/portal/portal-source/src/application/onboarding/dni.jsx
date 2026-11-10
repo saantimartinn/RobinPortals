@@ -1,6 +1,6 @@
 // Onboarding step or helper for dni; OnboardingFlow owns the step sequence.
 import { useState } from "react";
-import { UploadCloud, Camera, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { UploadCloud, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 import { NAVY } from "../../theme.js";
 import { Btn, Field } from "../../ui.jsx";
 import { dniExtract, dniSave } from "../../api.js";
@@ -164,10 +164,6 @@ function UploadSlot({ label, preview, onPick }) {
           </div>
         )}
         <input type="file" accept="image/*" className="hidden" onChange={handleChange} />
-      </label>
-      <label className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 cursor-pointer hover:bg-slate-50">
-        <Camera className="h-4 w-4" /> Hacer foto de {label.toLowerCase()}
-        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleChange} />
       </label>
     </div>
   );
