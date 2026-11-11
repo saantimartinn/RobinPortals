@@ -8,6 +8,8 @@ import robinStudentArt from "../../../../packages/brand/assets/robin-student.svg
 import robinCommunityArt from "../../../../packages/brand/assets/robin-community.svg";
 import "./login.css";
 import { SupportDialogs } from "./support/SupportDialogs.jsx";
+import { claimUpdateNotice } from "./support/update-notice-gate.js";
+import { api } from "./api/core.js";
 import { RecoveryRequest, ResetPasswordScreen } from "./support/PasswordRecovery.jsx";
 
 import { isAdminUser } from "./session.js";
@@ -62,7 +64,8 @@ export default function PortalRobin() {
   const [subscriptionAccessResolved, setSubscriptionAccessResolved] = useState(false);
   const [entryNotice, setEntryNotice] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
-  const [introOpen, setIntroOpen] = useState(false);
+  const [introUserId, setIntroUserId] = useState(null);
+  const introOpen = Boolean(authState.user?.id && introUserId === authState.user.id);
   const [resetToken] = useState(() => {
     try { return new URLSearchParams(window.location.hash.slice(1)).get("reset"); } catch (_) { return null; }
   });
@@ -75,15 +78,19 @@ export default function PortalRobin() {
 
   useEffect(() => {
     const user = authState.user;
+    setIntroUserId(null);
     if (resetToken || !user || isAdminUser(user) || user.auth_source === "external_client") return;
-    try {
-      if (!window.localStorage.getItem(`robin_portal_update_notice_2026:${user.id}`)) setIntroOpen(true);
-    } catch (_) { setIntroOpen(true); }
+    let active = true;
+    let storage;
+    try { storage = window.localStorage; } catch (_) {}
+    void claimUpdateNotice(user.id, (body) => api.post("/api/portal-update-notice", body), storage)
+      .then((show) => { if (active && show) setIntroUserId(user.id); })
+      .catch((error) => reportClientError("portal_update_notice", error));
+    return () => { active = false; };
   }, [authState.user?.id, resetToken]);
 
   function dismissIntro() {
-    try { window.localStorage.setItem(`robin_portal_update_notice_2026:${authState.user?.id}`, "seen"); } catch (_) {}
-    setIntroOpen(false);
+    setIntroUserId(null);
   }
 
   function withSupport(content, floatingButton = false) {

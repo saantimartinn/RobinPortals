@@ -126,6 +126,11 @@ to = "/.netlify/functions/portal-report-problem"
 status = 200
 
 [[redirects]]
+from = "/portal/api/portal-update-notice"
+to = "/.netlify/functions/portal-portal-update-notice"
+status = 200
+
+[[redirects]]
 from = "/portal/api/profile/lived-abroad"
 to = "/.netlify/functions/portal-profile-lived-abroad"
 status = 200

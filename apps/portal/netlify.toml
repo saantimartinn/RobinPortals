@@ -63,6 +63,10 @@
   from = "/api/report-problem"
   to = "/.netlify/functions/report-problem"
   status = 200
+[[redirects]]
+  from = "/api/portal-update-notice"
+  to = "/.netlify/functions/portal-update-notice"
+  status = 200
 
 [[redirects]]
   from = "/api/profile/lived-abroad"
