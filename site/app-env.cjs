@@ -38,6 +38,7 @@ function scopeFor(appId) {
     for (const [key, value] of Object.entries(siteEnv)) {
       if (key.startsWith(own)) values[key.slice(own.length)] = value;
     }
+    values.ROBIN_APP_ID = appId;
     // New checkouts use the Portal del Alumno Revolut merchant. Community's
     // existing Stripe subscriptions still renew under their original provider.
     if (appId === 'robinjr' || appId === 'community') {
@@ -124,7 +125,12 @@ function runInAppWithEnv(appId, overrides, fn) {
 function wrapScheduled(appId, load) {
   const wrapped = wrapFunction(appId, load);
   const run = wrapped.handler;
-  return { ...wrapped, handler: (...args) => (siteEnv.ROBIN_RUN_SCHEDULED === 'true' || wrapped.alwaysRun === true ? run(...args) : Promise.resolve({ statusCode: 204, body: '' })) };
+  return { ...wrapped, handler: (...args) => {
+    const jobEnabled = wrapped.scheduleEnabledEnv
+      && scopeFor(appId)[wrapped.scheduleEnabledEnv] === 'true';
+    return siteEnv.ROBIN_RUN_SCHEDULED === 'true' || wrapped.alwaysRun === true || jobEnabled
+      ? run(...args) : Promise.resolve({ statusCode: 204, body: '' });
+  } };
 }
 
 // The apps' functions use the classic Lambda format (exports.handler(event)), but
@@ -167,7 +173,8 @@ function toModern(handler) {
 
 /** Modern Netlify Function for an app's classic function (see toModern). */
 function serve(appId, load, { scheduled = false } = {}) {
-  return toModern((scheduled ? wrapScheduled : wrapFunction)(appId, load).handler);
+  const handler = (scheduled ? wrapScheduled : wrapFunction)(appId, load).handler;
+  return toModern(scheduled ? (event) => handler({ ...event, httpMethod: undefined, netlifyScheduled: true }) : handler);
 }
 
 module.exports = { wrapFunction, wrapScheduled, serve, toModern, runInApp, runInAppWithEnv, prefix, APP_IDS };

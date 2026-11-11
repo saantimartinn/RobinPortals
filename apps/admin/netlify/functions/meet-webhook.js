@@ -14,9 +14,9 @@
  * Auth: query ?token= o header X-Meet-Webhook-Secret == MEET_WEBHOOK_SECRET.
  *
  * Al recibir una transcripción lista:
- *   - recupera el texto (Meet REST API),
- *   - resuelve el cliente (booking del asesor más cercano en el tiempo),
- *   - resume con Claude y compila users.historial (conservando reuniones previas).
+ *   - recupera los metadatos del documento y la fecha real cuando Google la facilita,
+ *   - encola el documento con la misma clave que la búsqueda programada,
+ *   - un worker conserva texto y resumen y actualiza el historial de forma atómica.
  * Todo se loguea en webhook_log (source='meet').
  */
 const { getSupabase } = require('../../lib/supabase');

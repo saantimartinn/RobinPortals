@@ -215,7 +215,12 @@ async function createMeetEvent({ advisorEmail, summary, description, startAtIso,
     const m = video.uri.match(/meet\.google\.com\/([a-z\-]+)/i);
     if (m) meetCode = m[1];
   }
-  return { eventId: data.id, htmlLink: data.htmlLink || null, meetUrl, meetCode };
+  let transcription = { enabled: false, reason: 'authorization_pending' };
+  if (process.env.MEET_AUTO_TRANSCRIBE_ENABLED === 'true' && meetCode) {
+    try { transcription = await artifacts.enableAutomaticTranscription(advisorEmail, meetCode); }
+    catch (error) { transcription = { enabled:false, reason:error.message }; console.warn('[meet_auto_transcription_failed]', error.message); }
+  }
+  return { eventId: data.id, htmlLink: data.htmlLink || null, meetUrl, meetCode, transcription };
 }
 
 /**
@@ -281,37 +286,6 @@ const DRIVE_API = 'https://www.googleapis.com/drive/v3';
  * desde `sinceIso`. Meet nombra estos docs con "Transcript"/"Transcripción".
  * @returns {Promise<Array<{id,name,createdTime}>>}
  */
-async function driveListTranscriptDocs(advisorEmail, sinceIso) {
-  const token = await getAccessToken(advisorEmail);
-  const clauses = [
-    "mimeType='application/vnd.google-apps.document'",
-    "trashed=false",
-    // Drive's `name contains` only matches prefixes. Meet typically puts
-    // "- Transcript" at the end of the event title, so search fullText and
-    // then filter by filename to avoid matching arbitrary docs whose body
-    // happens to mention transcripts.
-    "(fullText contains 'Transcript' or fullText contains 'Transcripción' or fullText contains 'Transcripcion')",
-  ];
-  if (sinceIso) clauses.push(`createdTime > '${sinceIso}'`);
-  const q = clauses.join(' and ');
-  const files = [];
-  let pageToken = '';
-  do {
-    const url = `${DRIVE_API}/files?corpora=user&spaces=drive`
-      + `&q=${encodeURIComponent(q)}`
-      + `&pageSize=100`
-      + (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '')
-      + `&fields=${encodeURIComponent('nextPageToken,files(id,name,createdTime,mimeType)')}`;
-    const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await resp.json().catch(() => ({}));
-    if (!resp.ok) throw new Error('drive_list_error: ' + JSON.stringify(data).slice(0, 300));
-    files.push(...(data.files || []));
-    pageToken = data.nextPageToken || '';
-  } while (pageToken);
-
-  return files.filter((file) => /transcript|transcripci[oó]n/i.test(file.name || ''));
-}
-
 /** Exporta el texto plano de un Google Doc. */
 async function driveExportText(advisorEmail, fileId) {
   const token = await getAccessToken(advisorEmail);
@@ -324,6 +298,8 @@ async function driveExportText(advisorEmail, fileId) {
   return await resp.text();
 }
 
+const artifacts = require('../../../packages/meeting-history/google-artifacts.cjs').createMeetArtifacts({ getAccessToken });
+
 module.exports = {
   isConfigured,
   getAccessToken,
@@ -334,6 +310,6 @@ module.exports = {
   deleteCalendarEvent,
   listTranscriptEntries,
   getConferenceRecord,
-  driveListTranscriptDocs,
+  ...artifacts,
   driveExportText,
 };

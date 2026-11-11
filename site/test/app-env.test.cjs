@@ -9,7 +9,7 @@ process.env.ROBINJR__SUPABASE_URL = 'https://robinjr.example';
 process.env.PORTAL__REVOLUT_MERCHANT_SECRET_KEY = 'shared-test-key';
 process.env.ROBINJR__REVOLUT_MERCHANT_SECRET_KEY = 'old-sandbox-key';
 process.env.SITE_LEVEL = 'shared';
-const { wrapFunction, wrapScheduled, toModern, runInApp, runInAppWithEnv } = require('../app-env.cjs');
+const { wrapFunction, wrapScheduled, toModern, serve, runInApp, runInAppWithEnv } = require('../app-env.cjs');
 
 const probe = () => ({
   handler: async () => {
@@ -85,6 +85,29 @@ test('the Revolut reconciliation runs while legacy scheduled jobs remain disable
   delete process.env.ROBIN_RUN_SCHEDULED;
   const fn = wrapScheduled('community', () => ({ alwaysRun: true, handler: () => ({ statusCode: 200 }) }));
   assert.equal(fn.handler().statusCode, 200);
+});
+
+test('a transcript job can opt in without enabling unrelated legacy jobs', async () => {
+  delete process.env.ROBIN_RUN_SCHEDULED;
+  const transcript = wrapScheduled('portal', () => ({ scheduleEnabledEnv: 'MEET_TRANSCRIPT_POLL_ENABLED', handler: () => ({ statusCode: 200 }) }));
+  const legacy = wrapScheduled('portal', () => ({ handler: () => ({ statusCode: 200 }) }));
+  runInApp('portal', () => { process.env.MEET_TRANSCRIPT_POLL_ENABLED = 'true'; });
+  try { assert.deepEqual([(await transcript.handler()).statusCode, (await legacy.handler()).statusCode], [200, 204]); }
+  finally { runInApp('portal', () => { delete process.env.MEET_TRANSCRIPT_POLL_ENABLED; }); }
+});
+
+test('modern scheduled invocations reach legacy jobs without an HTTP method', async () => {
+  delete process.env.ROBIN_RUN_SCHEDULED;
+  let event;
+  const fn = serve('portal', () => ({ alwaysRun: true, handler: async input => {
+    event = input;
+    return input.httpMethod ? { statusCode: 404 } : { statusCode: 200, body: '{}' };
+  } }), { scheduled: true });
+  const response = await fn(new Request('https://x.test/job', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"next_run":"2026-11-11T10:00:00Z"}' }));
+  assert.equal(response.status, 200);
+  assert.equal(event.httpMethod, undefined);
+  assert.equal(event.netlifyScheduled, true);
+  assert.equal(JSON.parse(event.body).next_run, '2026-11-11T10:00:00Z');
 });
 
 test('modern functions translate the request and the classic result', async () => {
