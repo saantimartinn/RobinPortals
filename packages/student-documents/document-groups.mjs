@@ -45,7 +45,9 @@ export function groupStudentDocumentsByCareer(documents = [], careers = [], { sh
 }
 
 export function studentDocumentProgress(entries = []) {
-  return { approved: entries.filter(({ document }) => document.status === 'validated').length, total: entries.length };
+  const pendingReview = entries.filter(({ document }) => document.status === 'pending_review').length;
+  const approved = entries.filter(({ document }) => document.status === 'validated').length;
+  return { delivered: approved + pendingReview, pendingReview, total: entries.length };
 }
 
 export function formatDocumentDeadline(value) {

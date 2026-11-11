@@ -320,7 +320,10 @@ export function DocumentosCliente() {
                       {group.career?.university && <p className="mt-0.5 text-xs text-slate-500">{group.career.university}{group.career.city ? ` · ${group.career.city}` : ""}</p>}
                     </div>
                     <span className="student-document-summary-actions">
-                      <span className="student-document-progress" title="Documentos aprobados" aria-label={`${progress.approved} de ${progress.total} documentos aprobados`}>{progress.approved}/{progress.total}</span>
+                      <span className="student-document-summary-counts">
+                        <span className="student-document-progress" title="Documentos entregados" aria-label={`${progress.delivered} de ${progress.total} documentos entregados`}>{progress.delivered}/{progress.total} entregados</span>
+                        <span className="student-document-review">{progress.pendingReview} {progress.pendingReview === 1 ? "pendiente" : "pendientes"} de revisión</span>
+                      </span>
                       <span className="student-document-chevron"><ChevronDown className="h-4 w-4" aria-hidden="true" /></span>
                     </span>
                   </summary>
