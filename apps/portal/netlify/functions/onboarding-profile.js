@@ -84,6 +84,11 @@ exports.handler = async (event) => {
     return json({ error: 'invalid_academic_profile' }, { statusCode: 400 });
   }
 
+  const { subjectPreferencesMatch } = await import('../../../../packages/onboarding/subject-preferences.mjs');
+  if (!subjectPreferencesMatch(cleanQuestionnaire.signals, academicProfile.subjects)) {
+    return json({ error: 'missing_subject_preferences' }, { statusCode: 400 });
+  }
+
   try {
     const sb = getSupabase();
 
