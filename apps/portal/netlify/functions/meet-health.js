@@ -44,7 +44,7 @@ exports.handler = async (event) => {
 
   // ---- Tablas ----
   const tables = {};
-  for (const t of ['bookings', 'processed_meet_docs', 'users', 'webhook_log']) {
+  for (const t of ['bookings', 'processed_meet_docs', 'users', 'webhook_log', 'meeting_transcripts']) {
     const r = await step(async () => {
       const { error } = await sb.from(t).select('*', { count: 'exact', head: true });
       if (error) throw new Error(error.message);
@@ -74,19 +74,36 @@ exports.handler = async (event) => {
       const docs = await gcal.driveListTranscriptDocs(a.email, since1h);
       return `docs transcripción (última hora): ${docs.length}`;
     });
+    row.transcription_capabilities = await step(() => gcal.transcriptionCapabilities(a.email));
     advisors.push(row);
   }
 
   const allAdvisorsOk = advisors.every((a) => a.oauth.ok && a.calendar_freebusy.ok && a.drive_read.ok);
   const envOk = env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && env.ANTHROPIC_API_KEY;
   const tablesOk = Object.values(tables).every((t) => t.ok);
+  const processing = await step(async () => {
+    const sb = getSupabase();
+    const { data, error } = await sb.from('meeting_transcripts').select('status, completed_at, error_code').order('created_at', { ascending:false }).limit(1000);
+    if (error) throw error;
+    const counts = {};
+    for (const item of data || []) counts[item.status] = (counts[item.status] || 0) + 1;
+    return { counts, sample_limit:1000, last_completed:(data || []).filter(item => item.completed_at).map(item => item.completed_at).sort().at(-1) || null };
+  });
+  const enabled = process.env.MEET_TRANSCRIPT_POLL_ENABLED === 'true';
+  const automatic = process.env.MEET_AUTO_TRANSCRIBE_ENABLED === 'true';
+  const authorizationReady = advisors.every(a => a.transcription_capabilities?.ok && a.transcription_capabilities.detail.account_matches
+    && a.transcription_capabilities.detail.auto_transcription_permission && a.transcription_capabilities.detail.meet_read_permission);
 
   return json({
-    overall: (allAdvisorsOk && envOk && tablesOk) ? 'ok' : 'revisar',
+    overall: (allAdvisorsOk && envOk && tablesOk && enabled && automatic && authorizationReady && processing.ok) ? 'ok' : 'revisar',
+    processing_enabled: enabled,
+    automatic_transcription_enabled: automatic,
+    authorization_ready: authorizationReady,
+    processing,
     checked_at: now.toISOString(),
     env,
     tables,
     advisors,
-    hint: 'Todo verde = listo. Si un asesor falla en drive_read pero oauth OK, revisa que el scope drive.readonly esté en su refresh token.',
+    hint: 'La conexión con Google no demuestra una llamada procesada. Revisa permisos de Meet, identidad de cada asesor, activación del trabajo y última reunión completada.',
   });
 };
