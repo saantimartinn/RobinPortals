@@ -5,6 +5,7 @@
  *
  * Compartido por la verificación de Checkout y los webhooks de pago.
  */
+const { TIME_ZONE } = require('../../../packages/time/madrid.cjs');
 const { BUCKET } = require('./supabase');
 const drive = require('./google-drive');
 const { buildContractPdf } = require('./contract-pdf');
@@ -19,7 +20,7 @@ const { isReleaseTestUser } = require('../../../packages/auth/release-test.cjs')
 
 function fmtFecha(iso) {
   try {
-    return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric', timeZone: TIME_ZONE })
       .format(new Date(iso));
   } catch (_) { return String(iso); }
 }

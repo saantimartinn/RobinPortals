@@ -6,6 +6,8 @@ const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const holded = require('../../lib/holded');
 const { isPaymentAnnulled } = require('../../lib/payments');
+const { dayStart } = require('../../../../packages/time/madrid.cjs');
+const { loadRevenueAdjustments } = require('../../lib/finance/revenue');
 const {
   buildFinanceDashboard,
   captureTreasuryHistory,
@@ -51,8 +53,9 @@ exports.handler = async (event) => {
     }
     const invoiceStart = bounds.previousStart < bounds.start ? bounds.previousStart : bounds.start;
 
-    const [invoices, portalRows, expenseResult] = await Promise.all([
-      holded.listSalesInvoices({ start: Math.floor(invoiceStart.getTime() / 1000), end: Math.floor(bounds.end.getTime() / 1000) }),
+    const [documents, adjustments, portalRows, expenseResult] = await Promise.all([
+      holded.listSalesDocuments({ start: dayStart(invoiceStart.toISOString().slice(0, 10)).getTime() / 1000, end: dayStart(bounds.end.toISOString().slice(0, 10)).getTime() / 1000 }),
+      loadRevenueAdjustments(invoiceStart, bounds.end),
       loadPortalFinanceRows(),
       loadExpenseEntries(bounds.start, bounds.end),
     ]);
@@ -74,7 +77,7 @@ exports.handler = async (event) => {
     const dashboard = await buildFinanceDashboard({
       period,
       bounds,
-      invoices,
+      invoices: [...documents, ...adjustments],
       users: portalRows.users,
       payments: portalRows.payments,
       ledgerEntries: expenseResult.entries,

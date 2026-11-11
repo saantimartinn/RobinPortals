@@ -3,7 +3,8 @@
 const DAY_MS = 86400000;
 const round = (value) => Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
 const amount = (value) => Number(value || 0);
-const ymd = (date) => date.toISOString().slice(0, 10);
+const { dateKey } = require('../../../../packages/time/madrid.cjs');
+const ymd = (date) => dateKey(date);
 const fromUnix = (value) => value ? new Date(Number(value) * 1000) : null;
 const startOfUtcDay = (date) => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 const addDays = (date, count) => new Date(date.getTime() + count * DAY_MS);

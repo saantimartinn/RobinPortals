@@ -1,4 +1,5 @@
 // Admin workspace module for dashboard; AdminPortal composes these views.
+import { formatDateTime } from "../../client-utils.js";
 import { useMemo, useState, useEffect } from "react";
 import { MessageCircle, Calendar, LayoutDashboard, Shield, CheckCircle2, Users, Plus, CreditCard, Loader2, AlertCircle } from "lucide-react";
 import { GOLD, NAVY } from "../../theme.js";
@@ -244,7 +245,7 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
                         {cl && <span className="text-slate-500"> · {cl.nombre || cl.email}</span>}
                       </div>
                       <div className="text-[10px] text-slate-400 truncate">
-                        {ev.detail} · {new Date(ev.at).toLocaleDateString("es-ES", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" })}
+                        {ev.detail} · {formatDateTime(ev.at, { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" })}
                       </div>
                     </div>
                   </button>
@@ -274,7 +275,7 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
                     {cl ? `${cl.nombre || ""} ${cl.apellidos || ""}`.trim() : (b.topic || "Alumno")}
                   </div>
                   <div className="text-[11px] text-slate-500 truncate">
-                    {new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "2-digit", month: "long" }).format(when)} · {new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(when)} · {b.duration_min} min
+                    {formatDateTime(when, { weekday: "long", day: "2-digit", month: "long" })} · {formatDateTime(when, { hour: "2-digit", minute: "2-digit" })} · {b.duration_min} min
                   </div>
                 </button>
                 <div className="flex items-center gap-2 flex-shrink-0">

@@ -3,6 +3,7 @@ const { ymd, amount, addDays, addMonths, round } = require("./utils");
 const { v2List } = require("./holded");
 const { madridToday } = require("./periods");
 const { getAdminSupabase } = require("../admin-supabase");
+const { calendarDate } = require('../../../../packages/time/madrid.cjs');
 
 async function ecbRates() {
   const response = await fetch('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.csv', { headers: { Accept: 'text/csv' } });
@@ -53,7 +54,7 @@ async function computeTreasurySnapshots({ includeBackfill = false } = {}) {
       const current = amount(account.balance);
       const movementAfterCutoff = movements.reduce((total, movement) => {
         const rawDate = movement.value_date || movement.booking_date || movement.date;
-        const date = rawDate ? new Date(rawDate) : null;
+        const date = rawDate ? calendarDate(rawDate) : null;
         return date && date >= addDays(cutoff, 1) ? total + signedMovement(movement) : total;
       }, 0);
       const nativeBalance = round(current - movementAfterCutoff);

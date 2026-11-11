@@ -65,7 +65,7 @@ export function AdminChatAssistant({ user, activeClientId, clients, mascot }) {
         user_id: notesUserId,
         raw_notes: notesText,
         meeting_title: notesTitle || "Reunión",
-        meeting_date: new Date().toISOString().slice(0, 10),
+        meeting_date: new Date().toISOString(),
       });
       setNotesText(""); setNotesTitle("");
       setNotesOpen(false);

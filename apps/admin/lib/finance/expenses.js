@@ -4,6 +4,7 @@ const { amount, round, ymd, addDays } = require("./utils");
 const { validInvoice } = require("./invoices");
 const { inBounds, bucketMap, bucketKey, makeBuckets } = require("./periods");
 const { v2List, mapWithConcurrency, v2Fetch, listLedgerEntries } = require("./holded");
+const { dayStart } = require('../../../../packages/time/madrid.cjs');
 
 function purchaseLineBase(line) {
   if (String(line?.type || '').toLowerCase() === 'title') return 0;
@@ -263,8 +264,8 @@ async function loadExpenseEntries(start, end, options = {}) {
     const accountLoader = options.listExpenseAccounts || holded.listExpenseAccounts;
     const [documents, expenseAccounts] = await Promise.all([
       loader({
-      start: Math.floor(start.getTime() / 1000),
-      end: Math.floor(end.getTime() / 1000),
+      start: dayStart(ymd(start)).getTime() / 1000,
+      end: dayStart(ymd(end)).getTime() / 1000,
       }),
       accountLoader().catch((error) => {
         console.warn('holded expense accounts warning', error?.message || error);

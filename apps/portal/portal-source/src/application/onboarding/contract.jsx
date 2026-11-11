@@ -13,7 +13,7 @@ const { pricingVersionForNewUser, usesInternational2700Plan } = financialConfig;
 
 export function OnboardingContract({ user, onLogout, onDone }) {
   const today = new Date();
-  const todayStr = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "long", year: "numeric" }).format(today);
+  const todayStr = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Madrid" }).format(today);
 
   const tipo = (user.tipo || "general").toLowerCase();
   const variant = CONTRACT_VARIANTS[tipo] || CONTRACT_VARIANTS.general;

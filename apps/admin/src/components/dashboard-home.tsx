@@ -59,7 +59,7 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
     ["Leads activos", String(activeLeads.length), "CRM conectado", Users, "blue", null],
     ["Nuevos leads", String(acquisition?.leads ?? newLeads.length), `${periodLabel} · CRM + histórico`, Sparkles, "gold", null],
     ["Nuevos clientes", String(acquisition?.newClients ?? newClients.length), `${periodLabel} · conversión CRM o firma`, GraduationCap, "green", dashboardReportUrl("altas", period)],
-    ["Ventas este año", holded ? `${Math.round(holded.currentYear.sales).toLocaleString("es-ES")} €` : "—", holded ? `${holded.currentYear.invoices} facturas en Holded` : "Holded no disponible", CircleDollarSign, "red", dashboardReportUrl("facturacion", period)],
+    ["Ventas este año", holded ? `${holded.currentYear.sales.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : "—", holded ? `${holded.currentYear.invoices} documentos · ${holded.currentYear.adjustments || 0} ajustes` : "Holded no disponible", CircleDollarSign, "red", dashboardReportUrl("facturacion", period)],
   ] as const;
   const visibleDays = Math.max(1, Math.floor((today.getTime() - rangeStart.getTime()) / 86400000) + 1);
   const chartData = acquisition?.buckets.map((bucket) => ({ key: bucket.key, day: bucket.label, tick: bucket.tick, leads: bucket.leads, clients: bucket.clients }))

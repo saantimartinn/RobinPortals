@@ -1,4 +1,5 @@
 // Portal view or navigation module for bookings portal; the application shell owns session state.
+import { formatDateTime } from "../client-utils.js";
 import { useState, useEffect } from "react";
 import { Calendar, CheckCircle2, Loader2 } from "lucide-react";
 import { NAVY } from "../theme.js";
@@ -192,7 +193,7 @@ export function Reservas() {
               )}
               {lastCreated.start_at && (
                 <div className="text-xs text-slate-600 mt-1">
-                  {new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date(lastCreated.start_at))}
+                  {formatDateTime(new Date(lastCreated.start_at), { weekday: "long", day: "2-digit", month: "long", hour: "2-digit", minute: "2-digit" })}
                 </div>
               )}
             </div>
@@ -212,7 +213,7 @@ export function Reservas() {
             <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3">
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-slate-900 truncate">
-                  {new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "2-digit", month: "long" }).format(new Date(b.start_at))} · {new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(new Date(b.start_at))}
+                  {formatDateTime(new Date(b.start_at), { weekday: "long", day: "2-digit", month: "long" })} · {formatDateTime(new Date(b.start_at), { hour: "2-digit", minute: "2-digit" })}
                 </div>
                 <div className="text-xs text-slate-400 truncate">{b.topic} · {b.duration_min} min</div>
               </div>

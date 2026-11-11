@@ -16,12 +16,13 @@ export function DashboardReport({ snapshot, contacts, leadStages, holded }: { sn
   const safePeriod = (["7", "15", "30", "all"].includes(rawPeriod) ? rawPeriod : "30") as "7" | "15" | "30" | "all";
   const [acquisition, setAcquisition] = useState<SalesDashboard["acquisition"] | null>(null);
   useEffect(() => {
+    if (type !== "altas") return;
     let active = true;
     integrationClient.salesDashboard(dashboardAcquisitionPeriod(safePeriod))
       .then((result) => { if (active) setAcquisition(result.acquisition); })
       .catch(() => { if (active) setAcquisition(null); });
     return () => { active = false; };
-  }, [safePeriod]);
+  }, [safePeriod, type]);
   const periodDays = rawPeriod === "all" ? null : Number(rawPeriod);
   const today = new Date(); today.setHours(23, 59, 59, 999);
   const start = periodDays ? new Date(today.getTime() - (periodDays - 1) * 86400000) : null;
@@ -36,6 +37,12 @@ export function DashboardReport({ snapshot, contacts, leadStages, holded }: { sn
   const periodLabel = periodDays ? `Últimos ${periodDays} días` : "Todo el histórico";
   const stages: Array<[string, CrmStage]> = [["Por contactar", "Por contactar"], ["Contactados", "Contactado"], ["Llamadas programadas", "Llamada programada"], ["Propuestas enviadas", "Propuesta enviada"], ["Clientes", "Cliente"]];
   const title = type === "facturacion" ? "Informe de facturación anual" : type === "embudo" ? "Informe del embudo de captación" : "Informe de nuevos leads y clientes";
+  const annualInvoices = holded?.currentYearInvoices || [];
+  const invoiceTotal = (field: "subtotal" | "tax" | "total" | "paid" | "pending") =>
+    annualInvoices.reduce((sum, invoice) => sum + Math.round(invoice[field] * 100), 0) / 100;
+  const documentLabels: Record<string, string> = { invoice: "Factura", salesreceipt: "Ticket", creditnote: "Rectificativa", entry: "Ajuste contable" };
+  const adjustmentCount = holded?.currentYear.adjustments || 0;
+  const documentCount = holded?.currentYear.invoices || 0;
 
   return <div className="page report-page">
     <div className="title"><div><span>Informe detallado</span><h1>{title}</h1><p>Origen, criterio de cálculo y registros que componen el resultado.</p></div><button className="report-close" onClick={() => window.close()}>Cerrar pestaña</button></div>
@@ -53,10 +60,10 @@ export function DashboardReport({ snapshot, contacts, leadStages, holded }: { sn
     </>}
 
     {type === "facturacion" && <>
-      <section className="report-summary"><article><span>Ventas</span><strong>{formatMoney(holded?.currentYear.sales)}</strong><small>{holded?.currentYear.invoices || 0} facturas</small></article><article><span>Cobrado</span><strong>{formatMoney(holded?.currentYear.collected)}</strong><small>Importe pagado acumulado</small></article><article><span>Pendiente</span><strong>{formatMoney(holded?.currentYear.pending)}</strong><small>Total emitido menos cobrado</small></article></section>
-      <ReportMethod text="Los importes proceden de Holded para el año natural en curso. Ventas corresponde a la base imponible, sin impuestos; cobrado suma los pagos registrados y pendiente refleja el total emitido todavía no cobrado." />
-      <ReportTable headers={["Factura", "Cliente", "Fecha", "Total", "Cobrado", "Pendiente"]} rows={(holded?.recentInvoices || []).map((invoice) => [invoice.number || invoice.id, invoice.customer || "—", formatReportDate(invoice.date), formatMoney(invoice.total), formatMoney(invoice.paid), formatMoney(invoice.pending)])} empty="Holded no ha devuelto facturas recientes para mostrar el desglose." />
-      {holded?.syncedAt && <p className="report-sync">Datos sincronizados el {new Date(holded.syncedAt).toLocaleString("es-ES")}.</p>}
+      <section className="report-summary"><article><span>Ventas sin IVA</span><strong>{formatMoney(holded?.currentYear.sales)}</strong><small>{documentCount} documentos · {adjustmentCount} ajustes contables</small></article><article><span>IVA</span><strong>{formatMoney(holded?.currentYear.tax)}</strong><small>Documentos y ajustes registrados</small></article><article><span>Ventas con IVA</span><strong>{formatMoney(holded?.currentYear.billed)}</strong><small>Base imponible más IVA registrado</small></article></section>
+      <ReportMethod text={`Ventas incluye facturas y tickets vigentes, menos rectificativas, más ajustes de ingresos de Holded. Se excluyen borradores y anulaciones. ${formatMoney(holded?.currentYear.documentSales ?? holded?.currentYear.sales)} de documentos + ${formatMoney(holded?.currentYear.accountingAdjustments ?? 0)} de ajustes = ${formatMoney(holded?.currentYear.sales)} sin IVA. Las fechas y el corte anual usan Europe/Madrid. Los ajustes contables no se consideran cobros ni deudas de clientes.`} />
+      <ReportTable headers={["Tipo", "Documento", "Cliente / concepto", "Fecha", "Base sin IVA", "IVA", "Total con IVA", "Cobrado con IVA", "Pendiente con IVA"]} rows={annualInvoices.map((invoice) => [documentLabels[invoice.documentType || "invoice"] || "Documento", invoice.number || invoice.id, invoice.customer || "—", formatReportDate(invoice.date), formatMoney(invoice.subtotal), formatMoney(invoice.tax), formatMoney(invoice.total), formatMoney(invoice.paid), formatMoney(invoice.pending)])} footer={annualInvoices.length ? ["Total", `${documentCount} documentos`, `${adjustmentCount} ajustes`, "", formatMoney(invoiceTotal("subtotal")), formatMoney(invoiceTotal("tax")), formatMoney(invoiceTotal("total")), formatMoney(invoiceTotal("paid")), formatMoney(invoiceTotal("pending"))] : undefined} empty="No hay movimientos que formen el importe de ventas de este año." />
+      {holded?.syncedAt && <p className="report-sync">Datos sincronizados el {new Date(holded.syncedAt).toLocaleString("es-ES", { timeZone: "Europe/Madrid" })} · hora de España.</p>}
     </>}
   </div>;
 }
@@ -65,12 +72,12 @@ function ReportMethod({ text }: { text: string }) {
   return <section className="report-method"><FileText /><div><strong>Cómo se calcula</strong><p>{text}</p></div></section>;
 }
 
-function ReportTable({ headers, rows, empty = "No hay registros para este periodo." }: { headers: string[]; rows: string[][]; empty?: string }) {
-  return <section className="panel report-table"><table><thead><tr>{headers.map((header) => <th key={header}>{header}</th>)}</tr></thead><tbody>{rows.map((row, index) => <tr key={`${row[0]}-${index}`}>{row.map((cell, cellIndex) => <td key={`${cellIndex}-${cell}`}>{cell}</td>)}</tr>)}</tbody></table>{!rows.length && <p>{empty}</p>}</section>;
+function ReportTable({ headers, rows, footer, empty = "No hay registros para este periodo." }: { headers: string[]; rows: string[][]; footer?: string[]; empty?: string }) {
+  return <section className="panel report-table"><table><thead><tr>{headers.map((header) => <th key={header}>{header}</th>)}</tr></thead><tbody>{rows.map((row, index) => <tr key={`${row[0]}-${index}`}>{row.map((cell, cellIndex) => <td key={`${cellIndex}-${cell}`}>{cell}</td>)}</tr>)}</tbody>{footer && <tfoot><tr>{footer.map((cell, index) => <td key={index}>{cell}</td>)}</tr></tfoot>}</table>{!rows.length && <p>{empty}</p>}</section>;
 }
 
 function formatReportDate(value?: string | null) {
-  return value ? new Date(value).toLocaleDateString("es-ES") : "—";
+  return value ? new Date(value).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" }) : "—";
 }
 
 function formatMoney(value?: number) {

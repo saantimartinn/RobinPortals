@@ -413,8 +413,11 @@ const VARIANTS = { general: GENERAL, general_noes: GENERAL_NOES, delft: DELFT, l
 function schoolYearForDate(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  const year = date.getUTCFullYear();
-  const first = date.getUTCMonth() >= 8 ? year : year - 1;
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit',
+  }).formatToParts(date).map((part) => [part.type, part.value]));
+  const year = Number(parts.year);
+  const first = Number(parts.month) >= 9 ? year : year - 1;
   return `${first}–${first + 1}`;
 }
 

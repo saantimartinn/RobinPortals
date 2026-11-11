@@ -30,6 +30,7 @@
  *   - Cuenta contable según tipo de cliente (ver ACCOUNT_BY_TIPO).
  */
 
+const { dateKey, addCalendarDays } = require('../../../../packages/time/madrid.cjs');
 const { FISCAL } = require('../../shared/financial-config.cjs');
 const { IELTS_EXEMPTION_NOTE } = require('../extra-payments');
 const { holdedFetch, norm } = require('./client');
@@ -156,7 +157,7 @@ function invoiceTaxTreatmentFor(user, payment) {
 
 // Fecha en formato ISO YYYY-MM-DD que espera la v2 (a partir de epoch en segundos).
 function ymd(unixSec) {
-  return new Date(unixSec * 1000).toISOString().slice(0, 10);
+  return dateKey(new Date(unixSec * 1000));
 }
 
 function countryName(user) {
@@ -243,7 +244,7 @@ async function createInvoiceForPayment(sb, user, payment) {
   // Holded espera el precio NETO unitario; desglosa la base y el IVA a partir de él.
   const net = Math.round((gross / (1 + rate / 100)) * 100) / 100;
   const now = Math.floor(Date.now() / 1000);
-  const due = now + 7 * 24 * 3600;
+  const due = addCalendarDays(ymd(now), 7);
 
   // La v2 acepta directamente el ID interno de la cuenta del plan contable.
   const acct = accountFor(user.tipo);
@@ -252,7 +253,7 @@ async function createInvoiceForPayment(sb, user, payment) {
   const body = {
     contact_id: contactId,
     date: ymd(now),
-    due_date: ymd(due),
+    due_date: due,
     currency: String(payment.currency || 'eur').toLowerCase(),
     notes: treatment.note ? `${clientReference}\n${treatment.note}` : clientReference,
     ...(treatment.note ? { body: treatment.note } : {}),

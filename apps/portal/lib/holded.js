@@ -26,6 +26,7 @@
  *   - Cuenta contable según tipo de cliente (ver ACCOUNT_BY_TIPO).
  */
 
+const { dateKey, addCalendarDays } = require('../../../packages/time/madrid.cjs');
 const HOLDED_BASE = 'https://api.holded.com/api/v2';
 
 const {
@@ -143,7 +144,7 @@ function taxCodesFor(rate) {
 
 // Fecha en formato ISO YYYY-MM-DD que espera la v2 (a partir de epoch en segundos).
 function ymd(unixSec) {
-  return new Date(unixSec * 1000).toISOString().slice(0, 10);
+  return dateKey(new Date(unixSec * 1000));
 }
 
 function countryName(user) {
@@ -236,7 +237,7 @@ async function createInvoiceForPayment(sb, user, payment) {
   // porque la factura se emite sin IVA.
   const net = breakdown.base;
   const now = Math.floor(Date.now() / 1000);
-  const due = now + 7 * 24 * 3600;
+  const due = addCalendarDays(ymd(now), 7);
 
   // La v2 acepta directamente el ID interno de la cuenta del plan contable.
   const acct = accountFor(user.tipo, user, payment);
@@ -244,7 +245,7 @@ async function createInvoiceForPayment(sb, user, payment) {
   const body = {
     contact_id: contactId,
     date: ymd(now),
-    due_date: ymd(due),
+    due_date: due,
     currency: String(payment.currency || 'eur').toLowerCase(),
     notes: isIelts ? IELTS_NOTE : 'Cliente Robin ' + (user.lead_id || user.id || ''),
     retention: 0,
