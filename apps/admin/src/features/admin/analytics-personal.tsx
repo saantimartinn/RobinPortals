@@ -1,6 +1,6 @@
 // Admin feature module for analytics personal; the feature registry connects it to the authenticated shell.
 import { useEffect, useState, type FormEvent } from "react";
-import { Megaphone, ShieldCheck } from "lucide-react";
+import { Download, Megaphone, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Contact, CrmStage } from "@/types/domain";
@@ -11,6 +11,7 @@ import { DashboardLoader } from "@/components/dashboard-loader";
 import { EmptyChartBar } from "@/components/empty-chart-bar";
 import { Title } from './feature-shared';
 import { SalesOverview } from "./analytics-sales";
+import { campaignStatusLabel, downloadCampaignWorkbook, previousCalendarMonth } from "./campaign-export.mjs";
 
 export function PersonalAnalytics({ path, currentUser, contacts, leadStages, snapshot, isDeveloperAdmin }: { path: string; currentUser: string; contacts: Contact[]; leadStages: Record<string, CrmStage>; snapshot: PortalSnapshot | null; isDeveloperAdmin: boolean }) {
   const key = path.split("/").filter(Boolean)[1] || "ventas";
@@ -39,6 +40,7 @@ export function Campaigns({ currentUser, notify }: { currentUser: string; notify
   const [campaignSnapshot, setCampaignSnapshot] = useState<MetaSnapshot | null>(null);
   const [campaignLoading, setCampaignLoading] = useState(false);
   const [campaignError, setCampaignError] = useState("");
+  const [exporting, setExporting] = useState(false);
   async function syncMeta(force = false) {
     setSyncing(true);
     try {
@@ -80,6 +82,20 @@ export function Campaigns({ currentUser, notify }: { currentUser: string; notify
     setCampaignLoading(true);
     setCampaignRange({ from, to });
   }
+  function selectPreviousMonth() {
+    const range = previousCalendarMonth(new Date(), snapshot?.account.timezone || "Europe/Madrid");
+    setFrom(range.from);
+    setTo(range.to);
+    setCampaignLoading(true);
+    setCampaignRange(range);
+  }
+  async function exportCampaigns() {
+    if (!campaignData || campaignLoading || syncing || exporting || campaignError) return;
+    setExporting(true);
+    try { await downloadCampaignWorkbook(campaignData, campaignRange, campaignPeriod); }
+    catch (_) { notify("No se pudo descargar el Excel. Vuelve a intentarlo."); }
+    finally { setExporting(false); }
+  }
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   const campaignData = campaignRange ? campaignSnapshot : snapshot;
@@ -88,7 +104,7 @@ export function Campaigns({ currentUser, notify }: { currentUser: string; notify
     : "últimos 30 días";
   const euro = (value: number) => `${value.toLocaleString("es-ES", { maximumFractionDigits: 2 })} €`;
   const summary = snapshot?.summary;
-  const statusLabel: Record<string, string> = { ACTIVE: "Activa", PAUSED: "Pausada", ARCHIVED: "Archivada", DELETED: "Eliminada", CAMPAIGN_PAUSED: "Pausada", ADSET_PAUSED: "Pausada", IN_PROCESS: "En revisión", WITH_ISSUES: "Con incidencias" };
+  const statusLabel: Record<string, string> = campaignStatusLabel;
   if (syncing && !snapshot) return <div className="page"><DashboardLoader /></div>;
   return (
     <div className="page meta-page">
@@ -100,7 +116,7 @@ export function Campaigns({ currentUser, notify }: { currentUser: string; notify
         ["CPL real", summary ? euro(summary.cpl) : "—", "Inversión / leads"], ["Ventas", summary ? summary.purchases.toLocaleString("es-ES") : "—", "Compras atribuidas"], ["CAC", summary ? euro(summary.cac) : "—", "Inversión / ventas"], ["ROAS", summary ? `${summary.roas.toFixed(2)}×` : "—", summary ? euro(summary.revenue) : "—"],
       ].map(([label, value, detail]) => <article key={label}><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>)}</section>
       <div className="sales-analysis-grid"><MetaDailyChart title="Inversión diaria" daily={snapshot?.daily || []} metric="spend" /><MetaDailyChart title="CPM diario" daily={snapshot?.daily || []} metric="cpm" /></div>
-      <section className="panel campaign-panel"><div className="panel-heading"><div><h2>Campañas</h2><p>Datos reales · {campaignPeriod}</p></div><form className="meta-campaign-range" onSubmit={applyCampaignRange}><label>Desde<input type="date" required value={from} max={to || today} onChange={(event) => setFrom(event.target.value)} /></label><label>Hasta<input type="date" required value={to} min={from || undefined} max={today} onChange={(event) => setTo(event.target.value)} /></label><Button type="submit" variant="outline" disabled={campaignLoading || syncing}>{campaignLoading ? "Cargando…" : "Aplicar"}</Button>{campaignRange && <Button type="button" variant="outline" disabled={syncing} onClick={() => { setFrom(""); setTo(""); setCampaignRange(null); }}>Últimos 30 días</Button>}</form></div>{campaignError && <p className="meta-campaign-error" role="alert">{campaignError}</p>}<div className="data-table"><table><thead><tr><th>Campaña</th><th>Estado</th><th>Inversión</th><th>Leads</th><th>CPL</th><th>ROAS</th></tr></thead><tbody aria-busy={campaignLoading}>{campaignLoading ? <tr><td colSpan={6}>Cargando campañas del periodo seleccionado…</td></tr> : campaignData?.campaigns.map((row) => <tr key={row.id}><td><b>{row.name}</b><small>ID: {row.id}</small></td><td><Badge variant="outline">{statusLabel[row.status] || row.status}</Badge></td><td>{euro(row.spend)}</td><td>{row.leads.toLocaleString("es-ES")}</td><td>{euro(row.cpl)}</td><td>{row.roas.toFixed(2)}×</td></tr>)}{!campaignLoading && campaignData && campaignData.campaigns.length === 0 && <tr><td colSpan={6}>No hay campañas con entrega en este periodo.</td></tr>}</tbody></table></div></section>
+      <section className="panel campaign-panel"><div className="panel-heading"><div><h2>Campañas</h2><p>Datos reales · {campaignPeriod}</p></div><form className="meta-campaign-range" onSubmit={applyCampaignRange}><label>Desde<input type="date" required value={from} max={to || today} onChange={(event) => setFrom(event.target.value)} /></label><label>Hasta<input type="date" required value={to} min={from || undefined} max={today} onChange={(event) => setTo(event.target.value)} /></label><Button type="submit" variant="outline" disabled={campaignLoading || syncing}>{campaignLoading ? "Cargando…" : "Aplicar"}</Button><Button type="button" variant="outline" disabled={syncing} aria-pressed={!campaignRange} onClick={() => { setFrom(""); setTo(""); setCampaignRange(null); }}>Últimos 30 días</Button><Button type="button" variant="outline" disabled={syncing} onClick={selectPreviousMonth}>Mes anterior</Button><Button type="button" variant="outline" disabled={!campaignData || campaignLoading || syncing || exporting || Boolean(campaignError)} onClick={() => void exportCampaigns()}><Download />{exporting ? "Descargando…" : "Descargar Excel"}</Button></form></div>{campaignError && <p className="meta-campaign-error" role="alert">{campaignError}</p>}<div className="data-table"><table><thead><tr><th>Campaña</th><th>Estado</th><th>Inversión</th><th>Leads</th><th>CPL</th><th>ROAS</th></tr></thead><tbody aria-busy={campaignLoading}>{campaignLoading ? <tr><td colSpan={6}>Cargando campañas del periodo seleccionado…</td></tr> : campaignData?.campaigns.map((row) => <tr key={row.id}><td><b>{row.name}</b><small>ID: {row.id}</small></td><td><Badge variant="outline">{statusLabel[row.status] || row.status}</Badge></td><td>{euro(row.spend)}</td><td>{row.leads.toLocaleString("es-ES")}</td><td>{euro(row.cpl)}</td><td>{row.roas.toFixed(2)}×</td></tr>)}{!campaignLoading && campaignData && campaignData.campaigns.length === 0 && <tr><td colSpan={6}>No hay campañas con entrega en este periodo.</td></tr>}</tbody></table></div></section>
     </div>
   );
 }
