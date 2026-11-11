@@ -11,6 +11,8 @@ import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, Title, ContactDrawer, contactRoleOptions, contactRoleLabels, lostReasonOptions } from './feature-shared';
 import { EmailComposer } from "./email-composer";
 import { ClientFolderBrowser } from "./client-folders";
+import { InCelebration } from "./in-celebration-dialog";
+import { getInCelebration, lastCelebrationKey } from "./in-celebration.mjs";
 
 export { LeadInbox } from "./lead-inbox";
 import { leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
@@ -29,6 +31,8 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
   const [selected, setSelected] = useState<Contact | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [convertingId, setConvertingId] = useState<string | null>(null);
+  const [celebration, setCelebration] = useState<NonNullable<ReturnType<typeof getInCelebration>> | null>(null);
+  const lastCelebrationRef = useRef<string | null>(null);
   const [lostCategory, setLostCategory] = useState("");
   const [lostHeat, setLostHeat] = useState("0");
   const [lostFrom, setLostFrom] = useState("");
@@ -185,7 +189,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
     const leadId = pendingClientId;
     const contact = contacts.find((item) => item.id === leadId);
     const clientType = leadId ? categories[leadId] : "";
-    if (!leadId || !contact || !selectedPortal || (selectedPortal !== "community" && (!clientType || !selectedAdvisor))) return;
+    if (convertingId || !leadId || !contact || !selectedPortal || (selectedPortal !== "community" && (!clientType || !selectedAdvisor))) return;
     setConvertingId(leadId);
     const portalName = { alumno: "Portal del Alumno", robinjr: "Robin Jr", community: "Community" }[selectedPortal];
     notify(`Creando la cuenta de ${contact.name} en ${portalName}…`);
@@ -193,8 +197,16 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
       const result = await integrationClient.convertLead({ leadId, name: contact.name, email: contact.email, advisor: selectedAdvisor, clientType: clientType || "", targetPortal: selectedPortal });
       setRecentPortalAccounts((current) => ({ ...current, [leadId]: [...new Set([...(current[leadId] || []), selectedPortal])] }));
       if ((leadStages[leadId] || contact.stage) !== "Cliente") onMoveLead(leadId, "Cliente");
-      if (selectedPortal === "alumno") await onPortalRefresh();
       setPendingClientId(null);
+      let lastId = lastCelebrationRef.current;
+      try { lastId = localStorage.getItem(lastCelebrationKey) || lastId; } catch (_) {}
+      const nextCelebration = getInCelebration(result, { name: contact.name, portalName, lastId });
+      if (nextCelebration) {
+        lastCelebrationRef.current = nextCelebration.gif.id;
+        try { localStorage.setItem(lastCelebrationKey, nextCelebration.gif.id); } catch (_) {}
+        setCelebration(nextCelebration);
+      }
+      if (selectedPortal === "alumno") void onPortalRefresh().catch(() => notify("La cuenta está creada; actualiza la vista para verla."));
       if (result.result === "exists") notify(`${contact.name} ya tenía cuenta en ${portalName}`);
       else if (result.emailSent) notify(`Cuenta creada en ${portalName} y correo de acceso enviado`);
       else notify(`Cuenta creada en ${portalName}; el correo queda pendiente`);
@@ -364,6 +376,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
         </form>
       </div>}
       {pendingLostId && <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget && !savingOutcome) setPendingLostId(null); }}><form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmLost(); }}><button className="drawer-close" type="button" disabled={savingOutcome} onClick={() => setPendingLostId(null)}>×</button><span>Retirar del pipeline</span><h2>{lostDestination === "future" ? "Lead de próximo curso" : "Motivo obligatorio"}</h2><p>{lostDestination === "future" ? "El lead saldrá del CRM activo y se guardará únicamente en la tabla de próximos cursos." : "Selecciona por qué se ha perdido este lead. Este dato quedará guardado para el análisis comercial."}</p><label>Destino<select autoFocus value={lostDestination} onChange={(event) => { const destination = event.target.value as "lost" | "future"; setLostDestination(destination); setOutcomeError(""); }}><option value="lost">Lost definitivo</option><option value="future">Lead de próximo curso</option></select></label>{lostDestination === "lost" ? <><label>Motivo<select required value={lostReason} onChange={(event) => { setLostReason(event.target.value as LostReason | ""); if (event.target.value !== "other") setLostReasonDetail(""); }}><option value="">Seleccionar motivo…</option>{lostReasonOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>{lostReason === "other" && <label>Explicación breve<input required maxLength={120} value={lostReasonDetail} onChange={(event) => setLostReasonDetail(event.target.value)} placeholder="Escribe el motivo" /></label>}</> : <label>Curso académico<select required value={futureAcademicYear} onChange={(event) => setFutureAcademicYear(event.target.value as FutureAcademicYear | "")}><option value="">Seleccionar curso…</option><option value="2027-28">2027-28</option><option value="2028-29">2028-29</option></select></label>}{outcomeError && <small className="team-note-error" role="alert">{outcomeError}</small>}<div className="manual-lead-actions"><Button type="button" variant="outline" disabled={savingOutcome} onClick={() => setPendingLostId(null)}>Cancelar</Button><Button type="submit" disabled={savingOutcome || (lostDestination === "lost" ? !lostReason || (lostReason === "other" && !lostReasonDetail.trim()) : !futureAcademicYear)}>{savingOutcome ? "Moviendo…" : lostDestination === "future" ? "Enviar a próximos cursos" : "Marcar como Lost"}</Button></div></form></div>}
+      {celebration && <InCelebration celebration={celebration} onClose={() => setCelebration(null)} />}
       {stageReminderOpen && <div className="crm-stage-reminder" role="alertdialog" aria-modal="true" aria-labelledby="crm-stage-reminder-title"><section><div className="crm-stage-reminder-icon"><PhoneCall /></div><h2 id="crm-stage-reminder-title">¿Has registrado todas las llamadas?</h2><p>¿Has añadido todas las notas?</p>{stageReminderClosable ? <button type="button" aria-label="Cerrar aviso" onClick={() => setStageReminderOpen(false)}><X /></button> : <small>Podrás cerrar este aviso en 1 segundo.</small>}</section></div>}
     </div>
   );
