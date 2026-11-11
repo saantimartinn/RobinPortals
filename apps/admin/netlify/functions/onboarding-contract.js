@@ -8,6 +8,7 @@
  * Además genera un PDF del contrato completo (con los datos rellenos + firma) y
  * lo envía por email a hello@project-robin.com y al correo del cliente.
  */
+const { TIME_ZONE } = require('../../../../packages/time/madrid.cjs');
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
@@ -23,7 +24,7 @@ function esc(s) {
 }
 function fmtFecha(iso) {
   try {
-    return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric', timeZone: TIME_ZONE })
       .format(new Date(iso));
   } catch (_) { return String(iso); }
 }

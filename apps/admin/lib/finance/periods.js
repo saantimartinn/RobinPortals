@@ -1,5 +1,6 @@
 // Server-side periods helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { addDays, startOfUtcDay, ymd, addMonths } = require("./utils");
+const { calendarDate } = require('../../../../packages/time/madrid.cjs');
 
 const MADRID_TZ = 'Europe/Madrid';
 function madridToday() {
@@ -55,13 +56,16 @@ function periodBounds(period, today = madridToday(), customRange = null) {
   };
 }
 function inBounds(date, bounds) {
-  return date && date >= bounds.start && date < bounds.end;
+  const day = date && calendarDate(date);
+  return Boolean(day && day >= bounds.start && day < bounds.end);
 }
 function weekStart(date) {
+  date = calendarDate(date);
   const day = date.getUTCDay() || 7;
   return addDays(startOfUtcDay(date), 1 - day);
 }
 function bucketKey(date, granularity) {
+  date = calendarDate(date);
   if (granularity === 'day') return ymd(startOfUtcDay(date));
   if (granularity === 'week') return ymd(weekStart(date));
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-01`;

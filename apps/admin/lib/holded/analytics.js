@@ -22,11 +22,27 @@ async function listDocuments(docType, { start, end, signal } = {}) {
     err.detail = data;
     throw err;
   }
-  return Array.isArray(data) ? data : (Array.isArray(data && data.data) ? data.data : []);
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  throw new Error('holded_invalid_document_response');
 }
 
 async function listSalesInvoices(options = {}) {
   return listDocuments('invoice', options);
+}
+
+async function listSalesDocuments(options = {}) {
+  const types = ['invoice', 'salesreceipt', 'creditnote'];
+  const groups = await Promise.all(types.map((type) => listDocuments(type, options)));
+  return groups.flatMap((documents, index) => documents.map((document) => {
+    const documentType = types[index];
+    if (documentType !== 'creditnote') return { ...document, documentType };
+    const signed = { ...document, documentType };
+    for (const field of ['subtotal', 'tax', 'total', 'paymentsTotal', 'paymentsPending', 'paymentsRefunds']) {
+      signed[field] = -Math.abs(Number(document[field] || 0));
+    }
+    return signed;
+  }));
 }
 
 async function listPurchaseDocuments(options = {}) {
@@ -66,4 +82,5 @@ module.exports = {
   listExpenseAccounts,
   listPurchaseDocuments,
   listSalesInvoices,
+  listSalesDocuments,
 };

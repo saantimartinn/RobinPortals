@@ -1,4 +1,5 @@
 // Admin workspace module for admin reservas; AdminPortal composes these views.
+import { formatDateTime } from "../../client-utils.js";
 import { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 import { NAVY } from "../../theme.js";
@@ -46,7 +47,7 @@ export function AdminReservas({ client }) {
             <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 mb-2">
               <div className="min-w-0">
                 <div className="text-sm font-semibold text-slate-900 truncate">
-                  {new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "2-digit", month: "long" }).format(new Date(b.start_at))} · {new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(new Date(b.start_at))}
+                  {formatDateTime(new Date(b.start_at), { weekday: "long", day: "2-digit", month: "long" })} · {formatDateTime(new Date(b.start_at), { hour: "2-digit", minute: "2-digit" })}
                 </div>
                 <div className="text-xs text-slate-400 truncate">{b.topic} · {b.duration_min} min</div>
               </div>
@@ -72,7 +73,7 @@ export function AdminReservas({ client }) {
               <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5">
                 <div className="min-w-0">
                   <div className="text-sm text-slate-700 truncate">
-                    {new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "2-digit", month: "short" }).format(new Date(b.start_at))} · {new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(new Date(b.start_at))}
+                    {formatDateTime(new Date(b.start_at), { weekday: "short", day: "2-digit", month: "short" })} · {formatDateTime(new Date(b.start_at), { hour: "2-digit", minute: "2-digit" })}
                   </div>
                   <div className="text-[11px] text-slate-400 truncate">{b.topic}</div>
                 </div>

@@ -18,26 +18,7 @@ const { adminName, canonicalAdvisorEmail } = require('../../lib/admins');
 const { bookingConfig, requestedDays } = require('../../lib/booking-config');
 const gcal = require('../../lib/google-calendar');
 
-const TZ = 'Europe/Madrid';
-
-// offset (ms) que Europe/Madrid lleva respecto a UTC en ese instante
-function tzOffsetMs(date) {
-  const dtf = new Intl.DateTimeFormat('en-US', {
-    timeZone: TZ, hour12: false,
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
-  });
-  const p = dtf.formatToParts(date).reduce((a, x) => { a[x.type] = x.value; return a; }, {});
-  const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour === '24' ? 0 : p.hour, p.minute, p.second);
-  return asUTC - date.getTime();
-}
-
-// Convierte hora de pared de Madrid (Y,M,D,h,m) al instante UTC correcto.
-function madridWallToUtc(y, mo, d, h, mi) {
-  const guess = new Date(Date.UTC(y, mo - 1, d, h, mi));
-  const off = tzOffsetMs(guess);
-  return new Date(guess.getTime() - off);
-}
+const { TIME_ZONE: TZ, dateKey, dayStart, addCalendarDays } = require('../../../../packages/time/madrid.cjs');
 
 function overlaps(sMs, eMs, busy) {
   for (const b of busy) {
@@ -67,12 +48,10 @@ exports.handler = async (event) => {
 
     // Rango: desde 'from' (o ahora) durante 'days' días
     const now = new Date();
-    let from = now;
-    if (q.from && /^\d{4}-\d{2}-\d{2}$/.test(q.from)) {
-      from = madridWallToUtc(+q.from.slice(0, 4), +q.from.slice(5, 7), +q.from.slice(8, 10), 0, 0);
-    }
+    const fromKey = q.from && /^\d{4}-\d{2}-\d{2}$/.test(q.from) ? q.from : dateKey(now);
+    const from = dayStart(fromKey);
     const timeMin = new Date(Math.max(from.getTime(), now.getTime()));
-    const timeMax = new Date(from.getTime() + days * 24 * 3600 * 1000);
+    const timeMax = dayStart(addCalendarDays(fromKey, days));
 
     // MODO INVERSO: la disponibilidad son ÚNICAMENTE los eventos "LLAMADAS CLIENTES"
     // que el asesor tenga en su calendario. Fuera de esas ventanas no hay huecos.
@@ -110,10 +89,10 @@ exports.handler = async (event) => {
     const slotsByDate = {};
     for (const w of windows) {
       for (let t = w.start; t + SLOTMS <= w.end; t += SLOTMS) {
-        if (t < minStartMs) continue;
+        if (t < Math.max(minStartMs, timeMin.getTime()) || t + SLOTMS > timeMax.getTime()) continue;
         if (overlaps(t, t + SLOTMS, busy)) continue;
         const s = new Date(t);
-        const dateLabel = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(s);
+        const dateLabel = dateKey(s);
         const label = new Intl.DateTimeFormat('es-ES', { timeZone: TZ, hour: '2-digit', minute: '2-digit' }).format(s);
         (slotsByDate[dateLabel] = slotsByDate[dateLabel] || []).push({ start: s.toISOString(), label, _ms: t });
       }
@@ -122,8 +101,7 @@ exports.handler = async (event) => {
     // Estructura por día en el rango solicitado (orden cronológico, sin duplicados)
     const out = [];
     for (let i = 0; i < days; i++) {
-      const dayRef = new Date(from.getTime() + i * 24 * 3600 * 1000);
-      const p = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(dayRef);
+      const p = addCalendarDays(fromKey, i);
       const dedup = Array.from(new Map((slotsByDate[p] || []).map((sl) => [sl._ms, sl])).values());
       const slots = dedup.sort((a, b) => a._ms - b._ms).map(({ _ms, ...rest }) => rest);
       out.push({ date: p, slots });

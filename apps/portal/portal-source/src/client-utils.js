@@ -7,8 +7,12 @@ export function reportClientError(operation, error) {
   }));
 }
 
+export function formatDateTime(value, options) {
+  return new Intl.DateTimeFormat("es-ES", { ...options, timeZone: "Europe/Madrid" }).format(new Date(value));
+}
+
 export function formatTime(date) {
-  try { return new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(date); }
+  try { return formatDateTime(date, { hour: "2-digit", minute: "2-digit" }); }
   catch { return ""; }
 }
 
@@ -17,7 +21,7 @@ export function formatTime(date) {
 // =====================
 export function formatDate(d) {
   if (!d) return "—";
-  try { return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(d)); }
+  try { return formatDateTime(d, { day: "2-digit", month: "short", year: "numeric" }); }
   catch { return "—"; }
 }
 

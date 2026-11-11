@@ -5,8 +5,9 @@ const apiFetch = (input: RequestInfo | URL, init?: RequestInit) =>
   globalThis.fetch(typeof input === "string" ? apiPath(input) : input, init);
 
 export type IntegrationStatus = { holded: boolean; meta: boolean; stripe: boolean; email: boolean; applicationPortal: boolean; adminDatabase: boolean };
-export type FinanceTotals = { sales: number; billed: number; base: number; tax: number; collected: number; pending: number; overdue: number; invoices: number; paidInvoices: number; pendingInvoices: number; partialInvoices: number; overdueInvoices: number; drafts: number; averageTicket: number; collectionRate: number };
-export type HoldedSnapshot = { syncedAt: string; currency: string; currentMonth: FinanceTotals; currentYear: FinanceTotals; previousYear: FinanceTotals; last12Months: { month: string; label: string; sales: number; previousYearSales: number; billed: number; collected: number; pending: number; invoices: number }[]; recentInvoices: { id: string; number: string; customer: string; date: string | null; dueDate: string | null; subtotal: number; tax: number; total: number; paid: number; pending: number; status: string; currency: string }[] };
+export type FinanceTotals = { sales: number; billed: number; base: number; tax: number; collected: number; pending: number; overdue: number; invoices: number; adjustments?: number; documentSales?: number; accountingAdjustments?: number; paidInvoices: number; pendingInvoices: number; partialInvoices: number; overdueInvoices: number; drafts: number; averageTicket: number; collectionRate: number };
+export type HoldedInvoice = { id: string; documentType?: 'invoice' | 'salesreceipt' | 'creditnote' | 'entry'; number: string; customer: string; date: string | null; dueDate: string | null; subtotal: number; tax: number; total: number; paid: number; pending: number; status: string; currency: string };
+export type HoldedSnapshot = { syncedAt: string; currency: string; currentMonth: FinanceTotals; currentYear: FinanceTotals; previousYear: FinanceTotals; last12Months: { month: string; label: string; sales: number; previousYearSales: number; billed: number; collected: number; pending: number; invoices: number }[]; currentYearInvoices: HoldedInvoice[]; recentInvoices: HoldedInvoice[] };
 export type FinanceSnapshot = HoldedSnapshot;
 export type MetaMetrics = { spend: number; impressions: number; clicks: number; reach: number; ctr: number; cpc: number; cpm: number; leads: number; purchases: number; revenue: number; cpl: number; cac: number; roas: number };
 export type MetaCampaign = MetaMetrics & { id: string; name: string; status: string };
@@ -34,9 +35,9 @@ export type FinanceDashboard = {
   available: boolean;
   kpis: { sales: number | null; invoices: number | null; contracted: number | null; students: number | null; cac: number | null; anomaly: boolean };
   buckets: { key: string; label: string; tick: string; sales: number; collected: number; pending: number; contracted: number; cumulativeContracted: number; cumulativeCollected: number; newClients: number; expenses: number; previousSales: number }[];
-  collections: { sales: number | null; collected: number | null; emitted: number | null; contracted: number | null; invoices: number | null; pending: number | null; averageInvoice: number | null; averageTicket: number | null };
+  collections: { sales: number | null; collected: number | null; emitted: number | null; contracted: number | null; invoices: number | null; adjustments?: number; documentsBase?: number; pending: number | null; averageInvoice: number | null; averageTicket: number | null };
   expenses: { operational: number | null; marketing: number | null; taxes: number | null; purchaseTax?: number | null; salesTax?: number | null; netTax?: number | null; other: number | null; capex: number | null; payments: number | null; total: number | null };
-  invoices: { id: string; number: string; customer: string; clientType: string | null; installment: string | null; date: string | null; base: number; tax: number; total: number; status: string; currency: string }[];
+  invoices: { id: string; documentType?: 'invoice' | 'salesreceipt' | 'creditnote' | 'entry'; number: string; customer: string; clientType: string | null; installment: string | null; date: string | null; base: number; tax: number; total: number; status: string; currency: string }[];
   cash: { available: boolean; points: { date: string; balance: number; source: string }[]; accounts: { id: string; name: string; type: string; currency: string; balance: number; rate_to_eur: number | null; balance_eur: number | null }[] };
   reports: { profitAndLoss: 'wip'; balance: 'wip' };
   expenseDiagnostics?: ExpenseDiagnostics;
@@ -80,9 +81,13 @@ function periodQuery(period: AnalyticsPeriod) {
   return `period=custom&from=${encodeURIComponent(period.from)}&to=${encodeURIComponent(period.to)}`;
 }
 
-function cachedMeta(): MetaSnapshot | null {
+function metaCacheKey(range?: AnalyticsDateRange) {
+  return range ? `${META_CACHE_KEY}:${range.from}:${range.to}` : META_CACHE_KEY;
+}
+
+function cachedMeta(range?: AnalyticsDateRange): MetaSnapshot | null {
   try {
-    const stored = JSON.parse(localStorage.getItem(META_CACHE_KEY) || 'null');
+    const stored = JSON.parse(localStorage.getItem(metaCacheKey(range)) || 'null');
     return stored?.savedAt && Date.now() - stored.savedAt < META_CACHE_MS ? stored.data : null;
   } catch (_) { return null; }
 }
@@ -94,19 +99,23 @@ export const integrationClient = {
     if (!response.ok) throw new Error(payload.detail || 'No se pudieron cargar los datos de Holded');
     return payload as HoldedSnapshot;
   },
-  meta: async (force = false): Promise<MetaSnapshot> => {
-    const cached = !force ? cachedMeta() : null;
+  meta: async (force = false, range?: AnalyticsDateRange): Promise<MetaSnapshot> => {
+    const cached = !force ? cachedMeta(range) : null;
     if (cached) return cached;
-    const response = await apiFetch(`/api/admin/meta/insights${force ? '?refresh=1' : ''}`, { credentials: 'include' });
+    const params = new URLSearchParams();
+    if (force) params.set('refresh', '1');
+    if (range) { params.set('from', range.from); params.set('to', range.to); }
+    const query = params.toString();
+    const response = await apiFetch(`/api/admin/meta/insights${query ? `?${query}` : ''}`, { credentials: 'include' });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const fallback = cachedMeta();
+      const fallback = cachedMeta(range);
       if (fallback) return fallback;
       const detail = String(payload.detail || '');
       if (response.status === 429 || /too many calls|rate limit/i.test(detail)) throw new Error('Meta ha limitado temporalmente las consultas. Espera unos minutos antes de actualizar de nuevo.');
       throw new Error(detail || 'No se pudieron cargar las estadísticas de Meta');
     }
-    try { localStorage.setItem(META_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), data: payload })); } catch (_) {}
+    try { localStorage.setItem(metaCacheKey(range), JSON.stringify({ savedAt: Date.now(), data: payload })); } catch (_) {}
     return payload as MetaSnapshot;
   },
   paymentAnalytics: async (): Promise<PaymentAnalytics> => {

@@ -21,13 +21,17 @@ async function v2Fetch(path, params = {}) {
 async function v2List(path, params = {}, maxPages = 50) {
   const items = [];
   let cursor = '';
+  const seen = new Set();
   for (let page = 0; page < maxPages; page += 1) {
     const payload = await v2Fetch(path, { ...params, ...(cursor ? { cursor } : {}) });
+    if (!Array.isArray(payload) && !Array.isArray(payload?.items)) throw new Error('holded_invalid_list_response');
     items.push(...(Array.isArray(payload?.items) ? payload.items : Array.isArray(payload) ? payload : []));
-    if (!payload?.has_more || !payload?.cursor) break;
+    if (!payload?.has_more) return items;
+    if (!payload?.cursor || seen.has(payload.cursor)) throw new Error('holded_pagination_incomplete');
     cursor = payload.cursor;
+    seen.add(cursor);
   }
-  return items;
+  throw new Error('holded_pagination_incomplete');
 }
 async function listLedgerEntries(start, end) {
   const params = { start_date: ymd(start), end_date: ymd(addDays(end, -1)), limit: 200 };

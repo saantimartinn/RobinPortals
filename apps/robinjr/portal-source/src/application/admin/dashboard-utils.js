@@ -50,14 +50,15 @@ export function dashboardAlerts({ clients = [], payments = [], documents = [], s
     });
   });
   const requiredByUser = {};
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(now));
   documents.forEach((document) => {
     if (document.status === "required" && document.required) {
       requiredByUser[document.user_id] = (requiredByUser[document.user_id] || 0) + 1;
     }
-    if (document.deadline && document.status !== "validated" && document.deadline < new Date(now).toISOString().slice(0, 10)) {
+    if (document.deadline && document.status !== "validated" && document.deadline < today) {
       const client = clientById.get(document.user_id);
       if (!client) return;
-      const overdueDays = Math.max(1, Math.floor((now - new Date(`${document.deadline}T00:00:00`).getTime()) / 86400000));
+      const overdueDays = Math.max(1, Math.floor((Date.parse(today) - Date.parse(document.deadline)) / 86400000));
       alerts.push({
         kind: "deadline",
         urgency: 70 + overdueDays,
