@@ -1,0 +1,24 @@
+.crm-in-celebration{position:fixed;inset:0;width:min(980px,calc(100vw - 40px));max-width:none;max-height:calc(100dvh - 40px);margin:auto;padding:0;border:0;border-radius:24px;overflow:visible;background:transparent;color:var(--robin-navy,#2D3A64);font-family:var(--robin-font-text);box-shadow:0 32px 120px #0006}
+.crm-in-celebration::backdrop{background:#172342bb;backdrop-filter:blur(6px)}
+.crm-in-celebration-card{position:relative;z-index:1;max-height:calc(100dvh - 40px);overflow:auto;border:1px solid #fff9;border-radius:24px;background:var(--robin-paper,#FFFDF5)}
+.crm-in-celebration-close{position:absolute;top:16px;right:16px;display:grid;place-items:center;width:36px;height:36px;border:1px solid #DFDED2;border-radius:50%;background:#FFFDF5;color:inherit;cursor:pointer}
+.crm-in-celebration-close svg{width:18px;height:18px}
+.crm-in-celebration header{padding:28px 60px 22px;text-align:center}
+.crm-in-celebration header>span{display:inline-flex;align-items:center;gap:8px;color:#ab4b20;font-size:11px;font-weight:700;letter-spacing:1.8px}
+.crm-in-celebration header>span svg{width:17px;height:17px}
+.crm-in-celebration h2{margin:8px 0;font:600 clamp(28px,4vw,44px)/1.1 var(--robin-font-display);color:var(--robin-navy,#2D3A64)}
+.crm-in-celebration p{margin:0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.crm-in-celebration-media{display:grid;place-items:center;min-height:180px;height:clamp(180px,48dvh,480px);background:#182441;overflow:hidden}
+.crm-in-celebration-media img{display:block;width:100%;height:100%;object-fit:contain}
+.crm-in-celebration-still{display:grid;place-items:center;gap:14px;color:#FFFDF5;font-size:90px}
+.crm-in-celebration-still strong{font:600 28px var(--robin-font-display)}
+.crm-in-celebration footer{display:flex;align-items:center;gap:12px;padding:18px 24px}
+.crm-in-celebration footer a{margin-right:auto;color:#687088;font-size:11px}
+.crm-in-celebration footer .ui-button{display:inline-flex;align-items:center;gap:7px;justify-content:center}
+.crm-in-celebration footer svg{width:15px;height:15px}
+.crm-in-confetti{position:fixed;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+.crm-in-confetti i{position:absolute;top:-20px;left:var(--x);width:9px;height:16px;background:var(--color);border-radius:2px;animation:crm-in-confetti-fall var(--duration) var(--delay) linear infinite}
+.crm-in-confetti i:nth-child(3n){width:12px;height:12px;border-radius:50%}
+@keyframes crm-in-confetti-fall{from{transform:translate3d(0,-20px,0) rotate(0deg);opacity:1}to{transform:translate3d(var(--drift),105dvh,0) rotate(780deg);opacity:.3}}
+@media(max-width:560px){.crm-in-celebration{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:18px}.crm-in-celebration-card{max-height:calc(100dvh - 20px);border-radius:18px}.crm-in-celebration header{padding:24px 40px 18px}.crm-in-celebration header>span{font-size:9px;letter-spacing:1px}.crm-in-celebration p{font-size:12px}.crm-in-celebration footer{flex-wrap:wrap;gap:10px;padding:14px}.crm-in-celebration footer>.ui-button:last-child{flex:1}.crm-in-celebration footer a{order:3;width:100%;text-align:center}}
+@media(prefers-reduced-motion:reduce){.crm-in-confetti{display:none}}
