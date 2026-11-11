@@ -1,6 +1,6 @@
 // Onboarding step or helper for profile; OnboardingFlow owns the step sequence.
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle2, Plus, Trash2, ChevronRight, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
+import { CheckCircle2, ChevronRight, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
 import { initQuestionnaireAnswers, QuestionField, qOptLabel, qFmtSlider } from "./questionnaire-fields.jsx";
 import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL, visibleQuestionnaireBlocks } from "../../questionnaire-data.js";
 import { GOLD, NAVY } from "../../theme.js";
@@ -11,6 +11,8 @@ import { OnboardingShell } from './onboarding-shared.jsx';
 import { useOnboardingNav } from './onboarding-nav.js';
 import { ProfileConversation } from './profile-conversation.jsx';
 import { formatSubjectRanking, subjectRankingSignals } from './subject-ranking.js';
+import { subjectPreferenceError } from '../../../../../../packages/onboarding/subject-preferences.mjs';
+import { SubjectRanking } from './subject-ranking.jsx';
 import { OnboardingThanks } from './thanks.jsx';
 import { sectionIntroduction } from './conversation-sections.js';
 
@@ -51,7 +53,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
 
   function preservePagePosition() {
     scrollPosition.current = window.scrollY;
-    setConversationHeight(conversationFrame.current?.getBoundingClientRect().height || 0);
+    setConversationHeight(0);
   }
 
   const options = [
@@ -140,7 +142,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       if (selectedAcademicSystem.levels.length && completedSubjects.some((subject) => !subject.level)) {
         return "Selecciona el nivel de cada asignatura que hayas añadido.";
       }
-      return "";
+      return subjectPreferenceError(completedSubjects);
     }
     const q = screens[idx]?.q;
     if (!q || q.optional || q.type === "slider") return "";
@@ -148,7 +150,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     if (q.type === "subject-ranking") {
       if (!Array.isArray(v) || !v.length) return "Añade al menos una asignatura antes de continuar.";
       if (selectedAcademicSystem?.levels.length && v.some((subject) => !subject.level)) return "Indica el nivel de cada asignatura antes de continuar.";
-      return "";
+      return subjectPreferenceError(v);
     }
     const ok = q.type === "multi"
       ? Array.isArray(v) && v.length > 0
@@ -185,7 +187,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       tiene_certificacion_ingles: answers[esMaestria ? "m_certificado" : "g_certificado"] === "Sí",
       certificacion_ingles: answers[esMaestria ? "m_certificado" : "g_certificado"] === "Sí"
         ? (answers[esMaestria ? "m_certificado_nombre" : "g_certificado_nombre"] || "").trim() : "",
-      ...subjectRankingSignals(esMaestria ? [] : answers.g_asignaturas),
+      ...subjectRankingSignals(esMaestria ? academicSubjects : answers.g_asignaturas),
       rasgos: answers.g_rasgos || [],
       valora: answers.g_valora || [],
       prioridad: answers.v_prioridad || "",
@@ -209,6 +211,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
       if (e.status === 409) setError("Ese correo ya está en uso por otra cuenta.");
       else if (e.data?.error === "invalid_email") setError("El correo no es válido.");
       else if (e.data?.error === "missing_questionnaire") setError("Faltan respuestas del cuestionario.");
+      else if (e.data?.error === "missing_subject_preferences") setError("Marca un pulgar arriba o abajo en todas las asignaturas.");
       else if (e.data?.error === "invalid_academic_profile") setError("Revisa el sistema académico, las asignaturas y sus niveles.");
       else setError(e.message || "No hemos podido guardar.");
       setBusy(false);
@@ -334,44 +337,8 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
               </select>
             </label>
 
-            {selectedAcademicSystem && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs font-semibold text-slate-600 ">Asignaturas</div>
-                    <div className="text-xs text-slate-400 mt-1">Deja vacíos los huecos que no necesites.</div>
-                  </div>
-                  <Btn variant="secondary" size="sm" onClick={addAcademicSubject} disabled={academicSubjects.length >= MAX_ACADEMIC_SUBJECTS}>
-                    <Plus className="h-3.5 w-3.5" /> Añadir
-                  </Btn>
-                </div>
+            {selectedAcademicSystem && <SubjectRanking value={academicSubjects.filter(subject => subject.name.trim())} onChange={setAcademicSubjects} system={selectedAcademicSystem} />}
 
-                <div className="space-y-2.5">
-                  {academicSubjects.map((subject, index) => (
-                    <div key={index} className="flex flex-col sm:flex-row gap-2">
-                      <input type="text" value={subject.name}
-                        onChange={(event) => updateAcademicSubject(index, "name", event.target.value)}
-                        placeholder={`Asignatura ${index + 1}`} aria-label={`Asignatura ${index + 1}`}
-                        className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
-                      {selectedAcademicSystem.levels.length > 0 && (
-                        <select value={subject.level}
-                          onChange={(event) => updateAcademicSubject(index, "level", event.target.value)}
-                          aria-label={`Nivel de la asignatura ${index + 1}`}
-                          disabled={!subject.name.trim()}
-                          className="min-w-0 sm:w-52 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition disabled:opacity-50">
-                          <option value="">Nivel…</option>
-                          {selectedAcademicSystem.levels.map((level) => <option key={level.value} value={level.value}>{level.label}</option>)}
-                        </select>
-                      )}
-                      <button type="button" onClick={() => removeAcademicSubject(index)} aria-label={`Eliminar asignatura ${index + 1}`}
-                        className="h-10 w-10 self-end sm:self-auto rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:border-rose-200 grid place-items-center transition">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </>
         )}
 

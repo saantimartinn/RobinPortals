@@ -191,3 +191,103 @@ body:has(.guided-onboarding) .robin-report-floating { top:18px; padding:9px 12px
 }
 
 .guided-onboarding .profile-conversation .onboarding-question-body { min-height:140px; max-height:420px; overflow-y:auto; overscroll-behavior:contain; padding:3px; scrollbar-width:thin; }
+
+/* Keep the current question, response and navigation within the visible screen. */
+.student-portal.guided-onboarding.is-profile-conversation { height:100dvh; min-height:0; display:grid; grid-template-rows:auto minmax(0,1fr); overflow:hidden; }
+.is-profile-conversation .guided-layout { min-height:0; height:100%; grid-template-columns:228px minmax(0,1fr); overflow:hidden; }
+.is-profile-conversation .guided-sidebar { position:static; min-height:0; height:100%; overflow-y:auto; padding:24px 18px; }
+.student-portal.guided-onboarding.is-profile-conversation .guided-main { display:flex; flex-direction:column; max-width:1440px; min-height:0; height:100%; padding:18px 28px; }
+.is-profile-conversation .guided-prompt { flex:none; margin-bottom:12px; }
+.is-profile-conversation .guided-prompt h1 { font-size:28px; }
+.is-profile-conversation .guided-subtitle { display:none; }
+.is-profile-conversation .guided-content { display:flex; flex:1; min-height:0; }
+.is-profile-conversation .profile-conversation { display:grid; grid-template-columns:minmax(240px,.8fr) minmax(0,1.2fr); grid-template-rows:auto minmax(0,1fr); width:100%; min-height:0; }
+.is-profile-conversation .profile-conversation-header { grid-column:1/-1; padding:10px 16px; gap:10px; }
+.is-profile-conversation .profile-conversation-header > img { width:36px; height:36px; }
+.is-profile-conversation .profile-conversation-header strong { font-size:21px; }
+.is-profile-conversation .profile-conversation-header span { margin-top:3px; }
+.is-profile-conversation .profile-conversation-log { min-height:0; max-height:none; padding:18px 14px; }
+.is-profile-conversation .profile-message { gap:7px; }
+.is-profile-conversation .profile-message > img { width:28px; height:28px; }
+.is-profile-conversation .profile-message > div { max-width:calc(100% - 35px); padding:12px; }
+.is-profile-conversation .profile-message h2 { font-size:18px; line-height:1.35; }
+.is-profile-conversation .profile-message p { font-size:13px; line-height:1.45; }
+.is-profile-conversation .profile-message .profile-section-intro { font-size:12px; margin-bottom:8px; padding-bottom:8px; }
+.is-profile-conversation .profile-conversation-composer { display:flex; flex-direction:column; min-height:0; padding:16px; border-top:0; border-left:var(--robin-line); }
+.is-profile-conversation .profile-conversation-block { flex:none; margin-bottom:10px; gap:4px; }
+.is-profile-conversation .profile-conversation-block h2 { font-size:20px; }
+.is-profile-conversation .onboarding-question-flow { display:flex; flex-direction:column; flex:1; min-height:0; gap:10px; }
+.guided-onboarding.is-profile-conversation .profile-conversation .onboarding-question-body { flex:1; min-height:0; max-height:none; overflow-y:auto; gap:12px; padding:3px 5px; }
+.guided-onboarding.is-profile-conversation .profile-conversation .onboarding-question-nav { position:static; flex:none; margin:0; padding:10px 0 0; }
+.is-profile-conversation .guided-content .q-choice { min-height:44px; padding:10px 12px; font-size:13px; gap:8px; }
+.is-profile-conversation .q-choices { gap:8px; }
+.is-profile-conversation .guided-content :is(input:not([type="range"]),select,textarea) { min-height:42px; font-size:14px; }
+.is-profile-conversation .guided-content button.inline-flex { min-height:42px; }
+.is-profile-conversation .subject-ranking-list { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px; margin-top:10px; }
+.is-profile-conversation .subject-ranking-row { padding:8px; gap:7px; }
+.is-profile-conversation .subject-ranking-title { min-width:90px; }
+.is-profile-conversation .subject-ranking-note { margin:8px 0; line-height:1.4; }
+.is-profile-conversation .subject-ranking-row[data-preference-missing="true"] { border-color:#e4b66d; }
+.is-profile-conversation .guided-content .subject-ranking-row select { flex-basis:100%; min-width:0; max-width:none; min-height:34px; }
+@media(max-width:1050px) and (min-width:701px) {
+  .is-profile-conversation .guided-layout { grid-template-columns:190px minmax(0,1fr); }
+  .student-portal.guided-onboarding.is-profile-conversation .guided-main { padding:14px; }
+  .is-profile-conversation .profile-conversation { grid-template-columns:minmax(200px,.75fr) minmax(0,1.25fr); }
+}
+@media(max-width:700px) {
+  .is-profile-conversation .guided-layout { display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); }
+  .is-profile-conversation .guided-sidebar { height:auto; padding:8px 12px; overflow:visible; }
+  .is-profile-conversation .guided-steps li > :is(button,.guided-step) { padding:5px 2px; gap:3px; }
+  .student-portal.guided-onboarding.is-profile-conversation .guided-main { padding:10px 12px 12px; }
+  .is-profile-conversation .guided-prompt { margin-bottom:8px; }
+  .is-profile-conversation .guided-prompt h1 { font-size:23px; }
+  .is-profile-conversation .profile-conversation { grid-template-columns:minmax(0,1fr); grid-template-rows:auto 105px minmax(0,1fr); }
+  .is-profile-conversation .profile-conversation-header { padding:8px 12px; }
+  .is-profile-conversation .profile-conversation-header > img { width:30px; height:30px; }
+  .is-profile-conversation .profile-conversation-header strong { font-size:18px; }
+  .is-profile-conversation .profile-conversation-header span { font-size:10px; }
+  .is-profile-conversation .profile-conversation-log { padding:10px; }
+  .is-profile-conversation .profile-message h2 { font-size:16px; }
+  .is-profile-conversation .profile-message .profile-message-hint { display:none; }
+  .is-profile-conversation .profile-conversation-composer { padding:10px; border-left:0; border-top:var(--robin-line); }
+  .is-profile-conversation .profile-conversation-block h2 { font-size:17px; }
+  .is-profile-conversation .profile-conversation-block > span { font-size:9px; }
+  .is-profile-conversation .guided-content :is(input:not([type="range"]),select,textarea) { font-size:16px; }
+  .is-profile-conversation .subject-ranking-list { grid-template-columns:minmax(0,1fr); }
+  .is-profile-conversation .subject-ranking-title { flex-basis:auto; }
+  .is-profile-conversation .subject-ranking-actions button { width:38px; height:40px; }
+  .is-profile-conversation .guided-content .subject-ranking-row select { font-size:16px; }
+}
+
+.student-portal.guided-onboarding.is-profile-conversation .guided-main { gap:0; }
+.student-portal.guided-onboarding.is-profile-conversation .guided-prompt { margin-bottom:8px; }
+.is-profile-conversation .profile-conversation-history > summary { display:none; }
+@media(max-width:700px) {
+  .is-profile-conversation .profile-conversation { grid-template-rows:auto auto minmax(0,1fr); }
+  .is-profile-conversation .profile-conversation-log { max-height:150px; }
+  .is-profile-conversation .profile-conversation-history > summary { display:block; margin-bottom:6px; color:var(--robin-ink-500); font-size:11px; cursor:pointer; }
+  .is-profile-conversation .profile-conversation .onboarding-question-nav { padding-top:6px; }
+}
+@media(min-width:380px) and (max-width:700px) {
+  .is-profile-conversation .subject-ranking-list { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+  .is-profile-conversation .subject-ranking-row { padding:5px; gap:3px; }
+  .is-profile-conversation .subject-ranking-title { flex-basis:100%; min-width:0; }
+  .is-profile-conversation .subject-ranking-title strong { font-size:12px; line-height:1.2; }
+  .is-profile-conversation .subject-ranking-actions { gap:4px; }
+  .is-profile-conversation .subject-ranking-actions button { width:32px; height:32px; }
+  .is-profile-conversation .subject-ranking-actions button svg { width:16px; height:16px; }
+}
+
+@media(max-width:700px) {
+  .student-portal.guided-onboarding.is-profile-conversation .guided-main > .guided-prompt { margin:0 0 8px; padding:0; }
+  .is-profile-conversation .profile-message.is-current .profile-message-sender { display:none; }
+  .is-profile-conversation .profile-message.is-current > div { padding:8px 10px; }
+  .is-profile-conversation .profile-conversation-history > summary { font-size:10px; line-height:1.2; margin-bottom:4px; }
+  .is-profile-conversation .subject-ranking-add > input { min-height:40px; height:40px; padding:7px 10px; }
+  .is-profile-conversation .subject-add-button { padding:8px 10px; }
+  .is-profile-conversation .subject-ranking-note { margin:4px 0; line-height:1.3; }
+}
+@media(min-width:380px) and (max-width:700px) {
+  .is-profile-conversation .subject-ranking-row { padding:4px; gap:2px; }
+  .is-profile-conversation .subject-ranking-actions button { width:30px; height:30px; }
+}

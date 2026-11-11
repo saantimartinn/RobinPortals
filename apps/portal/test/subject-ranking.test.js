@@ -2,15 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const load = () => import('../portal-source/src/application/onboarding/subject-ranking.js');
 
-test('reordena asignaturas conservando niveles y preferencias sin modificar el original', async () => {
-  const { moveSubject } = await load();
-  const original = [{ name: 'Matemáticas', level: 'hl', preference: 'like' }, { name: 'Historia', level: 'sl', preference: null }];
-  assert.deepEqual(moveSubject(original, 1, 0), [original[1], original[0]]);
-  assert.equal(original[0].name, 'Matemáticas');
-  assert.deepEqual(moveSubject(original, 0, -1), original);
-});
-
-test('los pulgares se pueden alternar o desmarcar y no afectan al orden', async () => {
+test('cada asignatura conserva un pulgar seleccionado y permite cambiar de opinión', async () => {
   const { toggleSubjectPreference } = await load();
   let subjects = [{ name: 'Física', preference: null }, { name: 'Historia', preference: null }];
   subjects = toggleSubjectPreference(subjects, 0, 'like');
@@ -18,18 +10,20 @@ test('los pulgares se pueden alternar o desmarcar y no afectan al orden', async 
   subjects = toggleSubjectPreference(subjects, 0, 'dislike');
   assert.equal(subjects[0].preference, 'dislike');
   subjects = toggleSubjectPreference(subjects, 0, 'dislike');
-  assert.equal(subjects[0].preference, null);
+  assert.equal(subjects[0].preference, 'dislike');
   assert.deepEqual(subjects.map((s) => s.name), ['Física', 'Historia']);
 });
 
-test('el resumen y las señales guardadas respetan el orden y los pulgares', async () => {
+test('el resumen y las señales guardadas no asignan posiciones de preferencia', async () => {
   const { formatSubjectRanking, subjectRankingSignals } = await load();
   const subjects = [{ name: 'Arte', preference: 'like' }, { name: 'Historia', preference: null }, { name: 'Física', preference: 'dislike' }];
-  assert.deepEqual(formatSubjectRanking(subjects), ['1. Arte — Me gusta', '2. Historia', '3. Física — No me gusta']);
+  assert.deepEqual(formatSubjectRanking(subjects), ['Arte — Me gusta', 'Historia', 'Física — No me gusta']);
   const signals = subjectRankingSignals(subjects);
   assert.deepEqual(signals.asignaturas_fav, ['Arte']);
   assert.deepEqual(signals.asignaturas_menos, ['Física']);
-  assert.deepEqual(signals.asignaturas_ordenadas.map((s) => s.name), ['Arte', 'Historia', 'Física']);
+  assert.deepEqual(signals.asignaturas.map((s) => s.name), ['Arte', 'Historia', 'Física']);
+  assert.ok(signals.asignaturas.every(subject => !('rank' in subject)));
+  assert.equal(signals.asignaturas_ordenadas, undefined);
 });
 
 test('la lista sustituye las preguntas antiguas y va después de la especialidad', async () => {

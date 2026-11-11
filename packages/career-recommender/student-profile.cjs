@@ -19,7 +19,7 @@ function subjectTokens(values) {
 }
 function normalizeSignals(signals = {}) {
   const out = { ...signals };
-  const ranked = Array.isArray(signals.asignaturas_ordenadas) ? signals.asignaturas_ordenadas : [];
+  const ranked = Array.isArray(signals.asignaturas) ? signals.asignaturas : Array.isArray(signals.asignaturas_ordenadas) ? signals.asignaturas_ordenadas : [];
   const likes = ranked.length ? ranked.filter(s=>s.preference==='like').map(s=>s.name) : signals.asignaturas_fav;
   const dislikes = ranked.length ? ranked.filter(s=>s.preference==='dislike').map(s=>s.name) : signals.asignaturas_menos;
   out.asignaturas_fav = subjectTokens(likes);
@@ -46,7 +46,21 @@ function collectOpenResponses(questionnaire = {}) {
 }
 function prepareStudent(user) {
   const questionnaire = user.questionnaire || {};
-  return {...user,questionnaire:{...questionnaire,signals:{...normalizeSignals(questionnaire.signals),open_responses:collectOpenResponses(questionnaire)}}};
+  const signals = normalizeSignals(questionnaire.signals || {});
+  const source = signals.asignaturas || signals.asignaturas_ordenadas;
+  const subjects = Array.isArray(source) ? source.map(({name,preference})=>({name,preference:preference || null}))
+    .sort((a,b)=>String(a.name).localeCompare(String(b.name),'es')) : [];
+  if (subjects.length) signals.asignaturas = subjects;
+  delete signals.asignaturas_ordenadas;
+  // Old questionnaires explicitly requested a ranking. Preserve the stored
+  // answers, but send the model only unnumbered subject preferences.
+  const blocks = (questionnaire.blocks || []).map(block=>({...block,items:(block.items || []).map(item=>{
+    if (!normalize(item.q).startsWith('que asignaturas cursas')) return item;
+    const answers = subjects.length ? subjects.map(subject=>`${subject.name}${subject.preference==='like'?' — Me gusta':subject.preference==='dislike'?' — No me gusta':''}`)
+      : (Array.isArray(item.a)?item.a:[]).map(answer=>String(answer).replace(/^\s*\d+[.)]\s*/,'' )).sort((a,b)=>a.localeCompare(b,'es'));
+    return {...item,q:'Asignaturas cursadas y preferencias (sin orden de preferencia)',a:answers};
+  })}));
+  return {...user,questionnaire:{...questionnaire,blocks,signals:{...signals,open_responses:collectOpenResponses(questionnaire)}}};
 }
 function historicalSignals(value = {}) {
   const signals = normalizeSignals(value);

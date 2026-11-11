@@ -18,7 +18,7 @@ export function OnboardingShell({ user, title, subtitle, question, questionMeta,
   const progress = Math.round(((stepNumber - 1) / totalSteps) * 100);
 
   return (
-    <div className="student-portal is-onboarding guided-onboarding">
+    <div className={`student-portal is-onboarding guided-onboarding${conversation ? " is-profile-conversation" : ""}`}>
       <header className="guided-topbar">
         <a className="guided-brand" href="#onboarding-content" aria-label="Robin · Robin Jr"><img src={robinLogo} alt="Robin" /><span>Robin Jr</span></a>
         <button type="button" className="guided-signout" onClick={onLogout}><LogOut size={15} /> Cerrar sesión</button>

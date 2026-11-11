@@ -2,11 +2,11 @@ import { Q_GENERAL, Q_VOCACIONAL, Q_AREAS, Q_MASTER_BLOCKS } from '../../questio
 import { formatSubjectRanking, subjectRankingSignals } from '../onboarding/subject-ranking.js';
 const ALL_QUESTIONS=[Q_GENERAL,Q_VOCACIONAL,...Object.values(Q_AREAS),...Q_MASTER_BLOCKS].flatMap(block=>block.questions);
 const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
-export function questionDefinition(text){return ALL_QUESTIONS.find(question=>normalize(question.q)===normalize(text));}
+export function questionDefinition(text){return ALL_QUESTIONS.find(question=>normalize(question.q)===normalize(text))||(normalize(text).includes('queasignaturascursas')?ALL_QUESTIONS.find(question=>question.id==='g_asignaturas'):undefined);}
 export const PROFILE_FIELDS=['nombre','apellidos','email','username','dni_numero','direccion','fecha_nacimiento','telefono_alumno','pais'];
 export function profileDraft(client){
  const signals=client.questionnaire?.signals||{};
- const preferred=signals.asignaturas_ordenadas||[];
+ const preferred=signals.asignaturas||signals.asignaturas_ordenadas||[];
  return {
   ...Object.fromEntries(PROFILE_FIELDS.map(key=>[key,client[key]||''])),
   origin:client.origin||'',application_level:client.application_level||'',has_eu_id:client.has_eu_id??null,
@@ -26,7 +26,7 @@ export function profilePayload(draft,original){
  const data={...Object.fromEntries(PROFILE_FIELDS.map(key=>[key,draft[key]])),origin:draft.origin,application_level:draft.application_level,has_eu_id:draft.has_eu_id,intereses:draft.intereses,academic_system:draft.academic_system,academic_subjects:draft.academic_subjects.map(({name,level})=>({name,level}))};
  if(!draft.questionnaire)return data;
  const q=JSON.parse(JSON.stringify(draft.questionnaire));const signals={...(q.signals||{}),areas:[...draft.intereses]};
- const syncRanking=JSON.stringify(draft.academic_subjects)!==JSON.stringify(profileDraft(original).academic_subjects)||Array.isArray(signals.asignaturas_ordenadas);
+ const syncRanking=JSON.stringify(draft.academic_subjects)!==JSON.stringify(profileDraft(original).academic_subjects)||Array.isArray(signals.asignaturas)||Array.isArray(signals.asignaturas_ordenadas);
  for(const block of q.blocks||[]) for(const item of block.items||[]){
   const def=questionDefinition(item.q);
   if(def?.type==='subject-ranking') {item.a=formatSubjectRanking(draft.academic_subjects);continue;}
@@ -41,6 +41,6 @@ export function profilePayload(draft,original){
   if(def.id.endsWith('_certificado_nombre'))signals.certificacion_ingles=item.a;
  }
  if(signals.tiene_certificacion_ingles===false)signals.certificacion_ingles='';
- if(syncRanking)Object.assign(signals,subjectRankingSignals(draft.academic_subjects));
+ if(syncRanking){delete signals.asignaturas_ordenadas;Object.assign(signals,subjectRankingSignals(draft.academic_subjects));}
  q.signals=signals;data.questionnaire=q;return data;
 }

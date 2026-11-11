@@ -32,7 +32,7 @@ const Q_GENERAL = {
     { id: "g_colegio", type: "text", q: "Nombre de tu colegio actual" },
     { id: "g_sistema", type: "single", q: "¿Qué sistema educativo estás cursando?", options: ["Bachillerato español", "Bachillerato Internacional (IB)", "A-Levels (británico)", "Sistema americano", "Bac francés", "Otro"] },
     { id: "g_modalidad", type: "text", q: "¿Qué modalidad de Bachillerato estás cursando, si aplica a tu caso? (Por ejemplo: Ciencias y Tecnología, Humanidades o Artes)", hint: "Escribe tu modalidad. Si no aplica a tu caso, puedes indicarlo o dejar la respuesta en blanco.", optional: true },
-    { id: "g_asignaturas", type: "subject-ranking", q: "¿Qué asignaturas cursas? Ordénalas de la que más te gusta a la que menos.", hint: "Añade tus asignaturas, ordénalas y, si quieres, marca con el pulgar arriba las que te gustan y con el pulgar abajo las que no." },
+    { id: "g_asignaturas", type: "subject-ranking", q: "¿Qué asignaturas cursas?", hint: "Añade todas tus asignaturas y marca si cada una te gusta o no. Es obligatorio elegir un pulgar en todas." },
     { id: "g_nota", type: "slider", q: "¿Cuál es tu nota media del año pasado?", min: 0, max: 10, step: 0.5, def: 7, left: "0", right: "10" },
     { id: "g_estilo", type: "slider", q: "¿Cómo prefieres aprender?", min: 0, max: 10, step: 1, def: 5, left: "Práctica", right: "Teoría" },
     { id: "g_valora", type: "multi", q: "¿Qué valoras MÁS en una carrera universitaria?", options: Q_VALORA, max: 3 },
