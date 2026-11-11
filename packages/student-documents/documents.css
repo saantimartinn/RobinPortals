@@ -18,6 +18,17 @@
 .student-document-summary:hover { background: #fffdf5; }
 .student-document-summary:focus-visible { outline: 2px solid #2d3a64; outline-offset: -3px; border-radius: 12px; }
 .student-document-summary-actions { display: flex; flex-shrink: 0; align-items: center; gap: 10px; }
+.student-document-summary-counts { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.student-document-review {
+  padding: 4px 9px;
+  border: 1px solid #e8ce83;
+  border-radius: 999px;
+  background: #fff6db;
+  color: #805b12;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
 .student-document-chevron {
   display: grid;
   place-items: center;
@@ -43,7 +54,10 @@
 @media (max-width: 520px) {
   .student-document-summary { padding: 12px; gap: 8px; }
   .student-document-summary-actions { gap: 6px; }
-  .student-document-summary-actions > span:first-child { max-width: 80px; text-align: right; }
+  .student-document-summary { flex-wrap: wrap; }
+  .student-document-summary > div { flex: 1 1 140px; }
+  .student-document-summary-actions { margin-left: auto; }
+  .student-document-summary-counts { text-align: right; }
   .student-document-list { padding: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {

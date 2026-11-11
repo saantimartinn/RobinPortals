@@ -62,11 +62,16 @@ test('conserva la fecha propia del expediente cuando no hay fecha de carrera', (
   const other=groupStudentDocumentsByCareer([{id:'other',deadline:'2027-04-01'}],[]);
   assert.equal(other.ungrouped[0].deadline,'2027-04-01');
 });
-test('el marcador cuenta documentos aprobados y las fechas ausentes o inválidas se muestran sin inventar plazos', async () => {
-  const {studentDocumentProgress,formatDocumentDeadline}=await import('../../../packages/student-documents/document-groups.mjs');
+test('el marcador cuenta como entregados los aprobados y pendientes de revisión, excluyendo rechazados y ausentes', async () => {
+  const {studentDocumentProgress}=await import('../../../packages/student-documents/document-groups.mjs');
   const entries=[{document:{status:'validated'}},{document:{status:'pending_review'}},{document:{status:'required'}},{document:{status:'rejected'}}];
-  assert.deepEqual(studentDocumentProgress(entries),{approved:1,total:4});
-  assert.deepEqual(studentDocumentProgress([]),{approved:0,total:0});
+  assert.deepEqual(studentDocumentProgress(entries),{delivered:2,pendingReview:1,total:4});
+  assert.deepEqual(studentDocumentProgress([]),{delivered:0,pendingReview:0,total:0});
+  entries[1].document.status='validated';
+  assert.deepEqual(studentDocumentProgress(entries),{delivered:2,pendingReview:0,total:4});
+});
+test('las fechas ausentes o inválidas se muestran sin inventar plazos', async () => {
+  const {formatDocumentDeadline}=await import('../../../packages/student-documents/document-groups.mjs');
   assert.equal(formatDocumentDeadline('2027-01-15'),'15/01/2027');
   assert.equal(formatDocumentDeadline(null),null);
   assert.equal(formatDocumentDeadline('2027-02-31'),null);
