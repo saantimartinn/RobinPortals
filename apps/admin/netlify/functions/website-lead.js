@@ -10,6 +10,19 @@ function normalizeLeadType(value) {
   return null;
 }
 
+const metaLandingCampaigns = {
+  '/webinar21-11': 'Webinar 21-11',
+  '/vaparaaholanda': 'Portugal',
+  '/veteaholanda': 'Campaña continua Candela',
+};
+
+function metaCampaignForLanding(pageUrl) {
+  try {
+    const path = new URL(String(pageUrl || ''), 'https://project-robin.com').pathname.replace(/\/$/, '').toLowerCase();
+    return metaLandingCampaigns[path] || null;
+  } catch (_) { return null; }
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
   const configured = process.env.WEBSITE_LEAD_INGEST_SECRET || '';
@@ -50,14 +63,16 @@ exports.handler = async (event) => {
   if (!email && !phone) return json({ error: 'email_or_phone_required' }, { statusCode: 400 });
   const submittedAt = body.createdAt || body.created_at;
   const createdAt = submittedAt && !Number.isNaN(Date.parse(submittedAt)) ? new Date(submittedAt).toISOString() : undefined;
+  const pageUrl = body.pageUrl || body.page_url || body.meta?.page_url || null;
+  const metaCampaign = metaCampaignForLanding(pageUrl);
   try {
     const result = await ingestCrmLead({
-      source: 'website', externalId: body.submissionId || body.id || body.meta?.submission_id, name,
+      source: metaCampaign ? 'meta' : 'website', externalId: body.submissionId || body.id || body.meta?.submission_id, name,
       createOnlyEmail: body.createOnlyEmail === true,
       email, phone, createdAt, summary: body.summary,
       comment: formNotes, bodyText: formNotes, leadType, course, school,
-      campaign: body.campaign || body.utm_campaign,
-      payload: { form_name: formName, questionnaire: body.questionnaire || body.cuestionario || null, course: course || null, school_name: school || null, origin_city: city || null, origin_country: country || null, selected_area: area || null, service: service || null, utm_source: body.utm_source || null, utm_medium: body.utm_medium || null, page_url: body.pageUrl || body.page_url || body.meta?.page_url || null },
+      campaign: metaCampaign || body.campaign || body.utm_campaign,
+      payload: { form_name: formName, questionnaire: body.questionnaire || body.cuestionario || null, course: course || null, school_name: school || null, origin_city: city || null, origin_country: country || null, selected_area: area || null, service: service || null, utm_source: body.utm_source || null, utm_medium: body.utm_medium || null, page_url: pageUrl },
     });
     // Elementor treats every status other than exactly 200 as a failed form,
     // including the otherwise valid 201 Created response.
