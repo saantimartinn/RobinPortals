@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-test('website webhook maps recommender contact and create-only instructions to CRM', async () => {
+test('website webhook maps recommender contacts and Meta landing campaigns to CRM', async () => {
   const ingestPath = require.resolve('../lib/crm-lead-ingest');
   const handlerPath = require.resolve('../netlify/functions/website-lead');
   const originalIngest = require(ingestPath);
@@ -40,6 +40,23 @@ test('website webhook maps recommender contact and create-only instructions to C
     assert.equal(captured.payload.form_name, 'recomendador');
     assert.equal(captured.payload.page_url, 'https://project-robin.com/rbmt/');
     assert.match(captured.comment, /pa[ií]s: España/i);
+
+    for (const [pageUrl, source, campaign] of [
+      ['/webinar21-11/', 'meta', 'Webinar 21-11'],
+      ['https://project-robin.com/vaparaaholanda/?utm_source=google', 'meta', 'Portugal'],
+      ['/veteaholanda/', 'meta', 'Campaña continua Candela'],
+      ['/contacto/', 'website', 'Otra campaña'],
+      ['/veteaholanda-extra/', 'website', 'Otra campaña'],
+    ]) {
+      const result = await handler({
+        httpMethod: 'POST', headers: { 'x-robin-lead-secret': 'test-secret' },
+        body: JSON.stringify({ name: 'Lead de prueba', email: 'landing@example.com', page_url: pageUrl, campaign: 'Otra campaña' }),
+      });
+      assert.equal(result.statusCode, 200, pageUrl);
+      assert.equal(captured.source, source, pageUrl);
+      assert.equal(captured.campaign, campaign, pageUrl);
+      assert.equal(captured.payload.page_url, pageUrl, pageUrl);
+    }
   } finally {
     require.cache[ingestPath].exports = originalIngest;
     delete require.cache[handlerPath];
