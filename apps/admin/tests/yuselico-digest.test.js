@@ -5,7 +5,7 @@ const { buildDigest, isMadridFridayNine, sendYuselicoDigest } = require('../lib/
 test('Yuselico digest separates this week from older leads and lists names only', () => {
   const leads = [
     { name: 'Histórico', source_created_at: '2026-11-05T10:00:00Z' },
-    { name: 'Nuevo', source_created_at: '2026-11-10T17:00:00Z' },
+    { name: 'Nuevo', email: 'privado@example.com', phone: '600000000', source_created_at: '2026-11-10T17:00:00Z' },
     { name: 'Siguiente semana', source_created_at: '2026-11-13T08:00:00Z' },
     { name: 'Prueba', source_created_at: '2026-11-10T17:00:00Z', is_test: true },
   ];
@@ -13,9 +13,17 @@ test('Yuselico digest separates this week from older leads and lists names only'
   assert.equal(digest.week, '2026-11-13');
   assert.equal(digest.newCount, 1);
   assert.equal(digest.historicalCount, 1);
-  assert.match(digest.text, /Nuevos \(1\)\n- Nuevo/);
-  assert.match(digest.text, /Históricos \(1\)\n- Histórico/);
+  assert.match(digest.text, /NUEVOS ESTA SEMANA \(1\)\n- Nuevo/);
+  assert.match(digest.text, /HISTÓRICO ACUMULADO \(1\)\n- Histórico/);
   assert.doesNotMatch(digest.text, /Prueba|Siguiente semana|2026-/);
+  assert.doesNotMatch(digest.text + digest.html, /privado@example\.com|600000000/);
+  assert.match(digest.html, /Nuevos esta semana/);
+});
+
+test('lead names are escaped in the HTML email', () => {
+  const digest = buildDigest([{ name: 'Ana & <equipo>', source_created_at: '2026-11-10T17:00:00Z' }], new Date('2026-11-12T12:00:00Z'));
+  assert.match(digest.html, /Ana &amp; &lt;equipo&gt;/);
+  assert.doesNotMatch(digest.html, /<equipo>/);
 });
 
 test('Friday 09:00 Europe/Madrid moves between 07:00 and 08:00 UTC with daylight saving', () => {
@@ -58,5 +66,6 @@ test('the scheduled message selects only Yuselico leads and uses a weekly idempo
   assert.equal(message.to, 'yuselicostudio@gmail.com');
   assert.equal(message.idempotencyKey, 'yuselico-weekly-2026-11-13');
   assert.equal(message.text.includes('David'), true);
+  assert.equal(message.html.includes('David'), true);
   assert.deepEqual({ newCount: result.newCount, historicalCount: result.historicalCount }, { newCount: 1, historicalCount: 0 });
 });
