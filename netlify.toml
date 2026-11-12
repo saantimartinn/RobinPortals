@@ -65,6 +65,9 @@ schedule = "59 * * * *"
 [functions.admin-web-retention]
 schedule = "30 4 * * *"
 
+[functions.admin-yuselico-weekly-digest]
+schedule = "0 7,8 * * 5"
+
 [[redirects]]
 from = "/portal/api/auth/login"
 to = "/.netlify/functions/portal-auth-login"

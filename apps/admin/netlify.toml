@@ -450,3 +450,7 @@
 # ---------- Retención de analítica web: elimina eventos con más de 14 meses ----------
 [functions."web-retention"]
   schedule = "30 4 * * *"
+
+# Viernes a las 09:00 Europe/Madrid (07:00 UTC en verano; 08:00 UTC en invierno).
+[functions."yuselico-weekly-digest"]
+  schedule = "0 7,8 * * 5"

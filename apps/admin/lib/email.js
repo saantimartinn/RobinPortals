@@ -10,7 +10,7 @@
 const { getSupabase } = require('./supabase');
 const { emailLogMetadata } = require('./privacy');
 
-async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, reply_to, replyTo }) {
+async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, reply_to, replyTo, idempotencyKey }) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM || 'Project Robin <no-reply@project-robin.com>';
   if (!to) return { sent: false, reason: 'missing_to' };
@@ -35,6 +35,7 @@ async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, r
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + key,
+        ...(idempotencyKey ? { 'Idempotency-Key': String(idempotencyKey).slice(0, 256) } : {}),
       },
       body: JSON.stringify({ from, to: Array.isArray(to) ? to : [to], subject, html, text, attachments, reply_to: reply_to || replyTo || undefined, cc: cc ? (Array.isArray(cc) ? cc : [cc]) : undefined, bcc: bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : undefined }),
     });
