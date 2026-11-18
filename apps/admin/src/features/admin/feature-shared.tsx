@@ -3,13 +3,13 @@ import { DeveloperRecordsTable } from "@/components/developer-leads-table";
 import { useEffect, useState } from "react";
 import { Check, Copy, Flame, MessageCircle, PhoneCall, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Contact, CrmStage, LeadCategory, LeadContactRole, LostReason } from "@/types/domain";
+import { Contact, CrmStage, LeadCategory, LeadContactRole, LeadCourse, LostReason } from "@/types/domain";
 import { integrationClient } from "@/services/integrations";
 import { adminDataClient } from "@/services/admin-data";
 import { FutureAcademicYear, LeadCall, LeadTeamNote, RecommenderHistory } from "@/services/admin-data";
 import { PortalAdmin, PortalSnapshot } from "@/services/portal";
 import { RecommenderModal } from "./recommender-modal";
-import { leadCourseGroup } from "./lead-course-group.mjs";
+import { leadCourseGroup, leadCourseGroups } from "./lead-course-group.mjs";
 
 export type FeatureModuleProps = {
   path: string;
@@ -33,6 +33,7 @@ export type FeatureModuleProps = {
   leadHeat: Record<string, number>;
   onSetLeadHeat: (id: string, heat: number) => void;
   onSetLeadContactRole: (id: string, contactRole: LeadContactRole) => void;
+  onSetLeadCourse: (id: string, course: LeadCourse) => Promise<void>;
   leadNotes: Record<string, string>;
   onSetLeadNotes: (id: string, notes: string) => void;
   leadLostDates: Record<string, string>;
@@ -59,10 +60,14 @@ export function Title({ name, sub, eyebrow = "ROBIN ADMIN PLATFORM", children }:
   return <div className="title"><div><span>{eyebrow}</span><h1>{name}</h1><p>{sub}</p></div><div>{children}</div></div>;
 }
 
-export function ContactDrawer({ contact, admins = [], onClose, heat = contact.heat || 50, onHeatChange, onOwnerChange, onContactRoleChange, onDeleteLead, leadMode = false }: { contact: Contact; admins?: string[]; onClose: () => void; heat?: number; onHeatChange?: (value: number) => void; onOwnerChange?: (owner: string) => void; onContactRoleChange?: (value: LeadContactRole) => void; onDeleteLead?: (id: string) => Promise<void>; leadMode?: boolean }) {
+export function ContactDrawer({ contact, admins = [], onClose, heat = contact.heat || 50, onHeatChange, onOwnerChange, onContactRoleChange, onCourseChange, onDeleteLead, leadMode = false }: { contact: Contact; admins?: string[]; onClose: () => void; heat?: number; onHeatChange?: (value: number) => void; onOwnerChange?: (owner: string) => void; onContactRoleChange?: (value: LeadContactRole) => void; onCourseChange?: (value: LeadCourse) => Promise<void>; onDeleteLead?: (id: string) => Promise<void>; leadMode?: boolean }) {
   const [localHeat, setLocalHeat] = useState(heat);
   const [localContactRole, setLocalContactRole] = useState<LeadContactRole | "">(contact.contactRole || "");
   const [localOwner, setLocalOwner] = useState(contact.owner || "");
+  const [localCourse, setLocalCourse] = useState(() => leadCourseGroup(contact.course));
+  const [savingCourse, setSavingCourse] = useState(false);
+  const [courseStatus, setCourseStatus] = useState("");
+  const [courseError, setCourseError] = useState("");
   const [teamNotes, setTeamNotes] = useState<LeadTeamNote[]>([]);
   const [teamNoteDraft, setTeamNoteDraft] = useState("");
   const [teamNotesLoading, setTeamNotesLoading] = useState(false);
@@ -87,6 +92,23 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   useEffect(() => { setPhoneCopyStatus(""); setLocalContactRole(contact.contactRole || ""); setLocalOwner(contact.owner || ""); setLocalHeat(heat); }, [contact.id, contact.contactRole, contact.owner, heat]);
+  useEffect(() => { setLocalCourse(leadCourseGroup(contact.course)); }, [contact.id, contact.course]);
+  useEffect(() => { setCourseStatus(""); setCourseError(""); }, [contact.id]);
+  async function changeCourse(value: LeadCourse) {
+    if (!onCourseChange || value === localCourse) return;
+    const previous = localCourse;
+    setLocalCourse(value);
+    setSavingCourse(true);
+    setCourseStatus("");
+    setCourseError("");
+    try {
+      await onCourseChange(value);
+      setCourseStatus("Guardado");
+    } catch (error) {
+      setLocalCourse(previous);
+      setCourseError(error instanceof Error ? error.message : "No se pudo guardar el curso");
+    } finally { setSavingCourse(false); }
+  }
   useEffect(() => {
     if (!leadMode) return;
     let active = true;
@@ -210,7 +232,7 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
         <span>{leadMode ? "FICHA DEL LEAD" : "PERFIL DEL ALUMNO"}</span><h2>{contact.name}</h2><p>{contact.email} · {contact.phone}</p>
         <div className="detail-kpis"><article><small>{leadMode ? "Tipo" : "Progreso"}</small><strong>{leadMode ? contact.category || "—" : `${contact.probability}%`}</strong></article><article><small>Responsable</small><strong>{localOwner || "Sin asignar"}</strong></article></div>
         {!leadMode && <section className="whatsapp-detail"><h3><MessageCircle /> WhatsApp</h3><p>{contact.phone}</p><textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Escribe un mensaje…" /><Button variant="outline" onClick={sendMessage} disabled={sending || !message.trim()}>{sending ? "Enviando…" : "Enviar por WhatsApp"}</Button>{messageStatus && <small>{messageStatus}</small>}</section>}
-        {leadMode && <section className="lead-information"><h3>Información del lead</h3><dl><div><dt>ID</dt><dd>{contact.displayId || "—"}</dd></div><div><dt>Correo electrónico</dt><dd>{contact.email || "—"}</dd></div><div><dt>Teléfono</dt><dd className="lead-phone-value"><span>{contact.phone || "—"}</span><Button type="button" size="sm" variant="outline" aria-label={`Copiar teléfono ${contact.phone || ""}`} title="Copiar teléfono" onClick={() => void copyLeadPhone()} disabled={!contact.phone}>{phoneCopyStatus === "Copiado" ? <Check /> : <Copy />}{phoneCopyStatus || "Copiar"}</Button></dd></div><div><dt>Contacto principal</dt><dd><select className="lead-contact-role" value={localContactRole} onChange={(event) => { const value = event.target.value as LeadContactRole; setLocalContactRole(value); if (value) onContactRoleChange?.(value); }}><option value="">Sin indicar</option>{contactRoleOptions.map((role) => <option key={role} value={role}>{contactRoleLabels[role]}</option>)}</select></dd></div><div><dt>Origen</dt><dd>{contact.source || "—"}</dd></div><div><dt>Campaña</dt><dd>{contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Sin identificar"}</dd></div><div><dt>Curso</dt><dd>{leadCourseGroup(contact.course)}</dd></div><div><dt>Interés</dt><dd>{contact.interest || "—"}</dd></div><div><dt>Estado</dt><dd>{contact.stage || "Por contactar"}</dd></div>{contact.stage === "Lost" && <><div><dt>Motivo Lost</dt><dd>{lostReasonLabel(contact.lostReason)}</dd></div>{contact.lostReasonDetail && <div><dt>Detalle</dt><dd>{contact.lostReasonDetail}</dd></div>}</>}<div><dt>Agente de venta</dt><dd><select className="owner-select lead-owner-select" value={localOwner} onChange={(event) => { const owner = event.target.value; setLocalOwner(owner); if (owner) onOwnerChange?.(owner); }}><option value="">Sin asignar</option>{admins.map((admin) => <option key={admin} value={admin}>{admin}</option>)}</select></dd></div><div><dt>Fecha de alta</dt><dd>{contact.createdAt ? new Date(contact.createdAt).toLocaleDateString("es-ES") : "—"}</dd></div></dl></section>}
+        {leadMode && <section className="lead-information"><h3>Información del lead</h3><dl><div><dt>ID</dt><dd>{contact.displayId || "—"}</dd></div><div><dt>Correo electrónico</dt><dd>{contact.email || "—"}</dd></div><div><dt>Teléfono</dt><dd className="lead-phone-value"><span>{contact.phone || "—"}</span><Button type="button" size="sm" variant="outline" aria-label={`Copiar teléfono ${contact.phone || ""}`} title="Copiar teléfono" onClick={() => void copyLeadPhone()} disabled={!contact.phone}>{phoneCopyStatus === "Copiado" ? <Check /> : <Copy />}{phoneCopyStatus || "Copiar"}</Button></dd></div><div><dt>Contacto principal</dt><dd><select className="lead-contact-role" value={localContactRole} onChange={(event) => { const value = event.target.value as LeadContactRole; setLocalContactRole(value); if (value) onContactRoleChange?.(value); }}><option value="">Sin indicar</option>{contactRoleOptions.map((role) => <option key={role} value={role}>{contactRoleLabels[role]}</option>)}</select></dd></div><div><dt>Origen</dt><dd>{contact.source || "—"}</dd></div><div><dt>Campaña</dt><dd>{contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Sin identificar"}</dd></div><div><dt>Curso</dt><dd>{onCourseChange ? <><select className="lead-contact-role" aria-label="Curso" value={localCourse} disabled={savingCourse} onChange={(event) => { void changeCourse(event.target.value as LeadCourse); }}>{leadCourseGroups.map((course) => <option key={course} value={course}>{course}</option>)}</select>{(savingCourse || courseStatus) && <small className="lead-course-status" role="status">{savingCourse ? "Guardando…" : courseStatus}</small>}{courseError && <small className="lead-course-status team-note-error" role="alert">{courseError}</small>}</> : leadCourseGroup(contact.course)}</dd></div><div><dt>Interés</dt><dd>{contact.interest || "—"}</dd></div><div><dt>Estado</dt><dd>{contact.stage || "Por contactar"}</dd></div>{contact.stage === "Lost" && <><div><dt>Motivo Lost</dt><dd>{lostReasonLabel(contact.lostReason)}</dd></div>{contact.lostReasonDetail && <div><dt>Detalle</dt><dd>{contact.lostReasonDetail}</dd></div>}</>}<div><dt>Agente de venta</dt><dd><select className="owner-select lead-owner-select" value={localOwner} onChange={(event) => { const owner = event.target.value; setLocalOwner(owner); if (owner) onOwnerChange?.(owner); }}><option value="">Sin asignar</option>{admins.map((admin) => <option key={admin} value={admin}>{admin}</option>)}</select></dd></div><div><dt>Fecha de alta</dt><dd>{contact.createdAt ? new Date(contact.createdAt).toLocaleDateString("es-ES") : "—"}</dd></div></dl></section>}
         {leadMode && <section className="lead-information"><h3>Recomendador</h3>
           {recommenderLoading && <p>Consultando formularios…</p>}
           {recommenderError && <p role="alert">{recommenderError}</p>}

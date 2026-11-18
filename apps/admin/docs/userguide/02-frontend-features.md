@@ -21,6 +21,8 @@ Portal del Alumno**, no en el CRM de este panel. En ese portal, el precio de Men
 666,33 €; su pago se descuenta de la primera cuota de General, Delft o Llegada.
 Consulta [Mentoría y conversión](../../../portal/docs/MENTORIA_CONVERSION.md).
 
+En Información del lead, Curso se edita mediante las tres equivalencias existentes. La acción `onSetLeadCourse` del shell guarda el valor con `adminDataClient.updateLead()` y el PATCH de `/api/admin/crm/leads`; el backend valida la opción y combina `source_payload.course` con los metadatos existentes. La ficha muestra el estado de guardado y restaura el valor anterior si falla. La tabla y los filtros reciben el curso actualizado; esta corrección no cambia la fase ni el responsable del lead.
+
 ### Bandeja, Eventos y Lost leads
 
 La ruta `/admin/bandeja-leads` sigue entrando por el registro de features y usa la shell existente. `lead-inbox.tsx` compone las pestañas; `lead-shared.tsx` contiene la selección de bandejas y la regla de antigüedad. Los leads pendientes de asignar que superan 30 días se muestran en Lost leads → >30 days leads y dejan de aparecer en las pestañas de entrada. Los asignados permanecen en el CRM personal.

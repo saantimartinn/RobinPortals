@@ -11,6 +11,7 @@ const campaignNameCache = new Map();
 const CAMPAIGN_CACHE_MS = 6 * 60 * 60 * 1000;
 const LOST_REASONS = new Set(['price', 'more_destinations', 'competition', 'other']);
 const CONTACT_ROLES = new Set(['madre', 'padre', 'hijo', 'hija']);
+const LEAD_COURSES = new Set(['1º de Bachillerato', '2º de Bachillerato', 'Otros']);
 
 async function requireAdmin(event) {
   const session = readSessionFromEvent(event);
@@ -141,16 +142,21 @@ exports.handler = async (event) => {
     if (body.patch.contact_role !== undefined && body.patch.contact_role !== null && !CONTACT_ROLES.has(String(body.patch.contact_role))) {
       return json({ error: 'invalid_contact_role', detail: 'Selecciona madre, padre, hijo o hija.' }, { statusCode: 400 });
     }
-    if (body.patch.source !== undefined || body.patch.lost_reason !== undefined || body.patch.lost_reason_detail !== undefined) {
+    if (body.patch.course !== undefined && !LEAD_COURSES.has(body.patch.course)) {
+      return json({ error: 'invalid_course', detail: 'Selecciona 1º de Bachillerato, 2º de Bachillerato u Otros.' }, { statusCode: 400 });
+    }
+    if (body.patch.source !== undefined || body.patch.lost_reason !== undefined || body.patch.lost_reason_detail !== undefined || body.patch.course !== undefined) {
       const { data: current, error: currentError } = await crm.from('crm_leads').select('source_payload').eq('id', body.id).single();
       if (currentError) throw currentError;
       body.patch.source_payload = { ...(current?.source_payload || {}) };
       if (body.patch.source !== undefined) body.patch.source_payload.source = String(body.patch.source || '').trim().toLowerCase() || 'manual';
       if (body.patch.lost_reason !== undefined) body.patch.source_payload.lost_reason = lostReason || null;
       if (body.patch.lost_reason_detail !== undefined) body.patch.source_payload.lost_reason_detail = lostReasonDetail || null;
+      if (body.patch.course !== undefined) body.patch.source_payload.course = body.patch.course;
       delete body.patch.source;
       delete body.patch.lost_reason;
       delete body.patch.lost_reason_detail;
+      delete body.patch.course;
     }
     const allowed = ['owner_names', 'source_payload', 'lead_type', 'crm_stage', 'heat', 'comment', 'contact_role', 'lost_at'];
     const update = Object.fromEntries(Object.entries(body.patch).filter(([key]) => allowed.includes(key)));

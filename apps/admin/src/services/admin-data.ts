@@ -1,5 +1,5 @@
 // Browser API client for admin data; keeps endpoint and fetch details out of the screens.
-import type { Contact, CrmStage, LeadCategory, LeadContactRole, LostReason } from "@/types/domain";
+import type { Contact, CrmStage, LeadCategory, LeadContactRole, LeadCourse, LostReason } from "@/types/domain";
 import { apiPath } from "@/lib/api-path";
 import { metaCampaignForLanding } from "../../shared/lead-attribution.mjs";
 
@@ -31,7 +31,7 @@ export type RecommenderSession = {
 export type RecommenderHistory = { count: number; latest: RecommenderSession | null };
 export type FutureAcademicYear = "2027-28" | "2028-29";
 export type FutureLead = Contact & { academicYear: FutureAcademicYear; archivedAt: string };
-type LeadPatch = { owner?: string; source?: string; category?: LeadCategory | ""; stage?: CrmStage; heat?: number; notes?: string; contactRole?: LeadContactRole | ""; lostAt?: string; lostReason?: LostReason | ""; lostReasonDetail?: string };
+type LeadPatch = { course?: LeadCourse; owner?: string; source?: string; category?: LeadCategory | ""; stage?: CrmStage; heat?: number; notes?: string; contactRole?: LeadContactRole | ""; lostAt?: string; lostReason?: LostReason | ""; lostReasonDetail?: string };
 
 function statusFor(stage: CrmStage): Contact["status"] {
   if (stage === "Por contactar") return "Nuevo";
@@ -244,6 +244,7 @@ export const adminDataClient = {
     if (patch.heat !== undefined) update.heat = patch.heat;
     if (patch.notes !== undefined) update.comment = patch.notes;
     if (patch.contactRole !== undefined) update.contact_role = patch.contactRole || null;
+    if (patch.course !== undefined) update.course = patch.course;
     if (patch.lostAt !== undefined) update.lost_at = patch.lostAt || null;
     if (patch.lostReason !== undefined) update.lost_reason = patch.lostReason || null;
     if (patch.lostReasonDetail !== undefined) update.lost_reason_detail = patch.lostReasonDetail.trim() || null;
