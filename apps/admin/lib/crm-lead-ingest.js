@@ -134,7 +134,10 @@ async function storeDirectFutureLead(crm, { row, source, externalId, course, exi
 }
 
 async function ingestCrmLead(input, crm = getAdminSupabase()) {
-  const source = clean(input.source || 'website', 40).toLowerCase();
+  const { metaCampaignForLanding } = await import('../shared/lead-attribution.mjs');
+  const landingCampaign = metaCampaignForLanding(input.payload?.page_url, input.createdAt);
+  const source = landingCampaign ? 'meta' : clean(input.source || 'website', 40).toLowerCase();
+  const campaign = landingCampaign || input.campaign;
   const externalId = clean(input.externalId, 160) || null;
   const email = clean(input.email, 320).toLowerCase() || null;
   const phone = clean(input.phone, 80) || null;
@@ -145,7 +148,7 @@ async function ingestCrmLead(input, crm = getAdminSupabase()) {
   }
   const existing = input.createOnlyEmail ? null : await findExisting(crm, { source, externalId, email, phone });
   const course = detectedCourse(input);
-  const payload = { ...(existing?.source_payload || {}), ...(input.payload || {}), ...(course ? { course } : {}), ...(input.campaign ? { campaign_name: clean(input.campaign, 500) } : {}), source, external_id: externalId, received_at: new Date().toISOString() };
+  const payload = { ...(existing?.source_payload || {}), ...(input.payload || {}), ...(course ? { course } : {}), ...(campaign ? { campaign_name: clean(campaign, 500) } : {}), source, external_id: externalId, received_at: new Date().toISOString() };
   const sourceComment = clean(input.comment || input.bodyText || input.summary, 10000) || null;
   const row = {
     name, email, phone,
@@ -156,7 +159,7 @@ async function ingestCrmLead(input, crm = getAdminSupabase()) {
     lead_type: input.leadType || existing?.lead_type || null,
     crm_stage: existing?.crm_stage || 'Por contactar',
     owner_names: input.owner ? [clean(input.owner, 120)] : (existing?.owner_names || []),
-    campaign_notion_urls: input.campaign ? [clean(input.campaign, 500)] : (existing?.campaign_notion_urls || []),
+    campaign_notion_urls: campaign ? [clean(campaign, 500)] : (existing?.campaign_notion_urls || []),
     source_payload: payload,
     source_created_at: input.createdAt || existing?.source_created_at || new Date().toISOString(),
     source_updated_at: new Date().toISOString(),

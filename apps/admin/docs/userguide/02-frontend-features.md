@@ -9,6 +9,7 @@
 | Área | Módulo(s) | Responsabilidad / dependencias principales |
 |---|---|---|
 | CRM y bandeja | [`leads.tsx`](../../src/features/admin/leads.tsx), [`lead-inbox.tsx`](../../src/features/admin/lead-inbox.tsx), [`lead-shared.tsx`](../../src/features/admin/lead-shared.tsx) | Tabla y grupos de leads, asignación, etapas, notas, llamadas, heat, origen y ficha. Consumidor de `adminDataClient`. |
+| Equivalencias de curso | [`lead-course-group.mjs`](../../src/features/admin/lead-course-group.mjs) | Función pura compartida por filtros, tablas, fichas, recomendador y CSV. Presenta 1º de Bachillerato, 2º de Bachillerato u Otros sin sobrescribir el valor original. |
 | Campos y panel compartido | [`feature-shared.tsx`](../../src/features/admin/feature-shared.tsx) | Tipos de props, títulos, drawer de contacto, etiquetas y vista de base para desarrollador. |
 | Estudiantes | [`students.tsx`](../../src/features/admin/students.tsx) | Vista global, perfil del cliente y traducción visual de asignación. |
 | Analytics | [`analytics.tsx`](../../src/features/admin/analytics.tsx), `analytics-personal.tsx`, `analytics-finance.tsx`, `analytics-sales.tsx` | Composición de analítica agregada, personal, financiera y comercial; datos tipados en `src/services/integrations.ts`. |
@@ -19,6 +20,14 @@ La conversión de un cliente de Mentoría ya abonada se realiza en la **ficha de
 Portal del Alumno**, no en el CRM de este panel. En ese portal, el precio de Mentoría es
 666,33 €; su pago se descuenta de la primera cuota de General, Delft o Llegada.
 Consulta [Mentoría y conversión](../../../portal/docs/MENTORIA_CONVERSION.md).
+
+### Bandeja, Eventos y Lost leads
+
+La ruta `/admin/bandeja-leads` sigue entrando por el registro de features y usa la shell existente. `lead-inbox.tsx` compone las pestañas; `lead-shared.tsx` contiene la selección de bandejas y la regla de antigüedad. Los leads pendientes de asignar que superan 30 días se muestran en Lost leads → >30 days leads y dejan de aparecer en las pestañas de entrada. Los asignados permanecen en el CRM personal.
+
+Eventos agrupa U Lisboa, U Canarias, U Valencia y Webinar 21-11. La normalización de las ferias vive en `src/services/admin-data.ts`. La atribución de las landings se comparte entre ingestión y cliente mediante `shared/lead-attribution.mjs`: la URL de captación prevalece sobre campañas heredadas. `/webinar21-11/` y `/webianr21-11/` corresponden a Meta Ads y Webinar 21-11; `/veteaholanda/` corresponde a Meta Ads y Campaña continua Candela. La sección del webinar requiere origen Meta Ads y campaña Webinar 21-11, y no duplica esos leads en las pestañas de entrada. Su enlace directo usa `?view=eventos&section=webinar-21-11`. Las secciones de Eventos y Lost conservan su selección mediante la query de la URL.
+
+Lost definitivos usa los leads con fase Lost. Año que viene consulta el archivo `crm_future_leads` mediante `adminDataClient.listFutureLeads()` y el GET autenticado de `/api/admin/crm/future-leads`; el POST existente conserva el traslado a próximos cursos. La antigua ruta `/admin/crm/lost` redirige a la nueva pestaña de Lost definitivos.
 
 ## Dashboard e informes
 

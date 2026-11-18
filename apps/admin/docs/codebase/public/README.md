@@ -4,6 +4,12 @@
 
 Maintained files in this directory and links to their responsibilities.
 
+## Subdirectories
+
+| Directory | Responsibility |
+|---|---|
+| [`celebrations/`](celebrations/README.md) | See the linked module files. |
+
 ## Files
 
 | File | Responsibility |

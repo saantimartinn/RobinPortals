@@ -4,19 +4,36 @@ import { Download, Filter, Plus, Search, UserCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Contact, LostReason } from "@/types/domain";
-import { adminDataClient, type WebBooking } from "@/services/admin-data";
+import { adminDataClient, type FutureLead, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, lostReasonOptions, Title, ContactDrawer } from './feature-shared';
-import { type InboxView, LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel, matchesInboxView } from "./lead-shared";
+import { type InboxView, type LostLeadSection, type EventLeadSection, LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel, matchesInboxView, leadInboxSection } from "./lead-shared";
+import { leadCourseGroup, leadCourseGroups } from "./lead-course-group.mjs";
 
-export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
+export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, leadLostDates, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Contact | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sourceFilter, setSourceFilter] = useState("all");
   const [campaignFilter, setCampaignFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
-  const [view, setView] = useState<InboxView>("all");
+  const [view, setView] = useState<InboxView>(() => {
+    const initialView = new URLSearchParams(window.location.search).get("view");
+    return initialView === "lost" || initialView === "eventos" ? initialView : "all";
+  });
+  const [lostSection, setLostSection] = useState<LostLeadSection>(() => {
+    const section = new URLSearchParams(window.location.search).get("section");
+    return section === "definitive" || section === "overdue" ? section : "future";
+  });
+  const [eventSection, setEventSection] = useState<EventLeadSection>(() => {
+    const section = new URLSearchParams(window.location.search).get("section");
+    return section === "canarias" || section === "valencia" || section === "webinar-21-11" ? section : "lisboa";
+  });
+  const [now, setNow] = useState(Date.now);
+  const [futureLeads, setFutureLeads] = useState<FutureLead[]>([]);
+  const [futureLoading, setFutureLoading] = useState(false);
+  const [futureError, setFutureError] = useState("");
+  const [futureRetry, setFutureRetry] = useState(0);
   const [bookings, setBookings] = useState<WebBooking[] | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [bookingRetry, setBookingRetry] = useState(0);
@@ -30,17 +47,49 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
   const [pendingLost, setPendingLost] = useState<Contact | null>(null);
   const [lostReason, setLostReason] = useState<LostReason | "">("");
   const [lostReasonDetail, setLostReasonDetail] = useState("");
-  const list = useMemo(() => contacts.filter((contact) => {
+  const isLost = view === "lost";
+  const isEvents = view === "eventos";
+  const isFuture = isLost && lostSection === "future";
+  const canAssign = !isLost || lostSection === "overdue";
+  const futureById = useMemo(() => new Map(futureLeads.map((lead) => [lead.id, lead])), [futureLeads]);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    const refreshAge = () => setNow(Date.now());
+    window.addEventListener("focus", refreshAge);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", refreshAge); };
+  }, []);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (isLost) { url.searchParams.set("view", "lost"); url.searchParams.set("section", lostSection); }
+    else if (isEvents) { url.searchParams.set("view", "eventos"); url.searchParams.set("section", eventSection); }
+    else { url.searchParams.delete("view"); url.searchParams.delete("section"); }
+    window.history.replaceState(null, "", url);
+  }, [isLost, isEvents, lostSection, eventSection]);
+  useEffect(() => {
+    if (!isFuture) return;
+    let active = true;
+    setFutureLoading(true);
+    setFutureError("");
+    const load = () => adminDataClient.listFutureLeads()
+      .then((rows) => { if (active) { setFutureLeads(rows); setFutureError(""); } })
+      .catch((error) => { if (active) setFutureError(error instanceof Error ? error.message : "Error de conexión"); })
+      .finally(() => { if (active) setFutureLoading(false); });
+    void load();
+    const unsubscribe = adminDataClient.subscribe(() => { void load(); });
+    return () => { active = false; unsubscribe(); };
+  }, [isFuture, futureRetry]);
+  const sectionContacts = useMemo(() => isFuture ? futureLeads : contacts.filter((contact) => {
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
-    // Al asignarlo, el lead pasa al CRM personal y sale de la bandeja.
-    if (stage !== "Por contactar" || leadOwners[contact.id]) return false;
-    if (!matchesInboxView(contact, view)) return false;
+    const section = leadInboxSection(contact, stage, leadOwners[contact.id] ?? contact.owner, now);
+    return isLost ? section === lostSection : section === "active" && matchesInboxView(contact, view, eventSection);
+  }), [contacts, futureLeads, isFuture, isLost, lostSection, eventSection, leadOwners, leadStages, now, view]);
+  const list = useMemo(() => sectionContacts.filter((contact) => {
     if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${inboxCampaignLabel(contact)} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
     if (campaignFilter !== "all" && inboxCampaignLabel(contact) !== campaignFilter) return false;
-    if (courseFilter !== "all" && contact.course !== courseFilter) return false;
+    if (courseFilter !== "all" && leadCourseGroup(contact.course) !== courseFilter) return false;
     return true;
-  }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [contacts, leadOwners, leadStages, query, sourceFilter, campaignFilter, courseFilter, view]);
+  }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [sectionContacts, query, sourceFilter, campaignFilter, courseFilter]);
   useEffect(() => {
     if (view !== "reservas") return;
     let active = true;
@@ -68,10 +117,10 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     }
     return selected;
   }, [bookings]);
-  const sources = useMemo(() => [...new Set(contacts.map((contact) => contact.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
-  const campaigns = useMemo(() => [...new Set(contacts.map(inboxCampaignLabel).filter((campaign) => campaign !== "—" && campaign !== "Campaña pendiente" && campaign !== "Página no registrada"))].sort((a, b) => a.localeCompare(b, "es")), [contacts]);
-  const courses = useMemo(() => [...new Set(contacts.map((contact) => contact.course?.trim()).filter((course): course is string => Boolean(course)))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })), [contacts]);
+  const sources = useMemo(() => [...new Set(sectionContacts.map((contact) => contact.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [sectionContacts]);
+  const campaigns = useMemo(() => [...new Set(sectionContacts.map(inboxCampaignLabel).filter((campaign) => campaign !== "—" && campaign !== "Campaña pendiente" && campaign !== "Página no registrada"))].sort((a, b) => a.localeCompare(b, "es")), [sectionContacts]);
   const activeFilters = [sourceFilter, campaignFilter, courseFilter].filter((value) => value !== "all").length;
+  function resetFilters() { setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }
   function openLost(contact: Contact) {
     setPendingLost(contact);
     setLostReason("");
@@ -80,10 +129,9 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
   function confirmLost(event: React.FormEvent) {
     event.preventDefault();
     if (!pendingLost || !lostReason || (lostReason === "other" && !lostReasonDetail.trim())) return;
-    // Lost es una vista del CRM personal: asignamos el lead al usuario que lo descarta para que siga visible allí.
-    onAssignLead(pendingLost.id, currentUser);
+    if (!leadOwners[pendingLost.id]) onAssignLead(pendingLost.id, currentUser);
     onMoveLead(pendingLost.id, "Lost", { lostReason, lostReasonDetail: lostReason === "other" ? lostReasonDetail.trim() : "" });
-    notify(`${pendingLost.name} enviado a Lost`);
+    notify(`${pendingLost.name} enviado a Lost definitivos`);
     setPendingLost(null);
   }
   async function saveLeadGroup(event: React.FormEvent) {
@@ -103,8 +151,8 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
   function exportLeads() {
     const rows = list;
     const csvCell = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
-    const headers = ["Nombre", "Email", "Teléfono", "Origen", "Campaña", "Curso", "País", "Interés", "Responsable", "Días sin contactar", "Heat", "Motivo Lost", "Detalle Lost", "Comentario", "Fecha de alta"];
-    const body = rows.map((contact) => [contact.name, contact.email, contact.phone, contact.source, inboxCampaignLabel(contact), contact.course || "", contact.country || "Otros", contact.interest || "", leadOwners[contact.id] || "Sin asignar", leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id])) ?? "", contact.heat ?? "", lostReasonLabel(contact.lostReason), contact.lostReasonDetail || "", contact.comment || "", contact.createdAt || ""].map(csvCell).join(","));
+    const headers = ["Nombre", "Email", "Teléfono", "Origen", "Campaña", "Curso", "País", "Interés", "Responsable", "Días sin contactar", "Heat", "Motivo Lost", "Detalle Lost", "Comentario", "Fecha de alta", ...(isFuture ? ["Curso académico", "Fecha de archivo"] : [])];
+    const body = rows.map((contact) => [contact.name, contact.email, contact.phone, contact.source, inboxCampaignLabel(contact), leadCourseGroup(contact.course), contact.country || "Otros", contact.interest || "", (isFuture ? contact.owner : leadOwners[contact.id] ?? contact.owner) || "Sin asignar", leadDaysWithoutContact(contact, Boolean(contact.owner), now) ?? "", contact.heat ?? "", lostReasonLabel(contact.lostReason), contact.lostReasonDetail || "", contact.comment || "", contact.createdAt || "", ...(isFuture ? [futureById.get(contact.id)?.academicYear || "", futureById.get(contact.id)?.archivedAt || ""] : [])].map(csvCell).join(","));
     const blob = new Blob([`\uFEFF${headers.map(csvCell).join(",")}\n${body.join("\n")}`], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -120,37 +168,52 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
       <div className="module-toolbar">
         <label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nombre, email o canal…" /></label>
         <Button variant="outline" onClick={() => setFiltersOpen((open) => !open)}><Filter />Filtros{activeFilters > 0 && <span className="filter-count">{activeFilters}</span>}</Button>
-        <Button variant="outline" onClick={exportLeads}><Download />Exportar CSV</Button>
-        <Button variant="outline" onClick={() => setAddingGroup(true)}><Plus />Añadir grupo</Button>
-        <Button onClick={() => setAddingLead(true)}><Plus />Añadir lead</Button>
+        <Button variant="outline" onClick={exportLeads} disabled={isFuture && (futureLoading || Boolean(futureError))}><Download />Exportar CSV</Button>
+        {!isLost && <><Button variant="outline" onClick={() => setAddingGroup(true)}><Plus />Añadir grupo</Button>
+        <Button onClick={() => setAddingLead(true)}><Plus />Añadir lead</Button></>}
       </div>
-      {filtersOpen && <section className="lead-filters panel"><label>Origen<select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}><option value="all">Todos los orígenes</option>{sources.map((source) => <option key={source} value={source}>{source}</option>)}</select></label><label>Campaña<select value={campaignFilter} onChange={(event) => setCampaignFilter(event.target.value)}><option value="all">Todas las campañas</option>{campaigns.map((campaign) => <option key={campaign} value={campaign}>{campaign}</option>)}</select></label><label>Curso<select value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)}><option value="all">Todos los cursos</option>{courses.map((course) => <option key={course} value={course}>{course}</option>)}</select></label><button type="button" onClick={() => { setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>Limpiar filtros</button></section>}
+      {filtersOpen && <section className="lead-filters panel"><label>Origen<select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}><option value="all">Todos los orígenes</option>{sources.map((source) => <option key={source} value={source}>{source}</option>)}</select></label><label>Campaña<select value={campaignFilter} onChange={(event) => setCampaignFilter(event.target.value)}><option value="all">Todas las campañas</option>{campaigns.map((campaign) => <option key={campaign} value={campaign}>{campaign}</option>)}</select></label><label>Curso<select value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)}><option value="all">Todos los cursos</option>{leadCourseGroups.map((course) => <option key={course} value={course}>{course}</option>)}</select></label><button type="button" onClick={() => { setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>Limpiar filtros</button></section>}
       <nav className="inbox-views" aria-label="Secciones de la bandeja">
-        {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); setQuery(""); setSourceFilter("all"); setCampaignFilter("all"); setCourseFilter("all"); }}>{label}</button>)}
+        {INBOX_VIEWS.map(([key, label]) => <button key={key} type="button" aria-pressed={view === key} onClick={() => { setView(key); resetFilters(); }}>{label}</button>)}
       </nav>
+      {isLost && <section className="inbox-subsections" aria-label="Lost leads">
+        <nav className="inbox-views" aria-label="Subsecciones de Lost leads">
+          {LOST_SECTIONS.map(([key, label]) => <button key={key} type="button" aria-pressed={lostSection === key} onClick={() => { setLostSection(key); resetFilters(); }}>{label}</button>)}
+        </nav>
+        <p className="assignment-note">{lostSection === "future" ? "Leads guardados para retomar en próximos cursos." : lostSection === "definitive" ? "Leads descartados definitivamente, con su motivo de pérdida." : "Leads que han pasado más de 30 días sin asignar en la bandeja. Ya no aparecen en las pestañas de entrada."}</p>
+      </section>}
+      {isEvents && <section className="inbox-subsections" aria-label="Eventos">
+        <nav className="inbox-views" aria-label="Subsecciones de Eventos">
+          {EVENT_SECTIONS.map(([key, label]) => <button key={key} type="button" aria-pressed={eventSection === key} onClick={() => { setEventSection(key); resetFilters(); }}>{label}</button>)}
+        </nav>
+        <p className="assignment-note">Leads de {EVENT_SECTIONS.find(([key]) => key === eventSection)?.[2]}.</p>
+      </section>}
       {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
       {view === "recomendador" && <p className="assignment-note">Leads procedentes del recomendador de carreras. También aparecen en la bandeja General.</p>}
       {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario ({bookingError}). <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
-      <section className="panel inbox-panel">
+      {isFuture && futureError && <p className="assignment-note" role="alert">{futureError}. <button type="button" onClick={() => setFutureRetry((retry) => retry + 1)}>Reintentar</button></p>}
+      <section className="panel inbox-panel" aria-busy={isFuture && futureLoading}>
         <div className="data-table">
           <table>
-            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Origen</th><th>Campaña</th><th>Curso</th><th>País</th><th>Interés</th><th>Asignar a</th><th>Días sin contactar</th><th>Marcar como Lost</th></tr></thead>
+            <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Origen</th><th>Campaña</th><th>Curso</th><th>País</th><th>Interés</th><th>{canAssign ? "Asignar a" : "Responsable"}</th>{isFuture ? <><th>Curso académico</th><th>Fecha de archivo</th></> : <><th>Días sin contactar</th><th>{canAssign ? "Marcar como Lost" : "Motivo Lost"}</th>{isLost && <th>{lostSection === "overdue" ? "Desde" : "Fecha Lost"}</th>}</>}</tr></thead>
             <tbody>
-              {list.length === 0 && <tr><td colSpan={view === "reservas" ? 11 : 10} className="empty-copy">{view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
-              {list.map((contact) => (
-                <tr key={contact.id} className="unassigned-lead" onClick={() => setSelected(contact)}>
-                  <td><button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
+              {isFuture && (futureLoading || futureError) ? <tr><td colSpan={10} className="empty-copy">{futureLoading ? "Cargando leads de próximos cursos…" : "No se ha podido cargar esta sección."}</td></tr> : list.length === 0 && <tr><td colSpan={view === "reservas" || isLost && !isFuture ? 11 : 10} className="empty-copy">{query || activeFilters ? "No hay leads que coincidan con la búsqueda y los filtros." : isLost ? lostSection === "future" ? "No hay leads guardados para próximos cursos." : lostSection === "definitive" ? "No hay lost definitivos." : "No hay leads con más de 30 días en la bandeja." : view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
+              {!(isFuture && (futureLoading || futureError)) && list.map((contact) => (
+                <tr key={contact.id} className={isFuture ? "archived-lead" : canAssign ? "unassigned-lead" : ""} onClick={isFuture ? undefined : () => setSelected(contact)}>
+                  <td>{isFuture ? <><b>{contact.name}</b><small>{contact.email}</small><small>{contact.phone}</small></> : <button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button>}</td>
                   <td><time className="lead-entry-time" dateTime={contact.createdAt}>{formatLeadEntry(contact.createdAt)}</time></td>
                   {view === "reservas" && <td>{bookings === null ? "Cargando…" : bookingError ? "No disponible" : <BookingDate booking={bookingByEmail.get(contact.email.trim().toLowerCase())} />}</td>}
                   <td><span className="lead-source-readonly">{contact.source || "—"}</span></td>
                   <td><span className="lead-source-readonly">{inboxCampaignLabel(contact)}</span></td>
-                  <td>{contact.course || ""}</td>
+                  <td>{leadCourseGroup(contact.course)}</td>
                   <td>{contact.country || "Otros"}</td>
                   <td>{contact.interest || ""}</td>
                   <td>
-                    <select
+                    {canAssign ? <select
                       className="owner-select"
+                      aria-label={`Asignar a: ${contact.name}`}
                       value={leadOwners[contact.id] || ""}
+                      onClick={(event) => event.stopPropagation()}
                       onChange={(event) => {
                         event.stopPropagation();
                         onAssignLead(contact.id, event.target.value);
@@ -159,24 +222,27 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
                     >
                       <option value="">Sin asignar</option>
                       {admins.map((admin) => <option key={admin}>{admin}</option>)}
-                    </select>
+                    </select> : (isFuture ? contact.owner : leadOwners[contact.id] ?? contact.owner) || "Sin asignar"}
                   </td>
-                  <td><span className="days-without-contact">{leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id])) ?? "—"}</span></td>
-                  <td><button type="button" className="inbox-lost-action" aria-label={`Marcar como Lost: ${contact.name}`} onClick={(event) => { event.stopPropagation(); openLost(contact); }}>LOST</button></td>
+                  {isFuture ? <><td>{futureById.get(contact.id)?.academicYear || "—"}</td><td>{formatLeadEntry(futureById.get(contact.id)?.archivedAt)}</td></> : <>
+                    <td><span className="days-without-contact">{leadDaysWithoutContact(contact, Boolean(leadOwners[contact.id]), now) ?? "—"}</span></td>
+                    <td>{canAssign ? <button type="button" className="inbox-lost-action" aria-label={`Marcar como Lost: ${contact.name}`} onClick={(event) => { event.stopPropagation(); openLost(contact); }}>LOST</button> : <>{lostReasonLabel(contact.lostReason)}{contact.lostReasonDetail && <small>{contact.lostReasonDetail}</small>}</>}</td>
+                    {isLost && <td>{formatLeadEntry(lostSection === "overdue" && leadEntryTimestamp(contact.createdAt) > 0 ? new Date(leadEntryTimestamp(contact.createdAt) + 30 * 86400000).toISOString() : leadLostDates[contact.id] || contact.lostAt)}</td>}
+                  </>}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
-      <p className="assignment-note"><UserCheck /> Al asignar un lead, aparecerá inmediatamente en el CRM personal del usuario seleccionado.</p>
+      {canAssign && <p className="assignment-note"><UserCheck /> Al asignar un lead, aparecerá inmediatamente en el CRM personal del usuario seleccionado.</p>}
       {pendingLost && (
         <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendingLost(null); }}>
           <form className="manual-lead-card crm-outcome-card" role="dialog" aria-modal="true" aria-labelledby="inbox-lost-title" onSubmit={confirmLost}>
             <button className="drawer-close" type="button" aria-label="Cerrar" onClick={() => setPendingLost(null)}>×</button>
             <span>Enviar a Lost</span>
             <h2 id="inbox-lost-title">{pendingLost.name}</h2>
-            <p>Selecciona el motivo de la pérdida. El lead quedará asignado a {currentUser} y visible en su sección Lost.</p>
+            <p>Selecciona el motivo de la pérdida. El lead aparecerá en Lost leads → Lost definitivos.</p>
             <label>Motivo
               <select required autoFocus value={lostReason} onChange={(event) => { setLostReason(event.target.value as LostReason | ""); if (event.target.value !== "other") setLostReasonDetail(""); }}>
                 <option value="">Seleccionar motivo…</option>
@@ -231,4 +297,6 @@ function BookingDate({ booking }: { booking?: WebBooking }) {
   return <time className="lead-entry-time" dateTime={booking.start}>{bookingDateFormatter.format(date)} · {bookingTimeFormatter.format(date)}</time>;
 }
 
-const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["recomendador", "Recomendador"], ["reservas", "Reservas"]];
+const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["recomendador", "Recomendador"], ["eventos", "Eventos"], ["reservas", "Reservas"], ["lost", "Lost leads"]];
+const LOST_SECTIONS: Array<[LostLeadSection, string]> = [["future", "Año que viene"], ["definitive", "Lost definitivos"], ["overdue", ">30 days leads"]];
+const EVENT_SECTIONS: Array<[EventLeadSection, string, string]> = [["lisboa", "U Lisboa", "Unitour Lisboa"], ["canarias", "U Canarias", "Unitour Canarias"], ["valencia", "U Valencia", "Unitour Valencia"], ["webinar-21-11", "Webinar 21-11", "Webinar 21-11"]];

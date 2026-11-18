@@ -76,7 +76,6 @@ Generado desde imports del código.
 | [frontend/src/main.jsx](../frontend/src/main.jsx) | `../../../../packages/brand/brand.css`, `./app.jsx`, `./index.css`, `../../../../packages/portal-nav/robin-shell.css` |
 | [frontend/src/shared/constants.js](../frontend/src/shared/constants.js) | — |
 | [frontend/src/shared/NotificationPopup.jsx](../frontend/src/shared/NotificationPopup.jsx) | `./ui.jsx`, `./theme.js`, `../api/index.js` |
-| [frontend/src/shared/TermsModal.jsx](../frontend/src/shared/TermsModal.jsx) | `./ui.jsx`, `./theme.js`, `./constants.js` |
 | [frontend/src/shared/theme.js](../frontend/src/shared/theme.js) | — |
 | [frontend/src/shared/ui.jsx](../frontend/src/shared/ui.jsx) | `./theme.js` |
 | [frontend/src/shared/utils.js](../frontend/src/shared/utils.js) | `./constants.js` |

@@ -11,6 +11,7 @@ Maintained files in this directory and links to their responsibilities.
 | [`application-roles.cjs`](../../../shared/application-roles.cjs) | Repository file: application-roles.cjs. |
 | [`contract-content.cjs`](../../../shared/contract-content.cjs) | Contenido de los cinco contratos 2027 (revisión integrada). Fuente única para la vista previa del onboarding y el PDF firmado. |
 | [`financial-config.cjs`](../../../shared/financial-config.cjs) | Repository file: financial-config.cjs. |
+| [`lead-attribution.mjs`](../../../shared/lead-attribution.mjs) | Repository file: lead-attribution.mjs. |
 | [`password-policy.cjs`](../../../shared/password-policy.cjs) | Repository file: password-policy.cjs. |
 | [`portal-faqs.json`](../../../shared/portal-faqs.json) | Repository file: portal-faqs.json. |
 

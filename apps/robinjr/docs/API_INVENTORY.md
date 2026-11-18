@@ -1,12 +1,12 @@
 # API inventory
 
-Generated from `netlify.toml` and static analysis of 69 Netlify Functions.
+Generated from `netlify.toml` and static analysis of 70 Netlify Functions.
 Scheduled/internal Functions without a redirect are listed with their direct function path. This is an
 engineering inventory, not a substitute for runtime or legal review.
 
 | Function | Method | Route | Auth | Role | Input | Validation | OK | Errors (static) | Tables (static) | Integrations |
 |---|---|---|---|---|---|---|---|---|---|---|
-| admin-assistant | POST | /api/admin/assistant | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, missing_messages, forbidden | career_templates, client_careers, documents, payments, users | Anthropic |
+| admin-assistant | POST | /api/admin/assistant | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, missing_messages, forbidden, focus_not_assigned | career_templates, client_careers, documents, payments, users | Anthropic |
 | admin-career-suggestions | GET/POST | /api/admin/career-suggestions | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, forbidden, missing_user_id, client_not_found, invalid_feedback | career_recommendation_feedback, users | Anthropic |
 | admin-careers-assign | POST | /api/admin/careers/assign | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_fields, forbidden | client_careers, users | none |
 | admin-careers-create | POST | /api/admin/careers | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_fields, forbidden, career_not_found | career_templates, users | none |
@@ -24,7 +24,7 @@ engineering inventory, not a substitute for runtime or legal review.
 | admin-drive-health | GET | /api/admin/drive-health | Session cookie | application admin | none | field checks | JSON | unauthorized, forbidden, not_configured | users | Google Drive, Google Calendar/Meet |
 | admin-drive-rename | GET/POST | /api/admin/drive-rename | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, forbidden, user_not_found, missing_target | users | Google Drive, Google Calendar/Meet, Notion |
 | admin-drive-sync | GET/POST | /api/admin/drive-sync | Session cookie | application admin | JSON body + query | origin, JSON, field checks | JSON | bad_origin, unauthorized, forbidden, user_not_found, missing_target | users, webhook_log | Google Drive, Holded |
-| admin-historial-add | POST | /api/admin/historial/add | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, missing_user_id, missing_raw_notes, forbidden, user_not_found | users | Anthropic |
+| admin-historial-add | POST | /api/admin/historial/add | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, notes_too_large, invalid_meeting_date, missing_user_id, missing_raw_notes | users | Google Calendar/Meet, Anthropic |
 | admin-integration-snapshot | GET | /api/admin/integration-snapshot | Session cookie | application admin | none | method/auth only | JSON | unauthorized, forbidden | payments, users, webhook_log | Revolut, Holded |
 | admin-notifications | GET/POST | /api/admin/notifications | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | unauthorized, forbidden, bad_origin, missing_title, missing_content, no_recipients | notification_recipients, notifications, users | none |
 | admin-payments-add | POST | /api/admin/payments/add | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_user_id, invalid_preset, missing_concept | payments, users, webhook_log | Google Sheets, Holded, Notion |
@@ -53,12 +53,13 @@ engineering inventory, not a substitute for runtime or legal review.
 | documents-upload-ticket | POST | /api/documents/upload-ticket | Session cookie | application admin | JSON body | origin, JSON, ownership, field checks | JSON | bad_origin, unauthorized, invalid_json, not_found, forbidden, missing_user_id | documents, users | none |
 | documents-upload | POST | /api/documents/upload | Session cookie | application admin | JSON body | origin, JSON, ownership, field checks | JSON | bad_origin, unauthorized, invalid_json, missing_fields, not_found, forbidden | career_templates, documents, users, webhook_log | Google Drive, Resend/email |
 | faqs | GET/POST | /api/faqs | Session cookie | application admin | JSON body | origin, JSON, field checks | JSON | unauthorized, bad_origin, forbidden, invalid_json, builtin_read_only, missing_id | portal_faqs, users | none |
-| integration-retry | SCHEDULE | cron: */10 * * * * | Netlify schedule | provider/system | raw/JSON body | field checks | JSON | not_found | payments, users, webhook_log | Google Calendar/Meet, Google Sheets, Holded |
+| integration-retry | SCHEDULE | cron: */10 * * * * | Netlify schedule | provider/system | raw/JSON body | field checks | JSON | not_found | payments, users, webhook_log | Google Calendar/Meet, Google Sheets, Holded, Notion |
 | invoice-pdf | GET | /api/invoice-pdf | Session cookie | authenticated | query | ownership, field checks | PDF | unauthorized, missing_payment_id, not_found, no_holded_invoice, pdf_unavailable, server_error | payments, users, webhook_log | Holded |
 | me | GET | /api/me | Session cookie | application admin | none | field checks | JSON | unauthorized, common_login_required | users | none |
-| meet-health | GET/POST | /api/meet/health | Provider secret/signature | none | query | signature/secret | JSON | server_error/none explicit | none detected | Google Calendar/Meet |
-| meet-transcript-poll | SCHEDULE | cron: */15 * * * * | Netlify schedule | provider/system | none | method/auth only | JSON | not_found | bookings, processed_meet_docs, users, webhook_log | Google Drive, Google Calendar/Meet, Anthropic |
-| meet-webhook | POST | /api/meet/webhook | Provider secret/signature | provider/system | raw/JSON body + query | signature/secret, field checks | JSON | invalid_json, invalid_pubsub_message, unknown_advisor | bookings, users, webhook_log | Google Drive, Google Calendar/Meet, Anthropic |
+| meet-health | GET/POST | /api/meet/health | Provider secret/signature | none | query | signature/secret | JSON | server_error/none explicit | meeting_transcripts | Google Calendar/Meet |
+| meet-transcript-poll | SCHEDULE | cron: */15 * * * * | Netlify schedule | provider/system | none | method/auth only | HTTP response | server_error/none explicit | none detected | Google Calendar/Meet, Anthropic |
+| meet-transcript-process-background | ANY | /.netlify/functions/meet-transcript-process-background | Public/internal | none | none | method/auth only | HTTP response | server_error/none explicit | none detected | Google Calendar/Meet, Anthropic |
+| meet-webhook | POST | /api/meet/webhook | Provider secret/signature | provider/system | raw/JSON body + query | signature/secret, field checks | JSON | invalid_json, invalid_pubsub_message, unknown_advisor | none detected | Google Calendar/Meet |
 | notifications-ack | POST | /api/notifications/ack | Session cookie | authenticated | JSON body | origin, JSON, field checks | JSON | unauthorized, bad_origin, missing_notification_id, not_found, update_failed | notification_recipients, notifications, users, webhook_log | Resend/email |
 | notifications-list | GET | /api/notifications | Session cookie | authenticated | none | method/auth only | JSON | unauthorized | notification_recipients, notifications | none |
 | notion-webhook | POST | /api/notion/webhook | Provider secret/signature | provider/system | JSON body + query | JSON, signature/secret, field checks | JSON | missing_secret_configuration, invalid_secret, invalid_json, parse_error, missing_lead_id, identity_collision | users, webhook_log | Google Drive, Google Sheets, Holded, Resend/email, Notion |

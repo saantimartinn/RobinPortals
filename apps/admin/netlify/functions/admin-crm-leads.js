@@ -18,12 +18,17 @@ async function requireAdmin(event) {
   return findAdminForSession(getSupabase(), session, 'id,email,username,nombre,apellidos,role');
 }
 
+function metaAdId(lead) {
+  if (lead.source_payload?.page_url) return null;
+  return lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1];
+}
+
 async function metaCampaignNames(leads) {
   const version = process.env.META_API_VERSION || 'v26.0';
-  const allAdIds = [...new Set(leads.map((lead) => lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1]).filter(Boolean))];
+  const allAdIds = [...new Set(leads.map(metaAdId).filter(Boolean))];
   const names = new Map();
   for (const lead of leads) {
-    const adId = lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1];
+    const adId = metaAdId(lead);
     const storedCampaign = String(lead.source_payload?.campaign_name || lead.campaign_notion_urls?.[0] || '').trim();
     if (adId && storedCampaign && !storedCampaign.startsWith('meta-ad:')) names.set(String(adId), storedCampaign);
   }
@@ -68,7 +73,7 @@ exports.handler = async (event) => {
       const leads = (data || []).filter((lead) => !lead.is_test && lead.source_payload?.simulated !== true);
       const campaignNames = await metaCampaignNames(leads);
       return json({ leads: leads.map((lead) => {
-        const adId = lead.source_payload?.ad_id || String(lead.campaign_notion_urls?.[0] || '').match(/^meta-ad:(.+)$/)?.[1];
+        const adId = metaAdId(lead);
         const campaignName = adId && campaignNames.get(adId);
         return campaignName ? { ...lead, source_payload: { ...(lead.source_payload || {}), campaign_name: campaignName } } : lead;
       }) });

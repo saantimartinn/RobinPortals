@@ -95,7 +95,7 @@ function ChangePasswordCard() {
     setBusy(true);
     try {
       await changePassword(current, next);
-      try { window.webkit?.messageHandlers?.robinAuth?.postMessage({ action: "passwordChanged", password: next }); } catch (_) {}
+      try { window.webkit?.messageHandlers?.robinAuth?.postMessage({ action: "passwordChanged", password: next }); } catch (_) { console.warn("[native_password_update_failed]"); }
       setCurrent(""); setNext(""); setConfirm(""); setOpen(false); setSuccess(true);
     } catch (submitError) {
       setError(submitError.status === 401

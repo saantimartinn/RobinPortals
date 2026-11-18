@@ -7,9 +7,10 @@ import { APPS, ROOT } from './apps.mjs';
 let failed = false;
 for (const app of [{ id: 'site', dir: 'site' }, ...APPS]) {
   const cwd = resolve(ROOT, app.dir);
-  const dir = ['test', 'tests'].find((name) => existsSync(resolve(cwd, name)));
-  if (!dir) continue;
-  const files = readdirSync(resolve(cwd, dir)).filter((file) => /\.test\.(c|m)?js$/.test(file)).map((file) => `${dir}/${file}`);
+  const files = ['test', 'tests'].flatMap((dir) => existsSync(resolve(cwd, dir))
+    ? readdirSync(resolve(cwd, dir)).filter((file) => /\.test\.(c|m)?js$/.test(file)).map((file) => `${dir}/${file}`)
+    : []);
+  if (!files.length) continue;
   console.log(`\n=== ${app.id} (${files.length} archivos)`);
   const result = spawnSync(process.execPath, ['--test', ...files], { cwd, stdio: 'inherit' });
   if (result.status !== 0) failed = true;

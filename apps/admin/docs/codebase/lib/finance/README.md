@@ -15,6 +15,7 @@ Maintained files in this directory and links to their responsibilities.
 | [`holded.js`](../../../../lib/finance/holded.js) | Backend domain service or provider adapter for holded. |
 | [`invoices.js`](../../../../lib/finance/invoices.js) | Backend domain service or provider adapter for invoices. |
 | [`periods.js`](../../../../lib/finance/periods.js) | Backend domain service or provider adapter for periods. |
+| [`revenue.js`](../../../../lib/finance/revenue.js) | Backend domain service or provider adapter for revenue. |
 | [`treasury.js`](../../../../lib/finance/treasury.js) | Backend domain service or provider adapter for treasury. |
 | [`utils.js`](../../../../lib/finance/utils.js) | Backend domain service or provider adapter for utils. |
 

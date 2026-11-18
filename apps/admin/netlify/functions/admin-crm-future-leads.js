@@ -15,10 +15,22 @@ async function requireAdmin(event) {
 }
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
+  if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') return methodNotAllowed(['GET', 'POST']);
   try {
     const admin = await requireAdmin(event);
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
+    const crm = getAdminSupabase();
+    if (event.httpMethod === 'GET') {
+      const leads = [];
+      for (let offset = 0; ; offset += 1000) {
+        const { data, error } = await crm.from('crm_future_leads').select('*')
+          .order('moved_at', { ascending: false }).order('id', { ascending: false }).range(offset, offset + 999);
+        if (error) throw error;
+        leads.push(...(data || []).filter((lead) => !lead.lead_snapshot?.is_test && lead.lead_snapshot?.source_payload?.simulated !== true));
+        if (!data || data.length < 1000) break;
+      }
+      return json({ leads });
+    }
     const body = parseJsonBody(event);
     if (!body) return json({ error: 'invalid_json', detail: 'La solicitud no tiene un formato válido.' }, { statusCode: 400 });
     const leadId = String(body.leadId || '').trim();
@@ -28,7 +40,6 @@ exports.handler = async (event) => {
       return json({ error: 'invalid_academic_year', detail: 'Selecciona 2027-28 o 2028-29.' }, { statusCode: 400 });
     }
 
-    const crm = getAdminSupabase();
     const actor = await syncCrmIdentity(crm, admin);
     const { data, error } = await crm.rpc('move_crm_lead_to_future', {
       p_lead_id: leadId,

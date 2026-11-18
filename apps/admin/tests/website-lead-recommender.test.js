@@ -43,19 +43,40 @@ test('website webhook maps recommender contacts and Meta landing campaigns to CR
 
     for (const [pageUrl, source, campaign] of [
       ['/webinar21-11/', 'meta', 'Webinar 21-11'],
-      ['https://project-robin.com/vaparaaholanda/?utm_source=google', 'meta', 'Portugal'],
+      ['/webianr21-11/', 'meta', 'Webinar 21-11'],
+      ['https://project-robin.com/WEBINAR21-11/?utm_source=google', 'meta', 'Webinar 21-11'],
+      ['https://project-robin.com/vaparaaholanda/?utm_source=google', 'meta', 'PORTUGAL II'],
       ['/veteaholanda/', 'meta', 'Campaña continua Candela'],
       ['/contacto/', 'website', 'Otra campaña'],
       ['/veteaholanda-extra/', 'website', 'Otra campaña'],
+      ['/webinar21-11-extra/', 'website', 'Otra campaña'],
+      ['/contacto/?next=/webinar21-11/', 'website', 'Otra campaña'],
     ]) {
       const result = await handler({
         httpMethod: 'POST', headers: { 'x-robin-lead-secret': 'test-secret' },
-        body: JSON.stringify({ name: 'Lead de prueba', email: 'landing@example.com', page_url: pageUrl, campaign: 'Otra campaña' }),
+        body: JSON.stringify({ name: 'Lead de prueba', email: 'landing@example.com', page_url: pageUrl, campaign: 'Otra campaña', createdAt: '2026-11-16T12:00:00Z' }),
       });
       assert.equal(result.statusCode, 200, pageUrl);
       assert.equal(captured.source, source, pageUrl);
       assert.equal(captured.campaign, campaign, pageUrl);
       assert.equal(captured.payload.page_url, pageUrl, pageUrl);
+    }
+    for (const [pageUrl, createdAt, source, campaign] of [
+      ['/vaparaaholanda/', '2026-11-14T23:59:59.999Z', 'meta', 'Portugal'],
+      ['/vaparaaholanda/', '2026-11-15T00:00:00Z', 'meta', 'PORTUGAL II'],
+      ['/vaparaaholanda/', '2026-11-15T01:00:00+01:00', 'meta', 'PORTUGAL II'],
+      ['/vaparaholanda/', '2026-11-15T00:00:00Z', 'meta', 'PORTUGAL II'],
+      ['https://project-robin.com/VAPARAAHOLANDA?utm_source=facebook', '2026-11-18T12:00:00Z', 'meta', 'PORTUGAL II'],
+      ['/vaparaaholanda-extra/', '2026-11-18T12:00:00Z', 'website', 'Otra campaña'],
+      ['/contacto/?next=/vaparaaholanda/', '2026-11-18T12:00:00Z', 'website', 'Otra campaña'],
+    ]) {
+      const result = await handler({
+        httpMethod: 'POST', headers: { 'x-robin-lead-secret': 'test-secret' },
+        body: JSON.stringify({ name: 'Lead de prueba', email: 'landing@example.com', page_url: pageUrl, campaign: 'Otra campaña', createdAt }),
+      });
+      assert.equal(result.statusCode, 200, `${pageUrl}: ${createdAt}`);
+      assert.equal(captured.source, source, `${pageUrl}: ${createdAt}`);
+      assert.equal(captured.campaign, campaign, `${pageUrl}: ${createdAt}`);
     }
   } finally {
     require.cache[ingestPath].exports = originalIngest;

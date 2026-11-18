@@ -12,7 +12,7 @@ const browserGlobals = new Set([
   'AbortController', 'Blob', 'CSS', 'Date', 'Error', 'File', 'FileReader', 'FormData',
   'Image', 'Intl', 'JSON', 'Map', 'Math', 'Number', 'Object', 'Promise', 'RegExp',
   'Set', 'String', 'URL', 'URLSearchParams', 'console', 'document', 'fetch', 'globalThis',
-  'alert', 'confirm', 'localStorage', 'navigator', 'setInterval', 'setTimeout',
+  'alert', 'confirm', 'localStorage', 'sessionStorage', 'navigator', 'setInterval', 'setTimeout',
   'clearInterval', 'clearTimeout', 'window',
 ]);
 

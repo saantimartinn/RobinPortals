@@ -2,6 +2,7 @@
 const { sendEmail } = require('./email');
 const { chatCompletion } = require('./anthropic-chat');
 const { errorCode } = require('./observability');
+const { deleteCalendarEvent } = require('./google-calendar');
 
 // Construye un briefing breve del cliente para el asesor (mismo contexto que el
 // asistente IA del panel). Best-effort: si la IA o las consultas fallan, cae al
@@ -143,4 +144,33 @@ ${briefing}`;
   return emailResults;
 }
 
-module.exports = { buildAdvisorBriefing, sendBookingNotifications };
+function isBookingSlotConflict(error) {
+  const message = String(error && error.message || '');
+  return (error && error.code === '23P01' && message.includes('booking_slot_unavailable'))
+    || (error && error.code === '23505' && message.includes('bookings_advisor_scheduled_slot_key'));
+}
+
+async function hasPendingBooking(sb, userId) {
+  const { data, error } = await sb.from('bookings')
+    .select('id').eq('user_id', userId).eq('status', 'scheduled')
+    .gt('start_at', new Date().toISOString()).limit(1);
+  if (error) throw error;
+  return Boolean(data?.length);
+}
+
+async function insertBookingOrRollback({ sb, row, advisorEmail, eventId, removeEvent = deleteCalendarEvent }) {
+  const { data, error } = await sb.from('bookings').insert(row).select().single();
+  if (!error && data) return data;
+
+  let cleanupError = null;
+  try {
+    await removeEvent(advisorEmail, eventId);
+  } catch (errorDeletingEvent) {
+    cleanupError = errorDeletingEvent;
+  }
+  const persistenceError = error || new Error('booking_insert_failed');
+  if (cleanupError) persistenceError.calendarCleanupError = cleanupError;
+  throw persistenceError;
+}
+
+module.exports = { buildAdvisorBriefing, sendBookingNotifications, hasPendingBooking, insertBookingOrRollback, isBookingSlotConflict };

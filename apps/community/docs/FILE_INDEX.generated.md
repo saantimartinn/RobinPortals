@@ -72,7 +72,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/admin-permissions.js](../frontend/src/admin-permissions.js) | Módulo frontend: admin-permissions | canAdminSee, firstAllowedAdminUrl, isDeveloperAdminEmail |
 | [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, changePassword, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMutate, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCancel, subscriptionCheckout, subscriptionPlans, subscriptionPortal, subscriptionSync |
 | [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app | PortalRobin, handleLogout, onFocus, refresh, refreshUser |
-| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav | CrossPortalNav, openRobinJr |
+| [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav | CrossPortalNav, closeEscape, closeOutside, openRobinJr |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | Módulo frontend: SubscriberPortal | SubscriberPortal |
 | [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | Módulo frontend: SubscriberShell | SubscriberShell, initialTab, poll, refreshEvents, refreshRequests |
 | [frontend/src/application/subscription-portal.css](../frontend/src/application/subscription-portal.css) | Módulo frontend: subscription-portal.css | — |
@@ -150,7 +150,6 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/main.jsx](../frontend/src/main.jsx) | Módulo frontend: main | — |
 | [frontend/src/shared/constants.js](../frontend/src/shared/constants.js) | Módulo frontend: constants | — |
 | [frontend/src/shared/NotificationPopup.jsx](../frontend/src/shared/NotificationPopup.jsx) | Módulo frontend: NotificationPopup | NotificationPopup, handle |
-| [frontend/src/shared/TermsModal.jsx](../frontend/src/shared/TermsModal.jsx) | Módulo frontend: TermsModal | TermsModal |
 | [frontend/src/shared/theme.js](../frontend/src/shared/theme.js) | Módulo frontend: theme | — |
 | [frontend/src/shared/ui.jsx](../frontend/src/shared/ui.jsx) | Módulo frontend: ui | Badge, Btn, Card, CardContent, CardHeader, Divider, Field, KpiCard, Row, SelectField, TextareaField |
 | [frontend/src/shared/utils.js](../frontend/src/shared/utils.js) | Módulo frontend: utils | formatDate, formatMoney, getRobinLevel, isSubscriberAdmin, isSubscriberUser, prepareLogoFile, resizeImageFile, robinDaysActive, robinLevelDef, robinLockFor, studentJobUrl, uid |

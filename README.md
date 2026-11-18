@@ -28,6 +28,9 @@ documentadas en [Mentoría y conversión](apps/portal/docs/MENTORIA_CONVERSION.m
 | `npm run site:pull-env` | Copia a `apps/*/.env` las variables de cada proyecto de Netlify (solo lectura) |
 | `npm run site:netlify-env -- --site-url https://<sitio>.netlify.app` | Prepara en `.netlify/production-env.json` las variables del sitio de producción (no envía nada) |
 
+El ejecutor `site/test-all.mjs` reúne los archivos `*.test.js`, `*.test.cjs` y
+`*.test.mjs` de `test/` y `tests/` en cada app, y los ejecuta desde su propia carpeta.
+
 `netlify.toml` de la raíz es generado: cada app sigue definiendo sus rutas en su propio `netlify.toml`, y `site/generate-config.mjs` las monta bajo su ruta y renombra sus funciones con el prefijo de la app.
 
 ## Producción

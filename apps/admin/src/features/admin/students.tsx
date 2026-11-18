@@ -8,6 +8,7 @@ import { Contact } from "@/types/domain";
 import { PortalClient, PortalSnapshot } from "@/services/portal";
 import { Title, ContactDrawer } from './feature-shared';
 import { ClientFolderBrowser } from './client-folders';
+import { leadCourseGroup } from './lead-course-group.mjs';
 
 export function GlobalStudents({ path, snapshot, connected, contacts }: { path: string; snapshot: PortalSnapshot | null; connected: boolean; contacts: Contact[] }) {
   const [selected, setSelected] = useState<Contact | null>(null);
@@ -36,7 +37,7 @@ export function GlobalStudents({ path, snapshot, connected, contacts }: { path: 
         {contacts.map((contact) => (
           <button key={contact.id} className="student-card" onClick={() => setSelected(contact)}>
             <i>{contact.initials}</i>
-            <div><h3>{contact.name}</h3><p>{contact.university}</p><span>{contact.course}</span></div>
+            <div><h3>{contact.name}</h3><p>{contact.university}</p><span>{leadCourseGroup(contact.course)}</span></div>
             <Badge variant="outline">{contact.status}</Badge>
             <ChevronRight />
           </button>

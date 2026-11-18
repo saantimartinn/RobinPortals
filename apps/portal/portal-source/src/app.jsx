@@ -46,7 +46,7 @@ function nextOnboardingStep(user) {
 }
 
 function sendNativeAuthEvent(payload) {
-  try { window.webkit?.messageHandlers?.robinAuth?.postMessage(payload); } catch (_) {}
+  try { window.webkit?.messageHandlers?.robinAuth?.postMessage(payload); } catch (_) { console.warn("[native_auth_event_failed]"); }
 }
 
 export default function PortalRobin() {
@@ -82,7 +82,7 @@ export default function PortalRobin() {
     if (resetToken || !user || isAdminUser(user) || user.auth_source === "external_client") return;
     let active = true;
     let storage;
-    try { storage = window.localStorage; } catch (_) {}
+    try { storage = window.localStorage; } catch (_) { storage = undefined; }
     void claimUpdateNotice(user.id, (body) => api.post("/api/portal-update-notice", body), storage)
       .then((show) => { if (active && show) setIntroUserId(user.id); })
       .catch((error) => reportClientError("portal_update_notice", error));
@@ -121,8 +121,8 @@ export default function PortalRobin() {
   useEffect(() => {
     if (window.location.pathname.replace(/\/+$/, "") === "/portal/logout") {
       (async () => {
-        try { await fetch("/therobinplan/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {}
-        try { await apiLogout(); } catch (_) {}
+        try { await fetch("/therobinplan/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) { console.warn("[community_logout_failed]"); }
+        try { await apiLogout(); } catch (_) { console.warn("[portal_logout_failed]"); }
         window.location.replace(loginUrl());
       })();
       return undefined;
@@ -163,7 +163,7 @@ export default function PortalRobin() {
             allowed = subscriber.subscription_status === "active" || subscriber.subscription_status === "trialing";
           }
         }
-      } catch (_) {}
+      } catch (_) { allowed = false; }
       if (mounted) {
         setSubscriptionAccess(allowed);
         setCheckingSubscriptionAccess(false);
@@ -177,8 +177,7 @@ export default function PortalRobin() {
     if (resetToken || !authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
     const admin = isAdminUser(authState.user);
     const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
-    let next = null;
-    try { next = new URLSearchParams(window.location.search).get("next"); } catch (_) {}
+    const next = new URLSearchParams(window.location.search).get("next");
     // Admins land in the admin after logging in; on /portal they get the admin view of the student portal.
     if (admin) {
       if (next === "/admin" || pathname === "/login") {

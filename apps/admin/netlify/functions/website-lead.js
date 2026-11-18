@@ -10,19 +10,6 @@ function normalizeLeadType(value) {
   return null;
 }
 
-const metaLandingCampaigns = {
-  '/webinar21-11': 'Webinar 21-11',
-  '/vaparaaholanda': 'Portugal',
-  '/veteaholanda': 'Campaña continua Candela',
-};
-
-function metaCampaignForLanding(pageUrl) {
-  try {
-    const path = new URL(String(pageUrl || ''), 'https://project-robin.com').pathname.replace(/\/$/, '').toLowerCase();
-    return metaLandingCampaigns[path] || null;
-  } catch (_) { return null; }
-}
-
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
   const configured = process.env.WEBSITE_LEAD_INGEST_SECRET || '';
@@ -64,8 +51,9 @@ exports.handler = async (event) => {
   const submittedAt = body.createdAt || body.created_at;
   const createdAt = submittedAt && !Number.isNaN(Date.parse(submittedAt)) ? new Date(submittedAt).toISOString() : undefined;
   const pageUrl = body.pageUrl || body.page_url || body.meta?.page_url || null;
-  const metaCampaign = metaCampaignForLanding(pageUrl);
   try {
+    const { metaCampaignForLanding } = await import('../../shared/lead-attribution.mjs');
+    const metaCampaign = metaCampaignForLanding(pageUrl, createdAt);
     const result = await ingestCrmLead({
       source: metaCampaign ? 'meta' : 'website', externalId: body.submissionId || body.id || body.meta?.submission_id, name,
       createOnlyEmail: body.createOnlyEmail === true,

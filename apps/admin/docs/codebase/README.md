@@ -14,6 +14,7 @@ Robin Admin source tree, grouped by runtime responsibility.
 | [`shared/`](shared/README.md) | See the linked module files. |
 | [`src/`](src/README.md) | React application executed in the browser. |
 | [`supabase/`](supabase/README.md) | SQL migrations and seed material for managed database projects. |
+| [`test/`](test/README.md) | See the linked module files. |
 | [`tests/`](tests/README.md) | Node test-runner regression tests. |
 
 ## Files

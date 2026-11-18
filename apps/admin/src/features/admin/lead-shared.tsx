@@ -1,9 +1,26 @@
 // Admin feature module for lead shared; the feature registry connects it to the authenticated shell.
 import type { Contact } from "@/types/domain";
 
-export type InboxView = "all" | "España" | "Portugal" | "recomendador" | "reservas";
+export type InboxView = "all" | "España" | "Portugal" | "recomendador" | "eventos" | "reservas" | "lost";
+export type LostLeadSection = "future" | "definitive" | "overdue";
+export type EventLeadSection = "lisboa" | "canarias" | "valencia" | "webinar-21-11";
 
-export function matchesInboxView(contact: Pick<Contact, "source" | "campaign" | "formName" | "country">, view: InboxView) {
+export function unitourEvent(campaign?: string): EventLeadSection | undefined {
+  return campaign?.trim().toLowerCase().match(/^unitour (lisboa|canarias|valencia)$/)?.[1] as EventLeadSection | undefined;
+}
+
+export function leadInboxSection(contact: Pick<Contact, "createdAt" | "stage" | "owner">, stage = contact.stage || "Por contactar", owner = contact.owner || "", now = Date.now()): "active" | "definitive" | "overdue" | null {
+  if (stage === "Lost") return "definitive";
+  if (stage !== "Por contactar" || owner.trim()) return null;
+  const enteredAt = leadEntryTimestamp(contact.createdAt);
+  return enteredAt > 0 && now - enteredAt > 30 * 86400000 ? "overdue" : "active";
+}
+
+export function matchesInboxView(contact: Pick<Contact, "source" | "campaign" | "formName" | "country">, view: InboxView, eventSection: EventLeadSection = "lisboa") {
+  const event = unitourEvent(contact.campaign)
+    || (contact.source === "Meta Ads" && contact.campaign?.trim().toLowerCase() === "webinar 21-11" ? "webinar-21-11" : undefined);
+  if (view === "eventos") return event === eventSection;
+  if (event) return false;
   if (view === "reservas") return contact.formName === "reserva";
   if (contact.formName === "reserva") return false;
   if (view === "recomendador") {
@@ -45,6 +62,7 @@ export function formatLeadEntry(value?: string) {
 }
 
 export function campaignOrOrigin(contact: Contact) {
+  if (unitourEvent(contact.campaign)) return contact.campaign.trim();
   if (contact.campaign?.trim().toLowerCase() === "recomendador") return "Recomendador";
   if (contact.source === "Meta Ads") {
     return contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Campaña pendiente";
@@ -54,6 +72,7 @@ export function campaignOrOrigin(contact: Contact) {
 }
 
 export function inboxCampaignLabel(contact: Contact) {
+  if (unitourEvent(contact.campaign)) return contact.campaign.trim();
   if (contact.campaign?.trim().toLowerCase() === "recomendador") return "Recomendador";
   if (contact.source === "Meta Ads") {
     return contact.campaign && contact.campaign !== "Pendiente de identificar" ? contact.campaign : "Campaña pendiente";

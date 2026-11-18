@@ -68,3 +68,21 @@ test('recommender creates a normal website lead with contact, course and campaig
   assert.equal(writes[0].row.source_payload.campaign_name, 'Recomendador');
   assert.deepEqual(writes[0].row.campaign_notion_urls, ['Recomendador']);
 });
+
+test('la ingestión persiste Meta y la campaña de la landing por encima de valores heredados', async () => {
+  for (const [page_url, expected] of [
+    ['/webinar21-11/', 'Webinar 21-11'],
+    ['/webianr21-11/', 'Webinar 21-11'],
+    ['/veteaholanda/', 'Campaña continua Candela'],
+  ]) {
+    const { crm, writes } = crmForRecommender();
+    await ingestCrmLead({
+      source: 'website', name: 'Lead de prueba', email: 'landing@example.com',
+      campaign: 'Campaña incorrecta', payload: { page_url, campaign_name: 'Campaña incorrecta' },
+    }, crm);
+    assert.equal(writes[0].row.source_payload.source, 'meta');
+    assert.equal(writes[0].row.source_payload.campaign_name, expected);
+    assert.deepEqual(writes[0].row.campaign_notion_urls, [expected]);
+    assert.equal(writes[0].row.source_payload.page_url, page_url);
+  }
+});

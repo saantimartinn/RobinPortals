@@ -12,14 +12,21 @@ Maintained files in this directory and links to their responsibilities.
 | [`analytics-personal.tsx`](../../../../../src/features/admin/analytics-personal.tsx) | Admin feature module: analytics personal. |
 | [`analytics-sales.tsx`](../../../../../src/features/admin/analytics-sales.tsx) | Admin feature module: analytics sales. |
 | [`analytics.tsx`](../../../../../src/features/admin/analytics.tsx) | Admin feature module: analytics. |
+| [`campaign-export.mjs`](../../../../../src/features/admin/campaign-export.mjs) | Admin feature module: campaign export. |
 | [`client-folders.tsx`](../../../../../src/features/admin/client-folders.tsx) | Admin feature module: client folders. |
 | [`developer-logs.tsx`](../../../../../src/features/admin/developer-logs.tsx) | Admin feature module: developer logs. |
 | [`developers.tsx`](../../../../../src/features/admin/developers.tsx) | Admin feature module: developers. |
 | [`email-composer.tsx`](../../../../../src/features/admin/email-composer.tsx) | Admin feature module: email composer. |
 | [`feature-shared.tsx`](../../../../../src/features/admin/feature-shared.tsx) | Admin feature module: feature shared. |
+| [`in-celebration-dialog.tsx`](../../../../../src/features/admin/in-celebration-dialog.tsx) | Admin feature module: in celebration dialog. |
+| [`in-celebration.css`](../../../../../src/features/admin/in-celebration.css) | Admin feature module: in celebration. |
+| [`in-celebration.mjs`](../../../../../src/features/admin/in-celebration.mjs) | Admin feature module: in celebration. |
+| [`lead-course-group.mjs`](../../../../../src/features/admin/lead-course-group.mjs) | Admin feature module: lead course group. |
 | [`lead-inbox.tsx`](../../../../../src/features/admin/lead-inbox.tsx) | Admin feature module: lead inbox. |
 | [`lead-shared.tsx`](../../../../../src/features/admin/lead-shared.tsx) | Admin feature module: lead shared. |
 | [`leads.tsx`](../../../../../src/features/admin/leads.tsx) | Admin feature module: leads. |
+| [`recommender-modal.css`](../../../../../src/features/admin/recommender-modal.css) | Admin feature module: recommender modal. |
+| [`recommender-modal.tsx`](../../../../../src/features/admin/recommender-modal.tsx) | Admin feature module: recommender modal. |
 | [`release-test-explanations.ts`](../../../../../src/features/admin/release-test-explanations.ts) | Admin feature module: release test explanations. |
 | [`release-tests.tsx`](../../../../../src/features/admin/release-tests.tsx) | Admin feature module: release tests. |
 | [`settings.tsx`](../../../../../src/features/admin/settings.tsx) | Admin feature module: settings. |

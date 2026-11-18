@@ -1,6 +1,7 @@
 // Browser API client for admin data; keeps endpoint and fetch details out of the screens.
 import type { Contact, CrmStage, LeadCategory, LeadContactRole, LostReason } from "@/types/domain";
 import { apiPath } from "@/lib/api-path";
+import { metaCampaignForLanding } from "../../shared/lead-attribution.mjs";
 
 const apiFetch = (input: RequestInfo | URL, init?: RequestInit) =>
   globalThis.fetch(typeof input === "string" ? apiPath(input) : input, init);
@@ -29,6 +30,7 @@ export type RecommenderSession = {
 };
 export type RecommenderHistory = { count: number; latest: RecommenderSession | null };
 export type FutureAcademicYear = "2027-28" | "2028-29";
+export type FutureLead = Contact & { academicYear: FutureAcademicYear; archivedAt: string };
 type LeadPatch = { owner?: string; source?: string; category?: LeadCategory | ""; stage?: CrmStage; heat?: number; notes?: string; contactRole?: LeadContactRole | ""; lostAt?: string; lostReason?: LostReason | ""; lostReasonDetail?: string };
 
 function statusFor(stage: CrmStage): Contact["status"] {
@@ -130,6 +132,8 @@ function toContact(row: Record<string, any>): Contact {
   const formNotes = fieldValue(fields, /(message|mensaje|notes?|notas?|comentario|comments?|details?|detalles?|respuesta|response|consulta)/);
   const payloadValue = (...keys: string[]) => keys.map((key) => row.source_payload?.[key]).find((value) => value != null && String(value).trim());
   const sourceComment = row.comment || row.body_text || row.summary || "";
+  const pageUrl = String(payloadValue("page_url") || labeledCommentValue(sourceComment, /^pagina$/, /^page$/) || "").trim();
+  const landingCampaign = metaCampaignForLanding(pageUrl, row.source_created_at || row.created_at);
   const course = humanizeLeadField(
     payloadValue("course", "curso", "academic_course", "school_year", "year_of_study", "grado")
       || fieldValue(fields, /(^|_)(course|curso|grado)($|_)/, /(^|_)school_?year($|_)/, /(^|_)year_?of_?study($|_)/)
@@ -147,17 +151,43 @@ function toContact(row: Record<string, any>): Contact {
   const storedCampaign = String(row.campaign_notion_urls?.[0] || "").trim();
   const payloadCampaign = String(row.source_payload?.campaign_name || "").trim();
   const isNotionUrl = (value: string) => /^https?:\/\/(?:www\.)?notion\.(?:so|site|com)\//i.test(value);
-  const campaign = [payloadCampaign, storedCampaign].find((value) => value && !value.startsWith("meta-ad:") && !isNotionUrl(value)) || "Pendiente de identificar";
+  const originalCampaign = landingCampaign || [payloadCampaign, storedCampaign].find((value) => value && !value.startsWith("meta-ad:") && !isNotionUrl(value)) || "Pendiente de identificar";
+  const isRecommender = [originalCampaign, formName, row.source_payload?.source]
+    .some((value) => String(value || "").trim().toLowerCase() === "recomendador");
+  const isUnitour = /^unitour (lisboa|canarias|valencia)$/i.test(originalCampaign.trim());
+  const isLisbonFair = formName === "feria" && row.source_payload?.tag === "unitour-lisboa-portugal";
+  const enteredAt = Date.parse(row.source_created_at || row.created_at || "");
+  // Lisboa está en UTC el 17/11/2026; se incluyen las 10:00 y las 18:00.
+  const isLisbonRecommender = isRecommender && enteredAt >= Date.parse("2026-11-17T10:00:00Z") && enteredAt <= Date.parse("2026-11-17T18:00:00Z");
+  const campaign = !isUnitour && (isLisbonFair || isLisbonRecommender) ? "Unitour Lisboa" : originalCampaign;
+  const source = landingCampaign ? "Meta Ads" : isUnitour || campaign === "Unitour Lisboa" ? "Eventos" : sourceFor(row);
   const comment = row.comment || row.body_text || row.summary || formNotes || remainingFormDetails || "";
   const countryField = fieldValue(fields, /(^|_)(pais|country)($|_)/);
   const commentCountry = countryFromComment(sourceComment) === "Otros" ? countryFromComment(`País: ${countryField}`) : countryFromComment(sourceComment);
   // Website forms only tag Portugal pages; otherwise the form language tells the market.
   const webLang = row.source_payload?.source === "website" ? String(row.source_payload?.lang || "").toLowerCase() : "";
   const country = commentCountry !== "Otros" ? commentCountry : campaign.toLowerCase() === "webinar 21-11" ? "España" : webLang === "es" ? "España" : webLang === "pt" ? "Portugal" : "Otros";
-  return { id: row.id, crmNotes: Array.isArray(row.source_payload?.crm_notes) ? row.source_payload.crm_notes : [], displayId: row.display_id || undefined, name, initials: name.split(/\s+/).slice(0, 2).map((part: string) => part[0] || "").join("").toUpperCase(), email: row.email || fieldValue(fields, /^e?mail$/, /^correo/) || "", phone: row.phone || fieldValue(fields, /phone/, /telefono/, /movil/) || "", country, university: row.school_name || "", course, interest, comment, contactAt: row.contact_at || undefined, contactRole: row.contact_role || undefined, product: "Aplicación", status: statusFor(stage), source: sourceFor(row), campaign, owner: row.owner_names?.[0] || "", probability: Number(row.heat || 0), nextAction: "", lastContact: row.contact_at || "—", value: 0, tags: [], databaseFields: databaseFieldValues(row), formName, pageUrl: row.source_payload?.source === "website" ? String(row.source_payload?.page_url || "").trim() : undefined, category: category as LeadCategory | undefined, heat: Number(row.heat ?? 50), notes: comment, stage, lostAt: row.lost_at || undefined, lostReason: row.source_payload?.lost_reason || undefined, lostReasonDetail: row.source_payload?.lost_reason_detail || undefined, portalAccounts: row.source_payload?.portal_accounts || (row.source_payload?.target_portal && row.source_payload?.target_user_id ? { [row.source_payload.target_portal]: row.source_payload.target_user_id } : {}), createdAt: row.source_created_at || row.created_at || undefined, clientAt: row.inside_at || undefined };
+  return { id: row.id, crmNotes: Array.isArray(row.source_payload?.crm_notes) ? row.source_payload.crm_notes : [], displayId: row.display_id || undefined, name, initials: name.split(/\s+/).slice(0, 2).map((part: string) => part[0] || "").join("").toUpperCase(), email: row.email || fieldValue(fields, /^e?mail$/, /^correo/) || "", phone: row.phone || fieldValue(fields, /phone/, /telefono/, /movil/) || "", country, university: row.school_name || "", course, interest, comment, contactAt: row.contact_at || undefined, contactRole: row.contact_role || undefined, product: "Aplicación", status: statusFor(stage), source, campaign, owner: row.owner_names?.[0] || "", probability: Number(row.heat || 0), nextAction: "", lastContact: row.contact_at || "—", value: 0, tags: [], databaseFields: databaseFieldValues(row), formName, pageUrl: row.source_payload?.source === "website" ? String(row.source_payload?.page_url || "").trim() : undefined, category: category as LeadCategory | undefined, heat: Number(row.heat ?? 50), notes: comment, stage, lostAt: row.lost_at || undefined, lostReason: row.source_payload?.lost_reason || undefined, lostReasonDetail: row.source_payload?.lost_reason_detail || undefined, portalAccounts: row.source_payload?.portal_accounts || (row.source_payload?.target_portal && row.source_payload?.target_user_id ? { [row.source_payload.target_portal]: row.source_payload.target_user_id } : {}), createdAt: row.source_created_at || row.created_at || undefined, clientAt: row.inside_at || undefined };
 }
 
 export const adminDataClient = {
+  async listFutureLeads(): Promise<FutureLead[]> {
+    const response = await apiFetch("/api/admin/crm/future-leads", { credentials: "include" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.detail || "No se pudieron cargar los leads de próximos cursos");
+    return (payload.leads || []).map((row: Record<string, any>) => ({
+      ...toContact({
+        ...row.lead_snapshot,
+        id: row.id, name: row.name, email: row.email, phone: row.phone,
+        owner_names: row.owner_name ? [row.owner_name] : [],
+        lead_type: row.lead_type, heat: row.heat, contact_role: row.contact_role,
+        source_created_at: row.source_created_at || row.lead_snapshot?.source_created_at,
+        source_payload: { ...row.lead_snapshot?.source_payload, source: row.source, campaign_name: row.campaign_name, course: row.course || row.lead_snapshot?.source_payload?.course },
+      }),
+      academicYear: row.academic_year,
+      archivedAt: row.moved_at,
+    }));
+  },
   async moveLeadToFuture(leadId: string, academicYear: FutureAcademicYear) {
     const response = await apiFetch("/api/admin/crm/future-leads", { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ leadId, academicYear }) });
     const payload = await response.json().catch(() => ({}));
