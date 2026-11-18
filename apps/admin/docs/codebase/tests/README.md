@@ -17,6 +17,7 @@ Node test-runner regression tests.
 | [`crm-future-leads.test.js`](../../../tests/crm-future-leads.test.js) | Automated regression coverage for crm-future-leads.test. |
 | [`crm-historical-metrics.test.js`](../../../tests/crm-historical-metrics.test.js) | Automated regression coverage for crm-historical-metrics.test. |
 | [`crm-lead-calls.test.js`](../../../tests/crm-lead-calls.test.js) | Automated regression coverage for crm-lead-calls.test. |
+| [`crm-lead-course.test.js`](../../../tests/crm-lead-course.test.js) | Automated regression coverage for crm-lead-course.test. |
 | [`crm-lead-ingest.test.js`](../../../tests/crm-lead-ingest.test.js) | Automated regression coverage for crm-lead-ingest.test. |
 | [`developer-logs.test.js`](../../../tests/developer-logs.test.js) | Automated regression coverage for developer-logs.test. |
 | [`extra-payments.test.js`](../../../tests/extra-payments.test.js) | Automated regression coverage for extra-payments.test. |

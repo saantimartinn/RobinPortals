@@ -54,7 +54,7 @@ import { DashboardReport } from "@/components/dashboard-report";
 import { Dashboard } from "@/components/dashboard-home";
 import { adminPath } from "@/components/admin-path";
 import { dashboardAcquisitionPeriod } from "@/components/dashboard-utils";
-import type { Contact, CrmStage, LeadCategory, LeadContactRole, LostReason } from "@/types/domain";
+import type { Contact, CrmStage, LeadCategory, LeadContactRole, LeadCourse, LostReason } from "@/types/domain";
 import { portalClient } from "@/services/portal";
 import type { PortalAdmin, PortalClient, PortalSnapshot } from "@/services/portal";
 import { adminDataClient } from "@/services/admin-data";
@@ -226,6 +226,11 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
     setLeadOwners((owners) => ({ ...owners, [id]: owner }));
     setCrmContacts((contacts) => contacts.map((contact) => contact.id === id ? { ...contact, owner } : contact));
     persistLead(id, { owner });
+  }
+
+  async function setLeadCourse(id: string, course: LeadCourse) {
+    await adminDataClient.updateLead(id, { course });
+    setCrmContacts((contacts) => contacts.map((contact) => contact.id === id ? { ...contact, course } : contact));
   }
 
   useEffect(() => {
@@ -443,6 +448,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
               leadHeat={leadHeat}
               onSetLeadHeat={(id, heat) => { setLeadHeat((values) => ({ ...values, [id]: heat })); persistLead(id, { heat }); }}
               onSetLeadContactRole={(id, contactRole) => { setCrmContacts((contacts) => contacts.map((contact) => contact.id === id ? { ...contact, contactRole } : contact)); persistLead(id, { contactRole }); }}
+              onSetLeadCourse={setLeadCourse}
               leadNotes={leadNotes}
               onSetLeadNotes={(id, notes) => { setLeadNotes((values) => ({ ...values, [id]: notes })); persistLead(id, { notes }); }}
               leadLostDates={leadLostDates}

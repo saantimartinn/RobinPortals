@@ -10,7 +10,7 @@ import { lostReasonLabel, lostReasonOptions, Title, ContactDrawer } from './feat
 import { type InboxView, type LostLeadSection, type EventLeadSection, LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel, matchesInboxView, leadInboxSection } from "./lead-shared";
 import { leadCourseGroup, leadCourseGroups } from "./lead-course-group.mjs";
 
-export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, leadLostDates, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, notify }: FeatureModuleProps) {
+export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, leadLostDates, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, onSetLeadCourse, notify }: FeatureModuleProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Contact | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -283,7 +283,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
         </tbody></table></div>
         <footer><Button type="button" variant="outline" onClick={() => setGroupRows((rows) => [...rows, emptyLeadGroupRow()])}><Plus />Añadir fila</Button><span>{groupRows.filter((row) => row.name.trim()).length} leads listos</span><div><Button type="button" variant="outline" onClick={() => setAddingGroup(false)}>Cancelar</Button><Button type="submit" disabled={savingGroup}>{savingGroup ? "Guardando…" : "Guardar grupo"}</Button></div></footer>
       </form></div>}
-      {selected && <ContactDrawer contact={{ ...selected, owner: leadOwners[selected.id] || "Sin asignar", stage: leadStages[selected.id] }} admins={admins} heat={selected.heat || 50} onHeatChange={(value) => onSetLeadHeat(selected.id, value)} onOwnerChange={(owner) => { onAssignLead(selected.id, owner); notify(`${selected.name} asignado a ${owner}`); }} onContactRoleChange={(value) => onSetLeadContactRole(selected.id, value)} onDeleteLead={async (id) => { await onDeleteLead(id); notify(`${selected.name} eliminado correctamente`); }} onClose={() => setSelected(null)} leadMode />}
+      {selected && <ContactDrawer contact={{ ...selected, owner: leadOwners[selected.id] || "Sin asignar", stage: leadStages[selected.id] }} admins={admins} heat={selected.heat || 50} onHeatChange={(value) => onSetLeadHeat(selected.id, value)} onOwnerChange={(owner) => { onAssignLead(selected.id, owner); notify(`${selected.name} asignado a ${owner}`); }} onContactRoleChange={(value) => onSetLeadContactRole(selected.id, value)} onCourseChange={async (course) => { const id = selected.id; await onSetLeadCourse(id, course); setSelected((contact) => contact?.id === id ? { ...contact, course } : contact); }} onDeleteLead={async (id) => { await onDeleteLead(id); notify(`${selected.name} eliminado correctamente`); }} onClose={() => setSelected(null)} leadMode />}
     </div>
   );
 }
