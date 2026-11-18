@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { insertBookingOrRollback, isBookingSlotConflict } = require('../netlify/functions/bookings-create');
+const { insertBookingOrRollback, isBookingSlotConflict } = require('../lib/booking-create');
 
 function supabaseInsert(result) {
   return {

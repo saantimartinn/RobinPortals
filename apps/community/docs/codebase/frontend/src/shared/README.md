@@ -7,7 +7,6 @@ Tema, catálogos, utilidades y componentes reutilizables.
 ## Archivos
 
 - [NotificationPopup.jsx](../../../../../frontend/src/shared/NotificationPopup.jsx): Módulo frontend: NotificationPopup.
-- [TermsModal.jsx](../../../../../frontend/src/shared/TermsModal.jsx): Módulo frontend: TermsModal.
 - [constants.js](../../../../../frontend/src/shared/constants.js): Módulo frontend: constants.
 - [theme.js](../../../../../frontend/src/shared/theme.js): Módulo frontend: theme.
 - [ui.jsx](../../../../../frontend/src/shared/ui.jsx): Módulo frontend: ui.

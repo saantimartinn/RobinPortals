@@ -29,6 +29,8 @@ Contenido mantenido de `supabase/migrations/`.
 | [`202610260001_booking_mentor_gap.sql`](../../../../supabase/migrations/202610260001_booking_mentor_gap.sql) | Archivo mantenido del repositorio: 202610260001_booking_mentor_gap.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202610280001_holded_invoice_claims.sql`](../../../../supabase/migrations/202610280001_holded_invoice_claims.sql) | Archivo mantenido del repositorio: 202610280001_holded_invoice_claims.sql. | — | Cuando cambie la responsabilidad indicada. |
 | [`202611050002_create_crm_client_notes.sql`](../../../../supabase/migrations/202611050002_create_crm_client_notes.sql) | Archivo mantenido del repositorio: 202611050002_create_crm_client_notes.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`20261111083924_meeting_transcript_history.sql`](../../../../supabase/migrations/20261111083924_meeting_transcript_history.sql) | Archivo mantenido del repositorio: 20261111083924_meeting_transcript_history.sql. | — | Cuando cambie la responsabilidad indicada. |
+| [`20261111090227_meeting_history_source_time.sql`](../../../../supabase/migrations/20261111090227_meeting_history_source_time.sql) | Archivo mantenido del repositorio: 20261111090227_meeting_history_source_time.sql. | — | Cuando cambie la responsabilidad indicada. |
 
 ---
 

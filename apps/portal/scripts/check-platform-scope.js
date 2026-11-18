@@ -34,7 +34,13 @@ const retiredContent = [
   '/api/meet/' + 'poll',
   'docs/' + 'runbook',
 ];
+// Cross-portal links and build/test compatibility names remain valid in this monorepo.
 const allowedRetiredContent = new Map([
+  ['docs/FILE_INDEX.generated.md', new Set(['leg' + 'acy'])],
+  ['docs/FILE_MAP.md', new Set(['The ' + 'Robin' + ' Plan', 'Robin' + ' Plan'])],
+  ['docs/codebase/portal-source/README.md', new Set(['leg' + 'acy'])],
+  ['portal-source/vite.config.js', new Set(['leg' + 'acy'])],
+  ['test/career-recommendations-handler.test.js', new Set(['leg' + 'acy'])],
   ['infrastructure/cloudflare/README.md', new Set(['The ' + 'Robin' + ' Plan', 'Robin' + ' Plan'])],
   ['portal-source/src/app.jsx', new Set(['The ' + 'Robin' + ' Plan', 'Robin' + ' Plan'])],
   ['portal-source/src/application/CrossPortalNav.jsx', new Set(['The ' + 'Robin' + ' Plan', 'Robin' + ' Plan'])],

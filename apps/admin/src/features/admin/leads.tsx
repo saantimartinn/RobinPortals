@@ -13,6 +13,7 @@ import { EmailComposer } from "./email-composer";
 import { ClientFolderBrowser } from "./client-folders";
 import { InCelebration } from "./in-celebration-dialog";
 import { getInCelebration, lastCelebrationKey } from "./in-celebration.mjs";
+import { leadCourseGroup } from "./lead-course-group.mjs";
 
 export { LeadInbox } from "./lead-inbox";
 import { leadDaysWithoutContact, formatLeadEntry, campaignOrOrigin } from "./lead-shared";
@@ -272,7 +273,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
                     <td><button type="button" className="lead-name-button" onClick={() => openContact(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
                     <td><time className="lead-entry-time" dateTime={contact.createdAt}>{formatLeadEntry(contact.createdAt)}</time></td>
                     <td><span className="lead-source-readonly">{campaignOrOrigin(contact)}</span>{["Meta Ads", "Página web"].includes(contact.source) && <small className="lead-source-kind">{contact.source}</small>}</td>
-                    <td>{contact.course || ""}</td>
+                    <td>{leadCourseGroup(contact.course)}</td>
                     <td>{contact.interest || ""}</td>
                     <td><span className="days-without-contact">{daysWithoutContact ?? "—"}</span></td>
                     <td className="crm-age-column"><span className={`crm-age-dot ${leadContactAgeTone(daysWithoutContact)}`} title={`${daysWithoutContact ?? 0} días sin contactar`} aria-label={`${daysWithoutContact ?? 0} días sin contactar`} /></td>

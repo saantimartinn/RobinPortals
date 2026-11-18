@@ -220,4 +220,8 @@ body,.work,.page{background:var(--robin-cream)!important;font-family:var(--robin
 .inbox-views button{height:2.25rem;padding:0 1rem;border:0;border-radius:var(--robin-radius-control);background:transparent;color:var(--robin-ink-600);font:500 .875rem var(--robin-font-text);cursor:pointer}
 .inbox-views button:hover{color:var(--robin-navy);background:var(--robin-ink-50)}
 .inbox-views button[aria-pressed="true"]{background:var(--robin-navy);color:var(--robin-paper);font-weight:600}
+.inbox-subsections{margin:0 0 1rem;padding:1rem 0 0;border-top:var(--robin-line)}
+.inbox-subsections .inbox-views{margin-bottom:.5rem}
+.inbox-subsections .assignment-note{margin:.25rem 0 0}
+.inbox-panel tbody tr.archived-lead{cursor:default}
 .inbox-panel tbody tr.booking-past td{color:var(--robin-ink-500)}

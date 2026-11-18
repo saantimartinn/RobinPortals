@@ -25,7 +25,7 @@ function FolderedClients({ clients, totalCount, onSelect }) {
   }
   function drop(event, id) {
     event.preventDefault(); setDragOver(null);
-    try { const payload = JSON.parse(event.dataTransfer.getData('application/x-robin-client')); if (payload.source === 'robinjr' && clients.some((client) => client.id === payload.id)) void change({ action: 'moveClient', source: 'robinjr', clientId: payload.id, folderId: id }); } catch (_) {}
+    try { const payload = JSON.parse(event.dataTransfer.getData('application/x-robin-client')); if (payload.source === 'robinjr' && clients.some((client) => client.id === payload.id)) void change({ action: 'moveClient', source: 'robinjr', clientId: payload.id, folderId: id }); } catch (_) { return; }
   }
   function dropProps(id) { return { 'data-drop-active': dragOver === (id || 'root') ? 'true' : undefined, onDragOver: (event) => { if (event.dataTransfer.types.includes('application/x-robin-client')) { event.preventDefault(); setDragOver(id || 'root'); } }, onDragLeave: () => setDragOver(null), onDrop: (event) => drop(event, id) }; }
   const folders = data.folders || [];

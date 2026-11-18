@@ -7,10 +7,10 @@ export function createUpdateNoticeGate() {
     if (pending.has(userId)) return pending.get(userId);
     const key = `robin_portal_update_notice_2026:${userId}`;
     let alreadySeen = false;
-    try { alreadySeen = Boolean(storage?.getItem(key)); } catch (_) {}
+    try { alreadySeen = Boolean(storage?.getItem(key)); } catch (_) { console.warn("[update_notice_cache_read_failed]"); }
     const request = Promise.resolve().then(() => claim({ already_seen: alreadySeen })).then((result) => {
       seen.add(userId);
-      try { storage?.setItem(key, 'seen'); } catch (_) {}
+      try { storage?.setItem(key, 'seen'); } catch (_) { console.warn('[update_notice_cache_write_failed]'); }
       return !alreadySeen && result?.show === true;
     }).finally(() => pending.delete(userId));
     pending.set(userId, request);

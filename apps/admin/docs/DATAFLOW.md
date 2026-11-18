@@ -57,6 +57,9 @@ Para diagnosticar 401/403, distinguir cookie ausente/expirada de principal váli
 Robin Admin recibe leads desde varios orígenes. Los puntos de entrada importantes incluyen:
 
 - Website: [`netlify/functions/website-lead.js`](../netlify/functions/website-lead.js), llamado desde formulario/cliente web.
+- Las reglas de landings viven en [`shared/lead-attribution.mjs`](../shared/lead-attribution.mjs) y se aplican al webhook, la ingestión y la lectura del cliente. `/webinar21-11/` y `/webianr21-11/` fuerzan Meta Ads / `Webinar 21-11`; `/veteaholanda/` fuerza Meta Ads / `Campaña continua Candela`, por encima de campañas heredadas. Un `ad_id` conservado en un registro con `page_url` no se usa para resolver campañas de formularios nativos de Meta.
+- [`scripts/repair-webinar-attribution.sql`](../scripts/repair-webinar-attribution.sql) prepara la corrección de datos existentes del webinar y del lead de Candela auditado. Ejecutar únicamente en el proyecto CRM `odcjxzxfaclwwoynfqui`, no en PortalAlumno; es una reparación de datos y no una migración de esquema.
+- La landing `/vaparaaholanda/` (también `/vaparaholanda/`) se atribuye a origen Meta Ads y campaña `PORTUGAL II` desde el 15/11/2026 incluido, usando la fecha de entrada enviada o la fecha actual si no se proporciona. Las entradas anteriores de `/vaparaaholanda/` conservan la campaña `Portugal`; la URL original permanece en `source_payload.page_url`.
 - Meta: [`meta-lead-webhook.js`](../netlify/functions/meta-lead-webhook.js) recibe el evento externo y valida el flujo de ingestión.
 - Notion: [`notion-webhook.js`](../netlify/functions/notion-webhook.js) recibe cambios del sistema CRM externo.
 - Operación interna: rutas `/api/admin/crm/*` y conversión servidor-a-servidor `/api/internal/crm/convert`.

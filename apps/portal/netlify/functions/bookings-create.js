@@ -20,29 +20,8 @@ const { createOperationLogger, errorCode } = require('../../lib/observability');
 const { evaluateSlot, BOOKING_BUFFER_MS } = require('../../lib/booking-availability');
 const { bookingConfig } = require('../../lib/booking-config');
 const { isoDate, numberValue } = require('../../lib/validation');
-const { sendBookingNotifications } = require('../../lib/booking-create');
+const { sendBookingNotifications, hasPendingBooking, insertBookingOrRollback, isBookingSlotConflict } = require('../../lib/booking-create');
 const { hasApplicationAdminRole } = require('../../lib/authorization');
-
-async function insertBookingOrRollback({ sb, row, advisorEmail, eventId, removeEvent = deleteCalendarEvent }) {
-  const { data, error } = await sb.from('bookings').insert(row).select().single();
-  if (!error && data) return data;
-
-  let cleanupError = null;
-  try {
-    await removeEvent(advisorEmail, eventId);
-  } catch (errorDeletingEvent) {
-    cleanupError = errorDeletingEvent;
-  }
-  const persistenceError = error || new Error('booking_insert_failed');
-  if (cleanupError) persistenceError.calendarCleanupError = cleanupError;
-  throw persistenceError;
-}
-
-function isBookingSlotConflict(error) {
-  const message = String(error && error.message || '');
-  return (error && error.code === '23P01' && message.includes('booking_slot_unavailable'))
-    || (error && error.code === '23505' && message.includes('bookings_advisor_scheduled_slot_key'));
-}
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
@@ -97,6 +76,11 @@ exports.handler = async (event) => {
     if (hasApplicationAdminRole(user)) {
       log.warn('rejected', { error_code: 'admins_cannot_book' });
       return json({ error: 'admins_cannot_book' }, { statusCode: 403 });
+    }
+
+    if (await hasPendingBooking(sb, user.id)) {
+      log.warn('rejected', { error_code: 'booking_pending' });
+      return json({ error: 'booking_pending' }, { statusCode: 409 });
     }
 
     const advisorEmail = canonicalAdvisorEmail(user.assigned_to);
@@ -172,6 +156,7 @@ exports.handler = async (event) => {
         sb,
         advisorEmail,
         eventId,
+        removeEvent: deleteCalendarEvent,
         row: {
           user_id: user.id,
           admin_email: advisorEmail,
@@ -194,6 +179,10 @@ exports.handler = async (event) => {
         log.warn('rejected', { error_code: 'slot_unavailable' });
         return json({ error: 'slot_unavailable' }, { statusCode: 409 });
       }
+      if (persistenceError.code === '23P01' && persistenceError.message?.includes('booking_pending') && !persistenceError.calendarCleanupError) {
+        log.warn('rejected', { error_code: 'booking_pending' });
+        return json({ error: 'booking_pending' }, { statusCode: 409 });
+      }
       console.error('[booking_insert_error]', errorCode(persistenceError, 'booking_insert_failed'));
       throw persistenceError;
     }
@@ -213,6 +202,3 @@ exports.handler = async (event) => {
     return serverError(e);
   }
 };
-
-module.exports.insertBookingOrRollback = insertBookingOrRollback;
-module.exports.isBookingSlotConflict = isBookingSlotConflict;

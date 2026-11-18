@@ -34,7 +34,6 @@ import {
   TrendingUp,
   UserCheck,
   Users,
-  CircleX,
   X,
 } from "lucide-react";
 import {
@@ -93,7 +92,6 @@ const sideMenus: Record<string, NavItem[]> = {
     ["/crm", "Por contactar", UserCheck, "crm.to_contact"],
     ["/crm/contactados", "Contactados", Users, "crm.contacted"],
     ["/crm/clientes", "Clientes", Sparkles, "crm.clients"],
-    ["/crm/lost", "Lost", CircleX, "crm.lost"],
   ],
   analytics: [
     ["/analiticas/ventas", "Ventas P", TrendingUp, "analytics.sales"],
@@ -137,6 +135,9 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
     return () => { active = false; window.removeEventListener("focus", refreshPermissions); document.removeEventListener("visibilitychange", refreshPermissions); };
   }, [authUser.id]);
   const path = window.location.pathname.replace(/^\/admin(?=\/|$)/, "") || "/";
+  useEffect(() => {
+    if (path === "/crm/lost") window.location.replace(adminPath("/bandeja-leads?view=lost&section=definitive"));
+  }, [path]);
   const area = getArea(path);
   const [open, setOpen] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);

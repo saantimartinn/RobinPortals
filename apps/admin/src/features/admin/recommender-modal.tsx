@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import type { Contact } from "@/types/domain";
 import type { RecommenderSession } from "@/services/admin-data";
+import { leadCourseGroup } from "./lead-course-group.mjs";
 import "./recommender-modal.css";
 
 const areaNames: Record<string, string> = {
@@ -41,7 +42,7 @@ export function RecommenderModal({ session, contact, onClose }: { session: Recom
       <div className="recommender-dialog-facts">
         <div><span>Origen</span><strong>{[session.originCity, session.originCountry].filter(Boolean).join(", ") || "—"}</strong></div>
         <div><span>Colegio</span><strong>{session.school || "—"}</strong></div>
-        <div><span>Curso</span><strong>{session.course || "No indicado"}</strong></div>
+        <div><span>Curso</span><strong>{leadCourseGroup(session.course)}</strong></div>
         <div><span>Fecha del test</span><strong>{dateLabel(session.createdAt)}</strong></div>
       </div>
       <div className="recommender-dialog-body">

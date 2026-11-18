@@ -64,6 +64,19 @@ necesita SQL versionado, revisión independiente, backup/plan de rollback y vali
 RLS/consumidores. No ejecutar `db push`, migraciones o comandos destructivos como parte de
 los gates normales.
 
+El límite de una llamada futura confirmada por alumno requiere
+[`202611180001_booking_student_pending.sql`](../supabase/migrations/202611180001_booking_student_pending.sql).
+La API comprueba la reserva antes de contactar Calendar; el trigger serializa las
+inserciones del mismo alumno para impedir dos reservas simultáneas, incluso con
+asesores distintos. Las solicitudes de cancelación mantienen el bloqueo hasta
+su aprobación. Las llamadas pasadas y canceladas no bloquean; las reservas ya
+existentes se conservan. El trigger no cambia RLS ni permisos y protege también
+las escrituras con `service_role` sobre `bookings`. Validar en staging dos reservas
+concurrentes, una cancelación aprobada y el acceso del alumno a sus propias reservas.
+Rollback del límite: eliminar el trigger `bookings_student_pending` de
+`public.bookings` y la función `public.enforce_booking_student_pending()`; no se
+eliminan reservas. Revertir también el código si se quiere retirar la regla de la API.
+
 La conversión de Mentoría requiere
 [`202611050003_convert_paid_mentoria_client.sql`](../supabase/migrations/202611050003_convert_paid_mentoria_client.sql)
 en la base de cada entorno antes de publicar la Function. La migración solo crea

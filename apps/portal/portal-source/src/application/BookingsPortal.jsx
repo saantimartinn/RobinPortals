@@ -6,8 +6,10 @@ import { NAVY } from "../theme.js";
 import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
 import { bookingsList, bookingsCreate, bookingsCancel, bookingsAvailability } from "../api.js";
 
+const PENDING_BOOKING_MESSAGE = "Ya tienes una llamada reservada. Podrás reservar otra cuando haya pasado o tu asesor la cancele. Solicitar su cancelación no libera la reserva hasta que tu asesor la apruebe.";
+
 export function Reservas() {
-  const [serverBookings, setServerBookings] = useState([]);
+  const [serverBookings, setServerBookings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -64,16 +66,23 @@ export function Reservas() {
   }, [refreshKey]);
 
   async function reserve() {
+    if (loading || serverBookings === null || busy) return;
     setError("");
+    if (upcoming.length) { setError(PENDING_BOOKING_MESSAGE); return; }
     if (!selectedSlot) { setError("Selecciona un hueco disponible."); return; }
     setBusy(true);
     try {
       const res = await bookingsCreate({ start_at: selectedSlot, duration_min: slotMin });
       setLastCreated(res.booking || null);
+      if (res.booking) setServerBookings((previous) => [...(previous || []), res.booking]);
       setSelectedSlot("");
       setRefreshKey((k) => k + 1);
     } catch (e) {
-      if (e.status === 409 && e.data?.error === "slot_unavailable") {
+      if (e.status === 409 && e.data?.error === "booking_pending") {
+        setError(PENDING_BOOKING_MESSAGE);
+        setSelectedSlot("");
+        setRefreshKey((k) => k + 1);
+      } else if (e.status === 409 && e.data?.error === "slot_unavailable") {
         setError("Ese horario ya no está disponible. Elige otro; dejamos al menos 15 minutos entre llamadas.");
         setSelectedSlot("");
         setRefreshKey((k) => k + 1);
@@ -98,8 +107,9 @@ export function Reservas() {
     }
   }
 
-  const upcoming = serverBookings.filter((b) => b.status === "scheduled" && new Date(b.start_at).getTime() > Date.now())
+  const upcoming = (serverBookings || []).filter((b) => b.status === "scheduled" && new Date(b.start_at).getTime() > Date.now())
     .sort((a, b) => new Date(a.start_at) - new Date(b.start_at));
+  const bookingBlocked = loading || serverBookings === null || upcoming.length > 0;
   const dayObj = avDays.find((d) => d.date === selectedDate) || null;
   const daySlots = dayObj ? (dayObj.slots || []) : [];
   const fmtDayBtn = (dstr) => {
@@ -115,14 +125,16 @@ export function Reservas() {
       <Card>
         <CardHeader title="Reservar llamada" subtitle={advisorName ? ("Con tu asesor " + advisorName + " · vía Google Meet") : "Con tu asesor Robin · vía Google Meet"} icon={Calendar} />
         <CardContent>
-          {avLoading && <div className="text-xs text-slate-500 mb-3">Cargando disponibilidad…</div>}
-          {!avLoading && !calendarConnected && (
+          {loading && <div className="text-xs text-slate-500 mb-3">Comprobando tus reservas…</div>}
+          {upcoming.length > 0 && <div role="status" className="text-xs text-slate-600 mb-3">{PENDING_BOOKING_MESSAGE}</div>}
+          {!bookingBlocked && avLoading && <div className="text-xs text-slate-500 mb-3">Cargando disponibilidad…</div>}
+          {!bookingBlocked && !avLoading && !calendarConnected && (
             <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
               Mostrando horario orientativo. Confirmaremos el hueco con tu asesor.
             </div>
           )}
 
-          {!avLoading && avDays.length > 0 && (
+          {!bookingBlocked && !avLoading && avDays.length > 0 && (
             <>
               <div className="text-xs font-semibold text-slate-600 mb-2 ">Día</div>
               <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
@@ -164,7 +176,7 @@ export function Reservas() {
             </>
           )}
 
-          {!avLoading && avDays.length === 0 && (
+          {!bookingBlocked && !avLoading && avDays.length === 0 && (
             <div className="text-xs text-slate-500 mb-4">No hay disponibilidad para mostrar ahora mismo.</div>
           )}
 
@@ -172,7 +184,7 @@ export function Reservas() {
             <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 mb-3">{error}</div>
           )}
           <div className="flex items-center gap-3">
-            <Btn variant="primary" onClick={reserve} disabled={busy || !selectedSlot}>
+            <Btn variant="primary" onClick={reserve} disabled={bookingBlocked || busy || !selectedSlot}>
               {busy ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Reservando…</> : <><Calendar className="h-3.5 w-3.5" /> Reservar Meet</>}
             </Btn>
             <div className="text-[11px] text-slate-400">Zona horaria Europe/Madrid · te llegará un email con el enlace.</div>

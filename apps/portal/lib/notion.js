@@ -4,6 +4,8 @@ const drive = require('./google-drive');
 const { errorCode } = require('./observability');
 const { minimizeLogPayload } = require('./privacy');
 
+const { contractPricingVersion, pricingVersionForNewUser } = require('../shared/financial-config.cjs');
+
 const TRIGGER_STATUS = ['INSIDE'];
 
 // Mapa Responsable (Notion) → email admin (portal).
@@ -212,7 +214,36 @@ function readNotionProp(p) {
   return null;
 }
 
+function buildExistingUserPatch(existing, { assignedEmail, notion_page_id, tipo, primer_pago_pagado }) {
+  const patch = {};
+  if (assignedEmail && existing.assigned_to !== assignedEmail) patch.assigned_to = assignedEmail;
+  if (notion_page_id) patch.notion_page_id = notion_page_id;
+  if (tipo) patch.tipo = normalizeTipo(tipo);
+  // Reprocesar un lead sin contrato firmado siempre lo deja en la tarifa vigente.
+  // Los datos de contratos firmados se conservan tal cual.
+  if (!existing.contract_signed) {
+    const effectiveTipo = normalizeTipo(tipo || existing.tipo);
+    const pricingVersion = pricingVersionForNewUser(effectiveTipo);
+    if (pricingVersion && contractPricingVersion(existing.contract_data) !== pricingVersion) {
+      const previousContractData = existing.contract_data && typeof existing.contract_data === 'object'
+        ? existing.contract_data
+        : {};
+      patch.contract_data = { ...previousContractData, pricing_version: pricingVersion };
+    }
+  }
+  // 1er pago marcado como pagado (p.ej. por transferencia) desde Notion:
+  // se salda la primera cuota y se salta el paso de pago del onboarding.
+  if (primer_pago_pagado && !existing.pago_completed) {
+    const nowIso = new Date().toISOString();
+    patch.pago_completed = true;
+    patch.pago_completed_at = nowIso;
+    patch.pago_data = { method: 'transferencia', source: 'notion', at: nowIso };
+  }
+  return patch;
+}
+
 module.exports = {
+  buildExistingUserPatch,
   TRIGGER_STATUS,
   ensureDriveFolder,
   logEvent,
