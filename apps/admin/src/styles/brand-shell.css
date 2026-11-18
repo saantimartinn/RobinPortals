@@ -225,3 +225,7 @@ body,.work,.page{background:var(--robin-cream)!important;font-family:var(--robin
 .inbox-subsections .assignment-note{margin:.25rem 0 0}
 .inbox-panel tbody tr.archived-lead{cursor:default}
 .inbox-panel tbody tr.booking-past td{color:var(--robin-ink-500)}
+
+/* Portugal leads in CRM cards, table and pipeline. */
+.qualification-card.portugal-lead,.pipeline-card.portugal-lead,.crm-lead-table tbody tr.portugal-lead{background-color:rgba(96,165,250,.24)}
+.qualification-card.portugal-lead:hover,.pipeline-card.portugal-lead:hover,.crm-lead-table tbody tr.portugal-lead:hover{background-color:rgba(96,165,250,.34)}
