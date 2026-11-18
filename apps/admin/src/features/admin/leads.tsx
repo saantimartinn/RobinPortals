@@ -254,7 +254,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
         {filtersOpen && <section className="lead-filters panel crm-lead-filters"><label>Categoría<select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value as LeadCategory | "all")}><option value="all">Todas las categorías</option>{leadCategories.map((category) => <option key={category} value={category}>{category}</option>)}</select></label><label>Campaña<select value={campaignFilter} onChange={(event) => setCampaignFilter(event.target.value)}><option value="all">Todas las campañas</option>{campaigns.map((campaign) => <option key={campaign} value={campaign}>{campaign}</option>)}</select></label><button type="button" onClick={() => { setCategoryFilter("all"); setCampaignFilter("all"); }}>Limpiar filtros</button></section>}
         {leadView === "cards" ? <div className="qualification-grid">
           {porContactarLeads.map((contact) => (
-            <article className={`qualification-card ${contact.formName === "colegios" ? "school-lead" : ""}`} key={contact.id}>
+            <article className={`qualification-card ${contact.country === "Portugal" ? "portugal-lead" : ""} ${contact.formName === "colegios" ? "school-lead" : ""}`} key={contact.id}>
               <span className={`lead-age-dot ${leadContactAgeTone(leadDaysWithoutContact(contact))}`} title={`${leadDaysWithoutContact(contact) ?? 0} días sin contactar`} aria-label={`${leadDaysWithoutContact(contact) ?? 0} días sin contactar`} />
               <button className="card-main" onClick={() => openContact(contact)}><small className={contact.formName === "colegios" ? "school-lead-label" : ""}>{contact.formName === "colegios" ? "COLEGIOS" : contact.source}</small><h3>{contact.name}</h3><p>{contact.email}</p><span><Flame /> Heat {leadHeat[contact.id]}</span></button>
               <label>Categoría obligatoria<CategoryPicker value={categories[contact.id] || ""} onChange={(category) => onCategorizeLead(contact.id, category)} /></label>
@@ -269,7 +269,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
               <tbody>
                 {porContactarLeads.map((contact) => {
                   const daysWithoutContact = leadDaysWithoutContact(contact);
-                  return <tr key={contact.id} onClick={() => openContact(contact)}>
+                  return <tr className={contact.country === "Portugal" ? "portugal-lead" : undefined} key={contact.id} onClick={() => openContact(contact)}>
                     <td><button type="button" className="lead-name-button" onClick={() => openContact(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button></td>
                     <td><time className="lead-entry-time" dateTime={contact.createdAt}>{formatLeadEntry(contact.createdAt)}</time></td>
                     <td><span className="lead-source-readonly">{campaignOrOrigin(contact)}</span>{["Meta Ads", "Página web"].includes(contact.source) && <small className="lead-source-kind">{contact.source}</small>}</td>
@@ -294,7 +294,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
               <section key={stage} onDragOver={(event) => event.preventDefault()} onDrop={() => void dropLead(stage)}>
                 <header><strong>{stage}</strong><span>{owned.filter((contact) => leadStages[contact.id] === stage).length}</span></header>
                 {owned.filter((contact) => leadStages[contact.id] === stage).map((contact) => (
-                  <button draggable={!convertingId} disabled={convertingId === contact.id} className="pipeline-card" key={contact.id} onDragStart={() => startDragging(contact.id)} onDragEnd={() => setDraggingId(null)} onClick={() => openContact(contact)}>
+                  <button draggable={!convertingId} disabled={convertingId === contact.id} className={`pipeline-card ${contact.country === "Portugal" ? "portugal-lead" : ""}`} key={contact.id} onDragStart={() => startDragging(contact.id)} onDragEnd={() => setDraggingId(null)} onClick={() => openContact(contact)}>
                     <div><Badge variant="outline">{categories[contact.id] || "Sin categoría"}</Badge>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<span className={`heat-pill heat-${Math.ceil((leadHeat[contact.id] || 0) / 25)}`}><Flame />{leadHeat[contact.id]}</span></div>
                     <h3>{contact.name}</h3><p>{contact.source} · {contact.email}</p><small>{contact.lastContact}</small>
                   </button>
