@@ -12,22 +12,41 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { sendEmail } = require('../lib/email');
+const { readArrivalIdentity } = require('../lib/arrival-access');
+const { readApplicationIdentity } = require('../lib/application-permissions');
 
 // Buzón principal (solicitado) + copia al buzón de operaciones ya verificado en Resend,
 // para garantizar la entrega aunque hello@ aún no esté configurado como destino.
 const SUPPORT_INBOX = ['hello@project-robin.com', 'projectrobinn@gmail.com'];
 
 exports.handler = async (event) => {
-  const session = readSessionFromEvent(event);
+  const session = readSessionFromEvent(event, { allowArrival: true });
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
+  const arrival = session.auth_source === 'application_arrival';
+  let identity = null;
+  if (arrival) {
+    try { identity = await readArrivalIdentity(event, session); }
+    catch (error) { return serverError(error); }
+    if (!identity) return json({ error: 'unauthorized' }, { statusCode: 401 });
+  }
+  const ownerKey = arrival ? 'portal_user_id' : 'user_id';
 
   if (event.httpMethod === 'GET') {
     try {
       const sb = getSupabase();
       const { data, error } = await sb
-        .from('service_requests').select('*').eq('user_id', session.uid).order('created_at', { ascending: false });
+        .from('service_requests').select('*').eq(ownerKey, session.uid).order('created_at', { ascending: false });
       if (error) throw error;
-      return json({ requests: data || [] });
+      let requests = data || [];
+      if (!arrival && session.application_uid && event.queryStringParameters?.include_arrival === '1') {
+        const linkedIdentity = await readApplicationIdentity(event);
+        if (linkedIdentity?.id === session.application_uid && linkedIdentity.arrival_pack?.contracted === true) {
+          const result = await sb.from('service_requests').select('*').eq('portal_user_id', linkedIdentity.id).order('created_at', { ascending: false });
+          if (result.error) throw result.error;
+          requests = [...requests, ...(result.data || [])].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+        }
+      }
+      return json({ requests });
     } catch (e) {
       console.error('service-requests GET error', e);
       return serverError(e);
@@ -38,14 +57,18 @@ exports.handler = async (event) => {
     if (!verifyOrigin(event)) return json({ error: 'bad_origin' }, { statusCode: 403 });
     const body = parseJsonBody(event);
     if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });
+    if (arrival && (body.service_key || (body.category && body.category !== 'soporte'))) {
+      return json({ error: 'service_not_included' }, { statusCode: 403 });
+    }
     const title = (body.title || '').trim();
     if (!title) return json({ error: 'missing_title' }, { statusCode: 400 });
     try {
       const sb = getSupabase();
       const { data, error } = await sb.from('service_requests').insert({
-        user_id: session.uid,
+        [ownerKey]: session.uid,
+        ...(arrival ? { requester_name: `${identity.nombre || ''} ${identity.apellidos || ''}`.trim() } : {}),
         service_key: body.service_key || null,
-        category: body.category || 'servicio',
+        category: arrival ? 'soporte' : body.category || 'servicio',
         title,
         details: body.details || null,
         status: 'open',
@@ -56,7 +79,7 @@ exports.handler = async (event) => {
       try {
         let who = '';
         try {
-          const { data: u } = await sb
+          const { data: u } = arrival ? { data: identity } : await sb
             .from('subscribers').select('nombre, apellidos, email, ciudad').eq('id', session.uid).single();
           if (u) {
             const fullName = `${u.nombre || ''} ${u.apellidos || ''}`.trim();
@@ -88,7 +111,7 @@ exports.handler = async (event) => {
         </div>`;
         let replyTo;
         try {
-          const { data: u2 } = await sb.from('subscribers').select('email').eq('id', session.uid).single();
+          const { data: u2 } = arrival ? { data: identity } : await sb.from('subscribers').select('email').eq('id', session.uid).single();
           if (u2 && u2.email) replyTo = u2.email;
         } catch (_) {}
         const mailRes = await sendEmail({ to: SUPPORT_INBOX, subject, text, html, tag: 'service_request_notif', reply_to: replyTo });

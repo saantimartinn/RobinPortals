@@ -66,6 +66,7 @@ function isCurrentPasswordResetToken(payload, passwordHash) {
 function signSession(user) {
   const payload = { uid: user.id, lead_id: user.lead_id, username: user.username, role: user.role };
   if (user.auth_source) payload.auth_source = user.auth_source;
+  if (user.application_uid) payload.application_uid = user.application_uid;
   return jwt.sign(
     payload,
     getJwtSecret(),
@@ -81,14 +82,15 @@ function clearApplicationSessionCookie() {
   return sharedCookies.build('robin_portal_session', '', { clear: true, maxAge: 0 });
 }
 
-function readSessionFromEvent(event) {
+function readSessionFromEvent(event, { allowArrival = false } = {}) {
   const token = sharedCookies.read(event, COOKIE_NAME);
   if (!token) return null;
   try {
     const session = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
     return session.uid
       && require('./principal').isSubscriberRole(session.role)
-      && ['application_sso', 'application_admin'].includes(session.auth_source)
+      && (['application_sso', 'application_admin'].includes(session.auth_source)
+        || (allowArrival && session.auth_source === 'application_arrival' && session.role === 'subscriber'))
       ? session
       : null;
   } catch (e) {

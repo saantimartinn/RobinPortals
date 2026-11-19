@@ -1,15 +1,17 @@
 // Shared onboarding frame; each step retains its own fields and save behavior.
 import { Check, ChevronLeft, LogOut } from "lucide-react";
-import { ONBOARDING_ORDER, ONBOARDING_STEPS as STEPS, useOnboardingNav } from "./onboarding-nav.js";
+import { ONBOARDING_ORDER, ONBOARDING_STEPS as STEPS, onboardingOrder, useOnboardingNav } from "./onboarding-nav.js";
 import robinLogo from "../../assets/robin-wordmark.png";
 import robinStudent from "../../../../../../packages/brand/assets/robin-student.svg";
 
 
 
-export function OnboardingShell({ user, title, subtitle, question, questionMeta, questionHint, stepNumber, totalSteps = STEPS.length, onLogout, fullscreen = false, conversation = false, children }) {
+export function OnboardingShell({ user, title, subtitle, question, questionMeta, questionHint, stepNumber, totalSteps, onLogout, fullscreen = false, conversation = false, children }) {
   const nav = useOnboardingNav();
   const firstName = user?.nombre?.trim().split(" ")[0];
-  const progress = Math.round(((stepNumber - 1) / totalSteps) * 100);
+  const order = onboardingOrder(user).slice(0, totalSteps);
+  const currentStepNumber = order.indexOf(ONBOARDING_ORDER[stepNumber - 1]) + 1;
+  const progress = Math.round(((currentStepNumber - 1) / order.length) * 100);
 
   return (
     <div className={`student-portal is-onboarding guided-onboarding${conversation ? " is-profile-conversation" : ""}`}>
@@ -23,19 +25,20 @@ export function OnboardingShell({ user, title, subtitle, question, questionMeta,
           <p className="guided-intro">Vamos a preparar tu cuenta, paso a paso.</p>
           <nav aria-label="Pasos para activar tu cuenta">
             <ol className="guided-steps">
-              {STEPS.slice(0, totalSteps).map(({ label, detail }, index) => {
-                const active = index === stepNumber - 1;
-                const done = nav ? index < nav.furthest : index < stepNumber - 1;
-                const canOpen = nav && index <= nav.furthest && !active && (!nav.canOpen || nav.canOpen(ONBOARDING_ORDER[index]));
+              {order.map((key, index) => {
+                const { label, detail } = STEPS[ONBOARDING_ORDER.indexOf(key)];
+                const active = index === currentStepNumber - 1;
+                const done = nav ? index < nav.furthest : index < currentStepNumber - 1;
+                const canOpen = nav && index <= nav.furthest && !active && (!nav.canOpen || nav.canOpen(key));
                 const content = <><span className="guided-step-number">{done && !active ? <Check size={16} /> : index + 1}</span><span><strong>{label}</strong><small>{detail}</small></span></>;
                 return <li key={label} className={active ? "is-active" : done ? "is-done" : "is-next"}>
-                  {canOpen ? <button type="button" onClick={() => nav.goTo(ONBOARDING_ORDER[index])}>{content}</button>
+                  {canOpen ? <button type="button" onClick={() => nav.goTo(key)}>{content}</button>
                     : <span className="guided-step" aria-current={active ? "step" : undefined}>{content}</span>}
                 </li>;
               })}
             </ol>
           </nav>
-          <div className="guided-overall-progress"><div><span>Tu cuenta</span><strong>Paso {stepNumber} de {totalSteps}</strong></div><div className="guided-progress-track" aria-hidden="true"><span style={{ width: `${progress}%` }} /></div></div>
+          <div className="guided-overall-progress"><div><span>Tu cuenta</span><strong>Paso {currentStepNumber} de {order.length}</strong></div><div className="guided-progress-track" aria-hidden="true"><span style={{ width: `${progress}%` }} /></div></div>
         </aside>
         <main className={`student-main guided-main${fullscreen ? " is-questionnaire" : ""}`} id="onboarding-content" tabIndex={-1}>
           {!fullscreen && nav?.goBack && <button type="button" className="onboarding-back-step" onClick={nav.goBack}><ChevronLeft size={16} /> Paso anterior</button>}

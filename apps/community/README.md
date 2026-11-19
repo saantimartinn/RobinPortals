@@ -5,6 +5,11 @@ con las otras tres apps en el sitio Netlify unificado. React/Vite se ejecuta
 en el navegador, Netlify Functions en el servidor y el dominio de datos de
 suscripción usa un proyecto Supabase propio.
 
+Los clientes con un Pack Llegada firmado pueden usar una variante reducida con
+su identidad del Portal del Alumno, sin crear otra cuenta. Una suscripción
+Community activa conserva la experiencia completa. Consulta [Pack Llegada](docs/PACK_LLEGADA.md)
+para los permisos, contratos, integraciones y la migración previa al despliegue.
+
 ## Estructura
 
 ```text

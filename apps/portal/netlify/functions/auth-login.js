@@ -117,8 +117,8 @@ exports.handler = async (event) => {
     const token = signSession(user);
     const cookie = buildSessionCookie(token);
 
-    let next_step = null;
-    if (user.requires_onboarding) next_step = user.dni_completed ? 'profile' : 'dni';
+    const { nextOnboardingStep } = await import('../../../../packages/onboarding/flow.mjs');
+    const next_step = nextOnboardingStep(user);
 
     log.success({ actor_id: user.id, actor_role: user.role, entity_type: 'session' });
     return json(

@@ -19,6 +19,7 @@ Regresiones unitarias y de límites arquitectónicos ejecutadas por Node.js.
 | [`admin-dashboard-utils.test.cjs`](../../../test/admin-dashboard-utils.test.cjs) | Pruebas automatizadas de admin dashboard utils.test. | — | Al fijar o actualizar el comportamiento cubierto. |
 | [`admin-navigation.test.mjs`](../../../test/admin-navigation.test.mjs) | Pruebas automatizadas de admin navigation.test. | `../portal-source/src/application/admin-navigation.js` | Al fijar o actualizar el comportamiento cubierto. |
 | [`admins.test.js`](../../../test/admins.test.js) | Pruebas automatizadas de admins.test. | `../lib/admins` | Al fijar o actualizar el comportamiento cubierto. |
+| [`arrival-pack.test.js`](../../../test/arrival-pack.test.js) | Pruebas automatizadas de arrival pack.test. | `../shared/arrival-pack.cjs`<br>`../shared/financial-config.cjs` | Al fijar o actualizar el comportamiento cubierto. |
 | [`assistant-history-context.test.js`](../../../test/assistant-history-context.test.js) | Pruebas automatizadas de assistant history context.test. | `../../../packages/meeting-history/assistant-context.cjs` | Al fijar o actualizar el comportamiento cubierto. |
 | [`auth-session.test.js`](../../../test/auth-session.test.js) | Pruebas automatizadas de auth session.test. | `../lib/auth` | Al fijar o actualizar el comportamiento cubierto. |
 | [`authorization.test.js`](../../../test/authorization.test.js) | Pruebas automatizadas de authorization.test. | `../lib/authorization` | Al fijar o actualizar el comportamiento cubierto. |
@@ -55,8 +56,10 @@ Regresiones unitarias y de límites arquitectónicos ejecutadas por Node.js.
 | [`meeting-history.test.js`](../../../test/meeting-history.test.js) | Pruebas automatizadas de meeting history.test. | `../../../packages/meeting-history/service.cjs` | Al fijar o actualizar el comportamiento cubierto. |
 | [`meeting-worker-auth.test.js`](../../../test/meeting-worker-auth.test.js) | Pruebas automatizadas de meeting worker auth.test. | `../../../packages/meeting-history/handlers.cjs`<br>`../lib/http` | Al fijar o actualizar el comportamiento cubierto. |
 | [`observability.test.js`](../../../test/observability.test.js) | Pruebas automatizadas de observability.test. | `../lib/observability` | Al fijar o actualizar el comportamiento cubierto. |
+| [`onboarding-arrival.test.js`](../../../test/onboarding-arrival.test.js) | Pruebas automatizadas de onboarding arrival.test. | — | Al fijar o actualizar el comportamiento cubierto. |
 | [`onboarding-dni-fallback.test.js`](../../../test/onboarding-dni-fallback.test.js) | Pruebas automatizadas de onboarding dni fallback.test. | — | Al fijar o actualizar el comportamiento cubierto. |
 | [`onboarding-drive-once.test.js`](../../../test/onboarding-drive-once.test.js) | Pruebas automatizadas de onboarding drive once.test. | — | Al fijar o actualizar el comportamiento cubierto. |
+| [`onboarding-payment-order.test.js`](../../../test/onboarding-payment-order.test.js) | Pruebas automatizadas de onboarding payment order.test. | — | Al fijar o actualizar el comportamiento cubierto. |
 | [`operational-config.test.js`](../../../test/operational-config.test.js) | Pruebas automatizadas de operational config.test. | `../lib/operational-config` | Al fijar o actualizar el comportamiento cubierto. |
 | [`password-policy.test.cjs`](../../../test/password-policy.test.cjs) | Pruebas automatizadas de password policy.test. | `../shared/password-policy.cjs` | Al fijar o actualizar el comportamiento cubierto. |
 | [`password-reset-flow.test.js`](../../../test/password-reset-flow.test.js) | Pruebas automatizadas de password reset flow.test. | `../lib/auth` | Al fijar o actualizar el comportamiento cubierto. |

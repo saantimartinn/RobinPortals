@@ -6,4 +6,5 @@ Cliente HTTP del mismo origen; cookies HttpOnly.
 
 ## Archivos
 
+- [arrival.js](../../../../../frontend/src/api/arrival.js): Módulo frontend: arrival.
 - [index.js](../../../../../frontend/src/api/index.js): Módulo frontend: index.

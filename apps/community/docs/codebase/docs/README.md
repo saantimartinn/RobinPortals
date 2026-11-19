@@ -30,6 +30,8 @@ Documentación mantenida y mapas generados.
 - [KNOWN_LIMITATIONS.md](../../KNOWN_LIMITATIONS.md): Documentación.
 - [OBSERVABILITY.md](../../OBSERVABILITY.md): Documentación.
 - [OPERATIONS.md](../../OPERATIONS.md): Documentación.
+- [PACK_LLEGADA.md](../../PACK_LLEGADA.md): Documentación.
+- [PARTNERS.md](../../PARTNERS.md): Documentación.
 - [PASSWORD_POLICY.md](../../PASSWORD_POLICY.md): Documentación.
 - [PRIVACY_DATA_MAP.md](../../PRIVACY_DATA_MAP.md): Documentación.
 - [TESTING.md](../../TESTING.md): Documentación.

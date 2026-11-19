@@ -7,6 +7,7 @@ const browserCjsNames = new Set([
   'financial-config.cjs',
   'academic-systems.cjs',
   'contract-content.cjs',
+  'product-access.cjs',
 ]);
 
 /** Convert the legacy, server-shared Robin config modules into native browser

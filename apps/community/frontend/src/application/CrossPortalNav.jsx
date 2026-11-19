@@ -4,6 +4,7 @@ import { ChevronDown, LogOut } from "lucide-react";
 import { ROBIN_LINKS as LINKS } from "../../../../../packages/portal-nav/links.js";
 import robinWordmark from "../assets/robin-wordmark.png";
 import "../../../../../packages/portal-nav/cross-portal-nav.css";
+import productAccess from '../../../shared/product-access.cjs';
 
 const STUDENT_KEYS = new Set(["robinjr", "application", "subscriptions"]);
 
@@ -27,7 +28,7 @@ export function CrossPortalNav({ current = "subscriptions", user = null, onLogou
   if (!user) return null;
   const isAdmin = !!user.is_application_admin;
   const accountName = [user.nombre, user.apellidos].filter(Boolean).join(" ") || user.username || user.email;
-  const links = isAdmin ? LINKS : LINKS.filter(([, , key]) => STUDENT_KEYS.has(key));
+  const links = productAccess.isArrivalOnly(user) ? LINKS.filter(([, , key]) => key === 'subscriptions') : isAdmin ? LINKS : LINKS.filter(([, , key]) => STUDENT_KEYS.has(key));
 
   async function openRobinJr(event) {
     event.preventDefault();

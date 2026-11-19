@@ -6,6 +6,9 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "../../portal/portal-source/src/application/BookingsPortal.jsx",
+    "../../portal/portal-source/src/application/payments/InvoiceReceipt.jsx",
+    "../../portal/portal-source/src/ui.jsx",
   ],
   theme: {
     extend: {},

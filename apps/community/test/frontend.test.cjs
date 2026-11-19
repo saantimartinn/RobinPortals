@@ -25,6 +25,9 @@ test('frontend entry points and domain views render with local fixtures', async 
     ['features/community/SubCommunity.jsx', 'SubCommunity', { user, events: [], partners: [], loading: false, onRefresh: noop }, 'Community'],
     ['features/community/SubPartners.jsx', 'SubPartners', { partners: [{ id: 'p1', name: 'Partner demo', category: 'other', logo_url: 'https://assets.example.test/logo.png' }], loading: false }, 'Logo de Partner demo'],
     ['features/profile/SubProfile.jsx', 'SubProfile', { user, onUserRefresh: noop, setActive: noop }, 'perfil'],
+    ['application/SubscriberPortal.jsx', 'SubscriberPortal', { user: { ...user, community_access: 'arrival', subscription_status: 'none', arrival_pack: { status: 'active', first_payment_completed: true } }, onLogout: noop, onUserRefresh: noop }, 'Pack Llegada'],
+    ['features/arrival/ArrivalCalls.jsx', 'ArrivalCalls', { user: { ...user, arrival_pack: { first_payment_completed: true } } }, 'Reservar llamada con mi asesor'],
+    ['features/arrival/ArrivalPayments.jsx', 'ArrivalPayments', {}, 'Pagos · Pack Llegada'],
   ];
   try {
     for (const [file, name, props, expected] of cases) {
@@ -40,6 +43,14 @@ test('frontend entry points and domain views render with local fixtures', async 
       for (const label of ['Desarrollo profesional','Academias','Fiesta','Eventos sociales','Eventos culturales','Apoyo legal','Trabajo']) {
         assert.match(html, new RegExp(label, 'i'));
       }
+    });
+    await t.test('Llegada and multiple-product clients retain the correct navigation', async () => {
+      const { SubscriberShell } = await server.ssrLoadModule('/src/application/SubscriberShell.jsx');
+      const arrival = renderToString(React.createElement(SubscriberShell, { user: { ...user, community_access: 'arrival', arrival_pack: { status: 'active' } }, onLogout: noop, onUserRefresh: noop }));
+      for (const label of ['Inicio', 'Llamadas', 'Tu habitación', 'Partners', 'Pagos', 'Soporte', 'FAQs', 'Ajustes']) assert.ok(arrival.includes(label));
+      for (const label of ['Lifestyle', 'Career Support', 'Mis eventos', 'Perks &amp; Partners', 'Tu vida fuera, un poco más fácil.']) assert.ok(!arrival.includes(label), label);
+      const full = renderToString(React.createElement(SubscriberShell, { user: { ...user, community_access: 'full', arrival_pack: { status: 'active' } }, onLogout: noop, onUserRefresh: noop }));
+      for (const label of ['Lifestyle', 'Career Support', 'Community', 'Mis eventos', 'Llamadas']) assert.ok(full.includes(label));
     });
   } finally { await server.close(); }
 });

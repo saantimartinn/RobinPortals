@@ -12,3 +12,5 @@ SQL estructural versionado, sin cuentas predeterminadas.
 - [004_subscription_billing.sql](../../../../supabase/migrations/004_subscription_billing.sql): Esquema de base de datos.
 - [005_revolut_subscriptions.sql](../../../../supabase/migrations/005_revolut_subscriptions.sql): Esquema de base de datos.
 - [006_crm_client_notes.sql](../../../../supabase/migrations/006_crm_client_notes.sql): Esquema de base de datos.
+- [007_arrival_pack_access.sql](../../../../supabase/migrations/007_arrival_pack_access.sql): Esquema de base de datos.
+- [008_website_partners.sql](../../../../supabase/migrations/008_website_partners.sql): Esquema de base de datos.

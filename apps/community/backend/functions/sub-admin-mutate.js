@@ -14,12 +14,12 @@ const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application
 
 // Campos permitidos por entidad (whitelist)
 const EVENT_FIELDS   = ['title', 'type', 'description', 'location', 'city', 'starts_at', 'ends_at', 'capacity', 'expires_at', 'meta', 'image_url', 'active', 'sort_order'];
-const PARTNER_FIELDS = ['name', 'category', 'city', 'description', 'benefits', 'discount', 'contact_url', 'booking_url', 'eligibility', 'logo_url', 'active', 'sort_order'];
+const PARTNER_FIELDS = ['name', 'category', 'city', 'description', 'benefits', 'discount', 'contact_url', 'booking_url', 'eligibility', 'logo_url', 'active', 'sort_order', 'products'];
 const USER_FIELDS    = ['ciudad', 'nombre', 'apellidos', 'subscription_status', 'subscription_plan', 'robin_level_override'];
 const REQUEST_FIELDS = ['status', 'title', 'details', 'category'];
 const DISCOUNT_FIELDS = ['code', 'percent_off', 'active', 'max_redemptions', 'note', 'duration_months'];
 const CHALLENGE_FIELDS = ['title', 'description', 'advance_days', 'files', 'questions', 'active', 'sort_order'];
-const FAQ_FIELDS = ['question', 'answer', 'category', 'published', 'sort_order', 'updated_at'];
+const FAQ_FIELDS = ['question', 'answer', 'category', 'published', 'sort_order', 'updated_at', 'products'];
 const SUBMISSION_FIELDS = ['status', 'note'];
 
 function normDuration(data) {
@@ -133,6 +133,7 @@ exports.handler = async (event) => {
     }
 
     const data = pick(payload, fields);
+    if (entity === 'partner' && data.products !== undefined && (!Array.isArray(data.products) || !data.products.length || data.products.some(product => !['community', 'pack_llegada'].includes(product)))) return json({ error: 'invalid_products' }, { statusCode: 400 });
     if (entity === 'partner' && payload.logo_data_url) {
       const image = parseImageDataUrl(payload.logo_data_url);
       if (!image) return json({ error: 'invalid_logo', detail: 'Usa PNG, JPG o WebP de hasta 2 MB.' }, { statusCode: 400 });
@@ -140,6 +141,7 @@ exports.handler = async (event) => {
       data.logo_url = logoUrl;
     }
     if (entity === 'faq') {
+      if (data.products !== undefined && (!Array.isArray(data.products) || !data.products.length || data.products.some(product => !['community', 'pack_llegada'].includes(product)))) return json({ error: 'invalid_products' }, { statusCode: 400 });
       data.question = String(data.question || '').trim();
       data.answer = String(data.answer || '').trim();
       data.category = String(data.category || 'General').trim().slice(0, 80) || 'General';

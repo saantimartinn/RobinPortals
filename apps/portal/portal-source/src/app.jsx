@@ -18,7 +18,8 @@ import { reportClientError } from "./client-utils.js";
 import { AdminPortal } from "./application/AdminPortal.jsx";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
-import { ONBOARDING_ORDER, OnboardingNavContext, nextOnboardingStep } from "./application/onboarding/onboarding-nav.js";
+import { onboardingOrder, nextOnboardingStep, OnboardingNavContext } from "./application/onboarding/onboarding-nav.js";
+
 import {
   OnboardingContract,
   OnboardingDNI,
@@ -34,7 +35,6 @@ import {
   onboardingState,
   paymentsVerify,
 } from "./api.js";
-
 
 
 function sendNativeAuthEvent(payload) {
@@ -152,7 +152,7 @@ export default function PortalRobin() {
           const response = await fetch("/therobinplan/api/me", { credentials: "same-origin", cache: "no-store" });
           if (response.ok) {
             const subscriber = await response.json();
-            allowed = subscriber.subscription_status === "active" || subscriber.subscription_status === "trialing";
+            allowed = subscriber.arrival_pack?.contracted === true || subscriber.subscription_status === "active" || subscriber.subscription_status === "trialing";
           }
         }
       } catch (_) { allowed = false; }
@@ -319,17 +319,18 @@ export default function PortalRobin() {
 
   if (authState.needsOnboarding) {
     // The server says which step is next; the user may go back to any earlier one.
-    const furthest = ONBOARDING_ORDER.indexOf(authState.onboardingStep);
-    const overrideIndex = ONBOARDING_ORDER.indexOf(onboardingOverride);
+    const order = onboardingOrder(authState.user);
+    const furthest = order.indexOf(authState.onboardingStep);
+    const overrideIndex = order.indexOf(onboardingOverride);
     const step = overrideIndex >= 0 && overrideIndex < furthest ? onboardingOverride : authState.onboardingStep;
-    const index = ONBOARDING_ORDER.indexOf(step);
+    const index = order.indexOf(step);
     const nav = {
       furthest,
-      goTo: (key) => setOnboardingOverride(ONBOARDING_ORDER.indexOf(key) < furthest ? key : null),
-      goBack: index > 0 ? () => setOnboardingOverride(ONBOARDING_ORDER[index - 1]) : null,
+      goTo: (key) => setOnboardingOverride(order.indexOf(key) >= 0 && order.indexOf(key) < furthest ? key : null),
+      goBack: index > 0 ? () => setOnboardingOverride(order[index - 1]) : null,
     };
     // After redoing an earlier step, continue with the one right after it.
-    const onDone = async () => { await refreshState(); setOnboardingOverride(ONBOARDING_ORDER[index + 1] || null); };
+    const onDone = async () => { await refreshState(); setOnboardingOverride(order[index + 1] || null); };
     const onboardingProps = { user: authState.user, onLogout: handleLogout, onDone };
     const Step = { origin: OnboardingOrigin, dni: OnboardingDNI, contract: OnboardingContract, profile: OnboardingProfile, payment: OnboardingPayment }[step];
     if (Step) return withSupport(<OnboardingNavContext.Provider value={nav}><Step key={step} {...onboardingProps} /></OnboardingNavContext.Provider>, true);

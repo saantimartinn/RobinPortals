@@ -121,8 +121,8 @@ export async function communityRsvp(eventId, status) {
   return api.post("/api/community/rsvp", { event_id: eventId, status });
 }
 
-export async function serviceRequestsList() {
-  return api.get("/api/service-requests");
+export async function serviceRequestsList(includeArrival = false) {
+  return api.get("/api/service-requests" + (includeArrival ? '?include_arrival=1' : ''));
 }
 
 export async function serviceRequestCreate(payload) {
@@ -162,5 +162,5 @@ export async function notificationAck(notificationId, action) {
   return api.post("/api/notifications/ack", { notification_id: notificationId, action });
 }
 
-export async function faqsList() { return api.get("/api/challenges?resource=faqs"); }
+export async function faqsList(arrival = false, includeArrival = false) { return api.get(arrival ? "/api/faqs" : "/api/challenges?resource=faqs" + (includeArrival ? '&include_arrival=1' : '')); }
 export async function adminFaqMutate(action, payload) { return subAdminMutate("faq", action, payload); }

@@ -4,9 +4,9 @@ import { ChevronDown, Loader2, Search } from "lucide-react";
 import { faqsList } from "../../api/index.js";
 import { Card, CardContent } from "../../shared/ui.jsx";
 
-function SubFaqs() {
+function SubFaqs({ arrival = false, includeArrival = false }) {
   const [faqs, setFaqs] = useState([]), [loading, setLoading] = useState(true), [error, setError] = useState(''), [query, setQuery] = useState('');
-  useEffect(() => { faqsList().then(r => setFaqs(r.faqs || [])).catch(e => setError(e.message || 'No se pudieron cargar las FAQs.')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { faqsList(arrival, includeArrival).then(r => setFaqs(r.faqs || [])).catch(e => setError(e.message || 'No se pudieron cargar las FAQs.')).finally(() => setLoading(false)); }, [arrival, includeArrival]);
   const visible = useMemo(() => { const q = query.trim().toLowerCase(); return q ? faqs.filter(f => `${f.question} ${f.answer} ${f.category}`.toLowerCase().includes(q)) : faqs; }, [faqs, query]);
   return <div className="space-y-5">
     <div className="student-page-heading"><span className="student-eyebrow">Resuelve tus dudas</span><h1>Preguntas frecuentes</h1></div>

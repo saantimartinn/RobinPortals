@@ -22,8 +22,8 @@ function load(relativeFile, overrides, transform) {
   return module.exports;
 }
 
-function fixture({ bookings = [], queryError = null, insertError = null, cleanupError = null } = {}) {
-  const calls = { availability: 0, meetings: 0, notifications: 0, inserted: [], deleted: [] };
+function fixture({ bookings = [], queryError = null, insertError = null, cleanupError = null, userPatch = {} } = {}) {
+  const calls = { availability: 0, meetings: 0, meetingArgs: [], notifications: 0, inserted: [], deleted: [] };
   const sb = {
     from(table) {
       assert.ok(['users', 'bookings'].includes(table));
@@ -37,7 +37,7 @@ function fixture({ bookings = [], queryError = null, insertError = null, cleanup
         },
         insert(row) { this.row = row; calls.inserted.push(row); return this; },
         async single() {
-          if (table === 'users') return { data: { id: studentId, role: 'client', email: 'student@example.com', assigned_to: 'manuel@project-robin.com' } };
+          if (table === 'users') return { data: { id: studentId, role: 'client', email: 'student@example.com', assigned_to: 'manuel@project-robin.com', ...userPatch } };
           return { data: insertError ? null : { id: 'new-booking', ...this.row }, error: insertError };
         },
       };
@@ -54,8 +54,9 @@ function fixture({ bookings = [], queryError = null, insertError = null, cleanup
         return [{ summary: 'LLAMADAS CLIENTES', start: requestedStart,
           end: new Date(Date.parse(requestedStart) + 3600000).toISOString() }];
       },
-      async createMeetEvent() {
+      async createMeetEvent(args) {
         calls.meetings++;
+        calls.meetingArgs.push(args);
         return { eventId: 'new-event', meetUrl: 'https://meet.google.com/abc-defg-hij' };
       },
       async deleteCalendarEvent(...args) { calls.deleted.push(args); if (cleanupError) throw cleanupError; },
@@ -63,8 +64,18 @@ function fixture({ bookings = [], queryError = null, insertError = null, cleanup
     '../../lib/booking-create': { ...require('../lib/booking-create'),
       async sendBookingNotifications() { calls.notifications++; return []; } },
   });
-  return { calls, send: () => handler({ httpMethod: 'POST', headers: {}, body: JSON.stringify({ start_at: requestedStart }) }) };
+  return { calls, send: (body = {}) => handler({ httpMethod: 'POST', headers: {}, body: JSON.stringify({ start_at: requestedStart, ...body }) }) };
 }
+
+test('Pack Llegada uses the authenticated student and assigned advisor in the existing booking flow', async () => {
+  const { calls, send } = fixture({ userPatch: { tipo: 'llegada', contract_signed: true, pago_completed: true, contract_data: { variant: 'llegada' } } });
+  const response = await send({ user_id: 'another-student', advisor_email: 'untrusted@example.test' });
+  assert.equal(response.statusCode, 200);
+  assert.equal(JSON.parse(response.body).booking.user_id, studentId);
+  assert.equal(calls.meetingArgs[0].advisorEmail, 'manuel@project-robin.com');
+  assert.deepEqual(Array.from(calls.meetingArgs[0].attendees), ['student@example.com']);
+  assert.equal(calls.notifications, 1);
+});
 
 test('una llamada futura bloquea otra reserva antes de consultar Calendar', async () => {
   for (const extra of [{}, { cancellation_requested_at: future }, { admin_email: 'otro-asesor@example.com' }]) {

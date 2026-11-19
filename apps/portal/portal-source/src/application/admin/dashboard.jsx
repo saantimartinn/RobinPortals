@@ -8,6 +8,7 @@ import { APP_PHASE_LABELS } from "../documents/document-utils.js";
 import { KpiCard, Row } from "../../shared/PortalWidgets.jsx";
 import { adminDashboard, adminTaskCreate, bookingsCancel } from "../../api.js";
 import { dashboardAlerts, dashboardClientMetrics, dashboardFinancialSummary, dashboardPhaseMetrics } from "./dashboard-utils.js";
+import { onboardingOrder } from '../onboarding/onboarding-nav.js';
 
 export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) {
   const adminId = (user.email || user.username || "").toLowerCase();
@@ -202,7 +203,7 @@ export function AdminDashboard({ user, onOpenClient, onOpenAssign, onGotoTab }) 
               {onboardingClients.length === 0 && <div className="text-xs text-slate-500">Nadie en onboarding ahora mismo.</div>}
               {onboardingClients.map((c) => {
                 const nm = [c.nombre, c.apellidos].filter(Boolean).join(" ") || c.email || c.lead_id || "—";
-                const step = !c.dni_completed ? "DNI" : !c.profile_completed ? "Perfil" : !c.pago_completed ? "Pago" : "Onboarding";
+                const step = !c.dni_completed ? "DNI" : onboardingOrder(c).includes('profile') && !c.profile_completed ? "Perfil" : !c.pago_completed ? "Pago" : "Onboarding";
                 const days = c.created_at ? Math.max(0, Math.floor((Date.now() - new Date(c.created_at).getTime()) / 86400000)) : null;
                 return (
                   <button key={c.id}

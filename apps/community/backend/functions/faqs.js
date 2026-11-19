@@ -2,19 +2,23 @@
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
+const { readArrivalIdentity } = require('../lib/arrival-access');
+const { visibleFaqs } = require('../../shared/product-access.cjs');
 
 exports.handler = async (event) => {
-  const session = readSessionFromEvent(event);
+  const session = readSessionFromEvent(event, { allowArrival: true });
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   const isAdmin = session.role === 'subscriber_admin';
   try {
+    const arrival = session.auth_source === 'application_arrival';
+    if (arrival && !await readArrivalIdentity(event, session)) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const sb = getSupabase();
     if (event.httpMethod === 'GET') {
       let query = sb.from('subscription_faqs').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true });
       if (!isAdmin) query = query.eq('published', true);
       const { data, error } = await query;
       if (error) throw error;
-      return json({ faqs: data || [] });
+      return json({ faqs: isAdmin ? data || [] : visibleFaqs(data, arrival) });
     }
     if (event.httpMethod !== 'POST') return methodNotAllowed(['GET', 'POST']);
     if (!verifyOrigin(event)) return json({ error: 'bad_origin' }, { statusCode: 403 });
@@ -33,6 +37,10 @@ exports.handler = async (event) => {
     if (!question || question.length > 300) return json({ error: 'invalid_question' }, { statusCode: 400 });
     if (!answer || answer.length > 5000) return json({ error: 'invalid_answer' }, { statusCode: 400 });
     const row = { question, answer, category: String(payload.category || 'General').trim().slice(0, 80) || 'General', published: payload.published !== false, sort_order: Number.isFinite(Number(payload.sort_order)) ? Number(payload.sort_order) : 0, updated_at: new Date().toISOString() };
+    if (payload.products !== undefined) {
+      if (!Array.isArray(payload.products) || !payload.products.length || payload.products.some(product => !['community', 'pack_llegada'].includes(product))) return json({ error: 'invalid_products' }, { statusCode: 400 });
+      row.products = [...new Set(payload.products)];
+    }
     let result;
     if (body.action === 'create') result = await sb.from('subscription_faqs').insert(row).select('*').single();
     else {

@@ -9,6 +9,7 @@ Mapa de responsabilidades y enlaces al código.
 - [docs](docs/README.md): Documentación mantenida y mapas generados.
 - [frontend](frontend/README.md): Frontend React/Vite: código que se ejecuta en el navegador.
 - [scripts](scripts/README.md): Verificación, documentación y tareas explícitas de operador.
+- [shared](shared/README.md): Tema, catálogos, utilidades y componentes reutilizables.
 - [supabase](supabase/README.md): Definición de datos independiente del portal de alumnos.
 - [test](test/README.md): Pruebas automatizadas sin credenciales ni proveedores reales.
 
