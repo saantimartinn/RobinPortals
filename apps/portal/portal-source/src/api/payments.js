@@ -2,12 +2,12 @@
 import { api } from "./core.js";
 
 // ----- PAGOS -----
-export async function paymentsList() {
-  return api.get("/api/payments");
+export async function paymentsList(product) {
+  return api.get("/api/payments" + (product ? '?product=' + encodeURIComponent(product) : ''));
 }
 // Checkout alojado para una cuota desbloqueada (2-3 o extra). Devuelve { url }.
-export async function paymentsCheckout(installment) {
-  return api.post("/api/payments/checkout", { installment });
+export async function paymentsCheckout(installment, product) {
+  return api.post("/api/payments/checkout", { installment, ...(product ? { product } : {}) });
 }
 // Confirma el pago al volver de la pasarela (idempotente).
 export async function paymentsVerify({ attemptId }) {

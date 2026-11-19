@@ -22,6 +22,7 @@ const { bookingConfig } = require('../../lib/booking-config');
 const { isoDate, numberValue } = require('../../lib/validation');
 const { sendBookingNotifications, hasPendingBooking, insertBookingOrRollback, isBookingSlotConflict } = require('../../lib/booking-create');
 const { hasApplicationAdminRole } = require('../../lib/authorization');
+const { arrivalPackForUser } = require('../../shared/arrival-pack.cjs');
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
@@ -66,7 +67,7 @@ exports.handler = async (event) => {
     const sb = getSupabase();
     const { data: user, error: eu } = await sb
       .from('users')
-      .select('id, lead_id, email, nombre, apellidos, assigned_to, role, historial, application_phase, phase_changed_at, tipo, num_carreras, pago_completed, intereses, created_at')
+      .select('id, lead_id, email, nombre, apellidos, assigned_to, role, historial, application_phase, phase_changed_at, tipo, num_carreras, pago_completed, intereses, created_at, contract_signed, contract_data')
       .eq('id', session.uid)
       .single();
     if (eu || !user) {
@@ -76,6 +77,12 @@ exports.handler = async (event) => {
     if (hasApplicationAdminRole(user)) {
       log.warn('rejected', { error_code: 'admins_cannot_book' });
       return json({ error: 'admins_cannot_book' }, { statusCode: 403 });
+    }
+    if (user.tipo === 'llegada' && (!user.contract_data?.variant || user.contract_data.variant === 'llegada')) {
+      const pack = arrivalPackForUser(user);
+      if (!pack?.calls_enabled || Date.parse(startAt) >= Date.parse(pack.service_end_at)) {
+        return json({ error: !pack?.first_payment_completed ? 'arrival_first_payment_required' : 'arrival_service_ended' }, { statusCode: 403 });
+      }
     }
 
     if (await hasPendingBooking(sb, user.id)) {

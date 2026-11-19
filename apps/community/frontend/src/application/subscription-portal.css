@@ -1,4 +1,8 @@
 /* Application UI for subscription portal; shared navigation and session state are owned by the surrounding shell. */
+.arrival-portal .student-nav-items .arrival-management-start { margin-top: 24px; }
+@media (max-width: 1023px) { .arrival-portal .student-nav-items .arrival-management-start { margin-top: 0; } }
+.robin-info-dialog { width:calc(100% - 2rem); max-width:28rem; padding:0; border:1px solid #DFDED2; border-radius:16px; background:#FFFDF5; color:#2D3A64; }
+.robin-info-dialog::backdrop { background:rgba(45,58,100,.4); }
 .student-portal {
   --student-navy: #2D3A64;
   --student-gold: #ECB450;

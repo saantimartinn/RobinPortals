@@ -7,6 +7,7 @@ Funcionalidades agrupadas por dominio.
 ## Carpetas
 
 - [admin](admin/README.md): Administración de suscriptores, contenidos, descuentos y notificaciones.
+- [arrival](arrival/README.md): Ver detalle.
 - [career](career/README.md): Empleo, mentorías y creación de CV.
 - [community](community/README.md): Comunidad, eventos, mensajes y retos.
 - [levels](levels/README.md): Progreso y beneficios de suscripción.

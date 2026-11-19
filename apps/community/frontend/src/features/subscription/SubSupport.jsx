@@ -11,16 +11,17 @@ function SubSupport({ requests, onRefresh }) {
   const [details, setDetails] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
 
   async function submit() {
     if (!title.trim()) return;
-    setSending(true);
+    setSending(true); setError('');
     try {
       await serviceRequestCreate({ category, title: title.trim(), details });
       setTitle(""); setDetails(""); setSent(true);
       await onRefresh();
       setTimeout(() => setSent(false), 3000);
-    } catch (_) {}
+    } catch (_) { setError('No se ha podido enviar la solicitud. Inténtalo de nuevo.'); }
     finally { setSending(false); }
   }
 
@@ -32,6 +33,7 @@ function SubSupport({ requests, onRefresh }) {
           <Field label="Asunto" value={title} onChange={setTitle} placeholder="¿En qué podemos ayudarte?" />
           <TextareaField label="Detalles" value={details} onChange={setDetails} rows={3} placeholder="Añade contexto o detalles..." />
           {sent && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">Solicitud enviada. Te responderemos pronto.</div>}
+          {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
           <Btn disabled={sending || !title.trim()} onClick={submit}>
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Enviar solicitud
           </Btn>

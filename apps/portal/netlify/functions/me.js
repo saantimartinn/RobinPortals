@@ -5,6 +5,7 @@ const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, serverError } = require('../../lib/http');
 const { applicationPlanForUser, contractPricingVersion } = require('../../shared/financial-config.cjs');
 const { signedUrl } = require('../../lib/storage');
+const { arrivalPackForUser } = require('../../shared/arrival-pack.cjs');
 
 const PRO_ADMIN_EMAILS = new Set([
   'noel@project-robin.com',
@@ -59,6 +60,7 @@ exports.handler = async (event) => {
       contract_signed: !!u.contract_signed,
       contract_signed_at: u.contract_signed_at || null,
       tipo: u.tipo || 'general',
+      arrival_pack: arrivalPackForUser(u),
       num_carreras: u.num_carreras || 1,
       first_payment_amount: firstPayment ? firstPayment.amount : null,
       mentoria_credit_eur: u.contract_data?.mentoria_upgrade?.credit_eur || null,

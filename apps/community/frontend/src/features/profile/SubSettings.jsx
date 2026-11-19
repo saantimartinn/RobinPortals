@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { SubSubscription } from "../subscription/SubSubscription.jsx";
 import { changePassword } from "../../api/index.js";
 
-function ChangePasswordCard() {
+export function ChangePasswordCard() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");

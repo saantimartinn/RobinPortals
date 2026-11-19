@@ -1,13 +1,12 @@
 # Frontend component map
 
-Generated from 45 focused frontend modules: 87 top-level functions/components.
+Generated from 45 focused frontend modules: 86 top-level functions/components.
 Props, state, API calls and child components are static approximations and must be reviewed with behavioral changes.
 Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-platform reproducibility.
 
 | Name | Module | Domain | Props/args | Local state | API calls | Child components | Line |
 |---|---|---|---|---|---|---|---:|
-| nextOnboardingStep | app.jsx | app/auth | user | none | none | none | 30 |
-| PortalRobin | app.jsx | app/auth | none | authState, onboardingOverride, active, entryError | apiLogout, apiMe, exchangeApplicationSession, onboardingState, paymentsVerify | CrossPortalNav, AdminPortal, OnboardingNavContext, Step, PortalShell | 40 |
+| PortalRobin | app.jsx | app/auth | none | authState, onboardingOverride, active, entryError | apiLogout, apiMe, exchangeApplicationSession, onboardingState, paymentsVerify | CrossPortalNav, AdminPortal, OnboardingNavContext, Step, PortalShell | 32 |
 | AdminPerfilAcademico | application/admin/academic.jsx | shared/application | { client } | none | none | Card, CardHeader, CardContent, Badge | 8 |
 | AdminCarrerasNew | application/admin/AdminCarrerasNew.jsx | shared/application | { client } | library, assigned, loading, error, formOpen, cName, cArea, cDescription, cSubjects, cRequirements | adminCareersListAll, adminCareersCreate, adminCareersDelete, adminCareersAssign, adminCareersUnassign | Card, CardHeader, Btn, CardContent, Field, TextareaField | 9 |
 | AdminChatAssistant | application/admin/AdminChatAssistant.jsx | shared/application | { user, activeClientId, clients, mascot } | mode, messages, draft, busy, error, notesOpen, notesText, notesUserId, notesTitle, notesBusy | adminAssistant, adminHistorialAdd | Btn | 8 |
@@ -56,7 +55,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 | SignaturePad | application/onboarding/contract.jsx | application/onboarding | { onChange } | drawing, empty | none | none | 289 |
 | OnboardingDNI | application/onboarding/dni.jsx | application/onboarding | { user, onLogout, onDone } | anverso, reverso, aPreview, rPreview, phase, manualEntry, error, busy, fields | dniExtract, dniSave | OnboardingShell, UploadSlot, Btn, Field | 9 |
 | UploadSlot | application/onboarding/dni.jsx | application/onboarding | { label, preview, onPick } | none | none | none | 145 |
-| OnboardingShell | application/onboarding/onboarding-shared.jsx | application/onboarding | { user, title, subtitle, question, questionMeta, questionHint, stepNumber, totalSteps = STEPS.length, onLogout, fullscreen = false, conversation = false, children } | none | none | none | 15 |
+| OnboardingShell | application/onboarding/onboarding-shared.jsx | application/onboarding | { user, title, subtitle, question, questionMeta, questionHint, stepNumber, totalSteps = STEPS.length, onLogout, fullscreen = false, conversation = false, children } | none | none | none | 9 |
 | OnboardingOrigin | application/onboarding/origin.jsx | application/onboarding | { user, onLogout, onDone } | origin, level, pais, hasEu, screen, error, busy | originSave | OnboardingShell, Choice, Field, Btn | 8 |
 | OnboardingPayment | application/onboarding/payment.jsx | application/onboarding | { user, onLogout, onDone } | busy, error, confirming | onboardingCheckout | OnboardingShell, Btn | 10 |
 | ProfileConversation | application/onboarding/profile-conversation.jsx | application/onboarding | { history, question, hint, meta, blockTitle, sectionIntro, containerRef, minimumHeight, children } | historyOpen | none | none | 4 |
@@ -98,7 +97,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 
 | Module | Bytes | Responsibility |
 |---|---:|---|
-| app.jsx | 7763 | composition root and authentication screens |
+| app.jsx | 7464 | composition root and authentication screens |
 | application/admin/academic.jsx | 3165 | focused frontend component module |
 | application/admin/AdminCarrerasNew.jsx | 11234 | focused frontend component module |
 | application/admin/AdminChatAssistant.jsx | 9602 | focused frontend component module |
@@ -124,15 +123,15 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 | application/Faqs.jsx | 6436 | focused frontend component module |
 | application/onboarding/contract.jsx | 15347 | application onboarding flow |
 | application/onboarding/dni.jsx | 8261 | application onboarding flow |
-| application/onboarding/onboarding-shared.jsx | 4135 | application onboarding flow |
+| application/onboarding/onboarding-shared.jsx | 3805 | application onboarding flow |
 | application/onboarding/OnboardingFlow.jsx | 336 | application onboarding flow |
 | application/onboarding/origin.jsx | 5716 | application onboarding flow |
-| application/onboarding/payment.jsx | 4427 | application onboarding flow |
+| application/onboarding/payment.jsx | 4927 | application onboarding flow |
 | application/onboarding/profile-conversation.jsx | 2832 | application onboarding flow |
 | application/onboarding/profile.jsx | 19362 | application onboarding flow |
 | application/onboarding/questionnaire-fields.jsx | 4847 | application onboarding flow |
 | application/onboarding/subject-ranking.jsx | 3742 | application onboarding flow |
-| application/onboarding/thanks.jsx | 1162 | application onboarding flow |
+| application/onboarding/thanks.jsx | 1193 | application onboarding flow |
 | application/payments/InvoiceReceipt.jsx | 4801 | printable payment receipt |
 | application/payments/payment-utils.jsx | 1395 | payment formatting and status UI |
 | application/PortalAssistant.jsx | 8385 | focused frontend component module |

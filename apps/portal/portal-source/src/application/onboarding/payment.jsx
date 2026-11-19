@@ -6,11 +6,13 @@ import { Btn } from "../../ui.jsx";
 import { reportClientError } from "../../client-utils.js";
 import { onboardingCheckout } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
+import { onboardingOrder } from './onboarding-nav.js';
 
 export function OnboardingPayment({ user, onLogout, onDone }) {
   const amount = Number(user.first_payment_amount);
   const paid = !!user.pago_completed;
   const isMentoria = String(user.tipo || '').toLowerCase() === 'mentoria';
+  const hasProfile = onboardingOrder(user).includes('profile');
 
   const [busy, setBusy]   = useState(false);
   const [error, setError] = useState("");
@@ -54,7 +56,7 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
     >
       <div className="space-y-5">
         {paid ? (
-          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm">Primer pago confirmado. Ahora vamos con las preguntas de orientación.</div>
+          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm">{hasProfile ? 'Primer pago confirmado. Ahora vamos con las preguntas de orientación.' : 'Primer pago confirmado. Tu Pack Llegada está activado.'}</div>
         ) : confirming ? (
           <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" /> Confirmando tu pago…
@@ -83,11 +85,11 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
         )}
 
         <Btn className="w-full" size="lg" variant="gold" onClick={pay} disabled={busy || (!paid && confirming)}>
-          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {paid ? "Continuando…" : "Redirigiendo a pago seguro…"}</> : paid ? <>Continuar con las preguntas <ChevronRight className="h-4 w-4" /></> : <>Continuar al pago{amountStr ? ` · ${amountStr} €` : ""} <ChevronRight className="h-4 w-4" /></>}
+          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {paid ? "Continuando…" : "Redirigiendo a pago seguro…"}</> : paid ? <>{hasProfile ? 'Continuar con las preguntas' : 'Finalizar onboarding'} <ChevronRight className="h-4 w-4" /></> : <>Continuar al pago{amountStr ? ` · ${amountStr} €` : ""} <ChevronRight className="h-4 w-4" /></>}
         </Btn>
 
         <div className="text-[11px] text-slate-400 text-center">
-          {paid ? 'Tu pago ya está registrado. Continúa para completar tu perfil académico.' : isMentoria ? 'Serás redirigido a la pasarela de pago segura para abonar la cuota única de Mentoría.' : 'Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor.'}
+          {paid ? hasProfile ? 'Tu pago ya está registrado. Continúa para completar tu perfil académico.' : 'Tu pago ya está registrado. Puedes finalizar el onboarding.' : isMentoria ? 'Serás redirigido a la pasarela de pago segura para abonar la cuota única de Mentoría.' : 'Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor.'}
         </div>
       </div>
     </OnboardingShell>

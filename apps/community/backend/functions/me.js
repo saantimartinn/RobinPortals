@@ -4,12 +4,17 @@ const { readSessionFromEvent } = require('../lib/auth');
 const { principalTable } = require('../lib/principal');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
 const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
+const { readArrivalIdentity, arrivalUser } = require('../lib/arrival-access');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
-  const session = readSessionFromEvent(event);
+  const session = readSessionFromEvent(event, { allowArrival: true });
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   try {
+    if (session.auth_source === 'application_arrival') {
+      const identity = await readArrivalIdentity(event, session);
+      return identity ? json(arrivalUser(identity)) : json({ error: 'unauthorized' }, { statusCode: 401 });
+    }
     if (session.auth_source === 'application_admin') {
       const identity = await readApplicationIdentity(event);
       if (!identity || identity.id !== session.uid || !canUseRobinPlan(identity)) {
@@ -39,6 +44,8 @@ exports.handler = async (event) => {
     let paymentProvider = u.stripe_subscription_id ? 'stripe' : null;
     const { data: revolut } = await sb.from('revolut_subscriptions').select('subscription_id').eq('subscriber_id', u.id).maybeSingle();
     if (revolut?.subscription_id) paymentProvider = 'revolut';
+    const identity = session.application_uid ? await readApplicationIdentity(event).catch(() => null) : null;
+    const arrivalPack = identity?.id === session.application_uid ? identity.arrival_pack : null;
     return json({
       id: u.id,
       lead_id: u.lead_id,
@@ -60,6 +67,8 @@ exports.handler = async (event) => {
       current_period_end: u.current_period_end || null,
       cancel_at_period_end: !!u.cancel_at_period_end,
       payment_provider: paymentProvider,
+      community_access: 'full',
+      arrival_pack: arrivalPack || null,
     });
   } catch (e) {
     console.error('me error', e);

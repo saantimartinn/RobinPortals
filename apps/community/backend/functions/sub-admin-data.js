@@ -72,7 +72,7 @@ exports.handler = async (event) => {
       };
     });
 
-    const requestsOut = requests.map((r) => ({ ...r, user_name: nameById[r.user_id] || null }));
+    const requestsOut = requests.map((r) => ({ ...r, user_name: nameById[r.user_id] || r.requester_name || null }));
 
     // --- Notificaciones enviadas por este panel (created_by = admin) ---
     let notificationsOut = [];

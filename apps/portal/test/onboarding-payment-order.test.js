@@ -117,3 +117,15 @@ test('el orden compartido y los requisitos conservan DNI, contrato y pago antes 
   assert.equal(hasCompletedOnboarding({ ...signedUser, pago_completed: true }), false);
   assert.equal(hasCompletedOnboarding({ ...signedUser, pago_completed: true, profile_completed: true }), true);
 });
+
+test('portal: el pago de Pack Llegada termina el onboarding sin exigir el perfil académico', async () => {
+  const user = { ...signedUser, tipo: 'llegada' };
+  await withModule('portal', 'lib/onboarding-fulfill.js', user, async ({ markOnboardingPaid }, db) => {
+    await markOnboardingPaid(db, user.id, { simulated: true });
+    assert.equal(user.pago_completed, true);
+    assert.equal(user.requires_onboarding, false);
+    assert.equal(user.profile_completed, false);
+    await markOnboardingPaid(db, user.id, { simulated: true });
+    assert.equal(db.updates.length, 1);
+  });
+});

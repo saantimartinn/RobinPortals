@@ -122,6 +122,7 @@ exports.handler = async (event) => {
     // General estándar queda a cero. Los demás planes siguen cobrando la
     // diferencia tras la nueva firma.
     const firstAmount = applicationPlanForUser({ ...u, contract_data, contract_signed: true })[0]?.amount;
+    const { onboardingOrder } = await import('../../../../packages/onboarding/flow.mjs');
     const coveredByMentoria = !!mentoriaUpgrade && firstAmount === 0;
 
     const { error: e2 } = await sb
@@ -134,7 +135,7 @@ exports.handler = async (event) => {
           pago_completed: true,
           pago_completed_at: nowIso,
           pago_data: { source: 'mentoria_credit', source_payment_id: mentoriaUpgrade.source_payment_id, amount: 0 },
-          ...(u.profile_completed ? { requires_onboarding: false } : {}),
+          ...(u.profile_completed || !onboardingOrder(u).includes('profile') ? { requires_onboarding: false } : {}),
         } : {}),
       })
       .eq('id', session.uid);

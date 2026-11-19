@@ -45,12 +45,19 @@ exports.handler = async (event) => {
     }
     const { user, ambiguous } = await findSubscriber(getSupabase(), identity);
     if (ambiguous) return json({ error: 'ambiguous_identity' }, { statusCode: 409 });
+    if (identity.arrival_pack?.contracted === true && !identity.is_application_admin
+      && identity.auth_source !== 'external_client'
+      && (!user || (user.role === 'subscriber' && !['active', 'trialing'].includes(user.subscription_status)))) {
+      const arrivalSession = { ...identity, role: 'subscriber', auth_source: 'application_arrival' };
+      return json({ ok: true }, { cookies: [buildSessionCookie(signSession(arrivalSession))] });
+    }
     if (!user) return json({ error: 'subscription_account_required' }, { statusCode: 403 });
     if (user.role === 'subscriber_admin' && !canUseRobinPlan(identity)) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
     if (user.role === 'subscriber' && !['active', 'trialing'].includes(user.subscription_status)) {
       return json({ error: 'active_subscription_required' }, { statusCode: 403, cookies: [buildSessionCookie('', { clear: true })] });
     }
     user.auth_source = 'application_sso';
+    user.application_uid = identity.id;
     const cookie = buildSessionCookie(signSession(user));
     return json({ ok: true }, { cookies: [cookie] });
   } catch (error) {

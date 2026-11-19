@@ -8,6 +8,8 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { isSubscriberRole } = require('../lib/principal');
+const { visibleFaqs } = require('../../shared/product-access.cjs');
+const { readApplicationIdentity } = require('../lib/application-permissions');
 const MAX_FILES = 8;
 const MAX_FILE_CHARS = 3_000_000; // ~2.2MB por archivo (base64)
 
@@ -21,12 +23,14 @@ exports.handler = async (event) => {
     const sb = getSupabase();
     const params = event.queryStringParameters || {};
     if (event.httpMethod === 'GET' && params.resource === 'faqs') {
-      let query = sb.from('subscription_faqs').select('id, question, answer, category, published, sort_order, created_at, updated_at')
+      let query = sb.from('subscription_faqs').select('*')
         .order('sort_order', { ascending: true }).order('created_at', { ascending: true });
       if (session.role !== 'subscriber_admin') query = query.eq('published', true);
       const { data, error } = await query;
       if (error) throw error;
-      return json({ faqs: data || [] });
+      const identity = params.include_arrival === '1' && session.application_uid ? await readApplicationIdentity(event) : null;
+      const includeArrival = identity?.id === session.application_uid && identity?.arrival_pack?.contracted === true;
+      return json({ faqs: session.role === 'subscriber_admin' ? data || [] : visibleFaqs(data, false, includeArrival) });
     }
 
     if (event.httpMethod === 'POST') {

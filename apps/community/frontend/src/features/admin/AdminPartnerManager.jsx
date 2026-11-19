@@ -13,7 +13,7 @@ function AdminPartnerManager({ partners, onChanged }) {
   const [err, setErr] = useState("");
   const cats = Object.keys(PARTNER_CATEGORY_LABELS);
 
-  function blank() { return { name: "", category: "other", city: "", description: "", benefits: "", discount: "", contact_url: "", eligibility: "", logo_url: "", active: true }; }
+  function blank() { return { name: "", category: "other", city: "", description: "", benefits: "", discount: "", contact_url: "", eligibility: "", logo_url: "", active: true, products: ['community'] }; }
   async function onLogo(e) {
     const file = e.target.files && e.target.files[0];
     e.target.value = "";
@@ -35,6 +35,7 @@ function AdminPartnerManager({ partners, onChanged }) {
         description: editing.description || null, benefits: editing.benefits || null, discount: editing.discount || null,
         contact_url: editing.contact_url || null, eligibility: editing.eligibility || null, logo_url: editing.logo_url || null,
         logo_data_url: editing.logo_data_url || null, active: editing.active !== false,
+        products: editing.products || ['community'],
       });
       setEditing(null); await onChanged();
     } catch (e) { setErr(e.message || "No se pudo guardar."); }
@@ -82,12 +83,13 @@ function AdminPartnerManager({ partners, onChanged }) {
               <Field label="URL de contacto" value={editing.contact_url} onChange={(v) => setEditing((p) => ({ ...p, contact_url: v }))} />
             </div>
             <Field label="Elegibilidad" value={editing.eligibility} onChange={(v) => setEditing((p) => ({ ...p, eligibility: v }))} />
+            <fieldset className="flex flex-wrap gap-4"><legend className="text-sm font-semibold mb-2">Productos con acceso</legend>{[['community', 'Community'], ['pack_llegada', 'Pack Llegada']].map(([key, label]) => <label key={key} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={(editing.products || ['community']).includes(key)} onChange={event => setEditing(previous => ({ ...previous, products: event.target.checked ? [...(previous.products || ['community']), key] : (previous.products || ['community']).filter(product => product !== key) }))} />{label}</label>)}</fieldset>
             <label className="flex items-center gap-2 text-sm text-slate-700">
               <input type="checkbox" checked={editing.active !== false} onChange={(e) => setEditing((p) => ({ ...p, active: e.target.checked }))} /> Activo
             </label>
             {err && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{err}</div>}
             <div className="flex gap-2">
-              <Btn disabled={saving} onClick={save}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar</Btn>
+              <Btn disabled={saving || editing.products?.length === 0} onClick={save}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar</Btn>
               <Btn variant="ghost" onClick={() => setEditing(null)}>Cancelar</Btn>
             </div>
           </CardContent>

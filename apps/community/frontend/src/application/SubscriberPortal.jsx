@@ -4,7 +4,7 @@ import { SubscriberShell } from "./SubscriberShell.jsx";
 import { SubscriptionPlanPicker } from "./SubscriptionPlanPicker.jsx";
 
 function SubscriberPortal({ user, onLogout, onUserRefresh }) {
-  const hasPlan = ["active", "trialing", "past_due"].includes(user.subscription_status);
+  const hasPlan = user.community_access === 'arrival' || ["active", "trialing", "past_due"].includes(user.subscription_status);
   if (!hasPlan) {
     return <SubscriptionPlanPicker user={user} onSubscribed={onUserRefresh} />;
   }

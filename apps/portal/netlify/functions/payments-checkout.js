@@ -11,6 +11,7 @@ const revolut = require('../../lib/revolut');
 const paymentProvider = require('../../lib/payment-provider');
 const attempts = require('../../lib/payment-attempts');
 const { toMinorUnits } = require('../../lib/payment-fulfill');
+const { arrivalPackForUser } = require('../../shared/arrival-pack.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -33,12 +34,14 @@ exports.handler = async (event) => {
     const sb = getSupabase();
     const { data: u, error: e1 } = await sb
       .from('users')
-      .select('id, lead_id, email, nombre, apellidos, tipo, origin, pais, num_carreras, has_eu_id, contract_signed, contract_data, pago_completed, pago_completed_at, pago_data')
+      .select('id, lead_id, email, nombre, apellidos, tipo, origin, pais, num_carreras, has_eu_id, contract_signed, contract_data, pago_completed, pago_completed_at, pago_data, role')
       .eq('id', session.uid)
       .single();
     if (e1 || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
 
-    await ensurePayments(sb, u);
+    const arrival = body.product === 'llegada';
+    if (arrival && !arrivalPackForUser(u)) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!arrival) await ensurePayments(sb, u);
 
     const { data: p, error: e2 } = await sb
       .from('payments')
@@ -49,6 +52,7 @@ exports.handler = async (event) => {
     if (e2 || !p) return json({ error: 'not_found' }, { statusCode: 404 });
     if (p.status === 'paid') return json({ error: 'already_paid' }, { statusCode: 409 });
     if (p.status !== 'unlocked') return json({ error: 'not_unlocked' }, { statusCode: 409 });
+    if (arrival && installment !== 2 && installment < 4) return json({ error: 'invalid_installment' }, { statusCode: 400 });
 
     const label = p.concept ? String(p.concept) : 'Cuota ' + p.installment;
     const currency = String(p.currency || 'EUR').toUpperCase();
@@ -70,7 +74,7 @@ exports.handler = async (event) => {
         email: u.email,
         attemptId: attempt.id,
         kind: 'installment',
-        redirectUrl: `${revolut.getBaseUrl(event)}/portal/?payment_attempt=${attempt.id}`,
+        redirectUrl: `${revolut.getBaseUrl(event)}${arrival ? '/therobinplan/' : '/portal/'}?payment_attempt=${attempt.id}`,
       });
       await attempts.attachProviderOrder(sb, attempt.id, order);
       return json({ url: order.checkout_url, id: order.id, attempt_id: attempt.id, provider });

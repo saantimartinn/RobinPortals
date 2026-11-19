@@ -154,7 +154,7 @@ async function markOnboardingPaid(sb, userId, pagoData) {
   if (!userId) return { ok: false, reason: 'no_user_id' };
   const { data: u, error } = await sb
     .from('users')
-    .select('id, lead_id, email, origin, dni_completed, contract_signed, pago_completed, profile_completed')
+    .select('id, lead_id, email, tipo, origin, dni_completed, contract_signed, pago_completed, profile_completed')
     .eq('id', userId)
     .single();
   if (error || !u) return { ok: false, reason: 'user_not_found' };
