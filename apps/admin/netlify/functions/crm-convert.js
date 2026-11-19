@@ -3,7 +3,7 @@ const { getSupabase } = require('../../lib/supabase');
 const { getAdminSupabase } = require('../../lib/admin-supabase');
 const { getJuniorSupabase } = require('../../lib/junior-supabase');
 const { getSubscriptionsSupabase } = require('../../lib/subscriptions-supabase');
-const { readSessionFromEvent, hashPassword } = require('../../lib/auth');
+const { readSessionFromEvent, hashPassword, verifyPassword } = require('../../lib/auth');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
 const { identityExists } = require('../../lib/identity');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
@@ -35,7 +35,16 @@ exports.handler = async (event) => {
     if (!admin || !isApplicationAdmin(admin)) return json({ error: 'forbidden' }, { statusCode: 403 });
     const body = parseJsonBody(event);
     if (!body || !body.leadId) return json({ error: 'missing_lead_id' }, { statusCode: 400 });
-    const targetPortal = String(body.targetPortal || '').trim().toLowerCase();
+    const crm = getAdminSupabase();
+    const { data: lead, error: leadError } = await crm.from('crm_leads')
+      .select('id,notion_numeric_id,name,email,lead_type,owner_names,source_payload,is_test,comment,body_text,source_created_at').eq('id', body.leadId).single();
+    if (leadError || !lead) return json({ error: 'lead_not_found' }, { statusCode: 404 });
+    if (lead.is_test || lead.source_payload?.simulated === true) return json({ error: 'test_lead_not_convertible' }, { statusCode: 400 });
+    if (!lead.email) return json({ error: 'lead_email_required' }, { statusCode: 400 });
+    // Llegada uses the existing Portal identity and onboarding, then Community SSO.
+    // Its stored CRM qualification cannot be overridden with another portal/type.
+    const tipo = normalizeTipo(lead.lead_type) === 'llegada' ? 'llegada' : normalizeTipo(body.clientType || lead.lead_type);
+    const targetPortal = tipo === 'llegada' ? 'alumno' : String(body.targetPortal || '').trim().toLowerCase();
     if (!PORTALS.has(targetPortal)) return json({ error: 'portal_required' }, { statusCode: 400 });
     const requestedAdvisor = normalizedPerson(body.advisor);
     if (targetPortal !== 'community' && !requestedAdvisor) return json({ error: 'advisor_required' }, { statusCode: 400 });
@@ -47,19 +56,12 @@ exports.handler = async (event) => {
       if (!advisor) return json({ error: 'advisor_invalid' }, { statusCode: 400 });
     }
 
-    const crm = getAdminSupabase();
-    const { data: lead, error: leadError } = await crm.from('crm_leads')
-      .select('id,notion_numeric_id,name,email,lead_type,owner_names,source_payload,is_test,comment,body_text,source_created_at').eq('id', body.leadId).single();
-    if (leadError || !lead) return json({ error: 'lead_not_found' }, { statusCode: 404 });
-    if (lead.is_test || lead.source_payload?.simulated === true) return json({ error: 'test_lead_not_convertible' }, { statusCode: 400 });
-    if (!lead.email) return json({ error: 'lead_email_required' }, { statusCode: 400 });
     const crmNotes = await loadCrmClientNotes(crm, lead);
 
     const leadId = String(lead.notion_numeric_id || lead.id);
     // Imported Notion rows use their Notion page UUID as the CRM id. Native
     // website/Meta leads have no Notion page and must not depend on one.
     const notionPageId = lead.source_payload?.notion_url ? lead.id : null;
-    const tipo = normalizeTipo(body.clientType || lead.lead_type);
     const assignedTo = advisor ? normalizeEmail(advisor) : null;
     const salesAgent = String(lead.owner_names?.[0] || admin.nombre || admin.email || '').trim();
     const targetDb = targetPortal === 'alumno' ? portal : targetPortal === 'robinjr' ? getJuniorSupabase() : getSubscriptionsSupabase();
@@ -70,7 +72,8 @@ exports.handler = async (event) => {
     let result = 'created';
     let userId;
     let emailSent = false;
-    const { data: existing, error: existingError } = await targetDb.from(table).select('id').eq('lead_id', leadId).maybeSingle();
+    let emailReason = null;
+    const { data: existing, error: existingError } = await targetDb.from(table).select('id,email,username,password_hash').eq('lead_id', leadId).maybeSingle();
     if (existingError) throw existingError;
     if (existing) {
       result = 'exists';
@@ -78,7 +81,6 @@ exports.handler = async (event) => {
       if (targetPortal !== 'community') {
         const { error } = await targetDb.from('users').update({ assigned_to: assignedTo, tipo, notion_page_id: notionPageId }).eq('id', existing.id);
         if (error) throw error;
-        if (targetPortal === 'alumno') await ensureDriveFolder(portal, existing.id);
       }
     } else {
       if (targetPortal === 'community') {
@@ -105,7 +107,6 @@ exports.handler = async (event) => {
       const { data: inserted, error: insertError } = await targetDb.from(table).insert(newUser).select('id').single();
       if (insertError) throw insertError;
       userId = inserted.id;
-      if (targetPortal === 'alumno') await ensureDriveFolder(portal, inserted.id);
     }
     let contractedAmount;
     if (targetPortal === 'alumno') {
@@ -146,11 +147,32 @@ exports.handler = async (event) => {
     }
     const { error: crmError } = await crm.from('crm_leads').update(crmUpdate).eq('id', lead.id);
     if (crmError) throw crmError;
-    if (result === 'created') {
+    const delivery = lead.source_payload?.account_access_emails?.[targetPortal];
+    if (delivery?.user_id === userId && delivery.status === 'sent') emailSent = true;
+    else {
       const password = String(process.env.CRM_BOOTSTRAP_PASSWORD || '');
-      const accessEmail = await sendAccountAccessEmail({ email: lead.email, name: lead.name, username: lead.email.trim().toLowerCase(), password, targetPortal });
-      emailSent = !!accessEmail.sent;
+      // A failed first delivery can be retried, but never reset a client's password
+      // or email an initial password that they have already changed.
+      if (result === 'exists' && (!password || !existing.password_hash || !verifyPassword(password, existing.password_hash))) emailReason = 'password_changed';
+      else {
+        const accessEmail = await sendAccountAccessEmail({
+          email: existing?.email || lead.email, name: lead.name,
+          username: existing?.username || lead.email.trim().toLowerCase(), password, targetPortal, clientType: tipo,
+          idempotencyKey: `crm-account-access/${targetPortal}/${userId}`,
+        });
+        emailSent = !!accessEmail.sent;
+        emailReason = emailSent ? null : accessEmail.reason || 'not_sent';
+        const { error: deliveryError } = await crm.from('crm_leads').update({ source_payload: {
+          ...crmUpdate.source_payload,
+          account_access_emails: { ...(lead.source_payload?.account_access_emails || {}), [targetPortal]: {
+            user_id: userId, status: emailSent ? 'sent' : 'failed',
+            ...(emailSent ? { sent_at: new Date().toISOString(), message_id: accessEmail.id || null } : { attempted_at: new Date().toISOString(), reason: emailReason }),
+          } },
+        } }).eq('id', lead.id);
+        if (deliveryError) throw deliveryError;
+      }
     }
+    if (targetPortal === 'alumno') await ensureDriveFolder(portal, userId);
     if (targetPortal !== 'community') {
       const sheet = await require('../../lib/google-sheets').upsertClientRow(targetDb, userId, {
         portalKind: targetPortal,
@@ -158,7 +180,7 @@ exports.handler = async (event) => {
       });
       if (!sheet.ok) console.error('crm-convert sheets sync:', sheet.reason);
     }
-    return json({ ok: true, result, userId, emailSent, loginUrl: '/portal/', targetPortal, assignedTo, salesAgent: salesAgent || null });
+    return json({ ok: true, result, userId, emailSent, emailReason, loginUrl: tipo === 'llegada' ? '/portal/?next=%2Ftherobinplan%2F' : '/portal/', targetPortal, assignedTo, salesAgent: salesAgent || null });
   } catch (error) {
     console.error('crm-convert error', error);
     return serverError(error, 'crm.convert');

@@ -7,6 +7,13 @@ The Portal's `users.tipo = 'llegada'` and signed contract identify the product.
 A conflicting contract variant (for example `general_noes`) is not a Llegada
 contract. Unsigned contracts, administrators and external identities do not qualify.
 
+Moving a CRM lead qualified as Llegada to IN fixes its account destination to the
+Portal identity, with an assigned advisor and no portal selector. Its credentials
+email links to the existing four-step onboarding. After completion, Portal opens
+the Pack's Community view automatically. Failed credential deliveries can be
+retried on the same account; provider idempotency and recorded delivery state
+avoid duplicate emails, and client-chosen passwords are never reset.
+
 Community's existing SSO first checks for a matching subscriber. An active or
 trialing Community subscription keeps the full experience and also receives the
 Pack's calls/payments. Otherwise SSO reuses the Portal user ID in the existing
