@@ -154,11 +154,12 @@ async function markOnboardingPaid(sb, userId, pagoData) {
   if (!userId) return { ok: false, reason: 'no_user_id' };
   const { data: u, error } = await sb
     .from('users')
-    .select('id, lead_id, email, pago_completed, contract_signed')
+    .select('id, lead_id, email, origin, dni_completed, contract_signed, pago_completed, profile_completed')
     .eq('id', userId)
     .single();
   if (error || !u) return { ok: false, reason: 'user_not_found' };
 
+  const { hasCompletedOnboarding } = await import('../../../packages/onboarding/flow.mjs');
   let justCompleted = false;
   if (!u.pago_completed) {
     const nowIso = (pagoData && pagoData.at) || new Date().toISOString();
@@ -170,7 +171,7 @@ async function markOnboardingPaid(sb, userId, pagoData) {
         pago_completed: true,
         pago_completed_at: nowIso,
         pago_data: pagoData || null,
-        requires_onboarding: false,
+        requires_onboarding: !hasCompletedOnboarding({ ...u, pago_completed: true }),
       })
       .eq('id', userId)
       .eq('pago_completed', false)

@@ -18,7 +18,7 @@ import { reportClientError } from "./client-utils.js";
 import { AdminPortal } from "./application/AdminPortal.jsx";
 import { PortalShell } from "./application/ApplicationPortals.jsx";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
-import { ONBOARDING_ORDER, OnboardingNavContext } from "./application/onboarding/onboarding-nav.js";
+import { ONBOARDING_ORDER, OnboardingNavContext, nextOnboardingStep } from "./application/onboarding/onboarding-nav.js";
 import {
   OnboardingContract,
   OnboardingDNI,
@@ -35,15 +35,7 @@ import {
   paymentsVerify,
 } from "./api.js";
 
-function nextOnboardingStep(user) {
-  if (!user.requires_onboarding) return null;
-  if (!user.origin) return "origin";
-  if (!user.dni_completed) return "dni";
-  if (!user.contract_signed) return "contract";
-  if (!user.profile_completed) return "profile";
-  if (!user.pago_completed) return "payment";
-  return null;
-}
+
 
 function sendNativeAuthEvent(payload) {
   try { window.webkit?.messageHandlers?.robinAuth?.postMessage(payload); } catch (_) { console.warn("[native_auth_event_failed]"); }

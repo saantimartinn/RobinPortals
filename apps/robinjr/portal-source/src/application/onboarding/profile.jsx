@@ -271,7 +271,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
   if (profileSaved) return <OnboardingThanks user={user} onLogout={onLogout} onDone={onDone} />;
 
   return (
-    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={4} onLogout={onLogout} fullscreen conversation>
+    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={5} onLogout={onLogout} fullscreen conversation>
       <ProfileConversation history={history} question={currentQuestion} hint={questionHint} meta={questionMeta} blockTitle={blockTitle} sectionIntro={sectionIntro} containerRef={conversationFrame} minimumHeight={conversationHeight}>
       <div className="onboarding-question-flow" onKeyDown={(event) => { if (event.key === "Enter" && event.target.tagName === "INPUT" && !busy) { event.preventDefault(); next(); } }}>
         {/* Progreso interno del cuestionario */}

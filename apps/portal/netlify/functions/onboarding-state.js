@@ -13,19 +13,8 @@ exports.handler = async (event) => {
     const { data: u, error } = await sb.from('users').select('*').eq('id', session.uid).single();
     if (error || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
 
-    const next_step = !u.requires_onboarding
-      ? null
-      : !u.origin
-        ? 'origin'
-        : !u.dni_completed
-          ? 'dni'
-          : !u.contract_signed
-            ? 'contract'
-            : !u.profile_completed
-              ? 'profile'
-              : !u.pago_completed
-                ? 'payment'
-                : null;
+    const { nextOnboardingStep } = await import('../../../../packages/onboarding/flow.mjs');
+    const next_step = nextOnboardingStep(u);
 
     return json({
       requires_onboarding: !!u.requires_onboarding,
