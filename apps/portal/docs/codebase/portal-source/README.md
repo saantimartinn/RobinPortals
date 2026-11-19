@@ -20,7 +20,6 @@ Proyecto frontend independiente que genera el portal publicado en `/portal/`.
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
 | [`index.html`](../../../portal-source/index.html) | Documento HTML base en el que Vite monta React. | — | Cuando cambie la responsabilidad indicada. |
-| [`node_modules`](../../../portal-source/node_modules) | Archivo mantenido del repositorio: node_modules. | — | Cuando cambie la responsabilidad indicada. |
 | [`package-lock.json`](../../../portal-source/package-lock.json) | Resolución reproducible de dependencias del frontend. | — | Solo como resultado de un cambio intencional de dependencias. |
 | [`package.json`](../../../portal-source/package.json) | Dependencias y comandos Vite del frontend. | — | Al cambiar dependencias, scripts o requisitos de Node.js. |
 | [`postcss.config.js`](../../../portal-source/postcss.config.js) | Transformaciones CSS aplicadas durante el build. | — | Cuando cambie la responsabilidad indicada. |
