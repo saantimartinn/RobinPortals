@@ -62,10 +62,27 @@ test('keeps the custom gross amount and validates the selected VAT treatment', (
   assert.equal(exempt.paymentData.exemption_note, IELTS_EXEMPTION_NOTE);
 });
 
+test('allows arbitrary positive class hours at the existing individual and group rates', () => {
+  for (const [hours, individual, group] of [[1, 33, 16.5], [3, 99, 49.5], [5, 165, 82.5], [7, 231, 115.5], [10, 330, 165], [25, 825, 412.5]]) {
+    for (const [class_mode, expected] of [['individual', individual], ['group', group]]) {
+      const payment = prepareExtraPayment(user, { preset: 'ielts_class', class_mode, hours: String(hours) });
+      assert.equal(payment.amount, expected);
+      assert.equal(payment.paymentData.hours, hours);
+      assert.equal(payment.paymentData.vat_treatment, 'exempt');
+    }
+  }
+});
+
+test('rejects empty, fractional, nonpositive and invalid class hours', () => {
+  for (const hours of [undefined, null, '', true, false, 0, -1, 1.5, '5.5', 'invalid', NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.throws(() => prepareExtraPayment(user, { preset: 'ielts_class', class_mode: 'individual', hours }), /invalid_hours/, String(hours));
+  }
+});
+
 test('rejects invalid preset parameters', () => {
   assert.throws(() => prepareExtraPayment(user, { preset: 'ielts_evaluation', units: 0 }), /invalid_units/);
   assert.throws(() => prepareExtraPayment(user, { preset: 'ielts_class', class_mode: 'pair', hours: 4 }), /invalid_class_mode/);
-  assert.throws(() => prepareExtraPayment(user, { preset: 'ielts_class', class_mode: 'group', hours: 5 }), /invalid_hours/);
+  assert.throws(() => prepareExtraPayment(user, { preset: 'ielts_class', class_mode: 'group', hours: 0 }), /invalid_hours/);
   assert.throws(() => prepareExtraPayment(user, { preset: 'custom', concept: 'x', amount: 10, vat_treatment: 'ten' }), /invalid_vat_treatment/);
 });
 

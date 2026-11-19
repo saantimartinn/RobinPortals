@@ -97,6 +97,8 @@ Para cambios de archivos sigue estas etapas por separado: autorización de uploa
 
 ### Pagos operativos
 
+Los pagos extra de preparación de inglés/IELTS admiten cualquier número entero positivo de horas. El servidor calcula el total a 33 €/hora individual o 16,50 €/hora en grupo, con la exención de IVA existente. `lib/extra-payments.js` valida este contrato; las vistas administrativas de Portal y Robin Jr permiten introducir la cantidad y muestran el total antes de guardar.
+
 Las pantallas del panel llaman servicios en `src/services/portal.ts` o `integrations.ts`, según el dominio. Los endpoints de pago de usuario, los endpoints `/api/admin/payments/*), la verificación y los webhooks pueden actualizar recursos distintos. Resuelve cada ruta en [API_INVENTORY](API_INVENTORY.md), inspecciona la Function y sigue [`lib/payments.js`](../lib/payments.js), [`lib/stripe.js`](../lib/stripe.js) u otro adaptador efectivamente importado. No infieras el proveedor por el nombre de una pantalla.
 
 En la entrada de un proveedor, verifica firma/secreto antes de procesar; registra la clave de evento para reconocer reintentos; persiste el resultado antes de informar éxito. En la salida, el servidor crea el intento/checkout con el proveedor y la UI solo navega o presenta estado. La URL de retorno no sustituye la confirmación de backend.

@@ -114,7 +114,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 | application/admin/AdminCarrerasNew.jsx | 13314 | focused frontend component module |
 | application/admin/AdminChatAssistant.jsx | 9602 | focused frontend component module |
 | application/admin/AdminDocumentosNew.jsx | 7224 | focused frontend component module |
-| application/admin/AdminPagos.jsx | 15714 | focused frontend component module |
+| application/admin/AdminPagos.jsx | 16173 | focused frontend component module |
 | application/admin/AdminReservas.jsx | 5868 | focused frontend component module |
 | application/admin/ClientAvatar.jsx | 582 | focused frontend component module |
 | application/admin/clientManagement.jsx | 12324 | focused frontend component module |
