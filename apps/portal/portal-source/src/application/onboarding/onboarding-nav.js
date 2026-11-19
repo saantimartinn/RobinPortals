@@ -2,7 +2,7 @@
 // completed step and returning to the next one. app.jsx provides the value.
 import { createContext, useContext } from "react";
 
-export const ONBOARDING_ORDER = ["origin", "dni", "contract", "profile", "payment"];
+export { ONBOARDING_ORDER, ONBOARDING_STEPS, nextOnboardingStep } from "../../../../../../packages/onboarding/flow.mjs";
 
 export const OnboardingNavContext = createContext(null);
 

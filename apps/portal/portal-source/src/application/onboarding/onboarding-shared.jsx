@@ -1,16 +1,10 @@
 // Shared onboarding frame; each step retains its own fields and save behavior.
 import { Check, ChevronLeft, LogOut } from "lucide-react";
-import { ONBOARDING_ORDER, useOnboardingNav } from "./onboarding-nav.js";
+import { ONBOARDING_ORDER, ONBOARDING_STEPS as STEPS, useOnboardingNav } from "./onboarding-nav.js";
 import robinLogo from "../../assets/robin-wordmark.png";
 import robinStudent from "../../../../../../packages/brand/assets/robin-student.svg";
 
-const STEPS = [
-  { label: "Tu solicitud", detail: "Desde dónde y qué quieres estudiar" },
-  { label: "Identidad", detail: "Verifica tus datos personales" },
-  { label: "Contrato", detail: "Revisa y firma el acuerdo" },
-  { label: "Perfil académico", detail: "Cuéntanos tus intereses" },
-  { label: "Primer pago", detail: "Completa la activación" },
-];
+
 
 export function OnboardingShell({ user, title, subtitle, question, questionMeta, questionHint, stepNumber, totalSteps = STEPS.length, onLogout, fullscreen = false, conversation = false, children }) {
   const nav = useOnboardingNav();

@@ -9,6 +9,7 @@ import { OnboardingShell } from './onboarding-shared.jsx';
 
 export function OnboardingPayment({ user, onLogout, onDone }) {
   const amount = Number(user.first_payment_amount);
+  const paid = !!user.pago_completed;
 
   const [busy, setBusy]   = useState(false);
   const [error, setError] = useState("");
@@ -26,6 +27,7 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
   async function pay() {
     setBusy(true); setError("");
     try {
+      if (paid) { await onDone(); return; }
       const r = await onboardingCheckout();
       if (r && r.url) { window.location.href = r.url; return; }
       setError("No se pudo iniciar el pago."); setBusy(false);
@@ -46,11 +48,13 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
     <OnboardingShell user={user}
       title="Realiza el primer pago"
       subtitle={amountStr ? `Pago seguro con tarjeta · Importe: ${amountStr} €` : "Pago seguro con tarjeta"}
-      stepNumber={5}
+      stepNumber={4}
       onLogout={onLogout}
     >
       <div className="space-y-5">
-        {confirming ? (
+        {paid ? (
+          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm">Primer pago confirmado. Ahora vamos con las preguntas de orientación.</div>
+        ) : confirming ? (
           <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" /> Confirmando tu pago…
           </div>
@@ -76,12 +80,12 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
           </div>
         )}
 
-        <Btn className="w-full" size="lg" variant="gold" onClick={pay} disabled={busy || confirming}>
-          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Redirigiendo a pago seguro…</> : <>Continuar al pago{amountStr ? ` · ${amountStr} €` : ""} <ChevronRight className="h-4 w-4" /></>}
+        <Btn className="w-full" size="lg" variant="gold" onClick={pay} disabled={busy || (!paid && confirming)}>
+          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {paid ? "Continuando…" : "Redirigiendo a pago seguro…"}</> : paid ? <>Continuar con las preguntas <ChevronRight className="h-4 w-4" /></> : <>Continuar al pago{amountStr ? ` · ${amountStr} €` : ""} <ChevronRight className="h-4 w-4" /></>}
         </Btn>
 
         <div className="text-[11px] text-slate-400 text-center">
-          {user.special_price_total_eur
+          {paid ? "Tu pago ya está registrado. Continúa para completar tu perfil académico." : user.special_price_total_eur
             ? "Serás redirigido a la pasarela de pago segura. Este es el único pago del programa."
             : "Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor."}
         </div>
