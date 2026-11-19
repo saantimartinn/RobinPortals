@@ -163,7 +163,7 @@ export default function PortalRobin() {
       }
     })();
     return () => { mounted = false; };
-  }, [authState.user?.id]);
+  }, [authState.user?.id, authState.user?.arrival_pack?.contracted]);
 
   useEffect(() => {
     if (resetToken || !authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
@@ -176,6 +176,12 @@ export default function PortalRobin() {
         landingHandled.current = true;
         window.location.replace("/admin");
       }
+      return;
+    }
+    // Arrival clients finish the existing four-step onboarding before entering
+    // their Community view, including when their email links directly there.
+    if (authState.user.tipo === "llegada" && authState.needsOnboarding) {
+      if (pathname === "/login") window.history.replaceState({}, "", "/portal/" + window.location.search);
       return;
     }
     if (next === "robinjr") {
@@ -222,11 +228,16 @@ export default function PortalRobin() {
       }
       return;
     }
+    if (authState.user.arrival_pack?.contracted && subscriptionAccess) {
+      landingHandled.current = true;
+      window.location.replace("/therobinplan/");
+      return;
+    }
     if (pathname === "/login") {
       landingHandled.current = true;
       window.location.replace("/portal/");
     }
-  }, [authState.user?.id, checkingSubscriptionAccess, subscriptionAccess, subscriptionAccessResolved, resetToken]);
+  }, [authState.user?.id, authState.user?.arrival_pack?.contracted, authState.needsOnboarding, checkingSubscriptionAccess, subscriptionAccess, subscriptionAccessResolved, resetToken]);
 
   useEffect(() => {
     let active = true;

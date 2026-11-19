@@ -144,6 +144,6 @@ export const integrationClient = {
       const messages: Record<string, string> = { lead_email_required: "El lead necesita un email antes de pasar a IN", portal_required: "Elige el portal de destino", advisor_required: "Debes elegir el asesor del cliente", advisor_invalid: "El asesor elegido no tiene acceso activo al portal", identity_collision: "Ya existe un usuario con ese email o identificador en el portal elegido", invalid_bootstrap_password_configuration: "Falta configurar una contraseña inicial válida" };
       throw new Error(messages[payload.error] || payload.detail || "No se pudo crear el alumno en el portal");
     }
-    return payload as { result: "created" | "exists"; userId: string; emailSent: boolean; loginUrl: string; targetPortal: "alumno" | "robinjr" | "community"; assignedTo: string | null; salesAgent: string | null };
+    return payload as { result: "created" | "exists"; userId: string; emailSent: boolean; emailReason: string | null; loginUrl: string; targetPortal: "alumno" | "robinjr" | "community"; assignedTo: string | null; salesAgent: string | null };
   },
 };

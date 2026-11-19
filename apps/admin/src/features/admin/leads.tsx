@@ -39,6 +39,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
   const [lostFrom, setLostFrom] = useState("");
   const [lostTo, setLostTo] = useState("");
   const [pendingClientId, setPendingClientId] = useState<string | null>(null);
+  const [conversionError, setConversionError] = useState("");
   const [selectedAdvisor, setSelectedAdvisor] = useState("");
   const [selectedPortal, setSelectedPortal] = useState<"alumno" | "robinjr" | "community" | "">("");
   const [recentPortalAccounts, setRecentPortalAccounts] = useState<Record<string, string[]>>({});
@@ -75,6 +76,7 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
     return campaignFilter === "all" || campaign === campaignFilter;
   });
   const activeCrmFilters = Number(categoryFilter !== "all") + Number(campaignFilter !== "all");
+  const pendingArrival = !!pendingClientId && categories[pendingClientId] === "Llegada";
 
   useEffect(() => {
     if (!stageReminderOpen) return;
@@ -182,7 +184,8 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
 
   function beginPortalConversion(leadId: string) {
     setSelectedAdvisor("");
-    setSelectedPortal("");
+    setSelectedPortal(categories[leadId] === "Llegada" ? "alumno" : "");
+    setConversionError("");
     setPendingClientId(leadId);
   }
 
@@ -192,13 +195,15 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
     const clientType = leadId ? categories[leadId] : "";
     if (convertingId || !leadId || !contact || !selectedPortal || (selectedPortal !== "community" && (!clientType || !selectedAdvisor))) return;
     setConvertingId(leadId);
-    const portalName = { alumno: "Portal del Alumno", robinjr: "Robin Jr", community: "Community" }[selectedPortal];
+    setConversionError("");
+    const portalName = clientType === "Llegada" ? "Pack Llegada" : { alumno: "Portal del Alumno", robinjr: "Robin Jr", community: "Community" }[selectedPortal];
     notify(`Creando la cuenta de ${contact.name} en ${portalName}…`);
     try {
       const result = await integrationClient.convertLead({ leadId, name: contact.name, email: contact.email, advisor: selectedAdvisor, clientType: clientType || "", targetPortal: selectedPortal });
       setRecentPortalAccounts((current) => ({ ...current, [leadId]: [...new Set([...(current[leadId] || []), selectedPortal])] }));
       if ((leadStages[leadId] || contact.stage) !== "Cliente") onMoveLead(leadId, "Cliente");
-      setPendingClientId(null);
+      if (result.emailSent || result.emailReason === "password_changed") setPendingClientId(null);
+      else setConversionError("La cuenta está creada, pero no se ha podido enviar el correo de acceso. Pulsa Reintentar para volver a enviarlo.");
       let lastId = lastCelebrationRef.current;
       try { lastId = localStorage.getItem(lastCelebrationKey) || lastId; } catch (_) {}
       const nextCelebration = getInCelebration(result, { name: contact.name, portalName, lastId });
@@ -208,11 +213,12 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
         setCelebration(nextCelebration);
       }
       if (selectedPortal === "alumno") void onPortalRefresh().catch(() => notify("La cuenta está creada; actualiza la vista para verla."));
-      if (result.result === "exists") notify(`${contact.name} ya tenía cuenta en ${portalName}`);
+      if (result.emailReason === "password_changed") notify(`${contact.name} ya tiene una contraseña propia. Puede acceder con ella o usar Recuperar contraseña.`);
+      else if (result.result === "exists") notify(`${contact.name} ya tenía cuenta en ${portalName}${result.emailSent ? "; correo de acceso enviado" : "; correo pendiente"}`);
       else if (result.emailSent) notify(`Cuenta creada en ${portalName} y correo de acceso enviado`);
       else notify(`Cuenta creada en ${portalName}; el correo queda pendiente`);
     } catch (error) {
-      notify(error instanceof Error ? error.message : "No se pudo crear la cuenta en el portal");
+      setConversionError(error instanceof Error ? error.message : "No se pudo crear la cuenta en el portal");
     } finally { setConvertingId(null); }
   }
 
@@ -350,16 +356,16 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
         <form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmClientConversion(); }}>
           <button className="drawer-close" type="button" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>×</button>
           <span>{leadStages[pendingClientId] === "Cliente" ? "Añadir portal" : "Pasar a IN"}</span>
-          <h2>Elegir portal del cliente</h2>
-          <p>La cuenta se creará en la base de datos del portal elegido. Puedes añadirle acceso a otro portal más adelante.</p>
-          <label>Portal de destino
+          <h2>{pendingArrival ? "Activar Pack Llegada" : "Elegir portal del cliente"}</h2>
+          <p>{pendingArrival ? "El cliente recibirá sus credenciales para completar el onboarding del Pack Llegada y acceder a su espacio en Robin Community." : "La cuenta se creará en la base de datos del portal elegido. Puedes añadirle acceso a otro portal más adelante."}</p>
+          {!pendingArrival && <label>Portal de destino
             <select required autoFocus value={selectedPortal} onChange={(event) => setSelectedPortal(event.target.value as typeof selectedPortal)}>
               <option value="">Seleccionar portal…</option>
               <option value="robinjr">Robin Jr</option>
               <option value="alumno">Portal del Alumno</option>
               <option value="community">Community</option>
             </select>
-          </label>
+          </label>}
           {selectedPortal !== "community" && <label>Asesor
             <select required value={selectedAdvisor} onChange={(event) => setSelectedAdvisor(event.target.value)}>
               <option value="">Seleccionar asesor…</option>{admins.map((admin) => <option key={admin} value={admin}>{admin}</option>)}
@@ -372,8 +378,9 @@ export function Crm({ path, currentUser, admins, contacts, leadOwners, onAssignL
           </div>
           <div className="manual-lead-actions">
             <Button type="button" variant="outline" disabled={!!convertingId} onClick={() => setPendingClientId(null)}>Cancelar</Button>
-            <Button type="submit" disabled={!selectedPortal || (selectedPortal !== "community" && (!categories[pendingClientId] || !selectedAdvisor)) || !!convertingId}>{convertingId ? "Creando acceso…" : "Crear acceso"}</Button>
+            <Button type="submit" disabled={!selectedPortal || (selectedPortal !== "community" && (!categories[pendingClientId] || !selectedAdvisor)) || !!convertingId}>{convertingId ? "Creando acceso…" : conversionError ? "Reintentar" : "Crear acceso"}</Button>
           </div>
+          {conversionError && <p className="team-note-error" role="alert">{conversionError}</p>}
         </form>
       </div>}
       {pendingLostId && <div className="drawer-wrap outcome-dialog-wrap" onMouseDown={(event) => { if (event.target === event.currentTarget && !savingOutcome) setPendingLostId(null); }}><form className="manual-lead-card crm-outcome-card" onSubmit={(event) => { event.preventDefault(); void confirmLost(); }}><button className="drawer-close" type="button" disabled={savingOutcome} onClick={() => setPendingLostId(null)}>×</button><span>Retirar del pipeline</span><h2>{lostDestination === "future" ? "Lead de próximo curso" : "Motivo obligatorio"}</h2><p>{lostDestination === "future" ? "El lead saldrá del CRM activo y se guardará únicamente en la tabla de próximos cursos." : "Selecciona por qué se ha perdido este lead. Este dato quedará guardado para el análisis comercial."}</p><label>Destino<select autoFocus value={lostDestination} onChange={(event) => { const destination = event.target.value as "lost" | "future"; setLostDestination(destination); setOutcomeError(""); }}><option value="lost">Lost definitivo</option><option value="future">Lead de próximo curso</option></select></label>{lostDestination === "lost" ? <><label>Motivo<select required value={lostReason} onChange={(event) => { setLostReason(event.target.value as LostReason | ""); if (event.target.value !== "other") setLostReasonDetail(""); }}><option value="">Seleccionar motivo…</option>{lostReasonOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>{lostReason === "other" && <label>Explicación breve<input required maxLength={120} value={lostReasonDetail} onChange={(event) => setLostReasonDetail(event.target.value)} placeholder="Escribe el motivo" /></label>}</> : <label>Curso académico<select required value={futureAcademicYear} onChange={(event) => setFutureAcademicYear(event.target.value as FutureAcademicYear | "")}><option value="">Seleccionar curso…</option><option value="2027-28">2027-28</option><option value="2028-29">2028-29</option></select></label>}{outcomeError && <small className="team-note-error" role="alert">{outcomeError}</small>}<div className="manual-lead-actions"><Button type="button" variant="outline" disabled={savingOutcome} onClick={() => setPendingLostId(null)}>Cancelar</Button><Button type="submit" disabled={savingOutcome || (lostDestination === "lost" ? !lostReason || (lostReason === "other" && !lostReasonDetail.trim()) : !futureAcademicYear)}>{savingOutcome ? "Moviendo…" : lostDestination === "future" ? "Enviar a próximos cursos" : "Marcar como Lost"}</Button></div></form></div>}

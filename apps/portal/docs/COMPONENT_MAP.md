@@ -8,7 +8,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 |---|---|---|---|---|---|---|---:|
 | sendNativeAuthEvent | app.jsx | app/auth | payload | none | none | none | 40 |
 | PortalRobin | app.jsx | app/auth | none | authState, onboardingOverride, active, subscriptionAccess, checkingSubscriptionAccess, subscriptionAccessResolved, entryNotice, reportOpen, introUserId, resetToken | apiLogin, apiLogout, apiMe, issueSsoTicket, onboardingState, paymentsVerify | SupportDialogs, ResetPasswordScreen, LoginScreen, CrossPortalNav, AdminPortal, OnboardingNavContext, Step, PortalShell | 44 |
-| LoginScreen | app.jsx | app/auth | { onLogin } | email, password, error, loading, recoveryOpen, biometryName | none | RecoveryRequest | 363 |
+| LoginScreen | app.jsx | app/auth | { onLogin } | email, password, error, loading, recoveryOpen, biometryName | none | RecoveryRequest | 374 |
 | AdminPerfilAcademico | application/admin/academic.jsx | shared/application | { client, onRefresh } | none | none | AdminProfileEditor | 3 |
 | AdminCarrerasNew | application/admin/AdminCarrerasNew.jsx | shared/application | { client } | library, assigned, loading, error, cName, cUni, cCity, cLevel, cDocs, editingId | adminCareersListAll, adminCareersCreate, adminCareersDelete, adminCareersAssign, adminCareersUnassign | Card, CardHeader, Btn, CardContent, Field, Divider, CareerRequirementsTimeline | 10 |
 | AdminChatAssistant | application/admin/AdminChatAssistant.jsx | shared/application | { user, activeClientId, clients, mascot } | mode, messages, draft, busy, error, notesOpen, notesText, notesUserId, notesTitle, notesBusy | adminAssistant, adminHistorialAdd | Btn | 8 |
@@ -109,7 +109,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 
 | Module | Bytes | Responsibility |
 |---|---:|---|
-| app.jsx | 18940 | composition root and authentication screens |
+| app.jsx | 19589 | composition root and authentication screens |
 | application/admin/academic.jsx | 209 | focused frontend component module |
 | application/admin/AdminCarrerasNew.jsx | 13314 | focused frontend component module |
 | application/admin/AdminChatAssistant.jsx | 9602 | focused frontend component module |

@@ -8,6 +8,7 @@ Node test-runner regression tests.
 
 | File | Responsibility |
 |---|---|
+| [`account-access-email.test.js`](../../../tests/account-access-email.test.js) | Automated regression coverage for account-access-email.test. |
 | [`admin-crm-recommender.test.js`](../../../tests/admin-crm-recommender.test.js) | Automated regression coverage for admin-crm-recommender.test. |
 | [`campaign-export.test.js`](../../../tests/campaign-export.test.js) | Automated regression coverage for campaign-export.test. |
 | [`client-count-exclusions.test.js`](../../../tests/client-count-exclusions.test.js) | Automated regression coverage for client-count-exclusions.test. |

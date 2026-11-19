@@ -52,12 +52,13 @@ test('CRM crea accesos en bases separadas y conserva ambos portales del mismo le
   const community = database({ subscribers: [] });
   const crm = database({ crm_leads: [lead], crm_lead_events: [{ id: 'note-1', lead_id: lead.id, event_type: 'team_note', metadata: { body: 'Llamar a la madre', author_name: 'Equipo' }, created_at: '2026-11-04T10:00:00Z' }], crm_lead_calls: [] });
   const sent = [];
+  let mailResult = { sent: true };
   const modules = {
     '../../lib/supabase': { getSupabase: () => portal },
     '../../lib/admin-supabase': { getAdminSupabase: () => crm },
     '../../lib/junior-supabase': { getJuniorSupabase: () => junior },
     '../../lib/subscriptions-supabase': { getSubscriptionsSupabase: () => community },
-    '../../lib/auth': { readSessionFromEvent: () => ({ uid: admin.id }), hashPassword: (value) => 'hash:' + value },
+    '../../lib/auth': { readSessionFromEvent: () => ({ uid: admin.id }), hashPassword: (value) => 'hash:' + value, verifyPassword: (value, hash) => hash === 'hash:' + value },
     '../../lib/authorization': { isApplicationAdmin: (user) => user.role === 'admin', normalizeEmail: (user) => user.email },
     '../../lib/identity': { identityExists: async () => false },
     '../../lib/http': {
@@ -68,8 +69,8 @@ test('CRM crea accesos en bases separadas y conserva ambos portales del mismo le
       verifyOrigin: () => true,
     },
     '../../shared/password-policy.cjs': { passwordPolicy: () => ({ ok: true }) },
-    '../../lib/notion': { normalizeTipo: (value) => value, ensureDriveFolder: async () => {} },
-    '../../lib/account-access-email': { sendAccountAccessEmail: async (payload) => { sent.push(payload); return { sent: true }; } },
+    '../../lib/notion': { normalizeTipo: (value) => String(value || '').toLowerCase().includes('llegada') ? 'llegada' : value, ensureDriveFolder: async () => {} },
+    '../../lib/account-access-email': { sendAccountAccessEmail: async (payload) => { sent.push(payload); return mailResult; } },
     '../../lib/finance-dashboard': { contractedAmountForUser: () => 1499 },
     '../../lib/crm-identity': {
       resolveCrmOwner: async () => ({ available: true, user: admin }),
@@ -90,10 +91,10 @@ test('CRM crea accesos en bases separadas y conserva ambos portales del mismo le
   } finally {
     Module._load = originalLoad;
   }
-  const convert = async (targetPortal, advisor = 'admin') => {
+  const convert = async (targetPortal, advisor = 'admin', overrides = {}) => {
     const response = await handler({
       httpMethod: 'POST',
-      body: JSON.stringify({ leadId: lead.id, targetPortal, advisor, clientType: 'General' }),
+      body: JSON.stringify({ leadId: lead.id, targetPortal, advisor, clientType: 'General', ...overrides }),
     });
     assert.equal(response.statusCode, 200);
     return JSON.parse(response.body);
@@ -138,6 +139,43 @@ test('CRM crea accesos en bases separadas y conserva ambos portales del mismo le
   assert.equal(community.tables.crm_client_notes.length, 1);
   assert.equal(sent.length, 3);
   assert.ok(sent.every((message) => message.username === lead.email && message.password === 'test-bootstrap-password#'));
+
+  const arrival = { id: 'arrival-1', name: 'Llegada Cliente', email: 'arrival@example.test', lead_type: 'Llegada', source_payload: {}, owner_names: ['Admin'] };
+  crm.tables.crm_leads.push(arrival);
+  const missingAdvisor = await handler({ httpMethod: 'POST', body: JSON.stringify({ leadId: arrival.id, targetPortal: 'community' }) });
+  assert.equal(missingAdvisor.statusCode, 400);
+  assert.equal(JSON.parse(missingAdvisor.body).error, 'advisor_required');
+  mailResult = { sent: false, reason: 'provider_error' };
+  const failedMail = await convert('community', 'admin', { leadId: arrival.id });
+  assert.equal(failedMail.targetPortal, 'alumno');
+  assert.equal(failedMail.emailSent, false);
+  assert.equal(failedMail.emailReason, 'provider_error');
+  assert.equal(community.tables.subscribers.length, 1);
+  const arrivalAccount = portal.tables.users.find(user => user.lead_id === arrival.id);
+  assert.equal(arrivalAccount.tipo, 'llegada');
+  assert.equal(arrivalAccount.assigned_to, admin.email);
+  assert.equal(arrivalAccount.requires_onboarding, true);
+  assert.equal(arrival.source_payload.account_access_emails.alumno.status, 'failed');
+  assert.ok(!JSON.stringify(arrival.source_payload).includes('test-bootstrap-password#'));
+  mailResult = { sent: true, id: 'mail-1' };
+  const recoveredMail = await convert('robinjr', 'admin', { leadId: arrival.id });
+  assert.equal(recoveredMail.result, 'exists');
+  assert.equal(recoveredMail.emailSent, true);
+  assert.equal(portal.tables.users.filter(user => user.lead_id === arrival.id).length, 1);
+  assert.equal(junior.tables.users.length, 1);
+  assert.equal(arrival.source_payload.account_access_emails.alumno.message_id, 'mail-1');
+  assert.equal(sent.at(-1).idempotencyKey, sent.at(-2).idempotencyKey);
+  assert.equal(sent.at(-1).clientType, 'llegada');
+  const attempts = sent.length;
+  await convert('', 'admin', { leadId: arrival.id });
+  assert.equal(sent.length, attempts);
+  arrivalAccount.password_hash = 'client-chosen-password-hash';
+  delete arrival.source_payload.account_access_emails.alumno;
+  const changedPassword = await convert('', 'admin', { leadId: arrival.id });
+  assert.equal(changedPassword.emailReason, 'password_changed');
+  assert.equal(changedPassword.emailSent, false);
+  assert.equal(arrivalAccount.password_hash, 'client-chosen-password-hash');
+  assert.equal(sent.length, attempts);
   if (previousPassword === undefined) delete process.env.CRM_BOOTSTRAP_PASSWORD;
   else process.env.CRM_BOOTSTRAP_PASSWORD = previousPassword;
 });

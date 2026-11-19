@@ -79,7 +79,9 @@ La lógica de identidad, normalización y deduplicación se debe buscar en los m
 
 ### Conversión y cambios de estado
 
-Una operación de conversión puede cruzar el prefijo interno `/api/internal/crm/convert`: este route está destinado a integración backend, no es el API genérico del navegador. Comprueba el caller antes de cambiar autenticación o payload. Asignación, etapa, notas, llamadas, campañas y estado futuro tienen handlers distintos, por lo que sus efectos secundarios y permisos no son necesariamente idénticos.
+La conversión desde `leads.tsx` llama mediante `integrations.ts` a `/api/internal/crm/convert`, protegido por sesión administrativa y origen. La calificación persistida Llegada fija el destino en la identidad del Portal del Alumno: el agente elige asesor, sin selector de portal. El cliente completa sus cuatro pasos y entra automáticamente en la variante Pack Llegada de Community mediante SSO.
+
+El envío de credenciales registra estado e identificador del proveedor en `source_payload.account_access_emails`, sin guardar contraseñas. Un envío fallido permite reintentar sobre la misma cuenta con una clave de idempotencia. Si el cliente ya cambió su contraseña, no se modifica ni se envía la contraseña inicial. Drive y Sheets se sincronizan después del envío. Asignación, etapa, notas, llamadas, campañas y estado futuro tienen handlers distintos.
 
 Al cambiar el contrato revisa: normalización de identificadores/email, dedupe, owner/advisor, estado visible, historial, sync con Notion, respuesta esperada por la UI e idempotencia de reintentos. El mapa de campos Notion está en [`docs/notion-crm-mapping.md`](notion-crm-mapping.md); métricas históricas están en [`docs/crm-historical-metrics.md`](crm-historical-metrics.md).
 
