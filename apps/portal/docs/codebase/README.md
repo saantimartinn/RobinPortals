@@ -14,7 +14,7 @@ Punto de entrada para entender el repositorio completo antes de bajar a una capa
 4. Consulta `shared/` para reglas idénticas en frontend y backend.
 5. Usa `test/` y `scripts/` para saber qué contrato protege CI.
 
-Este árbol cubre 395 archivos mantenidos en 30 carpetas. Los propios READMEs generados se excluyen para evitar una referencia recursiva.
+Este árbol cubre 393 archivos mantenidos en 30 carpetas. Los propios READMEs generados se excluyen para evitar una referencia recursiva.
 
 ## Subcarpetas
 
@@ -42,7 +42,6 @@ Este árbol cubre 395 archivos mantenidos en 30 carpetas. Los propios READMEs ge
 | [`USERGUIDE.md`](../../USERGUIDE.md) | Archivo mantenido del repositorio: USERGUIDE.md. | — | Cuando cambie la responsabilidad indicada. |
 | [`lint.config.cjs`](../../lint.config.cjs) | Patrones y carpetas usados por el lint de seguridad local. | — | Cuando cambie la responsabilidad indicada. |
 | [`netlify.toml`](../../netlify.toml) | Fuente de verdad de build, redirects, headers, Edge Functions y schedules de Netlify. | — | Al cambiar despliegue, rutas, cabeceras o schedules. |
-| [`node_modules`](../../node_modules) | Archivo mantenido del repositorio: node_modules. | — | Cuando cambie la responsabilidad indicada. |
 | [`package-lock.json`](../../package-lock.json) | Resolución reproducible de dependencias raíz; se regenera con npm. | — | Solo como resultado de un cambio intencional de dependencias. |
 | [`package.json`](../../package.json) | Dependencias y metadatos del backend y de los scripts raíz. | — | Al cambiar dependencias, scripts o requisitos de Node.js. |
 
