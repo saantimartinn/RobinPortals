@@ -1,4 +1,5 @@
 // Server-side extra payments helpers used by request handlers; provider calls and domain rules stay behind this boundary.
+const { numberValue } = require('./validation');
 const IELTS_EXEMPTION_NOTE = 'Operación exenta de IVA conforme al artículo 20.Uno.9.º de la Ley 37/1992.';
 
 const EXTRA_PAYMENT_PRESETS = Object.freeze({
@@ -7,7 +8,6 @@ const EXTRA_PAYMENT_PRESETS = Object.freeze({
   ielts_class: 'ielts_class',
 });
 
-const IELTS_HOURS = Object.freeze([4, 6, 8, 12]);
 const IELTS_RATES = Object.freeze({ individual: 33, group: 16.5 });
 
 function roundMoney(value) {
@@ -66,9 +66,9 @@ function prepareExtraPayment(user, input = {}) {
 
   if (preset === EXTRA_PAYMENT_PRESETS.ielts_class) {
     const classMode = String(input.class_mode || '').trim().toLowerCase();
-    const hours = Number(input.hours);
+    const hours = numberValue(input.hours, { min: 1, max: Number.MAX_SAFE_INTEGER, integer: true });
     if (!Object.hasOwn(IELTS_RATES, classMode)) throw inputError('invalid_class_mode');
-    if (!IELTS_HOURS.includes(hours)) throw inputError('invalid_hours');
+    if (hours == null) throw inputError('invalid_hours');
     const rate = IELTS_RATES[classMode];
     const modeLabel = classMode === 'individual' ? 'Individual' : 'Grupo';
     return {
@@ -105,7 +105,6 @@ function prepareExtraPayment(user, input = {}) {
 module.exports = {
   EXTRA_PAYMENT_PRESETS,
   IELTS_EXEMPTION_NOTE,
-  IELTS_HOURS,
   IELTS_RATES,
   prepareExtraPayment,
   studentName,

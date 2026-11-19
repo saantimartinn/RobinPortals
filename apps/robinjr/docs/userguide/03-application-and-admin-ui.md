@@ -19,6 +19,8 @@ desbloqueo de pagos.
 
 ## API/servidor que apoya la UI
 
+En pagos extra, las clases de inglés/IELTS admiten una cantidad entera de horas mayor que cero, introducida por el asesor. El total se actualiza al cambiar cantidad o modalidad: 33 €/hora individual y 16,50 €/hora en grupo, exento de IVA. El backend vuelve a validar la cantidad y calcular el importe antes de crear el pago.
+
 - Clientes/alumnos → `/api/admin/clients*`, `/api/profile*`, `/api/me`.
 - Onboarding → `/api/onboarding/*`; firma, DNI/OCR, registro de origin y checkout tienen handlers separados.
 - Carreras → `/api/careers`, `/api/admin/careers/*`, sugerencias IA.

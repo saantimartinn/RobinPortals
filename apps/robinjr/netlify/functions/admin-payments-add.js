@@ -10,6 +10,7 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { getSessionUser } = require('../../lib/session-user');
 const { isApplicationAdmin } = require('../../lib/authorization');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
+const { numberValue } = require('../../lib/validation');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -25,7 +26,7 @@ exports.handler = async (event) => {
   const concept = String(body.concept || '').trim();
   const tax_rate = String(body.tax_rate || '21').trim();
   const ielts_mode = String(body.ielts_mode || '').trim();
-  const ielts_hours = Number(body.ielts_hours);
+  const ielts_hours = numberValue(body.ielts_hours, { min: 1, max: Number.MAX_SAFE_INTEGER, integer: true });
   const units = Number(body.units);
   let amount = Number(body.amount);
   const due_date = body.due_date ? String(body.due_date).trim() : null;
@@ -39,7 +40,7 @@ exports.handler = async (event) => {
     amount = units * 33;
   }
   if (preset === 'ielts_class') {
-    if (!['individual', 'group'].includes(ielts_mode) || ![4, 6, 8, 12].includes(ielts_hours)) return json({ error: 'invalid_ielts_class' }, { statusCode: 400 });
+    if (!['individual', 'group'].includes(ielts_mode) || ielts_hours == null) return json({ error: 'invalid_ielts_class' }, { statusCode: 400 });
     amount = ielts_hours * (ielts_mode === 'group' ? 16.5 : 33);
   }
   if (!isFinite(amount) || amount <= 0) return json({ error: 'invalid_amount' }, { statusCode: 400 });
