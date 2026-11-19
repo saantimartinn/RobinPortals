@@ -1,6 +1,6 @@
 # File map
 
-Inventario generado de 376 archivos mantenidos por el repositorio. Los lockfiles se
+Inventario generado de 374 archivos mantenidos por el repositorio. Los lockfiles se
 excluyen porque describen resoluciones de dependencias, no módulos de arquitectura. Las
 dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 
@@ -193,10 +193,8 @@ dependencias, tablas e integraciones son inferencias estáticas conservadoras.
 | `netlify/functions/profile-avatar.js` | Entrypoint HTTP o programado: profile avatar | MAX_AVATAR_BYTES, avatarDescriptor, avatarPrefix, handler, handler (Netlify entrypoint), invalid | ../../lib/auth<br>../../lib/http<br>../../lib/storage<br>../../lib/supabase | test/profile-avatar.test.js | users | Supabase<br>Netlify | ACTIVE |
 | `netlify/functions/profile-lived-abroad.js` | Entrypoint HTTP o programado: profile lived abroad | handler, handler (Netlify entrypoint) | ../../lib/auth<br>../../lib/authorization<br>../../lib/http<br>../../lib/session-user<br>../../lib/supabase | — | users | Supabase<br>Netlify | ACTIVE |
 | `netlify/functions/revolut-webhook.js` | Entrypoint HTTP o programado: revolut webhook | handler, handler (Netlify entrypoint), logWebhook | ../../lib/observability<br>../../lib/payment-attempts<br>../../lib/payment-fulfill<br>../../lib/revolut<br>../../lib/supabase | — | webhook_log | Supabase<br>Revolut<br>Netlify | ACTIVE |
-| `node_modules` | Configuración o recurso: node_modules | — | — | — | — | — | ACTIVE |
 | `package.json` | Dependencias y metadatos del backend | — | — | — | — | Supabase<br>Anthropic | ACTIVE |
 | `portal-source/index.html` | Configuración o recurso: index.html | — | — | — | — | — | ACTIVE |
-| `portal-source/node_modules` | Configuración o recurso: node_modules | — | — | — | — | — | ACTIVE |
 | `portal-source/package.json` | Dependencias y scripts del frontend | — | — | — | — | — | ACTIVE |
 | `portal-source/postcss.config.js` | Configuración o recurso: postcss.config.js | — | — | — | — | — | ACTIVE |
 | `portal-source/public/favicon-150.png` | Activo público del frontend: favicon-150.png | — | — | — | — | — | ACTIVE |
