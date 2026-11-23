@@ -9,16 +9,16 @@ async function inboxViews() {
   return import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 }
 
-test('los leads del recomendador permanecen en General y aparecen también en su bandeja', async () => {
+test('los leads existentes del recomendador aparecen solo en su bandeja', async () => {
   const { matchesInboxView } = await inboxViews();
   const leads = [
-    { id: 'rbmt', source: 'Página web', campaign: 'Recomendador', formName: 'recomendador', country: 'España' },
+    { id: 'rbmt', source: 'Página web', campaign: 'Recomendador', formName: 'recomendador', country: 'España', createdAt: '2026-11-18T12:00:00Z' },
     { id: 'web', source: 'Página web', campaign: '', formName: 'contacto', country: 'Portugal' },
     { id: 'meta', source: 'Meta Ads', campaign: 'Campaña de otoño', country: 'España' },
   ];
-  assert.deepEqual(leads.filter(lead => matchesInboxView(lead, 'all')).map(lead => lead.id), ['rbmt', 'web', 'meta']);
+  assert.deepEqual(leads.filter(lead => matchesInboxView(lead, 'all')).map(lead => lead.id), ['web', 'meta']);
   assert.deepEqual(leads.filter(lead => matchesInboxView(lead, 'recomendador')).map(lead => lead.id), ['rbmt']);
-  assert.deepEqual(leads.filter(lead => matchesInboxView(lead, 'España')).map(lead => lead.id), ['rbmt', 'meta']);
+  assert.deepEqual(leads.filter(lead => matchesInboxView(lead, 'España')).map(lead => lead.id), ['meta']);
 });
 
 test('reconoce el origen por campaña, formulario o etiqueta de origen, sin confundir otras webs', async () => {
