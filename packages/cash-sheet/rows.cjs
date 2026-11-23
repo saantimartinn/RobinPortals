@@ -1,4 +1,4 @@
-// Proyección de los datos del portal sobre la pestaña «Cambios para Manu».
+// Proyección de los datos del perfil sobre las pestañas de CASH.
 const SOURCE_LABELS = Object.freeze({
   meta: 'Meta',
   referral: 'Referido',
@@ -62,6 +62,14 @@ function paymentSlot(payments, installment) {
   };
 }
 
+// Complete missing installments from the product's existing contract pricing.
+// Recorded amounts/statuses take precedence; projecting CASH never records a payment.
+function paymentsForCash(plan, recordedPayments = []) {
+  const byInstallment = new Map(plan.map(installment => [Number(installment.installment), { ...installment, status: 'locked' }]));
+  for (const payment of recordedPayments) byInstallment.set(Number(payment.installment), payment);
+  return [...byInstallment.values()].filter(payment => !payment.payment_data?.annulled_at);
+}
+
 function buildChangesRow(user, payments, paymentRow, options = {}) {
   const { channel, campaign } = acquisition(options.attribution);
   return {
@@ -75,4 +83,4 @@ function buildChangesRow(user, payments, paymentRow, options = {}) {
   };
 }
 
-module.exports = { acquisition, buildChangesRow, clientType, market, paymentSlot, sheetDate };
+module.exports = { acquisition, buildChangesRow, clientType, market, paymentSlot, paymentsForCash, sheetDate };

@@ -23,8 +23,8 @@
  *   A Asesor · B PR · C alumno · D Pago1 · E Estado1 · F Pago2 · G Estado2 ·
  *   H Pago3 · I Estado3 · J Pagado(*) · K Restante(*) · L Cobros ·
  *   M Sin IVA(*) · N Contrato
- *   (*) columnas con FÓRMULA en las filas plantilla: NO se sobreescriben cuando
- *       reutilizamos una fila existente; se dejan recalcular solas.
+ *   (*) se conservan las fórmulas existentes y se completan las ausentes.
+ *       La fórmula de cobrado incorpora los pagos adicionales registrados.
  */
 
 const SHEETS_API = 'https://sheets.googleapis.com/v4/spreadsheets';
@@ -32,10 +32,11 @@ const OAUTH_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const DEFAULT_SPREADSHEET_ID = '1fAzgWD-xmhbupFCKDx-wpBQG5wBJT9uv3MRScZ_EiRY';
 const DEFAULT_SHEET_GID = 2041257143;
 const CHANGES_SHEET_GID = 288896043;
-const { FISCAL, isLatamClient, usesInternational2700Plan } = require('../shared/financial-config.cjs');
-const { buildChangesRow } = require('../../../packages/cash-sheet/rows.cjs');
+const { FISCAL, isLatamClient, usesInternational2700Plan, applicationPlanForUser } = require('../shared/financial-config.cjs');
+const { prepareCashRow } = require('../../../packages/cash-sheet/layout.cjs');
+const { buildChangesRow, paymentsForCash } = require('../../../packages/cash-sheet/rows.cjs');
 const { attributionForUser } = require('../../../packages/cash-sheet/attribution.cjs');
-const { ensurePayments } = require('./payments');
+const { latamPlanWithPaidAmounts } = require('./payments');
 const TAX_FACTOR = 1 + (FISCAL.iva / 100);
 
 let _cachedToken = null;
@@ -99,7 +100,7 @@ function a1(tab, range) {
 }
 
 async function getRange(token, tab, range) {
-  const url = `${SHEETS_API}/${spreadsheetId()}/values/${encodeURIComponent(a1(tab, range))}?majorDimension=ROWS`;
+  const url = `${SHEETS_API}/${spreadsheetId()}/values/${encodeURIComponent(a1(tab, range))}?majorDimension=ROWS&valueRenderOption=FORMULA`;
   const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw new Error('sheets_get_failed: ' + (data.error && data.error.message || resp.status));
@@ -120,18 +121,6 @@ async function batchUpdate(token, tab, updates) {
   });
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw new Error('sheets_update_failed: ' + (data.error && data.error.message || resp.status));
-  return data;
-}
-
-async function appendRow(token, tab, rowValues, lastColumn = 'N') {
-  const url = `${SHEETS_API}/${spreadsheetId()}/values/${encodeURIComponent(a1(tab, `A:${lastColumn}`))}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ majorDimension: 'ROWS', values: [rowValues] }),
-  });
-  const data = await resp.json().catch(() => ({}));
-  if (!resp.ok) throw new Error('sheets_append_failed: ' + (data.error && data.error.message || resp.status));
   return data;
 }
 
@@ -156,11 +145,13 @@ function round2(n) {
 
 /**
  * Construye la fila de la hoja a partir del cliente y sus pagos (tabla payments).
- * Usa exactamente los mismos datos que muestra el portal para garantizar que la
- * información coincide. Las cuotas inexistentes (planes de 1-2 cuotas) se rellenan
- * con importe 0 y Estado "No" (decisión del usuario).
+ * Completa los importes pendientes desde el contrato y conserva los ajustes del
+ * perfil. Solo un registro en estado paid marca una cuota como cobrada.
+ * Las cuotas fuera del plan (planes de 1-2 cuotas) llevan importe 0 y Estado "No".
  */
-function buildRow(user, payments) {
+function buildRow(user, payments = []) {
+  const plan = applicationPlanForUser(user);
+  payments = paymentsForCash(isLatamClient(user) ? latamPlanWithPaidAmounts(plan, payments) : plan, payments);
   const byInst = new Map((payments || []).map((p) => [Number(p.installment), p]));
   const slot = (i) => {
     const p = byInst.get(i);
@@ -214,6 +205,7 @@ function locateRow(values, headerOffset, pr) {
 
   let found = null;
   let emptyRow = null;
+  let insertBefore = null;
   for (let i = headerIdx + 1; i < values.length; i++) {
     const row = values[i] || [];
     const a = (row[0] || '').toString().trim();
@@ -221,7 +213,7 @@ function locateRow(values, headerOffset, pr) {
     const c = (row[2] || '').toString().trim();
     const cLower = c.toLowerCase();
     // Filas de resumen al final -> paramos.
-    if (a.toLowerCase() === 'xx' || cLower === 'pagado' || cLower === 'no pagado' || cLower === 'total') break;
+    if (a.toLowerCase() === 'xx' || cLower === 'pagado' || cLower === 'no pagado' || cLower === 'total') { insertBefore = headerOffset + i; break; }
     if (b && pr && b === String(pr)) {
       found = headerOffset + i; // nº de fila real (1-indexed)
       break;
@@ -230,34 +222,25 @@ function locateRow(values, headerOffset, pr) {
       emptyRow = headerOffset + i;
     }
   }
-  return { found, emptyRow };
+  return { found, emptyRow, insertBefore };
 }
 
 async function upsertChangesRow(token, user, payments, paymentRow, options = {}) {
   const tab = await resolveTabTitle(token, CHANGES_SHEET_GID);
-  const values = await getRange(token, tab, 'A1:AB');
+  const values = await getRange(token, tab, 'A1:AA');
   const header = values[0] || [];
   if (header[19] !== 'Contrato' || header[22] !== 'Canal de captación' ||
       header[23] !== 'Campaña' || header[24] !== 'Mercado') {
     throw new Error('cash_changes_layout_mismatch');
   }
-  const { found, emptyRow } = locateRow(values, 1, paymentRow.pr);
-  const row = found || emptyRow;
+  const { found, emptyRow, insertBefore } = locateRow(values, 1, paymentRow.pr);
+  const row = found || emptyRow || insertBefore || values.length + 1;
   const c = buildChangesRow(user, payments, paymentRow, {
     ...options,
     isLatam: isLatamClient(user),
     international: usesInternational2700Plan(user),
   });
-  if (!row) {
-    await appendRow(token, tab, [
-      c.asesor, c.pr, c.alumno, c.pago1, c.estado1, c.slots[0].date, c.slots[0].invoice,
-      c.pago2, c.estado2, c.slots[1].date, c.slots[1].invoice,
-      c.pago3, c.estado3, c.slots[2].date, c.slots[2].invoice,
-      c.totalPagado, c.restante, c.cobroInicial, c.facInicial, c.contrato,
-      c.signatureDate, c.type, c.channel, c.campaign, c.market,
-    ], 'AB');
-    return;
-  }
+  await prepareCashRow({ token, spreadsheetId: spreadsheetId(), tab, values, row, complete: true, fresh: !found, insert: !found && !emptyRow, taxExempt: isLatamClient(user), paymentRow: c });
   const updates = [
     { range: `A${row}:E${row}`, values: [[c.asesor, c.pr, c.alumno, c.pago1, c.estado1]] },
     { range: `H${row}:I${row}`, values: [[c.pago2, c.estado2]] },
@@ -288,14 +271,18 @@ async function upsertClientRow(sb, userId, options = {}) {
     if (!isConfigured()) return { ok: false, reason: 'not_configured' };
     const { data: user, error } = await sb
       .from('users')
-      .select('id, lead_id, notion_page_id, nombre, apellidos, assigned_to, contract_signed, contract_signed_at, tipo, origin, pais, num_carreras, has_eu_id, contract_data, pago_completed, pago_completed_at, pago_data')
+      .select('id, lead_id, notion_page_id, email, nombre, apellidos, assigned_to, contract_signed, contract_signed_at, tipo, origin, pais, num_carreras, has_eu_id, contract_data, pago_completed, pago_completed_at, pago_data')
       .eq('id', userId)
       .single();
     if (error || !user) return { ok: false, reason: 'user_not_found' };
 
-    // La hoja debe mostrar el plan completo desde el onboarding, incluso si las
-    // filas de payments todavía no se habían materializado en otro endpoint.
-    const payments = await ensurePayments(sb, user);
+    // Read only: missing installments are projected from the contract in buildRow.
+    const { data: payments, error: paymentsError } = await sb
+      .from('payments')
+      .select('installment, amount, status, paid_at, invoice_number, payment_data')
+      .eq('user_id', userId)
+      .order('installment', { ascending: true });
+    if (paymentsError) throw paymentsError;
 
     const attribution = await attributionForUser(user, options.attribution);
     const r = buildRow(user, payments || []);
@@ -306,8 +293,8 @@ async function upsertClientRow(sb, userId, options = {}) {
     const headerOffset = 1; // empezamos a leer desde la fila 1
     const values = await getRange(token, tab, 'A1:N');
     if (values[0]?.[13] !== 'Contrato') throw new Error('cash_main_layout_mismatch');
-    const { found, emptyRow } = locateRow(values, headerOffset, r.pr);
-    const targetRow = found || emptyRow;
+    const { found, emptyRow, insertBefore } = locateRow(values, headerOffset, r.pr);
+    const targetRow = found || emptyRow || insertBefore || values.length + 1;
 
     // Conserva las fórmulas J, K y M; el selector de contrato está en N.
     const segFor = (row) => ([
@@ -316,22 +303,10 @@ async function upsertClientRow(sb, userId, options = {}) {
       { range: `N${row}:N${row}`, values: [[r.contrato]] },
     ]);
 
-    if (targetRow) {
-      await batchUpdate(token, tab, segFor(targetRow));
-      await upsertChangesRow(token, user, payments || [], r, { ...options, attribution });
-      return { ok: true, action: found ? 'updated' : 'filled', row: targetRow };
-    }
-
-    // Sin fila plantilla libre: añadimos una nueva con TODAS las columnas como
-    // valores (sin fórmulas, pero completa y correcta en ese momento).
-    const fullRow = [
-      r.asesor, r.pr, r.alumno,
-      r.pago1, r.estado1, r.pago2, r.estado2, r.pago3, r.estado3,
-      r.totalPagado, r.restante, r.cobroInicial, r.facInicial, r.contrato,
-    ];
-    await appendRow(token, tab, fullRow);
+    await prepareCashRow({ token, spreadsheetId: spreadsheetId(), tab, values, row: targetRow, fresh: !found, insert: !found && !emptyRow, taxExempt: isLatamClient(user), paymentRow: r });
+    await batchUpdate(token, tab, segFor(targetRow));
     await upsertChangesRow(token, user, payments || [], r, { ...options, attribution });
-    return { ok: true, action: 'appended' };
+    return { ok: true, action: found ? 'updated' : emptyRow ? 'filled' : 'inserted', row: targetRow };
   } catch (e) {
     console.error('[sheets] upsertClientRow error:', e && e.message);
     return { ok: false, reason: (e && e.message) || 'error' };

@@ -65,7 +65,7 @@ test('proyecta importes y estados de las tres cuotas en la fila operativa', () =
 
 test('incluye pagos extra en los totales sin desplazar las tres cuotas visibles', () => {
   const row = buildRow(
-    { lead_id: '2043', nombre: 'Grace', apellidos: 'Hopper' },
+    { lead_id: '2043', nombre: 'Grace', apellidos: 'Hopper', tipo: 'mentoria', contract_data: { special_price_total_eur: 450 } },
     [
       { installment: 1, amount: 450, status: 'paid' },
       { installment: 4, amount: 100, status: 'paid' },

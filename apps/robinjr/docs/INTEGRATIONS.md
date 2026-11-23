@@ -32,6 +32,8 @@ opcional ausente debe fallar de forma explícita o quedar registrada, nunca simu
 
 ## Fronteras de consistencia
 
+La sincronización con CASH completa los importes previstos a partir del contrato y conserva las cuotas ajustadas del perfil. Solo los registros `payments.status = paid` cuentan como cobrados; una cuota proyectada no se marca pagada por `pago_completed`. La exportación no crea ni modifica pagos. Si falla la lectura de pagos, se aborta la escritura en la hoja para evitar sustituir importes por ceros. Las filas nuevas heredan el formato nativo y reciben fórmulas de cobrado, restante y base sin IVA; las fórmulas propias de filas existentes se conservan y las ausentes se restauran. Los pagos adicionales cobrados se incorporan al cálculo sin convertirlo en un valor fijo. Si no queda una fila libre, se inserta antes del resumen.
+
 La escritura en las tablas de negocio es la fuente de verdad. Sheets, Holded, Drive y
 email son side effects; nunca deben convertir un fallo externo en un cobro o contrato
 ficticio. Calendar es la excepción en reservas: si no se puede crear el evento, no se

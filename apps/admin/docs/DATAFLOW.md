@@ -85,6 +85,8 @@ El envío de credenciales registra estado e identificador del proveedor en `sour
 
 Al cambiar el contrato revisa: normalización de identificadores/email, dedupe, owner/advisor, estado visible, historial, sync con Notion, respuesta esperada por la UI e idempotencia de reintentos. El mapa de campos Notion está en [`docs/notion-crm-mapping.md`](notion-crm-mapping.md); métricas históricas están en [`docs/crm-historical-metrics.md`](crm-historical-metrics.md).
 
+La sincronización con CASH completa los importes previstos a partir del contrato y conserva las cuotas ajustadas del perfil. Solo los registros `payments.status = paid` cuentan como cobrados; una cuota proyectada no se marca pagada por `pago_completed`. La exportación no crea ni modifica pagos. Si falla la lectura de pagos, se aborta la escritura en la hoja para evitar sustituir importes por ceros. Las filas nuevas heredan el formato nativo y reciben fórmulas de cobrado, restante y base sin IVA; las fórmulas propias de filas existentes se conservan y las ausentes se restauran. Los pagos adicionales cobrados se incorporan al cálculo sin convertirlo en un valor fijo. Si no queda una fila libre, se inserta antes del resumen.
+
 ## 3. Perfil de cliente, onboarding y documentos
 
 ### Datos de aplicación

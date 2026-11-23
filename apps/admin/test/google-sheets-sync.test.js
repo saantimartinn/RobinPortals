@@ -42,13 +42,17 @@ test('escribe el contrato en N y T sin alterar las fórmulas de las dos hojas', 
     const range = decodeURIComponent(String(url));
     if (range.includes("'26-27'!A1:N")) {
       const header = Array(14).fill(''); header[0] = 'Asesor'; header[13] = 'Contrato';
-      return response({ values: [header, ['Manuel', 'lead-1', 'Ada Lovelace']] });
+      const row = ['Manuel', 'lead-1', 'Ada Lovelace'];
+      row[9] = '=IF(E2="Si";D2;0) + IF(G2="Si";F2;0) + IF(I2="Si";H2;0)'; row[10] = '=L2-J2'; row[12] = '=L2/1,21';
+      return response({ values: [header, row] });
     }
-    if (range.includes("'Cambios para Manu'!A1:AB")) {
+    if (range.includes("'Cambios para Manu'!A1:AA")) {
       const header = Array(29).fill('');
       header[0] = 'Asesor'; header[19] = 'Contrato'; header[22] = 'Canal de captación';
       header[23] = 'Campaña'; header[24] = 'Mercado';
-      return response({ values: [header, ['Manuel', 'lead-1', 'Ada Lovelace']] });
+      const row = ['Manuel', 'lead-1', 'Ada Lovelace'];
+      row[15] = '=IF(E2="Si";D2;0) + IF(I2="Si";H2;0) + IF(M2="Si";L2;0)'; row[16] = '=R2-P2'; row[18] = '=R2/1,21';
+      return response({ values: [header, row] });
     }
     throw new Error(`Unexpected request: ${url}`);
   };
