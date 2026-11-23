@@ -1,3 +1,4 @@
+import { getLocale, t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for bookings portal; the application shell owns session state.
 import { formatDateTime } from "../client-utils.js";
 import { useState, useEffect } from "react";
@@ -7,6 +8,7 @@ import { Badge, Btn, Card, CardContent, CardHeader } from "../ui.jsx";
 import { bookingsList, bookingsCreate, bookingsAvailability } from "../api.js";
 
 export function Reservas() {
+  useLocale();
   const [serverBookings, setServerBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -93,26 +95,24 @@ export function Reservas() {
   const fmtDayBtn = (dstr) => {
     const dd = new Date(dstr + "T12:00:00");
     return {
-      wd: new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(dd),
-      dm: new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short" }).format(dd),
+      wd: new Intl.DateTimeFormat(getLocale(), { weekday: "short" }).format(dd),
+      dm: new Intl.DateTimeFormat(getLocale(), { day: "2-digit", month: "short" }).format(dd),
     };
   };
 
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Reservar llamada" subtitle={advisorName ? ("Con tu asesor " + advisorName + " · vía Google Meet") : "Con tu asesor Robin · vía Google Meet"} icon={Calendar} />
+        <CardHeader title={t("Reservar llamada")} subtitle={advisorName ? t("Con tu asesor {0} · vía Google Meet", [advisorName]) : t("Con tu asesor Robin · vía Google Meet")} icon={Calendar} />
         <CardContent>
-          {avLoading && <div className="text-xs text-slate-500 mb-3">Cargando disponibilidad…</div>}
+          {avLoading && <div className="text-xs text-slate-500 mb-3">{t("Cargando disponibilidad…")}</div>}
           {!avLoading && !calendarConnected && (
-            <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
-              Mostrando horario orientativo. Confirmaremos el hueco con tu asesor.
-            </div>
+            <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">{t("Mostrando horario orientativo. Confirmaremos el hueco con tu asesor.")}</div>
           )}
 
           {!avLoading && avDays.length > 0 && (
             <>
-              <div className="text-xs font-semibold text-slate-600 mb-2 ">Día</div>
+              <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Día")}</div>
               <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
                 {avDays.map((d) => {
                   const f = fmtDayBtn(d.date);
@@ -130,10 +130,10 @@ export function Reservas() {
                 })}
               </div>
 
-              <div className="text-xs font-semibold text-slate-600 mb-2 ">Hora ({slotMin} min)</div>
-              <div className="text-[11px] text-slate-500 mb-2">Hay al menos 15 minutos libres entre llamadas de un mismo mentor.</div>
+              <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Hora (")}{slotMin}{t(" min)")}</div>
+              <div className="text-[11px] text-slate-500 mb-2">{t("Hay al menos 15 minutos libres entre llamadas de un mismo mentor.")}</div>
               {daySlots.length === 0 ? (
-                <div className="text-xs text-slate-500 mb-4">Sin huecos disponibles este día.</div>
+                <div className="text-xs text-slate-500 mb-4">{t("Sin huecos disponibles este día.")}</div>
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-4">
                   {daySlots.map((sl) => {
@@ -143,7 +143,7 @@ export function Reservas() {
                         onClick={() => { setSelectedSlot(sl.start); setError(""); }}
                         className={"rounded-lg border px-2 py-2 text-sm font-medium " + (sel ? "border-transparent text-white" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300")}
                         style={sel ? { background: NAVY } : undefined}>
-                        {sl.label}
+                        {t(sl.label)}
                       </button>
                     );
                   })}
@@ -153,30 +153,27 @@ export function Reservas() {
           )}
 
           {!avLoading && avDays.length === 0 && (
-            <div className="text-xs text-slate-500 mb-4">No hay disponibilidad para mostrar ahora mismo.</div>
+            <div className="text-xs text-slate-500 mb-4">{t("No hay disponibilidad para mostrar ahora mismo.")}</div>
           )}
 
           {error && (
-            <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 mb-3">{error}</div>
+            <div className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 mb-3">{t(error)}</div>
           )}
           <div className="flex items-center gap-3">
             <Btn variant="primary" onClick={reserve} disabled={busy || !selectedSlot}>
-              {busy ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Reservando…</> : <><Calendar className="h-3.5 w-3.5" /> Reservar Meet</>}
+              {busy ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />{t(" Reservando…")}</> : <><Calendar className="h-3.5 w-3.5" />{t(" Reservar Meet")}</>}
             </Btn>
-            <div className="text-[11px] text-slate-400">Zona horaria Europe/Madrid · te llegará un email con el enlace.</div>
+            <div className="text-[11px] text-slate-400">{t("Zona horaria Europe/Madrid · te llegará un email con el enlace.")}</div>
           </div>
 
           {lastCreated && (
             <div className="mt-5 p-4 rounded-xl border border-emerald-200 bg-emerald-50/40">
               <div className="text-sm font-semibold text-emerald-800 flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4" /> ¡Reserva creada!
-              </div>
+                <CheckCircle2 className="h-4 w-4" />{t(" ¡Reserva creada!")}</div>
               {lastCreated.meet_join_url && (
                 <div className="mt-2">
                   <a href={lastCreated.meet_join_url} target="_blank" rel="noopener noreferrer"
-                    className="text-sm font-semibold underline" style={{ color: NAVY }}>
-                    Abrir Google Meet
-                  </a>
+                    className="text-sm font-semibold underline" style={{ color: NAVY }}>{t("Abrir Google Meet")}</a>
                 </div>
               )}
               {lastCreated.start_at && (
@@ -190,11 +187,11 @@ export function Reservas() {
       </Card>
 
       <Card>
-        <CardHeader title="Llamadas confirmadas" subtitle={`${upcoming.length} reserva(s)`} icon={Calendar} />
+        <CardHeader title={t("Llamadas confirmadas")} subtitle={t("{0} reserva(s)", [upcoming.length])} icon={Calendar} />
         <CardContent className="space-y-2">
-          {loading && <div className="text-xs text-slate-500">Cargando…</div>}
+          {loading && <div className="text-xs text-slate-500">{t("Cargando…")}</div>}
           {!loading && upcoming.length === 0 && (
-            <div className="text-xs text-slate-500">Aún no tienes llamadas reservadas.</div>
+            <div className="text-xs text-slate-500">{t("Aún no tienes llamadas reservadas.")}</div>
           )}
           {upcoming.map((b) => (
             <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3">
@@ -207,11 +204,9 @@ export function Reservas() {
               <div className="flex items-center gap-2 flex-shrink-0">
                 {b.meet_join_url && (
                   <a href={b.meet_join_url} target="_blank" rel="noopener noreferrer"
-                    className="text-xs font-semibold underline" style={{ color: NAVY }}>
-                    Entrar
-                  </a>
+                    className="text-xs font-semibold underline" style={{ color: NAVY }}>{t("Entrar")}</a>
                 )}
-                <Badge tone="green">Confirmada</Badge>
+                <Badge tone="green">{t("Confirmada")}</Badge>
               </div>
             </div>
           ))}

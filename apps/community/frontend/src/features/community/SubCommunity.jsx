@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Community feature UI for sub community; the application shell selects this view.
 import { Building2, CalendarCheck, Handshake, Lock, Plane, Sparkles, Tag, Users } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
@@ -16,6 +17,7 @@ import { SubTripsView } from "./SubTripsView.jsx";
 import { robinLockFor } from "../../shared/utils.js";
 
 function SubCommunity({ user, events, partners, loading, onRefresh }) {
+  useLocale();
   const [tab, setTab] = useState("resumen");
   const [robins, setRobins] = useState(false);
   const ciudad = user.ciudad || "";
@@ -33,14 +35,14 @@ function SubCommunity({ user, events, partners, loading, onRefresh }) {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Community" subtitle={ciudad ? `Personalizado para ${ciudad}` : "Resumen, eventos, grupos, perks, viajes y partners"} icon={Users} />
+        <CardHeader title="Community" subtitle={ciudad ? t("Personalizado para {0}", [ciudad]) : t("Resumen, eventos, grupos, perks, viajes y partners")} icon={Users} />
         <CardContent>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {tabs.map(({ key, label, icon: Icon }) => (
               <button key={key} onClick={() => setTab(key)}
                 className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition"
                 style={tab === key ? { background: GOLD, color: NAVY } : { background: "#F6F3E0", color: "#4E5979" }}>
-                <Icon className="h-3.5 w-3.5" /> {label}
+                <Icon className="h-3.5 w-3.5" /> {t(label)}
                 {key === "viajes" && viajesLock && <Lock className="h-3 w-3" />}
               </button>
             ))}
@@ -53,7 +55,7 @@ function SubCommunity({ user, events, partners, loading, onRefresh }) {
       {tab === "grupos" && <SubGroupsView events={events} ciudad={ciudad} />}
       {tab === "asociaciones" && <SubAssociationsView events={events} ciudad={ciudad} />}
       {tab === "ofertas" && <SubOffersView events={events} ciudad={ciudad} />}
-      {tab === "viajes" && (viajesLock ? <RobinLockedNotice level={viajesLock} label="Viajes" /> : <SubTripsView events={events} ciudad={ciudad} />)}
+      {tab === "viajes" && (viajesLock ? <RobinLockedNotice level={viajesLock} label={t("Viajes")} /> : <SubTripsView events={events} ciudad={ciudad} />)}
       {tab === "partners" && <SubPartners partners={partners} loading={loading} />}
 
       {tab === "resumen" && <OtrosRobinsCarousel onOpen={() => setRobins(true)} />}

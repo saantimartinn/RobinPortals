@@ -1,3 +1,4 @@
+import { getLocale, t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Onboarding step or helper for payment; OnboardingFlow owns the step sequence.
 import { useState, useEffect } from "react";
 import { ChevronRight, CreditCard, Loader2, AlertCircle } from "lucide-react";
@@ -8,6 +9,7 @@ import { onboardingCheckout } from "../../api.js";
 import { OnboardingShell } from './onboarding-shared.jsx';
 
 export function OnboardingPayment({ user, onLogout, onDone }) {
+  useLocale();
   const amount = Number(user.first_payment_amount);
   const paid = !!user.pago_completed;
 
@@ -41,53 +43,50 @@ export function OnboardingPayment({ user, onLogout, onDone }) {
   }
 
   const amountStr = Number.isFinite(amount)
-    ? amount.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    ? amount.toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : null;
 
   return (
     <OnboardingShell user={user}
-      title="Realiza el primer pago"
-      subtitle={amountStr ? `Pago seguro con tarjeta · Importe: ${amountStr} €` : "Pago seguro con tarjeta"}
+      title={t("Realiza el primer pago")}
+      subtitle={amountStr ? t("Pago seguro con tarjeta · Importe: {0} €", [amountStr]) : t("Pago seguro con tarjeta")}
       stepNumber={4}
       onLogout={onLogout}
     >
       <div className="space-y-5">
         {paid ? (
-          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm">Primer pago confirmado. Ahora vamos con las preguntas de orientación.</div>
+          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm">{t("Primer pago confirmado. Ahora vamos con las preguntas de orientación.")}</div>
         ) : confirming ? (
           <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-4 py-3 text-sm flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" /> Confirmando tu pago…
-          </div>
+            <Loader2 className="h-4 w-4 animate-spin" />{t(" Confirmando tu pago…")}</div>
         ) : (
-          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-2 text-xs">
-            🔒 El pago se procesa en una <strong>pasarela segura</strong>. Project Robin no almacena los datos de tu tarjeta.
-          </div>
+          <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-2 text-xs">{t("🔒 El pago se procesa en una ")}<strong>{t("pasarela segura")}</strong>{t(". Project Robin no almacena los datos de tu tarjeta.")}</div>
         )}
 
         <div className="rounded-2xl p-5 relative overflow-hidden text-white"
           style={{ background: NAVY }}>
           <div className="flex items-center justify-between">
-            <div className="text-xs text-white/50">Project Robin · Pago</div>
+            <div className="text-xs text-white/50">{t("Project Robin · Pago")}</div>
             <CreditCard className="h-5 w-5 text-white/70" />
           </div>
-          <div className="text-3xl font-bold mt-4 tracking-tight">{amountStr ? `${amountStr} €` : "Importe calculado al continuar"}</div>
-          <div className="mt-2 text-xs text-white/60">{user.special_price_total_eur ? "Pago total del programa" : "Primera cuota del programa"}</div>
+          <div className="text-3xl font-bold mt-4 tracking-tight">{amountStr ? `${amountStr} €` : t("Importe calculado al continuar")}</div>
+          <div className="mt-2 text-xs text-white/60">{user.special_price_total_eur ? t("Pago total del programa") : t("Primera cuota del programa")}</div>
         </div>
 
         {error && (
           <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{error}</span>
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{t(error)}</span>
           </div>
         )}
 
         <Btn className="w-full" size="lg" variant="gold" onClick={pay} disabled={busy || (!paid && confirming)}>
-          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {paid ? "Continuando…" : "Redirigiendo a pago seguro…"}</> : paid ? <>Continuar con las preguntas <ChevronRight className="h-4 w-4" /></> : <>Continuar al pago{amountStr ? ` · ${amountStr} €` : ""} <ChevronRight className="h-4 w-4" /></>}
+          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> {paid ? t("Continuando…") : t("Redirigiendo a pago seguro…")}</> : paid ? <>{t("Continuar con las preguntas ")}<ChevronRight className="h-4 w-4" /></> : <>{t("Continuar al pago")}{amountStr ? ` · ${amountStr} €` : ""} <ChevronRight className="h-4 w-4" /></>}
         </Btn>
 
         <div className="text-[11px] text-slate-400 text-center">
-          {paid ? "Tu pago ya está registrado. Continúa para completar tu perfil académico." : user.special_price_total_eur
-            ? "Serás redirigido a la pasarela de pago segura. Este es el único pago del programa."
-            : "Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor."}
+          {paid ? t("Tu pago ya está registrado. Continúa para completar tu perfil académico.") : user.special_price_total_eur
+            ? t("Serás redirigido a la pasarela de pago segura. Este es el único pago del programa.")
+            : t("Serás redirigido a la pasarela de pago segura. Al completar el pago quedará registrada la primera cuota; las siguientes las gestionará tu asesor.")}
         </div>
       </div>
     </OnboardingShell>

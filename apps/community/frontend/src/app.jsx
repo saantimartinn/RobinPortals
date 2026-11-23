@@ -1,3 +1,5 @@
+import { setTranslationsEnabled } from '../../../../packages/i18n/language.js';
+import { t, useLocale } from "../../../../packages/i18n/react.jsx";
 // Resolves the local subscriber session and selects the subscriber or admin shell.
 import { CANVAS } from "./shared/theme.js";
 import { Loader2 } from "lucide-react";
@@ -10,7 +12,9 @@ import { isSubscriberAdmin, isSubscriberUser } from "./shared/utils.js";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
 
 function PortalRobin() {
+  useLocale();
   const [state, setState] = useState({ loading: true, user: null });
+  useEffect(() => { setTranslationsEnabled(!isSubscriberAdmin(state.user)); }, [state.user]);
   const [applicationIdentity, setApplicationIdentity] = useState(null);
   const [checkingAdminPermission, setCheckingAdminPermission] = useState(true);
   useEffect(() => {
@@ -49,19 +53,19 @@ function PortalRobin() {
     await apiLogout();
     window.location.replace("/portal/logout");
   }
-  if (state.loading || (isSubscriberAdmin(state.user) && checkingAdminPermission)) return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Cargando portal" /></div>;
+  if (state.loading || (isSubscriberAdmin(state.user) && checkingAdminPermission)) return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label={t("Cargando portal")} /></div>;
   if (!state.user) {
-    return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label="Redirigiendo al acceso común" /></div>;
+    return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label={t("Redirigiendo al acceso común")} /></div>;
   }
   if (isSubscriberAdmin(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={applicationIdentity} onLogout={handleLogout} />
-    {applicationIdentity?.is_application_admin ? <SubscriberAdmin applicationIdentity={applicationIdentity} /> : <main role="alert" className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#2D3A64]"><h1 className="text-2xl font-bold">Robin Community no disponible</h1><p>No se ha podido validar la cuenta de administrador.</p><a className="underline" href="/admin">Volver al portal del administrador</a></main>}
+    {applicationIdentity?.is_application_admin ? <SubscriberAdmin applicationIdentity={applicationIdentity} /> : <main role="alert" className="min-h-[50vh] grid place-content-center gap-4 px-6 text-center text-[#2D3A64]"><h1 className="text-2xl font-bold">{t("Robin Community no disponible")}</h1><p>No se ha podido validar la cuenta de administrador.</p><a className="underline" href="/admin">Volver al portal del administrador</a></main>}
   </>;
   if (isSubscriberUser(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} />
     <SubscriberPortal user={state.user} onLogout={handleLogout} onUserRefresh={refreshUser} />
   </>;
-  return <div role="alert">Esta cuenta no pertenece a The Robin Plan. <button onClick={handleLogout}>Cerrar sesión</button></div>;
+  return <div role="alert">{t("Esta cuenta no pertenece a The Robin Plan. ")}<button onClick={handleLogout}>{t("Cerrar sesión")}</button></div>;
 }
 
 export { PortalRobin };

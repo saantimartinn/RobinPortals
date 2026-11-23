@@ -1,5 +1,6 @@
 // Career feature UI for cv build html; the application shell selects this view.
 import React from "react";
+import { t } from "../../../../../../packages/i18n/language.js";
 import { cvEsc } from "./cvEsc.js";
 
 function cvBuildHtml(cv) {
@@ -19,9 +20,9 @@ function cvBuildHtml(cv) {
       ${e.details ? `<div style="font-size:13px">${cvEsc(e.details)}</div>` : ""}
     </div>`).join("");
   const extras = (cv.extras || []).filter((x) => x && (x.title || x.detail)).map((x) => `<div><strong>${cvEsc(x.title)}:</strong> ${cvEsc(x.detail)}</div>`).join("");
-  const sec = (title, inner) => inner ? `<h2 style="font-size:14px;color:#2D3A64;border-bottom:1px solid #C3C5C1;padding-bottom:2px;margin:14px 0 6px">${cvEsc(title)}</h2>${inner}` : "";
+  const sec = (title, inner) => inner ? `<h2 style="font-size:14px;color:#2D3A64;border-bottom:1px solid #C3C5C1;padding-bottom:2px;margin:14px 0 6px">${cvEsc(t(title))}</h2>${inner}` : "";
   return `<div style="font-family:Calibri,Arial,sans-serif;color:#2D3A64;font-size:13px;line-height:1.45">
-    <h1 style="font-size:22px;margin:0 0 2px;color:#2D3A64">${cvEsc(cv.name) || "[Tu nombre]"}</h1>
+    <h1 style="font-size:22px;margin:0 0 2px;color:#2D3A64">${cvEsc(cv.name) || t("[Tu nombre]")}</h1>
     ${cv.headline ? `<div style="font-size:14px;color:#2D3A64;margin-bottom:2px">${cvEsc(cv.headline)}</div>` : ""}
     ${contactLine ? `<div style="font-size:12px;color:#4E5979">${contactLine}</div>` : ""}
     ${sec("Perfil", cv.summary ? `<div>${cvEsc(cv.summary)}</div>` : "")}

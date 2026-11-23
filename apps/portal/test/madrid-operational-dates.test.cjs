@@ -114,6 +114,7 @@ function renderComponent(app, file, exportName, stateValues, props, overrides = 
   const react = { Fragment: Symbol.for('react.fragment'), useState: () => [stateValues.shift(), () => {}], useRef: () => ({ current: null }), useEffect: () => {} };
   const context = { module, exports: module.exports, Date: frozenDate(clock),
     require: (id) => id in overrides ? overrides[id] : id === 'react' ? react
+      : id.endsWith('/packages/i18n/react.jsx') ? { ...localRequire(id.replace('/react.jsx', '/language.js')), useLocale() {} }
       : /ui\.jsx$/.test(id) || id === 'lucide-react' ? elements
       : /theme\.js$/.test(id) ? { NAVY: '#000', NAVY_DARK: '#000' } : localRequire(id) };
   vm.runInNewContext(source, context, { filename });

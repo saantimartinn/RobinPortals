@@ -1,3 +1,4 @@
+import { getLocale, t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Mi plan reúne reservas confirmadas y deadlines de documentos; las carreras
 // no generan eventos ni requisitos documentales en este calendario.
 import { useEffect, useMemo, useState } from "react";
@@ -5,7 +6,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, FileText, Loader2, LockKeyhole
 import { Badge, Card, CardContent, CardHeader } from "../ui.jsx";
 import { bookingsList, documentsList } from "../api.js";
 
-const WEEKDAYS = ["L", "M", "X", "J", "V", "S", "D"];
+
 const today = () => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 const dateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
@@ -26,7 +27,7 @@ function makePlanItems(bookings, documents) {
       return {
         id: `booking-${booking.id}`,
         date: dateKey(start),
-        time: new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit" }).format(start),
+        time: new Intl.DateTimeFormat(getLocale(), { hour: "2-digit", minute: "2-digit" }).format(start),
         title: booking.topic || "Llamada con tu asesor",
         detail: `${booking.duration_min || 30} min`,
         kind: "call",
@@ -36,12 +37,13 @@ function makePlanItems(bookings, documents) {
 }
 
 function formatSelectedDate(value) {
-  return new Date(`${value}T12:00:00`).toLocaleDateString("es-ES", {
+  return new Date(`${value}T12:00:00`).toLocaleDateString(getLocale(), {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
 }
 
 export function StudentPlanCalendar() {
+  useLocale();
   const [showSessionsNotice, setShowSessionsNotice] = useState(true);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,8 +90,9 @@ export function StudentPlanCalendar() {
     });
   }, [month]);
 
+  const weekdays = Array.from({ length: 7 }, (_, day) => new Intl.DateTimeFormat(getLocale(), { weekday: "short" }).format(new Date(2026, 0, 5 + day)));
   const selectedItems = itemMap.get(selectedDate) || [];
-  const monthLabel = month.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  const monthLabel = month.toLocaleDateString(getLocale(), { month: "long", year: "numeric" });
   const todayKey = dateKey(today());
 
   function shiftMonth(delta) {
@@ -110,33 +113,33 @@ export function StudentPlanCalendar() {
           if (event.target === event.currentTarget) setShowSessionsNotice(false);
         }}>
           <div className="student-plan-notice" role="dialog" aria-modal="true" aria-labelledby="student-plan-notice-title">
-            <button type="button" className="student-plan-notice-close" aria-label="Cerrar aviso" onClick={() => setShowSessionsNotice(false)}><X size={18} /></button>
+            <button type="button" className="student-plan-notice-close" aria-label={t("Cerrar aviso")} onClick={() => setShowSessionsNotice(false)}><X size={18} /></button>
             <span className="student-plan-notice-icon"><LockKeyhole size={25} /></span>
-            <h2 id="student-plan-notice-title">Tus sesiones se desbloquearán después de la primera llamada</h2>
-            <button type="button" className="student-plan-notice-action" autoFocus onClick={() => setShowSessionsNotice(false)}>Entendido</button>
+            <h2 id="student-plan-notice-title">{t("Tus sesiones se desbloquearán después de la primera llamada")}</h2>
+            <button type="button" className="student-plan-notice-action" autoFocus onClick={() => setShowSessionsNotice(false)}>{t("Entendido")}</button>
           </div>
         </div>
       )}
       <Card className="student-plan-card">
-        <CardHeader title="Mi plan" subtitle="Tus fechas importantes y llamadas, organizadas en un calendario" icon={CalendarDays} />
+        <CardHeader title={t("Mi plan")} subtitle={t("Tus fechas importantes y llamadas, organizadas en un calendario")} icon={CalendarDays} />
         <CardContent>
           {loading ? (
-            <div className="text-sm text-slate-400 text-center py-10 flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />Cargando tu plan…</div>
+            <div className="text-sm text-slate-400 text-center py-10 flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />{t("Cargando tu plan…")}</div>
           ) : error ? (
-            <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{error}</div>
+            <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{t(error)}</div>
           ) : (
             <div className="student-plan-layout">
-              <section className="student-calendar" aria-label="Calendario mensual">
+              <section className="student-calendar" aria-label={t("Calendario mensual")}>
                 <div className="student-calendar-toolbar">
-                  <div><span className="student-calendar-eyebrow">Calendario</span><h2>{monthLabel}</h2></div>
+                  <div><span className="student-calendar-eyebrow">{t("Calendario")}</span><h2>{monthLabel}</h2></div>
                   <div className="student-calendar-controls">
-                    <button type="button" onClick={goToToday} className="student-calendar-today">Hoy</button>
-                    <button type="button" onClick={() => shiftMonth(-1)} aria-label="Mes anterior" className="student-calendar-arrow"><ChevronLeft size={17} /></button>
-                    <button type="button" onClick={() => shiftMonth(1)} aria-label="Mes siguiente" className="student-calendar-arrow"><ChevronRight size={17} /></button>
+                    <button type="button" onClick={goToToday} className="student-calendar-today">{t("Hoy")}</button>
+                    <button type="button" onClick={() => shiftMonth(-1)} aria-label={t("Mes anterior")} className="student-calendar-arrow"><ChevronLeft size={17} /></button>
+                    <button type="button" onClick={() => shiftMonth(1)} aria-label={t("Mes siguiente")} className="student-calendar-arrow"><ChevronRight size={17} /></button>
                   </div>
                 </div>
                 <div className="student-calendar-grid" role="grid" aria-label={monthLabel}>
-                  {WEEKDAYS.map((day, index) => <div key={`${day}-${index}`} className="student-calendar-weekday" role="columnheader">{day}</div>)}
+                  {weekdays.map((day, index) => <div key={`${day}-${index}`} className="student-calendar-weekday" role="columnheader">{day}</div>)}
                   {calendarDays.map(({ date, key, inMonth }) => {
                     const dayItems = itemMap.get(key) || [];
                     const selected = key === selectedDate;
@@ -144,7 +147,7 @@ export function StudentPlanCalendar() {
                     const kinds = [...new Set(dayItems.map((item) => item.kind))];
                     return (
                       <button key={key} type="button" role="gridcell" aria-pressed={selected}
-                        aria-label={`${formatSelectedDate(key)}${dayItems.length ? `, ${dayItems.length} elemento(s)` : ""}`}
+                        aria-label={`${formatSelectedDate(key)}${dayItems.length ? t(", {0} elemento(s)", [dayItems.length]) : ""}`}
                         onClick={() => setSelectedDate(key)}
                         className={`student-calendar-day ${inMonth ? "" : "is-outside"} ${selected ? "is-selected" : ""} ${isToday ? "is-today" : ""}`}>
                         <span className="student-calendar-day-number">{date.getDate()}</span>
@@ -156,15 +159,15 @@ export function StudentPlanCalendar() {
                   })}
                 </div>
                 <div className="student-calendar-legend">
-                  <span><i className="is-document" />Documentos</span>
-                  <span><i className="is-call" />Llamadas</span>
+                  <span><i className="is-document" />{t("Documentos")}</span>
+                  <span><i className="is-call" />{t("Llamadas")}</span>
                 </div>
               </section>
 
               <aside className="student-plan-agenda" aria-live="polite">
-                <div className="student-plan-agenda-heading"><span className="student-calendar-eyebrow">Tu agenda</span><h3>{formatSelectedDate(selectedDate)}</h3></div>
+                <div className="student-plan-agenda-heading"><span className="student-calendar-eyebrow">{t("Tu agenda")}</span><h3>{formatSelectedDate(selectedDate)}</h3></div>
                 {selectedItems.length === 0 ? (
-                  <div className="student-plan-empty"><CalendarDays size={23} /><strong>Un día libre</strong><span>No tienes nada apuntado para esta fecha.</span></div>
+                  <div className="student-plan-empty"><CalendarDays size={23} /><strong>{t("Un día libre")}</strong><span>{t("No tienes nada apuntado para esta fecha.")}</span></div>
                 ) : (
                   <div className="student-plan-items">
                     {selectedItems.map((item) => {
@@ -174,7 +177,7 @@ export function StudentPlanCalendar() {
                       return (
                         <article key={item.id} className={`student-plan-item is-${item.kind}`}>
                           <span className="student-plan-item-icon"><Icon size={16} /></span>
-                          <div className="student-plan-item-copy"><div className="student-plan-item-top"><Badge tone={tone}>{label}</Badge>{item.time && <time>{item.time}</time>}</div><strong>{item.title}</strong><span>{item.detail}</span></div>
+                          <div className="student-plan-item-copy"><div className="student-plan-item-top"><Badge tone={tone}>{t(label)}</Badge>{item.time && <time>{item.time}</time>}</div><strong>{t(item.title)}</strong><span>{t(item.detail)}</span></div>
                         </article>
                       );
                     })}

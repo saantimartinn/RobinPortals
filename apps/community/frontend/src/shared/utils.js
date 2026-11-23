@@ -1,9 +1,10 @@
+import { getLocale } from "../../../../../packages/i18n/language.js";
 // Shared utils values or helpers used across this runtime.
 import { ROBIN_BENEFITS, ROBIN_LEVELS, ROBIN_LEVEL_ORDER, STUDENTJOB_CITY_SLUG } from "./constants.js";
 
 function formatDate(d) {
   if (!d) return "—";
-  try { return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(d)); }
+  try { return new Intl.DateTimeFormat(getLocale(), { day: "2-digit", month: "short", year: "numeric" }).format(new Date(d)); }
   catch { return "—"; }
 }
 
@@ -11,7 +12,7 @@ export { formatDate };
 
 function formatMoney(amount, currency) {
   if (amount == null) return null;
-  try { return new Intl.NumberFormat("es-ES", { style: "currency", currency: currency || "EUR" }).format(amount); }
+  try { return new Intl.NumberFormat(getLocale(), { style: "currency", currency: currency || "EUR" }).format(amount); }
   catch { return amount + " " + (currency || "EUR"); }
 }
 

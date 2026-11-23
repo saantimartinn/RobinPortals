@@ -1,3 +1,4 @@
+import { getLanguage } from "../../../../../packages/i18n/language.js";
 // Browser API client for chat; keeps endpoint and fetch details out of the screens.
 import { api } from "./core.js";
 
@@ -6,7 +7,7 @@ export async function chatAiList() {
   return api.get("/api/chat");
 }
 export async function chatAiSend(content) {
-  return api.post("/api/chat", { content });
+  return api.post("/api/chat", { content, language: getLanguage() });
 }
 
 // ----- CHAT CON IA · vista e intervención del ASESOR -----

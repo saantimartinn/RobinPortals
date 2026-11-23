@@ -1,3 +1,4 @@
+import { getLanguage } from "../../../../../packages/i18n/language.js";
 // Browser API client for index; keeps endpoint and fetch details out of the screens.
 import { changeCommonPassword } from "../../../../../packages/auth/change-password-client.mjs";
 async function request(method, url, body, isForm) {
@@ -82,7 +83,7 @@ export async function challengesList() { return api.get("/api/challenges"); }
 export async function challengeSubmit(challengeId, answers, files) { return api.post("/api/challenges", { action: "submit", challenge_id: challengeId, answers, files }); }
 
 export async function subscriberCvAi(payload) {
-  return api.post("/api/subscriber/cv-ai", payload);
+  return api.post("/api/subscriber/cv-ai", { ...payload, language: getLanguage() });
 }
 
 export async function subscriberProfileUpdate(payload) {

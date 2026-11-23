@@ -1,0 +1,12 @@
+.robin-language { display: inline-flex; flex-direction: column; gap: 2px; flex-shrink: 0; color: var(--robin-navy, #2D3A64); }
+.robin-language-label { font-size: 10px; line-height: 1.2; }
+.robin-language select { font: inherit; font-size: 12px; font-weight: 600; color: inherit; background: #fff; border: 1px solid #C3C5C1; border-radius: 6px; padding: 6px 22px 6px 8px; min-height: 34px; max-width: 130px; cursor: pointer; }
+.robin-language select:focus-visible { outline: 2px solid #2D3A64; outline-offset: 2px; }
+.robin-login-language { position: absolute; top: 16px; right: 20px; z-index: 2; }
+.guided-topbar .robin-language { margin-left: auto; }
+@media (max-width: 700px) {
+  .guided-topbar .robin-language-label { display: none; }
+  .guided-topbar .robin-language select { max-width: 108px; }
+  .guided-topbar .guided-signout { font-size: 0; gap: 0; padding: 8px; }
+}
+@media (max-width: 600px) { .robin-cross-actions .robin-language-label { display: none; } .robin-cross-actions .robin-language select { max-width: 108px; } }

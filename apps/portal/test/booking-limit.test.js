@@ -135,6 +135,7 @@ function renderBookings(bookings, { loading = false, create = async () => ({}) }
   let stateIndex = 0;
   const elements = new Proxy({}, { get: (_, name) => String(name) });
   const { Reservas } = load('portal-source/src/application/BookingsPortal.jsx', {
+    '../../../../../packages/i18n/react.jsx': { t: (text) => text, useLocale() {}, getLocale: () => 'es-ES' },
     react: { useEffect() {}, useState() { const index = stateIndex++; return [states[index], (value) => updates.push({ index, value })]; } },
     'lucide-react': elements,
     '../ui.jsx': elements,

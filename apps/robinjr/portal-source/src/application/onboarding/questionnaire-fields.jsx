@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Onboarding step or helper for questionnaire fields; OnboardingFlow owns the step sequence.
 import { CheckCircle2 } from "lucide-react";
 import { Q_AREAS, Q_GENERAL, Q_MASTER_BLOCKS, Q_VOCACIONAL } from "../../questionnaire-data.js";
@@ -26,25 +27,26 @@ export function qFmtSlider(def, val) {
 }
 
 export function QuestionField({ def, value, onChange, hideLabel = false, academicSystem }) {
+  useLocale();
   return (
     <div className="q-field">
       <div className={`q-label text-[13px] font-semibold text-slate-700 mb-2${hideLabel ? " sr-only" : ""}`}>
-        {def.q}
-        {def.optional && <span className="text-slate-400 font-normal"> (opcional)</span>}
-        {def.type === "multi" && def.max && <span className="text-slate-400 font-normal"> · máx. {def.max}</span>}
+        {t(def.q)}
+        {def.optional && <span className="text-slate-400 font-normal">{t(" (opcional)")}</span>}
+        {def.type === "multi" && def.max && <span className="text-slate-400 font-normal">{t(" · máx. ")}{def.max}</span>}
       </div>
       {def.type === "subject-ranking" && <SubjectRanking value={value} onChange={onChange} system={academicSystem} />}
       {def.type === "text" && (
-        <input type="text" value={value || ""} onChange={(e) => onChange(e.target.value)} aria-label={def.q}
+        <input type="text" value={value || ""} onChange={(e) => onChange(e.target.value)} aria-label={t(def.q)}
           className="q-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
       )}
       {def.type === "textarea" && (
-        <textarea rows={3} value={value || ""} onChange={(e) => onChange(e.target.value)} aria-label={def.q}
+        <textarea rows={3} value={value || ""} onChange={(e) => onChange(e.target.value)} aria-label={t(def.q)}
           className="q-input w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
       )}
       {def.type === "slider" && (
-        <QSlider label={def.q} value={value} min={def.min} max={def.max} step={def.step}
-          left={def.left} right={def.right} suffix={def.suffix} onChange={onChange} />
+        <QSlider label={t(def.q)} value={value} min={def.min} max={def.max} step={def.step}
+          left={t(def.left)} right={t(def.right)} suffix={def.suffix} onChange={onChange} />
       )}
       {(def.type === "single" || def.type === "multi") && (
         <QChoiceGrid options={def.options} value={value} multi={def.type === "multi"} max={def.max} onChange={onChange} />
@@ -54,22 +56,24 @@ export function QuestionField({ def, value, onChange, hideLabel = false, academi
 }
 
 function QSlider({ label, value, min, max, step, left, right, suffix, onChange }) {
+  useLocale();
   const v = value == null ? min : value;
   return (
     <div className="q-slider">
-      <input type="range" min={min} max={max} step={step} value={v} aria-label={label}
+      <input type="range" min={min} max={max} step={step} value={v} aria-label={t(label)}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full" style={{ accentColor: NAVY }} />
       <div className="flex items-center justify-between mt-1">
-        <span className="text-[11px] text-slate-400">{left}</span>
+        <span className="text-[11px] text-slate-400">{t(left)}</span>
         <span className="text-sm font-bold" style={{ color: NAVY }}>{v}{suffix || ""}</span>
-        <span className="text-[11px] text-slate-400">{right}</span>
+        <span className="text-[11px] text-slate-400">{t(right)}</span>
       </div>
     </div>
   );
 }
 
 function QChoiceGrid({ options, value, multi, max, onChange }) {
+  useLocale();
   const arr = multi ? (Array.isArray(value) ? value : []) : [];
   function pick(val) {
     if (multi) {
@@ -93,7 +97,7 @@ function QChoiceGrid({ options, value, multi, max, onChange }) {
               style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
               {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}
             </span>
-            <span className="leading-tight">{ol}</span>
+            <span className="leading-tight">{t(ol)}</span>
           </button>
         );
       })}

@@ -1,3 +1,5 @@
+import { setTranslationsEnabled } from '../../../../packages/i18n/language.js';
+import { t, useLocale, LanguageSelector } from "../../../../packages/i18n/react.jsx";
 // Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useRef, useState } from "react";
 import { loginUrl, ROBIN_LINKS } from "../../../../packages/portal-nav/links.js";
@@ -42,12 +44,14 @@ function sendNativeAuthEvent(payload) {
 }
 
 export default function PortalRobin() {
+  useLocale();
   const [authState, setAuthState] = useState({
     loading: true,
     user: null,
     needsOnboarding: false,
     onboardingStep: null,
   });
+  useEffect(() => { setTranslationsEnabled(!isAdminUser(authState.user)); }, [authState.user]);
   // A completed onboarding step the user went back to (null: the next pending step).
   const [onboardingOverride, setOnboardingOverride] = useState(null);
   const [active, setActive] = useState("estado");
@@ -88,7 +92,7 @@ export default function PortalRobin() {
   function withSupport(content, floatingButton = false) {
     return <>
       {content}
-      {floatingButton && <button className="robin-report-floating" type="button" onClick={() => setReportOpen(true)}><AlertCircle size={17} /> Reportar problema</button>}
+      {floatingButton && <button className="robin-report-floating" type="button" onClick={() => setReportOpen(true)}><AlertCircle size={17} />{t(" Reportar problema")}</button>}
       <SupportDialogs
         user={authState.user}
         reportOpen={reportOpen}
@@ -307,8 +311,7 @@ export default function PortalRobin() {
     return withSupport(
       <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}>
         <div className="flex items-center gap-3 text-slate-500 text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" /> Cargando portal…
-        </div>
+          <Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando portal…")}</div>
       </div>, true
     );
   }
@@ -323,8 +326,8 @@ export default function PortalRobin() {
   if (authState.user.auth_source === "external_client") return withSupport(<>
     <CrossPortalNav current="application" user={authState.user} onLogout={handleLogout} onReportProblem={() => setReportOpen(true)} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
     <main className="min-h-[50vh] grid place-content-center gap-3 px-6 text-center text-[#2D3A64]" role="status">
-      <h1 className="text-2xl font-bold">Portal del Alumno no disponible</h1>
-      <p>Esta cuenta no tiene un usuario en la base de datos del Portal del Alumno.</p>
+      <h1 className="text-2xl font-bold">{t("Portal del Alumno no disponible")}</h1>
+      <p>{t("Esta cuenta no tiene un usuario en la base de datos del Portal del Alumno.")}</p>
     </main>
   </>);
 
@@ -372,6 +375,7 @@ const STAGES = [
 ];
 
 function LoginScreen({ onLogin }) {
+  useLocale();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -408,14 +412,15 @@ function LoginScreen({ onLogin }) {
 
   return (
     <main className="robin-login">
+      <LanguageSelector className="robin-login-language" />
       <img className="robin-login-wordmark" src={robinWordmark} alt="Robin" />
       <div className="robin-postcard">
         <section className="robin-postcard-message" aria-labelledby="robin-login-title">
-          <h1 id="robin-login-title">Hola de nuevo.</h1>
-          <p className="robin-postcard-lead">Con este acceso entras a tu espacio en Robin, estés en la etapa que estés.</p>
+          <h1 id="robin-login-title">{t("Hola de nuevo.")}</h1>
+          <p className="robin-postcard-lead">{t("Con este acceso entras a tu espacio en Robin, estés en la etapa que estés.")}</p>
           <ul className="robin-postcard-stages">
             {STAGES.map(([art, name, line]) => (
-              <li key={name}><img src={art} alt="" /><span><strong>{name}</strong>{line}</span></li>
+              <li key={name}><img src={art} alt="" /><span><strong>{t(name)}</strong>{t(line)}</span></li>
             ))}
           </ul>
         </section>
@@ -425,21 +430,21 @@ function LoginScreen({ onLogin }) {
             <span>52°22′N 4°54′E</span>
           </div>
           <label className="robin-postcard-line">
-            <span>Usuario o correo</span>
-            <input type="text" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" />
+            <span>{t("Usuario o correo")}</span>
+            <input type="text" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("tu@correo.com")} />
           </label>
           <label className="robin-postcard-line">
-            <span>Contraseña</span>
+            <span>{t("Contraseña")}</span>
             <input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} />
           </label>
-          {error && <p className="robin-postcard-error" role="alert"><AlertCircle className="h-4 w-4 flex-shrink-0" />{error}</p>}
+          {error && <p className="robin-postcard-error" role="alert"><AlertCircle className="h-4 w-4 flex-shrink-0" />{t(error)}</p>}
           <button className="robin-postcard-submit" type="submit" disabled={!email || !password || loading}>
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Entrando…</> : "Entrar"}
+            {loading ? <><Loader2 className="h-4 w-4 animate-spin" />{t(" Entrando…")}</> : t("Entrar")}
           </button>
-          {biometryName && <button className="robin-postcard-submit" type="button" onClick={() => sendNativeAuthEvent({ action: "authenticate" })} disabled={loading}>Entrar con {biometryName}</button>}
-          <p className="robin-postcard-hint">Tu espacio Robin en un solo lugar.</p>
-          <button className="robin-forgot-password" type="button" onClick={() => setRecoveryOpen(true)}>Recuperar contraseña</button>
-          <a className="robin-forgot-password" href="/admin/politica-de-privacidad.html">Política de privacidad</a>
+          {biometryName && <button className="robin-postcard-submit" type="button" onClick={() => sendNativeAuthEvent({ action: "authenticate" })} disabled={loading}>{t("Entrar con ")}{biometryName}</button>}
+          <p className="robin-postcard-hint">{t("Tu espacio Robin en un solo lugar.")}</p>
+          <button className="robin-forgot-password" type="button" onClick={() => setRecoveryOpen(true)}>{t("Recuperar contraseña")}</button>
+          <a className="robin-forgot-password" href="/admin/politica-de-privacidad.html">{t("Política de privacidad")}</a>
         </form>
       </div>
       {recoveryOpen && <RecoveryRequest onClose={() => setRecoveryOpen(false)} />}

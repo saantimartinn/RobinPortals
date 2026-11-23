@@ -1,3 +1,5 @@
+import { setTranslationsEnabled } from '../../../../packages/i18n/language.js';
+import { t, useLocale } from "../../../../packages/i18n/react.jsx";
 // Resolves the current session and chooses the student or staff portal.
 import React, { useEffect, useState } from "react";
 import { loginUrl } from "../../../../packages/portal-nav/links.js";
@@ -30,6 +32,7 @@ import {
 
 
 export default function PortalRobin() {
+  useLocale();
   const [authState, setAuthState] = useState({
     loading: true,
     user: null,
@@ -37,6 +40,7 @@ export default function PortalRobin() {
     onboardingStep: null,
   });
   // A completed onboarding step the user went back to (null: the next pending step).
+  useEffect(() => { setTranslationsEnabled(!isAdminUser(authState.user)); }, [authState.user]);
   const [onboardingOverride, setOnboardingOverride] = useState(null);
   const [active, setActive] = useState("estado");
   const [entryError, setEntryError] = useState("");
@@ -129,13 +133,12 @@ export default function PortalRobin() {
     return (
       <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}>
         <div className="flex items-center gap-3 text-slate-500 text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" /> Cargando portal…
-        </div>
+          <Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando portal…")}</div>
       </div>
     );
   }
 
-  if (!authState.user) return <main className="min-h-screen grid place-content-center gap-4 px-6 text-center text-[#2D3A64]" role="alert"><h1 className="text-2xl font-bold">Acceso a RobinJr</h1><p>{entryError || "Redirigiendo al inicio de sesión común…"}</p>{entryError && <a className="underline" href="/login?next=robinjr">Volver al inicio de sesión</a>}</main>;
+  if (!authState.user) return <main className="min-h-screen grid place-content-center gap-4 px-6 text-center text-[#2D3A64]" role="alert"><h1 className="text-2xl font-bold">{t("Acceso a RobinJr")}</h1><p>{entryError || t("Redirigiendo al inicio de sesión común…")}</p>{entryError && <a className="underline" href="/login?next=robinjr">{t("Volver al inicio de sesión")}</a>}</main>;
   if (isAdminUser(authState.user)) return <>
     <CrossPortalNav current="robinjr" user={authState.user} onLogout={handleLogout} />
     <AdminPortal user={authState.user} />

@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Community feature UI for sub message thread; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { ChevronLeft, Loader2, MessageCircle, Send } from "lucide-react";
@@ -7,6 +8,7 @@ import { formatDate } from "../../shared/utils.js";
 import { messageSend, messagesThread } from "../../api/index.js";
 
 function SubMessageThread({ friend, onBack }) {
+  useLocale();
   const [msgs, setMsgs] = useState([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
@@ -20,8 +22,8 @@ function SubMessageThread({ friend, onBack }) {
   }
   useEffect(() => {
     load(true);
-    const t = setInterval(() => load(false), 8000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => load(false), 8000);
+    return () => clearInterval(timer);
   }, [friend && (friend.friend_id || friend.id)]);
   useEffect(() => { if (boxRef.current) boxRef.current.scrollTop = boxRef.current.scrollHeight; }, [msgs.length]);
 
@@ -37,13 +39,13 @@ function SubMessageThread({ friend, onBack }) {
     <Card>
       <CardHeader
         title={friend.name}
-        subtitle="Mensajes"
+        subtitle={t("Mensajes")}
         icon={MessageCircle}
-        right={<Btn size="sm" variant="ghost" onClick={onBack}><ChevronLeft className="h-4 w-4" /> Volver</Btn>} />
+        right={<Btn size="sm" variant="ghost" onClick={onBack}><ChevronLeft className="h-4 w-4" />{t(" Volver")}</Btn>} />
       <CardContent>
         <div ref={boxRef} className="h-80 overflow-y-auto space-y-2 pr-1 mb-3">
           {loading && <div className="text-sm text-slate-400 text-center py-8"><Loader2 className="h-4 w-4 animate-spin inline" /></div>}
-          {!loading && msgs.length === 0 && <div className="text-sm text-slate-400 text-center py-8">Aún no hay mensajes. ¡Saluda a {friend.name}!</div>}
+          {!loading && msgs.length === 0 && <div className="text-sm text-slate-400 text-center py-8">{t("Aún no hay mensajes. ¡Saluda a ")}{friend.name}!</div>}
           {msgs.map((m) => {
             const mine = m.recipient_id === (friend.friend_id || friend.id);
             return (
@@ -60,7 +62,7 @@ function SubMessageThread({ friend, onBack }) {
         <div className="flex items-end gap-2">
           <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={2}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Escribe un mensaje… (Enter para enviar)"
+            placeholder={t("Escribe un mensaje… (Enter para enviar)")}
             className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
           <Btn disabled={sending || !draft.trim()} onClick={send}>{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</Btn>
         </div>

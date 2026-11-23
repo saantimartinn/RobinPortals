@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Subscription feature UI for sub home; the application shell selects this view.
 import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Briefcase, CalendarCheck, ChevronRight, HeartHandshake, Tag, Users } from "lucide-react";
@@ -10,6 +11,7 @@ import { cityVisible } from "../community/cityVisible.js";
 import { formatDate, getRobinLevel, robinLevelDef } from "../../shared/utils.js";
 
 function SubHome({ user, events, partners, requests, setActive }) {
+  useLocale();
   const statusInfo = SUB_STATUS_LABELS[user.subscription_status] || SUB_STATUS_LABELS.none;
   const ciudad = user.ciudad || "";
   const now = Date.now();
@@ -46,48 +48,48 @@ function SubHome({ user, events, partners, requests, setActive }) {
             <div className="text-white/50 text-xs font-semibold mb-2">The Robin Plan</div>
             <div className="flex items-center gap-3 flex-wrap">
               <div className="text-white text-2xl font-bold" style={{ fontFamily: "var(--robin-font-display)" }}>
-                {user.subscription_plan === "annual" ? "Plan Anual" : "Plan Mensual"}
+                {user.subscription_plan === "annual" ? t("Plan Anual") : t("Plan Mensual")}
               </div>
-              <Badge tone={statusInfo.tone}>{statusInfo.label}</Badge>
+              <Badge tone={statusInfo.tone}>{t(statusInfo.label)}</Badge>
             </div>
-            <div className="text-white/60 text-sm mt-2">Bienvenido/a a tu portal de suscriptor.</div>
+            <div className="text-white/60 text-sm mt-2">{t("Bienvenido/a a tu portal de suscriptor.")}</div>
           </div>
           {daysAsRobin != null && (
             <div className="rounded-2xl px-5 py-4 text-center flex-shrink-0 bg-white/10 border border-white/15">
-              <div className="text-white/60 text-[11px] font-semibold ">Robin desde hace</div>
+              <div className="text-white/60 text-[11px] font-semibold ">{t("Robin desde hace")}</div>
               <div className="text-3xl font-bold mt-1" style={{ fontFamily: "var(--robin-font-display)", color: GOLD }}>{daysAsRobin}</div>
-              <div className="text-white/60 text-[11px] ">{daysAsRobin === 1 ? "día" : "días"}</div>
+              <div className="text-white/60 text-[11px] ">{daysAsRobin === 1 ? t("día") : t("días")}</div>
             </div>
           )}
         </div>
         <div className="relative mt-4 pt-4 border-t border-white/10 flex items-center gap-3 flex-wrap">
           <span className="text-xl leading-none">{rdef.emoji}</span>
-          <span className="text-white text-sm font-semibold">Nivel <span style={{ color: GOLD }}>{rdef.label}</span></span>
+          <span className="text-white text-sm font-semibold">{t("Nivel ")}<span style={{ color: GOLD }}>{t(rdef.label)}</span></span>
           <div className="flex-1 min-w-[140px]"><RobinProgressBar value={rlevel.progress} light /></div>
-          <span className="text-white/70 text-xs">{rlevel.nextLevel ? `Faltan ${rlevel.daysRemaining} ${rlevel.daysRemaining === 1 ? "día" : "días"} para ${robinLevelDef(rlevel.nextLevel).label}` : "Nivel máximo"}</span>
-          <Btn size="sm" variant="secondary" onClick={() => setActive("beneficios")}>Ver beneficios</Btn>
+          <span className="text-white/70 text-xs">{rlevel.nextLevel ? t("Faltan {0} {1} para {2}", [rlevel.daysRemaining, rlevel.daysRemaining === 1 ? t("día") : t("días"), robinLevelDef(rlevel.nextLevel).label]) : t("Nivel máximo")}</span>
+          <Btn size="sm" variant="secondary" onClick={() => setActive("beneficios")}>{t("Ver beneficios")}</Btn>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {tiles.map((t) => {
-          const Icon = t.icon;
-          const orange = t.id === "eventos";
+        {tiles.map((localItem) => {
+          const Icon = localItem.icon;
+          const orange = localItem.id === "eventos";
           const bg = orange ? GOLD : NAVY;
           const fg = orange ? NAVY : "#FEFBE5";
           return (
-            <button key={t.id} onClick={() => setActive(t.target)}
+            <button key={localItem.id} onClick={() => setActive(localItem.target)}
               className="rounded-2xl p-5 text-left min-h-[140px] flex flex-col justify-between"
               style={{ background: bg, color: fg }}>
               <div className="flex items-center gap-2 text-sm font-semibold">
-                <Icon className="h-4 w-4" style={orange ? {} : { color: GOLD }} /> {t.label}
+                <Icon className="h-4 w-4" style={orange ? {} : { color: GOLD }} /> {t(localItem.label)}
               </div>
-              {t.value !== undefined ? (
-                <div className="text-4xl font-bold leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>{t.value}</div>
+              {localItem.value !== undefined ? (
+                <div className="text-4xl font-bold leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>{localItem.value}</div>
               ) : (
-                <div className="text-sm font-semibold inline-flex items-center gap-1">Abrir <ChevronRight className="h-4 w-4" style={orange ? {} : { color: GOLD }} /></div>
+                <div className="text-sm font-semibold inline-flex items-center gap-1">{t("Abrir ")}<ChevronRight className="h-4 w-4" style={orange ? {} : { color: GOLD }} /></div>
               )}
-              <div className="text-[13px] opacity-80">{t.hint}</div>
+              <div className="text-[13px] opacity-80">{t(localItem.hint)}</div>
             </button>
           );
         })}
@@ -95,33 +97,33 @@ function SubHome({ user, events, partners, requests, setActive }) {
 
       <div className="grid lg:grid-cols-2 gap-5">
         <Card>
-          <CardHeader title="Próximos eventos" subtitle={ciudad ? `Personalizado para ${ciudad}` : undefined} icon={CalendarCheck} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
+          <CardHeader title={t("Próximos eventos")} subtitle={ciudad ? t("Personalizado para {0}", [ciudad]) : undefined} icon={CalendarCheck} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
           <CardContent className="space-y-3">
-            {upcomingEvents.length === 0 && <div className="text-sm text-slate-400">No hay eventos próximos por ahora.</div>}
+            {upcomingEvents.length === 0 && <div className="text-sm text-slate-400">{t("No hay eventos próximos por ahora.")}</div>}
             {upcomingEvents.slice(0, 6).map((e) => (
               <div key={e.id} className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-sm font-medium text-slate-800 truncate">{e.title}</div>
-                  <div className="text-xs text-slate-400">{formatDate(e.starts_at)} · {e.location || "Por confirmar"}</div>
+                  <div className="text-sm font-medium text-slate-800 truncate">{t(e.title)}</div>
+                  <div className="text-xs text-slate-400">{formatDate(e.starts_at)} · {e.location || t("Por confirmar")}</div>
                 </div>
-                <Badge tone={(COMMUNITY_TYPE_LABELS[e.type] || {}).tone || "slate"}>{(COMMUNITY_TYPE_LABELS[e.type] || {}).label || e.type}</Badge>
+                <Badge tone={(COMMUNITY_TYPE_LABELS[e.type] || {}).tone || "slate"}>{t((COMMUNITY_TYPE_LABELS[e.type] || {}).label || e.type)}</Badge>
               </div>
             ))}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader title="Perks & Partners" subtitle="Ventajas para miembros" icon={Tag} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
+          <CardHeader title="Perks & Partners" subtitle={t("Ventajas para miembros")} icon={Tag} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
           <CardContent className="space-y-2.5">
-            {homeOffers.length === 0 && <div className="text-sm text-slate-400">No hay perks activos ahora mismo.</div>}
+            {homeOffers.length === 0 && <div className="text-sm text-slate-400">{t("No hay perks activos ahora mismo.")}</div>}
             {homeOffers.slice(0, 6).map((o) => (
               <div key={o.id} className="rounded-xl border border-slate-100 p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-semibold text-slate-800 truncate">{(o.meta && o.meta.partner) || o.title}</div>
+                  <div className="text-sm font-semibold text-slate-800 truncate">{(o.meta && o.meta.partner) || t(o.title)}</div>
                   {o.meta && o.meta.tag && <Badge tone="gold">{o.meta.tag}</Badge>}
                 </div>
-                <div className="text-xs text-slate-500 mt-0.5">{o.title}</div>
-                {o.expires_at && <div className="text-[11px] mt-1 text-slate-400">Hasta {formatDate(o.expires_at)}</div>}
+                <div className="text-xs text-slate-500 mt-0.5">{t(o.title)}</div>
+                {o.expires_at && <div className="text-[11px] mt-1 text-slate-400">{t("Hasta ")}{formatDate(o.expires_at)}</div>}
               </div>
             ))}
           </CardContent>

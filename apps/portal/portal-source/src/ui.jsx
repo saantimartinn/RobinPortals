@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../packages/i18n/react.jsx";
 // Browser-side ui helper used by the application.
 import { GOLD, NAVY, NAVY_DARK } from "./theme.js";
 
@@ -7,8 +8,7 @@ export const Card = ({ children, className = "" }) => (
   </div>
 );
 
-export const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
-  <div className="ui-card-header px-6 py-4 border-b border-slate-100 flex items-center gap-4 justify-between">
+export const CardHeader = ({ title, subtitle, icon: Icon, right }) => { useLocale(); return (<div className="ui-card-header px-6 py-4 border-b border-slate-100 flex items-center gap-4 justify-between">
     <div className="flex items-center gap-3 min-w-0">
       {Icon && (
         <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0"
@@ -17,13 +17,12 @@ export const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
         </div>
       )}
       <div className="min-w-0">
-        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{title}</div>
-        {subtitle && <div className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</div>}
+        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{t(title)}</div>
+        {subtitle && <div className="text-xs text-slate-500 mt-0.5 truncate">{t(subtitle)}</div>}
       </div>
     </div>
-    {right && <div className="shrink-0">{right}</div>}
-  </div>
-);
+    {right && <div className="shrink-0">{t(right)}</div>}
+  </div>); };
 
 export const CardContent = ({ children, className = "" }) => <div className={`ui-card-content px-6 py-5 ${className}`}>{children}</div>;
 
@@ -49,36 +48,30 @@ export const Btn = ({ children, onClick, variant = "primary", className = "", di
   );
 };
 
-export const Field = ({ label, value, onChange, placeholder, type = "text" }) => (
-  <label className="block">
-    <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>
-    <input type={type} value={value || ""} onChange={(event) => onChange(event.target.value)} placeholder={placeholder}
+export const Field = ({ label, value, onChange, placeholder, type = "text" }) => { useLocale(); return (<label className="block">
+    <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>
+    <input type={type} value={value || ""} onChange={(event) => onChange(event.target.value)} placeholder={t(placeholder)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
-  </label>
-);
+  </label>); };
 
-export const TextareaField = ({ label, value, onChange, placeholder, rows = 4 }) => (
-  <label className="block">
-    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>}
-    <textarea rows={rows} value={value || ""} onChange={(event) => onChange(event.target.value)} placeholder={placeholder}
+export const TextareaField = ({ label, value, onChange, placeholder, rows = 4 }) => { useLocale(); return (<label className="block">
+    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>}
+    <textarea rows={rows} value={value || ""} onChange={(event) => onChange(event.target.value)} placeholder={t(placeholder)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
-  </label>
-);
+  </label>); };
 
-export const SelectField = ({ label, value, onChange, options = [], placeholder = "Selecciona…", allowEmpty = true }) => (
-  <label className="block">
-    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>}
+export const SelectField = ({ label, value, onChange, options = [], placeholder = "Selecciona…", allowEmpty = true }) => { useLocale(); return (<label className="block">
+    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>}
     <select value={value || ""} onChange={(event) => onChange(event.target.value)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition">
-      {allowEmpty && <option value="">{placeholder}</option>}
+      {allowEmpty && <option value="">{t(placeholder)}</option>}
       {options.map((option) => {
         const optionValue = typeof option === "string" ? option : option.value;
         const optionLabel = typeof option === "string" ? option : option.label;
-        return <option key={optionValue} value={optionValue}>{optionLabel}</option>;
+        return <option key={optionValue} value={optionValue}>{t(optionLabel)}</option>;
       })}
     </select>
-  </label>
-);
+  </label>); };
 
 export const Badge = ({ children, tone = "slate" }) => {
   const tones = {

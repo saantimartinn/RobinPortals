@@ -32,3 +32,7 @@ La URL puede ser `/api/*` en desarrollo/directo o `/therobinplan/api/*` en el do
 ---
 
 **USERGUIDE:** [Índice](../../USERGUIDE.md) · [← Anterior](./01-app-session-and-sso.md) · [Siguiente documento de lectura →](./03-admin-and-community-features.md) · [READMELONG](../../READMELONG.md)
+
+## Idioma del cliente
+
+Community y Pack Llegada comparten el selector ESPAÑOL / INGLÉS de `packages/i18n/` con Portal y Robin Jr. La preferencia `robin_language` persiste en el navegador y sincroniza las pestañas del mismo origen. El cambio actualiza la interfaz, las fechas y los importes sin reiniciar los formularios. La administración se mantiene en español; los nombres, mensajes y contenidos propios de los usuarios conservan su idioma original. El asistente de CV recibe el idioma seleccionado para sus nuevas respuestas.

@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Shell or navigation module for subscription plan picker; local authentication state stays in the application layer.
 import { AlertCircle, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Badge, Btn } from "../shared/ui.jsx";
@@ -8,6 +9,7 @@ import { formatMoney } from "../shared/utils.js";
 import { subscriptionCheckout, subscriptionPlans, subscriptionSync } from "../api/index.js";
 
 function SubscriptionPlanPicker({ user, onSubscribed }) {
+  useLocale();
   const [plans, setPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [selected, setSelected] = useState("monthly");
@@ -67,20 +69,16 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
     <div className="min-h-screen" style={{ background: CANVAS }}>
       <div className="max-w-5xl mx-auto px-4 py-10">
         <div className="text-center mb-8">
-          <div className="text-2xl md:text-3xl font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>
-            Hola {clientName || ""}, activa tu suscripción
-          </div>
-          <div className="text-sm text-slate-500 mt-2 max-w-lg mx-auto">
-            Elige el plan de The Robin Plan y desbloquea acompañamiento, servicios y comunidad para tu vida en el extranjero.
-          </div>
+          <div className="text-2xl md:text-3xl font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{t("Hola ")}{clientName || ""}{t(", activa tu suscripción")}</div>
+          <div className="text-sm text-slate-500 mt-2 max-w-lg mx-auto">{t("Elige el plan de The Robin Plan y desbloquea acompañamiento, servicios y comunidad para tu vida en el extranjero.")}</div>
           {user.subscription_status === "canceled" && (
-            <div className="mt-3 inline-flex"><Badge tone="amber">Tu suscripción anterior está cancelada — puedes reactivarla</Badge></div>
+            <div className="mt-3 inline-flex"><Badge tone="amber">{t("Tu suscripción anterior está cancelada — puedes reactivarla")}</Badge></div>
           )}
         </div>
 
         {error && (
           <div className="max-w-md mx-auto mb-6 flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-4 py-3">
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /><span>{error}</span>
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /><span>{t(error)}</span>
           </div>
         )}
 
@@ -104,21 +102,21 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
                 className="text-left rounded-2xl border-2 p-6 bg-white transition"
                 style={{ borderColor: isSel ? NAVY : "#EDECDB" }}>
                 <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{label}</div>
-                  {key === "annual" && <Badge tone="gold">{savings > 0 ? `Ahorra ${savings}€/año` : "Ahorra"}</Badge>}
+                  <div className="font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{t(label)}</div>
+                  {key === "annual" && <Badge tone="gold">{savings > 0 ? t("Ahorra {0}€/año", [savings]) : t("Ahorra")}</Badge>}
                 </div>
                 <div className="mt-3 text-3xl font-bold text-slate-900">
-                  {loadingPlans ? <Loader2 className="h-6 w-6 animate-spin text-slate-300" /> : (oneEuro ? "1,00 €" : (hasDisc ? discPrice : (price || "Consultar")))}
-                  {(oneEuro || hasDisc || price) && <span className="text-sm font-normal text-slate-400"> {oneEuro ? "primer pago" : interval}</span>}
+                  {loadingPlans ? <Loader2 className="h-6 w-6 animate-spin text-slate-300" /> : (oneEuro ? "1,00 €" : (hasDisc ? discPrice : (price || t("Consultar"))))}
+                  {(oneEuro || hasDisc || price) && <span className="text-sm font-normal text-slate-400"> {oneEuro ? t("primer pago") : interval}</span>}
                 </div>
-                {oneEuro && <div className="mt-1 text-sm text-slate-500">Después {price} {interval}</div>}
+                {oneEuro && <div className="mt-1 text-sm text-slate-500">{t("Después ")}{price} {interval}</div>}
                 {hasDisc && (
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-sm text-slate-400 line-through">{price}</span>
                     <Badge tone="gold">-{p.discount_percent}%</Badge>
                   </div>
                 )}
-                {p && !p.available && <div className="text-xs text-amber-600 mt-2">Próximamente disponible</div>}
+                {p && !p.available && <div className="text-xs text-amber-600 mt-2">{t("Próximamente disponible")}</div>}
               </button>
             );
           })}
@@ -126,13 +124,13 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
 
         <div className="max-w-2xl mx-auto mt-6">
           <div className="rounded-2xl bg-white border border-slate-100 p-5 mb-4">
-            <div className="text-sm font-semibold text-slate-800 mb-3">Datos de facturación</div>
+            <div className="text-sm font-semibold text-slate-800 mb-3">{t("Datos de facturación")}</div>
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 ["name", "Nombre o razón social"], ["taxId", "DNI, NIE o identificador fiscal"],
                 ["country", "País"], ["address", "Dirección fiscal"],
               ].map(([key, label]) => (
-                <label key={key} className="text-xs font-medium text-slate-600">{label}
+                <label key={key} className="text-xs font-medium text-slate-600">{t(label)}
                   <input required value={billing[key]} onChange={(e) => setBilling({ ...billing, [key]: e.target.value })}
                     className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900" />
                 </label>
@@ -140,21 +138,20 @@ function SubscriptionPlanPicker({ user, onSubscribed }) {
             </div>
           </div>
           <div className="rounded-2xl bg-white border border-slate-100 p-5">
-            <div className="text-xs font-semibold text-slate-500 mb-3">Incluido en tu plan</div>
+            <div className="text-xs font-semibold text-slate-500 mb-3">{t("Incluido en tu plan")}</div>
             <div className="grid sm:grid-cols-2 gap-2">
               {SUBSCRIBER_SERVICES.slice(0, 8).map((s) => (
                 <div key={s.key} className="flex items-center gap-2 text-sm text-slate-700">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: NAVY }} /> {s.title}
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: NAVY }} /> {t(s.title)}
                 </div>
               ))}
             </div>
           </div>
           <div className="mt-6 flex justify-center">
             <Btn size="lg" disabled={busy} onClick={() => startCheckout(selected)}>
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Continuar al pago seguro
-            </Btn>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}{t(" Continuar al pago seguro")}</Btn>
           </div>
-          <div className="text-center text-xs text-slate-400 mt-3">Pago procesado por Revolut · renovación automática · puedes cancelar cuando quieras</div>
+          <div className="text-center text-xs text-slate-400 mt-3">{t("Pago procesado por Revolut · renovación automática · puedes cancelar cuando quieras")}</div>
         </div>
       </div>
     </div>

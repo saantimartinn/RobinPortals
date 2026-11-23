@@ -1,3 +1,4 @@
+import { getLocale, t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for client sections; the application shell owns session state.
 import React, { useEffect, useState } from "react";
 import "../../../../../packages/student-documents/documents.css";
@@ -15,6 +16,7 @@ import {
 } from "../api.js";
 
 export function PagosCliente() {
+  useLocale();
   const [data, setData] = useState({ user: null, payments: [] });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -62,14 +64,13 @@ export function PagosCliente() {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Mis pagos" subtitle="Las cuotas de tu programa" icon={CreditCard} />
+        <CardHeader title={t("Mis pagos")} subtitle={t("Las cuotas de tu programa")} icon={CreditCard} />
         <CardContent>
           {loading ? (
             <div className="text-sm text-slate-400 text-center py-10 flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Cargando tus pagos…
-            </div>
+              <Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando tus pagos…")}</div>
           ) : loadError ? (
-            <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{loadError}</div>
+            <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{t(loadError)}</div>
           ) : (
             <div className="space-y-3">
               {data.payments.map((p) => {
@@ -83,24 +84,24 @@ export function PagosCliente() {
                       {isPaid ? <CheckCircle2 className="h-5 w-5" /> : isLocked ? <Shield className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold text-slate-900">{paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length)} · {eur(p.amount)}</div>
+                      <div className="text-sm font-semibold text-slate-900">{t(paymentTitle(p, data.payments.filter((x) => x.installment <= 3).length))} · {eur(p.amount)}</div>
                       <div className="text-xs text-slate-400">
-                        {isPaid && p.payment_data?.source === 'mentoria_credit' ? 'Cubierta por el pago de Mentoría' : isPaid && p.paid_at && `Pagado el ${new Date(p.paid_at).toLocaleDateString("es-ES")}`}
-                        {isUnlocked && p.unlocked_at && `Disponible desde el ${new Date(p.unlocked_at).toLocaleDateString("es-ES")}`}
-                        {isLocked && `Se desbloqueará cuando tu asesor lo indique`}
+                        {isPaid && p.payment_data?.source === 'mentoria_credit' ? t('Cubierta por el pago de Mentoría') : isPaid && p.paid_at && t("Pagado el {0}", [new Date(p.paid_at).toLocaleDateString(getLocale())])}
+                        {isUnlocked && p.unlocked_at && t("Disponible desde el {0}", [new Date(p.unlocked_at).toLocaleDateString(getLocale())])}
+                        {isLocked && t("Se desbloqueará cuando tu asesor lo indique", [])}
                       </div>
                       {p.due_date && !isPaid && (
-                        <div className="text-xs text-amber-600 mt-0.5">Fecha límite: {new Date(p.due_date + "T00:00:00").toLocaleDateString("es-ES")}</div>
+                        <div className="text-xs text-amber-600 mt-0.5">{t("Fecha límite: ")}{new Date(p.due_date + "T00:00:00").toLocaleDateString(getLocale())}</div>
                       )}
                     </div>
                     <PaymentStatusBadge status={p.status} />
                     <div className="flex gap-1 flex-shrink-0">
                       {isPaid && p.amount > 0 && (
-                        <Btn variant="secondary" size="sm" onClick={() => openInvoice(p)}><FileText className="h-3.5 w-3.5" /> {p.payment_data?.holded_invoice_id ? "Factura" : "Justificante"}</Btn>
+                        <Btn variant="secondary" size="sm" onClick={() => openInvoice(p)}><FileText className="h-3.5 w-3.5" /> {p.payment_data?.holded_invoice_id ? t("Factura") : t("Justificante")}</Btn>
                       )}
                       {isUnlocked && (
                         <Btn size="sm" variant="gold" disabled={payBusy} onClick={() => startCheckout(p)}>
-                          {payBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Pagar"}
+                          {payBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : t("Pagar")}
                         </Btn>
                       )}
                     </div>
@@ -122,6 +123,7 @@ export function PagosCliente() {
 // =====================
 
 export function CarrerasCliente() {
+  useLocale();
   const [careers, setCareers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -139,18 +141,15 @@ export function CarrerasCliente() {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Mis carreras" subtitle="Tu asesor te ha asignado las siguientes" icon={BookOpen} />
+        <CardHeader title={t("Mis carreras")} subtitle={t("Tu asesor te ha asignado las siguientes")} icon={BookOpen} />
         <CardContent>
           {loading ? (
             <div className="text-sm text-slate-400 text-center py-8 flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Cargando…
-            </div>
+              <Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando…")}</div>
           ) : error ? (
-            <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{error}</div>
+            <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{t(error)}</div>
           ) : careers.length === 0 ? (
-            <div className="text-sm text-slate-400 text-center py-8">
-              Aún no tienes carreras asignadas. Tu asesor te las asignará tras la fase de presentación.
-            </div>
+            <div className="text-sm text-slate-400 text-center py-8">{t("Aún no tienes carreras asignadas. Tu asesor te las asignará tras la fase de presentación.")}</div>
           ) : (
             <div className="space-y-2">
               {careers.map((c) => (
@@ -162,7 +161,7 @@ export function CarrerasCliente() {
                     <div className="text-sm font-semibold text-slate-900">{c.name}</div>
                     <div className="text-xs text-slate-500 mt-1">{c.university}{c.city ? ` · ${c.city}` : ""}</div>
                   </div>
-                  <Badge tone="green">Asignada</Badge>
+                  <Badge tone="green">{t("Asignada")}</Badge>
                 </div>
               ))}
             </div>
@@ -179,6 +178,7 @@ export function CarrerasCliente() {
 // =====================
 
 export function DocumentosCliente() {
+  useLocale();
   const [docs, setDocs] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
   const [careers, setCareers] = useState([]);
@@ -246,43 +246,39 @@ export function DocumentosCliente() {
       <div key={`${groupKey}-${d.id}`} className="student-document-card rounded-xl border border-slate-100 px-3 py-2.5" data-document-state={d.status}>
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-medium text-slate-900">{d.name}</div>
+            <div className="text-sm font-medium text-slate-900">{t(d.name)}</div>
             <div className="student-document-deadline"><CalendarDays size={13} aria-hidden="true" />
-              {dueDate ? <span>Fecha límite: <time dateTime={deadline}>{dueDate}</time></span> : <span>Sin fecha asignada</span>}
+              {dueDate ? <span>{t("Fecha límite: ")}<time dateTime={deadline}>{dueDate}</time></span> : <span>{t("Sin fecha asignada")}</span>}
             </div>
             <div className="text-xs text-slate-400">
-              {d.required ? "Obligatorio" : "Opcional"}
-              {d.uploaded_at && ` · subido ${new Date(d.uploaded_at).toLocaleDateString("es-ES")}`}
+              {d.required ? t("Obligatorio") : t("Opcional")}
+              {d.uploaded_at && t(" · subido {0}", [new Date(d.uploaded_at).toLocaleDateString(getLocale())])}
               {d.rejection_reason && ` · ${d.rejection_reason}`}
             </div>
             {careerNames.length > 0 && (
               <div className="mt-2 flex flex-wrap items-center gap-1 text-xs text-slate-600">
-                <span className="font-semibold">Carreras:</span>
+                <span className="font-semibold">{t("Carreras:")}</span>
                 {careerNames.map((name) => <span key={name} className="rounded-md bg-slate-100 px-2 py-0.5">{name}</span>)}
               </div>
             )}
           </div>
-          <Badge tone={info.tone}>{info.label}</Badge>
+          <Badge tone={info.tone}>{t(info.label)}</Badge>
         </div>
         <div className="flex flex-wrap gap-1 mt-2">
           {d.has_template && (
             <Btn variant="secondary" size="sm" onClick={() => downloadTemplate(d)}>
-              <Download className="h-3.5 w-3.5" /> Plantilla
-            </Btn>
+              <Download className="h-3.5 w-3.5" />{t(" Plantilla")}</Btn>
           )}
           {(d.status === "required" || d.status === "rejected") && (
             <>
               <input id={inputId} type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(d, f); e.target.value = ""; }} />
               <Btn size="sm" disabled={uploadingId === d.id} onClick={() => document.getElementById(inputId)?.click()}>
-                {uploadingId === d.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}
-                Subir
-              </Btn>
+                {uploadingId === d.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}{t("Subir")}</Btn>
             </>
           )}
           {d.has_file && (
             <Btn variant="secondary" size="sm" onClick={() => viewMy(d)}>
-              <Eye className="h-3.5 w-3.5" /> Ver mi archivo
-            </Btn>
+              <Eye className="h-3.5 w-3.5" />{t(" Ver mi archivo")}</Btn>
           )}
         </div>
       </div>
@@ -292,18 +288,15 @@ export function DocumentosCliente() {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Mis documentos" subtitle="Cada documento compartido sirve para todas las carreras indicadas: súbelo una sola vez" icon={FileText} />
+        <CardHeader title={t("Mis documentos")} subtitle={t("Cada documento compartido sirve para todas las carreras indicadas: súbelo una sola vez")} icon={FileText} />
         <CardContent>
-          {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2 mb-3">{error}</div>}
-          {careerError && <div className="text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-3">{careerError}</div>}
+          {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2 mb-3">{t(error)}</div>}
+          {careerError && <div className="text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2 mb-3">{t(careerError)}</div>}
           {loading ? (
             <div className="text-sm text-slate-400 text-center py-8 flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Cargando…
-            </div>
+              <Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando…")}</div>
           ) : docs.length === 0 ? (
-            <div className="text-sm text-slate-400 text-center py-8">
-              Aún no tienes documentos solicitados. Aparecerán aquí cuando tu asesor te asigne una carrera.
-            </div>
+            <div className="text-sm text-slate-400 text-center py-8">{t("Aún no tienes documentos solicitados. Aparecerán aquí cuando tu asesor te asigne una carrera.")}</div>
           ) : (
             <div className="space-y-5">
               {documentGroups.map((group) => {
@@ -316,13 +309,13 @@ export function DocumentosCliente() {
                   }}>
                   <summary className="student-document-summary">
                     <div>
-                      <h2 className="text-base font-semibold text-slate-900">{group.career?.name || group.label}</h2>
+                      <h2 className="text-base font-semibold text-slate-900">{group.career?.name || t(group.label)}</h2>
                       {group.career?.university && <p className="mt-0.5 text-xs text-slate-500">{group.career.university}{group.career.city ? ` · ${group.career.city}` : ""}</p>}
                     </div>
                     <span className="student-document-summary-actions">
                       <span className="student-document-summary-counts">
-                        <span className="student-document-progress" title="Documentos entregados" aria-label={`${progress.delivered} de ${progress.total} documentos entregados`}>{progress.delivered}/{progress.total} entregados</span>
-                        <span className="student-document-review">{progress.pendingReview} {progress.pendingReview === 1 ? "pendiente" : "pendientes"} de revisión</span>
+                        <span className="student-document-progress" title={t("Documentos entregados")} aria-label={t("{0} de {1} documentos entregados", [progress.delivered, progress.total])}>{progress.delivered}/{progress.total}{t(" entregados")}</span>
+                        <span className="student-document-review">{t(progress.pendingReview === 1 ? "{0} pendiente de revisión" : "{0} pendientes de revisión", [progress.pendingReview])}</span>
                       </span>
                       <span className="student-document-chevron"><ChevronDown className="h-4 w-4" aria-hidden="true" /></span>
                     </span>

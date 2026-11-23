@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Profile feature UI for sub settings; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { Loader2, Lock, LogOut } from "lucide-react";
@@ -6,6 +7,7 @@ import { SubSubscription } from "../subscription/SubSubscription.jsx";
 import { changePassword } from "../../api/index.js";
 
 export function ChangePasswordCard() {
+  useLocale();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
@@ -32,23 +34,20 @@ export function ChangePasswordCard() {
   }
 
   return <Card>
-    <CardHeader title="Seguridad" icon={Lock} subtitle="Cambia la contraseña de tu acceso Robin." />
+    <CardHeader title={t("Seguridad")} icon={Lock} subtitle={t("Cambia la contraseña de tu acceso Robin.")} />
     <CardContent>
-      {success && <p className="text-sm text-emerald-700 mb-4" role="status">Contraseña actualizada correctamente.</p>}
-      {!open ? <Btn onClick={() => { setSuccess(false); setOpen(true); }}>Cambiar contraseña</Btn> : <form className="grid gap-4 max-w-md" onSubmit={submit}>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Contraseña actual
-          <input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required autoComplete="current-password" value={current} onChange={(event) => setCurrent(event.target.value)} />
+      {success && <p className="text-sm text-emerald-700 mb-4" role="status">{t("Contraseña actualizada correctamente.")}</p>}
+      {!open ? <Btn onClick={() => { setSuccess(false); setOpen(true); }}>{t("Cambiar contraseña")}</Btn> : <form className="grid gap-4 max-w-md" onSubmit={submit}>
+        <label className="grid gap-1 text-sm font-medium text-slate-700">{t("Contraseña actual")}<input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required autoComplete="current-password" value={current} onChange={(event) => setCurrent(event.target.value)} />
         </label>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Nueva contraseña
-          <input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={next} onChange={(event) => setNext(event.target.value)} />
+        <label className="grid gap-1 text-sm font-medium text-slate-700">{t("Nueva contraseña")}<input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={next} onChange={(event) => setNext(event.target.value)} />
         </label>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Repetir nueva contraseña
-          <input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
+        <label className="grid gap-1 text-sm font-medium text-slate-700">{t("Repetir nueva contraseña")}<input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
         </label>
-        {error && <p className="text-sm text-rose-600" role="alert">{error}</p>}
+        {error && <p className="text-sm text-rose-600" role="alert">{t(error)}</p>}
         <div className="flex flex-wrap gap-2">
-          <Btn type="submit" disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</> : "Guardar contraseña"}</Btn>
-          <button type="button" className="px-3 py-2 text-sm text-slate-600" onClick={() => { setOpen(false); setCurrent(""); setNext(""); setConfirm(""); setError(""); }}>Cancelar</button>
+          <Btn type="submit" disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" />{t(" Guardando…")}</> : t("Guardar contraseña")}</Btn>
+          <button type="button" className="px-3 py-2 text-sm text-slate-600" onClick={() => { setOpen(false); setCurrent(""); setNext(""); setConfirm(""); setError(""); }}>{t("Cancelar")}</button>
         </div>
       </form>}
     </CardContent>
@@ -56,6 +55,7 @@ export function ChangePasswordCard() {
 }
 
 function SubSettings({ user, requests = [], onUserRefresh, onLogout }) {
+  useLocale();
   return (
     <div className="space-y-5">
       <ChangePasswordCard />
@@ -63,9 +63,9 @@ function SubSettings({ user, requests = [], onUserRefresh, onLogout }) {
       <SubSubscription user={user} requests={requests} onUserRefresh={onUserRefresh} />
 
       <Card>
-        <CardHeader title="Sesión" icon={LogOut} />
+        <CardHeader title={t("Sesión")} icon={LogOut} />
         <CardContent>
-          <Btn variant="danger" onClick={onLogout}><LogOut className="h-4 w-4" /> Cerrar sesión</Btn>
+          <Btn variant="danger" onClick={onLogout}><LogOut className="h-4 w-4" />{t(" Cerrar sesión")}</Btn>
         </CardContent>
       </Card>
     </div>

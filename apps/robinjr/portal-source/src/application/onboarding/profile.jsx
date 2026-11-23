@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Onboarding step or helper for profile; OnboardingFlow owns the step sequence.
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, ChevronRight, Loader2, AlertCircle, ChevronLeft } from "lucide-react";
@@ -24,6 +25,7 @@ const SYSTEM_VALUES = {
 };
 
 export function OnboardingProfile({ user, onLogout, onDone }) {
+  useLocale();
   const nav = useOnboardingNav();
   const [email, setEmail] = useState(user.email || "");
   const [intereses, setIntereses] = useState(user.intereses || []);
@@ -252,26 +254,26 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
     ? "Tu correo será tu usuario para entrar al portal."
     : screen === academicScreen
       ? "Última sección · sistema y asignaturas"
-      : `Cuestionario de orientación · pregunta ${screen} de ${questionCount}`;
+      : t("Cuestionario de orientación · pregunta {0} de {1}", [screen, questionCount]);
   const isLast = screen === totalScreens - 1;
   const conversationalQuestions = { g_ciudad: "¿En qué ciudad y país vives actualmente?", g_colegio: "¿Cómo se llama tu colegio actual?" };
   const currentQuestion = current?.kind === "question" ? conversationalQuestions[current.q.id] || current.q.q
     : screen === academicScreen ? "¿Qué sistema educativo estás cursando?"
       : "Para empezar, confirma tu correo y cuéntame qué áreas te interesan.";
   const questionMeta = current?.kind === "question"
-    ? `Pregunta ${screen} de ${questionCount}`
+    ? t("Pregunta {0} de {1}", [screen, questionCount])
     : screen === academicScreen ? "PERFIL · ÚLTIMA SECCIÓN" : "PERFIL · TUS INTERESES";
   const blockTitle = current?.kind === "question" ? current.block.title.replace(/^Bloque \d+ · /, "")
     : screen === academicScreen ? "Información académica" : "Tus intereses";
   const questionHint = current?.kind === "question"
-    ? current.q.hint || `${current.q.optional ? "Respuesta opcional. " : ""}${current.q.type === "multi" ? `Puedes elegir varias opciones${current.q.max ? `, máximo ${current.q.max}` : ""}.` : current.q.type === "single" ? "Elige una opción." : current.q.type === "slider" ? "Desliza para indicar tu respuesta." : "Escribe tu respuesta."}`
+    ? current.q.hint || `${current.q.optional ? t("Respuesta opcional. ") : ""}${current.q.type === "multi" ? t("Puedes elegir varias opciones{0}.", [current.q.max ? t(", máximo {0}", [current.q.max]) : ""]) : current.q.type === "single" ? t("Elige una opción.") : current.q.type === "slider" ? t("Desliza para indicar tu respuesta.") : t("Escribe tu respuesta.")}`
     : screen === academicScreen ? "Añade tus asignaturas actuales y sus niveles cuando corresponda."
       : "Selecciona al menos un área. Adaptaremos las preguntas a tus intereses.";
 
   if (profileSaved) return <OnboardingThanks user={user} onLogout={onLogout} onDone={onDone} />;
 
   return (
-    <OnboardingShell user={user} title="Tu perfil académico" subtitle={subtitle} stepNumber={5} onLogout={onLogout} fullscreen conversation>
+    <OnboardingShell user={user} title={t("Tu perfil académico")} subtitle={t(subtitle)} stepNumber={5} onLogout={onLogout} fullscreen conversation>
       <ProfileConversation history={history} question={currentQuestion} hint={questionHint} meta={questionMeta} blockTitle={blockTitle} sectionIntro={sectionIntro} containerRef={conversationFrame} minimumHeight={conversationHeight}>
       <div className="onboarding-question-flow" onKeyDown={(event) => { if (event.key === "Enter" && event.target.tagName === "INPUT" && !busy) { event.preventDefault(); next(); } }}>
         {/* Progreso interno del cuestionario */}
@@ -282,10 +284,10 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
 
         {screen === 0 && (
           <>
-            <Field label="Correo electrónico" value={email} onChange={setEmail} placeholder="tu@correo.com" type="email" />
+            <Field label={t("Correo electrónico")} value={email} onChange={setEmail} placeholder={t("tu@correo.com")} type="email" />
             <div>
-              <div className="text-xs font-semibold text-slate-600 mb-2 ">Áreas de interés para tu carrera</div>
-              <div className="text-xs text-slate-400 mb-3">{esMaestria ? "Selecciona al menos una: las áreas en las que te gustaría especializarte." : "Selecciona al menos una. Puedes elegir varias — adaptaremos el cuestionario a tus elecciones."}</div>
+              <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Áreas de interés para tu carrera")}</div>
+              <div className="text-xs text-slate-400 mb-3">{esMaestria ? t("Selecciona al menos una: las áreas en las que te gustaría especializarte.") : t("Selecciona al menos una. Puedes elegir varias — adaptaremos el cuestionario a tus elecciones.")}</div>
               <div className="grid grid-cols-2 gap-2">
                 {options.map((o) => {
                   const on = intereses.includes(o.value);
@@ -293,7 +295,7 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
                     <button key={o.value} type="button" onClick={() => toggle(o.value)} aria-pressed={on}
                       className="q-choice portal-area-choice flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition text-left"
                       style={on ? { background: NAVY, color: "#FEFBE5", borderColor: NAVY } : { background: "#FFFDF5", color: "#4E5979", borderColor: "#EDECDB" }}>
-                      <span>{o.label}</span>
+                      <span>{t(o.label)}</span>
                       <span className="portal-area-tick h-4 w-4 rounded grid place-items-center flex-shrink-0"
                         style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
                         {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}
@@ -312,8 +314,8 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
             {screen === 1 && (
               <p className="onboarding-question-hint">
                 {esMaestria
-                  ? "Estas respuestas ayudan a tu asesor a preparar tu candidatura al máster."
-                  : "Estas respuestas ayudan a tu asesor y a nuestra IA a recomendarte las carreras más compatibles."}
+                  ? t("Estas respuestas ayudan a tu asesor a preparar tu candidatura al máster.")
+                  : t("Estas respuestas ayudan a tu asesor y a nuestra IA a recomendarte las carreras más compatibles.")}
               </p>
             )}
           </div>
@@ -322,18 +324,16 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
         {screen === academicScreen && (
           <>
             <div className="rounded-xl px-4 py-3" style={{ background: "#F6F3E0" }}>
-              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "var(--robin-font-display)" }}>Sistema y asignaturas</div>
-              <div className="text-xs text-slate-500 mt-0.5">
-                Selecciona el sistema que cursas y añade tus asignaturas actuales. Si el sistema utiliza niveles, podrás indicarlos en cada asignatura.
-              </div>
+              <div className="text-sm font-bold" style={{ color: NAVY, fontFamily: "var(--robin-font-display)" }}>{t("Sistema y asignaturas")}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{t("Selecciona el sistema que cursas y añade tus asignaturas actuales. Si el sistema utiliza niveles, podrás indicarlos en cada asignatura.")}</div>
             </div>
 
             <label className="block">
-              <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Sistema académico</div>
+              <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t("Sistema académico")}</div>
               <select value={academicSystem} onChange={(event) => selectAcademicSystem(event.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition">
-                <option value="">Selecciona tu sistema académico…</option>
-                {ACADEMIC_SYSTEMS.map((system) => <option key={system.value} value={system.value}>{system.label}</option>)}
+                <option value="">{t("Selecciona tu sistema académico…")}</option>
+                {ACADEMIC_SYSTEMS.map((system) => <option key={system.value} value={system.value}>{t(system.label)}</option>)}
               </select>
             </label>
 
@@ -346,19 +346,18 @@ export function OnboardingProfile({ user, onLogout, onDone }) {
 
         {error && (
           <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{error}</span>
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{t(error)}</span>
           </div>
         )}
 
         <div className="onboarding-question-nav flex items-center gap-3">
           <Btn variant="secondary" onClick={back} disabled={busy || (screen === 0 && !nav?.goBack)}>
-            <ChevronLeft className="h-4 w-4" /> Atrás
-          </Btn>
+            <ChevronLeft className="h-4 w-4" />{t(" Atrás")}</Btn>
           <Btn className="flex-1" size="lg" onClick={next}
             disabled={busy || (screen === 0 && (!email.trim() || intereses.length === 0))}>
-            {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</>
-              : isLast ? <>Finalizar <CheckCircle2 className="h-4 w-4" /></>
-              : <>Continuar <ChevronRight className="h-4 w-4" /></>}
+            {busy ? <><Loader2 className="h-4 w-4 animate-spin" />{t(" Guardando…")}</>
+              : isLast ? <>{t("Finalizar ")}<CheckCircle2 className="h-4 w-4" /></>
+              : <>{t("Continuar ")}<ChevronRight className="h-4 w-4" /></>}
           </Btn>
         </div>
       </div>

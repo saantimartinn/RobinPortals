@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for application portals; the application shell owns session state.
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import "./student-portal.css";
@@ -49,6 +50,7 @@ import {
 const { APPLICATION_TOTALS, FISCAL: ROBIN_FISCAL } = financialConfig;
 
 export function PortalShell({ user, clientName, onLogout, active, setActive, onUserRefresh }) {
+  useLocale();
   const [profilePhoto, setProfilePhoto] = useState(user.avatar_url || null);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
@@ -111,25 +113,25 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
   return (
     <div className="student-portal">
       <NotificationPopup />
-      <a className="student-skip" href="#student-content">Saltar al contenido</a>
+      <a className="student-skip" href="#student-content">{t("Saltar al contenido")}</a>
       <div className="student-layout">
-        <nav className="student-sidebar" aria-label="Navegación del alumno">
+        <nav className="student-sidebar" aria-label={t("Navegación del alumno")}>
           <div className="student-identity">
-            <div className="student-avatar">{profilePhoto ? <img src={profilePhoto} alt="Tu foto de perfil" /> : (clientName || "R").charAt(0).toUpperCase()}</div>
-            <div><strong>{user?.nombre?.trim() || clientName.split(" ")[0]}</strong><span>Estudiante Robin Jr</span></div>
+            <div className="student-avatar">{profilePhoto ? <img src={profilePhoto} alt={t("Tu foto de perfil")} /> : (clientName || "R").charAt(0).toUpperCase()}</div>
+            <div><strong>{user?.nombre?.trim() || clientName.split(" ")[0]}</strong><span>{t("Estudiante Robin Jr")}</span></div>
           </div>
-          <p className="student-nav-caption">Tu espacio</p>
+          <p className="student-nav-caption">{t("Tu espacio")}</p>
           <div className="student-nav-items">
-            {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{label}</span></button>)}
+            {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{t(label)}</span></button>)}
           </div>
-          <div className="student-support"><span className="student-eyebrow">Robin Jr</span><h3>Tu futuro empieza con una idea.</h3><p>Habla con tu asesor y descubre las opciones que encajan contigo.</p><button onClick={() => setActive("reservas")}>Hablar con mi asesor <ArrowUpRight size={16} /></button></div>
+          <div className="student-support"><span className="student-eyebrow">Robin Jr</span><h3>{t("Tu futuro empieza con una idea.")}</h3><p>{t("Habla con tu asesor y descubre las opciones que encajan contigo.")}</p><button onClick={() => setActive("reservas")}>{t("Hablar con mi asesor ")}<ArrowUpRight size={16} /></button></div>
         </nav>
 
         <AnimatePresence mode="wait">
           <motion.main key={active}
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }} className="student-main" id="student-content" tabIndex={-1}>
-            {active !== "estado" && <div className="student-page-heading"><h1 className="student-eyebrow student-page-title">{navigation.find(item => item.key === active)?.label || "Mi camino"}</h1></div>}
+            {active !== "estado" && <div className="student-page-heading"><h1 className="student-eyebrow student-page-title">{navigation.find(item => item.key === active)?.label || t("Mi camino")}</h1></div>}
 
             {active === "estado" && (
               <Estado step={user.application_phase || 1} onNavigate={setActive} docsPendingCount={summary.documents} bookingsCount={summary.bookings} />

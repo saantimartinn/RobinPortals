@@ -1,3 +1,4 @@
+import { t, useLocale, LanguageSelector } from "../../../../../packages/i18n/react.jsx";
 // Common Robin navigation. Authentication and portal membership are checked by each product backend.
 import React, { useEffect, useRef, useState } from "react";
 import { AlertCircle, ChevronDown, LogOut, RefreshCw } from "lucide-react";
@@ -10,6 +11,7 @@ import "../../../../../packages/portal-nav/cross-portal-nav.css";
 const STUDENT_LINKS = new Set(["robinjr", "application", "subscriptions"]);
 
 export function CrossPortalNav({ current = "application", user = null, onLogout, onRefresh, onReportProblem, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" }) {
+  useLocale();
   const [notice, setNotice] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -56,31 +58,32 @@ export function CrossPortalNav({ current = "application", user = null, onLogout,
 
   return (
     <header className="robin-cross-nav">
-      <a className="robin-cross-brand" href={isAdmin ? LINKS[0][0] : LINKS[2][0]} aria-label={isAdmin ? "Robin Admin Platform, inicio" : "Robin, portal de alumno"}>
+      <a className="robin-cross-brand" href={isAdmin ? LINKS[0][0] : LINKS[2][0]} aria-label={isAdmin ? "Robin Admin Platform, inicio" : t("Robin, portal de alumno")}>
         <img src={robinWordmark} alt="ROBIN" />
-        <span>{isAdmin ? "Admin" : "Portal del alumno"}</span>
+        <span>{isAdmin ? "Admin" : t("Portal del alumno")}</span>
       </a>
       <div className="robin-cross-menu" ref={menuRef}>
         <button className="robin-cross-menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="robin-cross-links" onClick={() => setMenuOpen((value) => !value)}>
-          <span>{links.find(([, , key]) => key === current)?.[1] || "Portales"}</span><ChevronDown aria-hidden="true" />
+          <span>{t(links.find(([, , key]) => key === current)?.[1] || "Portales")}</span><ChevronDown aria-hidden="true" />
         </button>
-        <nav id="robin-cross-links" className={menuOpen ? "is-open" : ""} aria-label="Navegación de Robin">
+        <nav id="robin-cross-links" className={menuOpen ? "is-open" : ""} aria-label={t("Navegación de Robin")}>
           {links.map(([href, label, key]) => {
             const isActive = (current === "admin" && key === "admin") || key === current;
             const onClick = key === "robinjr" ? openRobinJr : key === "subscriptions" ? openCommunity : undefined;
-            return <a key={key} href={href} onClick={(event) => { setMenuOpen(false); onClick?.(event); }} className={isActive ? "is-active" : ""} aria-current={isActive ? "page" : undefined}>{label}</a>;
+            return <a key={key} href={href} onClick={(event) => { setMenuOpen(false); onClick?.(event); }} className={isActive ? "is-active" : ""} aria-current={isActive ? "page" : undefined}>{t(label)}</a>;
           })}
         </nav>
       </div>
       {accountName ? (
         <div className="robin-cross-actions">
-          {onReportProblem && <button className="robin-cross-report" type="button" onClick={onReportProblem} aria-label="Reportar problema" title="Reportar problema"><AlertCircle size={16} /> Reportar problema</button>}
+          {!isAdmin && <LanguageSelector />}
+          {onReportProblem && <button className="robin-cross-report" type="button" onClick={onReportProblem} aria-label={t("Reportar problema")} title={t("Reportar problema")}><AlertCircle size={16} />{t(" Reportar problema")}</button>}
           <span className="robin-cross-account">{accountName}</span>
-          {onRefresh && <button className="robin-cross-icon-button" type="button" onClick={onRefresh} aria-label="Recargar" title="Recargar"><RefreshCw size={18} /></button>}
-          {onLogout && <button className="robin-cross-icon-button" type="button" onClick={onLogout} aria-label="Cerrar sesión" title="Cerrar sesión"><LogOut size={18} /></button>}
+          {onRefresh && <button className="robin-cross-icon-button" type="button" onClick={onRefresh} aria-label={t("Recargar")} title={t("Recargar")}><RefreshCw size={18} /></button>}
+          {onLogout && <button className="robin-cross-icon-button" type="button" onClick={onLogout} aria-label={t("Cerrar sesión")} title={t("Cerrar sesión")}><LogOut size={18} /></button>}
         </div>
       ) : null}
-      {(notice || entryNotice) && <div className="robin-cross-notice" role="status" aria-live="polite"><span>{notice || entryNotice}</span>{notice && <button type="button" onClick={() => setNotice("")} aria-label="Cerrar aviso">×</button>}</div>}
+      {(notice || entryNotice) && <div className="robin-cross-notice" role="status" aria-live="polite"><span>{notice || t(entryNotice)}</span>{notice && <button type="button" onClick={() => setNotice("")} aria-label={t("Cerrar aviso")}>×</button>}</div>}
     </header>
   );
 }

@@ -43,6 +43,7 @@ exports.handler = async (event) => {
   const body = parseJsonBody(event);
   if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });
 
+  const responseLanguage = body.language === 'en' ? 'inglés' : 'español';
   const mode = body.mode === 'analyze' ? 'analyze' : 'generate';
   const purpose = PURPOSE_LABEL[body.purpose] ? body.purpose : 'professional';
   const sector = (body.sector || '').toString().trim();
@@ -53,7 +54,7 @@ exports.handler = async (event) => {
     if (mode === 'generate') {
       const inputs = (body.inputs || '').toString().trim();
       if (!inputs) return json({ error: 'missing_inputs' }, { statusCode: 400 });
-      const system = `Eres un experto en recursos humanos y redacción de CVs para estudiantes y jóvenes profesionales internacionales en Países Bajos/Europa. Creas CVs que SIEMPRE caben en UNA sola página A4: concisos, con solo la información relevante para el objetivo y el sector. Devuelves SIEMPRE un único objeto JSON válido, en español (salvo que el usuario pida otro idioma), sin texto fuera del JSON.`;
+      const system = `Eres un experto en recursos humanos y redacción de CVs para estudiantes y jóvenes profesionales internacionales en Países Bajos/Europa. Creas CVs que SIEMPRE caben en UNA sola página A4: concisos, con solo la información relevante para el objetivo y el sector. Devuelves SIEMPRE un único objeto JSON válido, en ${responseLanguage} (salvo que el usuario pida otro idioma), sin texto fuera del JSON.`;
       const user = `Crea un CV para una persona cuyo objetivo es conseguir ${purposeText}. Sector / estudios: ${sector || 'no especificado'}.
 
 Datos aportados:
@@ -88,7 +89,7 @@ Devuelve EXCLUSIVAMENTE este JSON (usa marcadores entre corchetes si falta info,
     }
 
     // ---------- ANALYZE ----------
-    const system = `Eres un evaluador experto de CVs para estudiantes y jóvenes profesionales. Evalúas con criterio profesional: claridad, estructura, impacto/resultados, relevancia para el objetivo y sector, ortografía y concreción. Respondes SIEMPRE en español y SOLO con un objeto JSON válido.`;
+    const system = `Eres un evaluador experto de CVs para estudiantes y jóvenes profesionales. Evalúas con criterio profesional: claridad, estructura, impacto/resultados, relevancia para el objetivo y sector, ortografía y concreción. Respondes SIEMPRE en ${responseLanguage} y SOLO con un objeto JSON válido.`;
     const promptText = `Analiza el CV para alguien cuyo objetivo es conseguir ${purposeText}, en el sector "${sector || 'no especificado'}".
 Devuelve EXCLUSIVAMENTE este JSON (sin texto fuera del JSON):
 { "score": <0-10>, "summary": "<1-2 frases>", "strengths": ["",""], "improvements": ["",""] }`;

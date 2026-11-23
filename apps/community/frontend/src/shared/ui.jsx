@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Shared ui values or helpers used across this runtime.
 import { GOLD, NAVY, NAVY_DARK } from "./theme.js";
 import React from "react";
@@ -60,8 +61,7 @@ const CardContent = ({ children, className = "" }) => <div className={`ui-card-c
 
 export { CardContent };
 
-const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
-  <div className="ui-card-header px-6 py-4 border-b border-slate-100 flex items-center gap-4 justify-between">
+const CardHeader = ({ title, subtitle, icon: Icon, right }) => { useLocale(); return (<div className="ui-card-header px-6 py-4 border-b border-slate-100 flex items-center gap-4 justify-between">
     <div className="flex items-center gap-3 min-w-0">
       {Icon && (
         <div className="h-9 w-9 rounded-xl grid place-items-center text-white flex-shrink-0"
@@ -70,13 +70,12 @@ const CardHeader = ({ title, subtitle, icon: Icon, right }) => (
         </div>
       )}
       <div className="min-w-0">
-        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{title}</div>
-        {subtitle && <div className="text-xs text-slate-500 mt-0.5 truncate">{subtitle}</div>}
+        <div className="ui-card-title text-[15px] font-semibold text-slate-900 truncate" style={{ fontFamily: "var(--robin-font-display)" }}>{t(title)}</div>
+        {subtitle && <div className="text-xs text-slate-500 mt-0.5 truncate">{t(subtitle)}</div>}
       </div>
     </div>
-    {right && <div className="shrink-0">{right}</div>}
-  </div>
-);
+    {right && <div className="shrink-0">{t(right)}</div>}
+  </div>); };
 
 export { CardHeader };
 
@@ -84,17 +83,16 @@ const Divider = () => <div className="h-px bg-slate-100 my-4" />;
 
 export { Divider };
 
-const Field = ({ label, value, onChange, placeholder, type = "text" }) => (
-  <label className="block">
-    <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>
-    <input type={type} value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+const Field = ({ label, value, onChange, placeholder, type = "text" }) => { useLocale(); return (<label className="block">
+    <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>
+    <input type={type} value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={t(placeholder)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition" />
-  </label>
-);
+  </label>); };
 
 export { Field };
 
 function KpiCard({ icon: Icon, label, value, sub, tone = "navy" }) {
+  useLocale();
   const bg = tone === "navy" ? NAVY :
              tone === "gold" ? GOLD :
              tone === "rose" ? "#B4424F" :
@@ -104,7 +102,7 @@ function KpiCard({ icon: Icon, label, value, sub, tone = "navy" }) {
   return (
     <div className="rounded-2xl p-4" style={{ background: bg, color: fg }}>
       <div className="flex items-center gap-2 opacity-80 text-xs font-semibold">
-        {Icon && <Icon className="h-3.5 w-3.5" />} {label}
+        {Icon && <Icon className="h-3.5 w-3.5" />} {t(label)}
       </div>
       <div className="text-2xl font-bold mt-1.5" style={{ fontFamily: "var(--robin-font-display)" }}>{value}</div>
       {sub && <div className="opacity-80 text-xs mt-1 truncate">{sub}</div>}
@@ -115,12 +113,13 @@ function KpiCard({ icon: Icon, label, value, sub, tone = "navy" }) {
 export { KpiCard };
 
 function Row({ label, value, tone = "slate" }) {
+  useLocale();
   const c = tone === "green" ? "text-emerald-700" :
             tone === "amber" ? "text-amber-700" :
             tone === "rose"  ? "text-rose-700"   : "text-slate-800";
   return (
     <div className="flex items-center justify-between gap-3 py-1">
-      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-xs text-slate-500">{t(label)}</div>
       <div className={`text-sm font-semibold ${c}`}>{value}</div>
     </div>
   );
@@ -128,29 +127,25 @@ function Row({ label, value, tone = "slate" }) {
 
 export { Row };
 
-const SelectField = ({ label, value, onChange, options = [], placeholder = "Selecciona…", allowEmpty = true }) => (
-  <label className="block">
-    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>}
+const SelectField = ({ label, value, onChange, options = [], placeholder = "Selecciona…", allowEmpty = true }) => { useLocale(); return (<label className="block">
+    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>}
     <select value={value || ""} onChange={(e) => onChange(e.target.value)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition">
-      {allowEmpty && <option value="">{placeholder}</option>}
+      {allowEmpty && <option value="">{t(placeholder)}</option>}
       {options.map((o) => {
         const val = typeof o === "string" ? o : o.value;
         const lbl = typeof o === "string" ? o : o.label;
-        return <option key={val} value={val}>{lbl}</option>;
+        return <option key={val} value={val}>{t(lbl)}</option>;
       })}
     </select>
-  </label>
-);
+  </label>); };
 
 export { SelectField };
 
-const TextareaField = ({ label, value, onChange, placeholder, rows = 4 }) => (
-  <label className="block">
-    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>}
-    <textarea rows={rows} value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+const TextareaField = ({ label, value, onChange, placeholder, rows = 4 }) => { useLocale(); return (<label className="block">
+    {label && <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>}
+    <textarea rows={rows} value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={t(placeholder)}
       className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:bg-white transition resize-none" />
-  </label>
-);
+  </label>); };
 
 export { TextareaField };

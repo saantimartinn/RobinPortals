@@ -1,9 +1,11 @@
+import { t, useLocale, LanguageSelector } from "../../../../../packages/i18n/react.jsx";
 import React, { useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { passwordResetConfirm, passwordResetRequest } from "../api.js";
 import { Modal } from "./SupportDialogs.jsx";
 
 export function RecoveryRequest({ onClose }) {
+  useLocale();
   const [identifier, setIdentifier] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -20,28 +22,28 @@ export function RecoveryRequest({ onClose }) {
     } finally { setBusy(false); }
   }
 
-  return <Modal title="Recuperar contraseña" onClose={onClose}>
+  return <Modal title={t("Recuperar contraseña")} onClose={onClose}>
     {sent ? <div className="robin-report-sent" role="status">
       <CheckCircle2 size={42} />
-      <h2>Revisa tu correo</h2>
-      <p>Si encontramos una cuenta de alumno asociada, te enviaremos un enlace para crear una contraseña nueva. El enlace caduca en 20 minutos.</p>
-      <button className="robin-support-primary" type="button" onClick={onClose}>Cerrar</button>
+      <h2>{t("Revisa tu correo")}</h2>
+      <p>{t("Si encontramos una cuenta de alumno asociada, te enviaremos un enlace para crear una contraseña nueva. El enlace caduca en 20 minutos.")}</p>
+      <button className="robin-support-primary" type="button" onClick={onClose}>{t("Cerrar")}</button>
     </div> : <>
-      <p className="robin-support-eyebrow">Acceso al portal</p>
-      <h2>Recuperar contraseña</h2>
-      <p className="robin-support-description">Escribe tu correo o nombre de usuario. Te enviaremos un enlace al correo asociado a la cuenta.</p>
+      <p className="robin-support-eyebrow">{t("Acceso al portal")}</p>
+      <h2>{t("Recuperar contraseña")}</h2>
+      <p className="robin-support-description">{t("Escribe tu correo o nombre de usuario. Te enviaremos un enlace al correo asociado a la cuenta.")}</p>
       <form className="robin-report-form" onSubmit={submit}>
-        <label>Correo o usuario
-          <input required maxLength={254} autoComplete="username" value={identifier} onChange={(event) => setIdentifier(event.target.value)} />
+        <label>{t("Correo o usuario")}<input required maxLength={254} autoComplete="username" value={identifier} onChange={(event) => setIdentifier(event.target.value)} />
         </label>
-        {error && <p className="robin-report-error" role="alert"><AlertCircle size={16} />{error}</p>}
-        <div className="robin-support-actions"><button className="robin-support-primary" type="submit" disabled={busy}>{busy ? <><Loader2 size={16} className="animate-spin" /> Enviando…</> : "Enviar enlace"}</button></div>
+        {error && <p className="robin-report-error" role="alert"><AlertCircle size={16} />{t(error)}</p>}
+        <div className="robin-support-actions"><button className="robin-support-primary" type="submit" disabled={busy}>{busy ? <><Loader2 size={16} className="animate-spin" />{t(" Enviando…")}</> : t("Enviar enlace")}</button></div>
       </form>
     </>}
   </Modal>;
 }
 
 export function ResetPasswordScreen({ token }) {
+  useLocale();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -64,25 +66,24 @@ export function ResetPasswordScreen({ token }) {
   }
 
   return <main className="robin-password-page">
+    <LanguageSelector className="robin-login-language" />
     <div className="robin-support-modal">
       {done ? <div className="robin-report-sent" role="status">
         <CheckCircle2 size={42} />
-        <h1>Contraseña actualizada</h1>
-        <p>Ya puedes entrar con tu nueva contraseña.</p>
-        <a className="robin-support-primary" href="/login">Ir al login</a>
+        <h1>{t("Contraseña actualizada")}</h1>
+        <p>{t("Ya puedes entrar con tu nueva contraseña.")}</p>
+        <a className="robin-support-primary" href="/login">{t("Ir al login")}</a>
       </div> : <>
-        <p className="robin-support-eyebrow">Acceso a Robin</p>
-        <h1>Crea una nueva contraseña</h1>
-        <p className="robin-support-description">Utiliza al menos 8 caracteres.</p>
+        <p className="robin-support-eyebrow">{t("Acceso a Robin")}</p>
+        <h1>{t("Crea una nueva contraseña")}</h1>
+        <p className="robin-support-description">{t("Utiliza al menos 8 caracteres.")}</p>
         <form className="robin-report-form" onSubmit={submit}>
-          <label>Nueva contraseña
-            <input type="password" required minLength={8} maxLength={72} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          <label>{t("Nueva contraseña")}<input type="password" required minLength={8} maxLength={72} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} />
           </label>
-          <label>Repetir nueva contraseña
-            <input type="password" required minLength={8} maxLength={72} autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
+          <label>{t("Repetir nueva contraseña")}<input type="password" required minLength={8} maxLength={72} autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
           </label>
-          {error && <p className="robin-report-error" role="alert"><AlertCircle size={16} />{error}</p>}
-          <div className="robin-support-actions"><button className="robin-support-primary" type="submit" disabled={busy}>{busy ? <><Loader2 size={16} className="animate-spin" /> Guardando…</> : "Guardar contraseña"}</button></div>
+          {error && <p className="robin-report-error" role="alert"><AlertCircle size={16} />{t(error)}</p>}
+          <div className="robin-support-actions"><button className="robin-support-primary" type="submit" disabled={busy}>{busy ? <><Loader2 size={16} className="animate-spin" />{t(" Guardando…")}</> : t("Guardar contraseña")}</button></div>
         </form>
       </>}
     </div>

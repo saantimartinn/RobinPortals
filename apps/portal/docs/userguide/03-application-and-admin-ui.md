@@ -6,6 +6,12 @@
 
 El onboarding se compone en `application/onboarding/OnboardingFlow.jsx` y delega el contenido de cada paso a módulos hermanos: `origin.jsx`, `dni.jsx`, `contract.jsx`, `profile.jsx`, `payment.jsx`, `questionnaire-fields.jsx` y `onboarding-shared.jsx`. Cambiar campos que se guardan requiere revisar API handler, schema/tables, contract/PDF si se repite en documento, y tests de onboarding.
 
+## Idioma del cliente
+
+El acceso común, el onboarding y las pantallas del cliente ofrecen el selector **ESPAÑOL / INGLÉS**. La preferencia se guarda en `robin_language` y se comparte entre Portal, Robin Jr y Community en el mismo navegador. El cambio actualiza textos, fechas e importes sin reiniciar formularios. Las pantallas administrativas permanecen en español.
+
+Las traducciones, los placeholders y la suscripción React viven en `packages/i18n/`. No se traducen valores persistidos del cuestionario, nombres ni mensajes escritos por usuarios. Los contratos se traducen al mostrarse; el documento canónico generado por el servidor conserva su contenido original.
+
 ## Superficie administrativa
 
 `AdminPortal.jsx` compone el espacio de trabajo admin. Los submódulos en `application/admin/` implementan dashboard y utilities, gestión de usuarios/clientes, progreso, configuración académica, carreras, pagos, reservas, documentos, chat y notificaciones. `AdminWorkspace.jsx` proporciona el layout común, `admin-navigation.js` define items, `CrossPortalNav.jsx` conecta los tres productos.

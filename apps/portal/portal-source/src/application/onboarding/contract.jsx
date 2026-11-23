@@ -1,3 +1,4 @@
+import { getLocale, t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Onboarding step or helper for contract; OnboardingFlow owns the step sequence.
 import React, { useState, useEffect, useRef } from "react";
 import { CheckCircle2, ChevronRight, Loader2, AlertCircle } from "lucide-react";
@@ -12,8 +13,9 @@ const { contractVariant: selectContractVariant } = contractContent;
 const { pricingVersionForNewUser, usesInternational2700Plan } = financialConfig;
 
 export function OnboardingContract({ user, onLogout, onDone }) {
+  useLocale();
   const today = new Date();
-  const todayStr = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Madrid" }).format(today);
+  const todayStr = new Intl.DateTimeFormat(getLocale(), { day: "2-digit", month: "long", year: "numeric", timeZone: "Europe/Madrid" }).format(today);
 
   const tipo = (user.tipo || "general").toLowerCase();
   const variant = CONTRACT_VARIANTS[tipo] || CONTRACT_VARIANTS.general;
@@ -79,35 +81,35 @@ export function OnboardingContract({ user, onLogout, onDone }) {
 
   return (
     <OnboardingShell user={user}
-      title={contractTitulo}
-      subtitle={contractSubtitle}
+      title={t(contractTitulo)}
+      subtitle={t(contractSubtitle)}
       stepNumber={3}
       onLogout={onLogout}
     >
       <div className="space-y-5">
         <div className="rounded-xl bg-sky-50 text-sky-700 border border-sky-100 px-3 py-2 text-sm">
           {esMaestria
-            ? "Tus datos personales se han extraído automáticamente de tu documento de identidad. Revisa el contrato y fírmalo para continuar."
-            : <>Los datos del <strong>alumno</strong> (nombre, DNI y dirección) se han extraído automáticamente del DNI. El <strong>cliente</strong> (tutor legal) sólo introduce su nombre y su propio DNI.</>}
+            ? t("Tus datos personales se han extraído automáticamente de tu documento de identidad. Revisa el contrato y fírmalo para continuar.")
+            : <>{t("Los datos del ")}<strong>{t("alumno")}</strong>{t(" (nombre, DNI y dirección) se han extraído automáticamente del DNI. El ")}<strong>{t("cliente")}</strong>{t(" (tutor legal) sólo introduce su nombre y su propio DNI.")}</>}
         </div>
-        {user.mentoria_credit_eur && <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-2 text-sm">Se descontarán {Number(user.mentoria_credit_eur).toLocaleString('es-ES', { minimumFractionDigits: 2 })} € ya abonados por Mentoría de la primera cuota de este programa.</div>}
+        {user.mentoria_credit_eur && <div className="rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 px-3 py-2 text-sm">{t("Se descontarán ")}{Number(user.mentoria_credit_eur).toLocaleString(getLocale(), { minimumFractionDigits: 2 })}{t(" € ya abonados por Mentoría de la primera cuota de este programa.")}</div>}
 
         <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <div className="text-[13px] font-semibold text-slate-800" style={{ fontFamily: "var(--robin-font-display)" }}>
-              {contractTitulo}
+              {t(contractTitulo)}
             </div>
-            <div className="text-[11px] text-slate-400">Fecha: {todayStr}</div>
+            <div className="text-[11px] text-slate-400">{t("Fecha: ")}{todayStr}</div>
           </div>
           <div className="px-4 py-4 max-h-[520px] overflow-auto text-[13px] leading-relaxed text-slate-700 space-y-2.5">
             {(() => {
               const values = {
                 CLIENTE_NOMBRE: nombreCliente || "NOMBRE DEL CLIENTE",
                 CLIENTE_DOC: dniCliente || (docLabel + " DEL CLIENTE").toUpperCase(),
-                CLIENTE_DOC_LABEL: docLabel,
+                CLIENTE_DOC_LABEL: t(docLabel),
                 ALUMNO_NOMBRE: alumnoNombre,
                 ALUMNO_DOC: alumnoDni,
-                ALUMNO_DOC_LABEL: docLabel,
+                ALUMNO_DOC_LABEL: t(docLabel),
                 DIRECCION: alumnoDireccion,
                 NUM_CARRERAS: "1, 2 o 3",
                 FECHA: todayStr,
@@ -116,48 +118,43 @@ export function OnboardingContract({ user, onLogout, onDone }) {
             })()}
 
             <div className="pt-3 mt-3 border-t border-slate-100 space-y-2.5">
-              <p className="font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>Firmas</p>
-              <p>
-                Por PROJECT ROBIN STUDENTS MOBILITY S.L.<br />
-                Administrador: Noel Cortes Cordoba — NIF B75355057<br />
-                Fecha: <Hl>{todayStr}</Hl>
+              <p className="font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{t("Firmas")}</p>
+              <p>{t("Por PROJECT ROBIN STUDENTS MOBILITY S.L.")}<br />{t("Administrador: Noel Cortes Cordoba — NIF B75355057")}<br />{t("Fecha: ")}<Hl>{todayStr}</Hl>
               </p>
-              <p>
-                Por El Cliente:<br />
+              <p>{t("Por El Cliente:")}<br />
                 {esMaestria
-                  ? <><Hl>{nombreCliente || "NOMBRE DEL CLIENTE"}</Hl><br />{docLabel} del firmante: <Hl>{dniCliente || "—"}</Hl><br /></>
-                  : <><Hl>{nombreCliente || "NOMBRE DEL CLIENTE"}</Hl>, tutor legal de <Hl>{alumnoNombre}</Hl> con {docLabel} <Hl>{alumnoDni}</Hl><br />{docLabel} del firmante (tutor legal): <Hl>{dniCliente || "—"}</Hl><br /></>}
-                Fecha: <Hl>{todayStr}</Hl>
+                  ? <><Hl>{nombreCliente || t("NOMBRE DEL CLIENTE")}</Hl><br />{t(docLabel)}{t(" del firmante: ")}<Hl>{dniCliente || "—"}</Hl><br /></>
+                  : <><Hl>{nombreCliente || t("NOMBRE DEL CLIENTE")}</Hl>{t(", tutor legal de ")}<Hl>{alumnoNombre}</Hl>{t(" con ")}{t(docLabel)} <Hl>{alumnoDni}</Hl><br />{t(docLabel)}{t(" del firmante (tutor legal): ")}<Hl>{dniCliente || "—"}</Hl><br /></>}{t("Fecha: ")}<Hl>{todayStr}</Hl>
               </p>
               <p className="text-[12px] font-semibold text-slate-700 pt-2">
-                {contractVariant.acceptanceFooter}
+                {t(contractVariant.acceptanceFooter)}
               </p>
             </div>
           </div>
         </div>
 
         <div>
-          <div className="text-xs font-semibold text-slate-600 mb-2 ">Datos del alumno (extraídos del DNI)</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Datos del alumno (extraídos del DNI)")}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <FieldReadOnly label="Nombre del alumno" value={alumnoNombre} />
-            <FieldReadOnly label="DNI del alumno" value={alumnoDni} />
+            <FieldReadOnly label={t("Nombre del alumno")} value={alumnoNombre} />
+            <FieldReadOnly label={t("DNI del alumno")} value={alumnoDni} />
             <div className="sm:col-span-2">
-              <FieldReadOnly label="Dirección del alumno" value={alumnoDireccion} />
+              <FieldReadOnly label={t("Dirección del alumno")} value={alumnoDireccion} />
             </div>
           </div>
         </div>
 
         <div>
-          <div className="text-xs font-semibold text-slate-600 mb-2 ">Datos del cliente{esMaestria ? "" : " (tutor legal)"}</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Datos del cliente")}{esMaestria ? "" : t(" (tutor legal)")}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Field label="Nombre completo del cliente" value={nombreCliente} onChange={setNombreCliente} placeholder="Nombre y apellidos" />
-            <Field label="DNI del cliente" value={dniCliente} onChange={(v) => setDniCliente(v.toUpperCase())} placeholder="12345678A" />
+            <Field label={t("Nombre completo del cliente")} value={nombreCliente} onChange={setNombreCliente} placeholder={t("Nombre y apellidos")} />
+            <Field label={t("DNI del cliente")} value={dniCliente} onChange={(v) => setDniCliente(v.toUpperCase())} placeholder="12345678A" />
           </div>
         </div>
 
         {variant.extras.length > 0 && (
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-2 ">Extras opcionales</div>
+            <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Extras opcionales")}</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {variant.extras.map((x) => {
                 const on = selectedExtras.includes(x.id);
@@ -171,7 +168,7 @@ export function OnboardingContract({ user, onLogout, onDone }) {
                         style={on ? { background: GOLD } : { background: "transparent", border: "1.5px solid #DFDED2" }}>
                         {on && <CheckCircle2 className="h-3 w-3" style={{ color: NAVY }} />}
                       </span>
-                      <span className="font-medium">{x.label}</span>
+                      <span className="font-medium">{t(x.label)}</span>
                     </span>
                     <span className={`text-xs font-semibold ${on ? "text-white/80" : "text-slate-500"}`}>+{x.price} €</span>
                   </label>
@@ -182,25 +179,25 @@ export function OnboardingContract({ user, onLogout, onDone }) {
         )}
 
         <div>
-          <div className="text-xs font-semibold text-slate-600 mb-2 ">Firma digital</div>
+          <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Firma digital")}</div>
           <SignaturePad onChange={setSigDataUrl} />
         </div>
 
         <label className="flex items-start gap-2 text-sm text-slate-700">
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1" />
-          <span>He leído y acepto los términos y condiciones del contrato.</span>
+          <span>{t("He leído y acepto los términos y condiciones del contrato.")}</span>
         </label>
 
         {error && (
           <div className="flex items-start gap-2 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{error}</span>
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> <span>{t(error)}</span>
           </div>
         )}
 
         <Btn className="w-full" size="lg"
           onClick={submit}
           disabled={busy || !agree || !sigDataUrl || !nombreCliente.trim() || !dniCliente.trim()}>
-          {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</> : <>Firmar y continuar <ChevronRight className="h-4 w-4" /></>}
+          {busy ? <><Loader2 className="h-4 w-4 animate-spin" />{t(" Guardando…")}</> : <>{t("Firmar y continuar ")}<ChevronRight className="h-4 w-4" /></>}
         </Btn>
       </div>
     </OnboardingShell>
@@ -236,9 +233,9 @@ const CONTRACT_VARIANTS = {
 function renderContractBlock(b, i, values) {
   switch (b.type) {
     case "h2":
-      return <p key={i} className="font-bold text-slate-900 mt-3" style={{ fontFamily: "var(--robin-font-display)" }}>{b.text}</p>;
+      return <p key={i} className="font-bold text-slate-900 mt-3" style={{ fontFamily: "var(--robin-font-display)" }}>{t(b.text)}</p>;
     case "h3":
-      return <p key={i} className="font-semibold text-slate-800 mt-2">{b.text}</p>;
+      return <p key={i} className="font-semibold text-slate-800 mt-2">{t(b.text)}</p>;
     case "p":
       return <p key={i}>{renderContractText(b.text, values)}</p>;
     case "ul":
@@ -255,7 +252,7 @@ function renderContractBlock(b, i, values) {
 }
 
 function renderContractText(text, values) {
-  const parts = String(text || "").split(/(\{\{[A-Z_]+\}\})/);
+  const parts = t(String(text || "")).split(/(\{\{[A-Z_]+\}\})/);
   return parts.map((p, i) => {
     const m = p.match(/^\{\{([A-Z_]+)\}\}$/);
     if (!m) return <React.Fragment key={i}>{p}</React.Fragment>;
@@ -273,15 +270,17 @@ function Hl({ children }) {
 }
 
 function FieldReadOnly({ label, value }) {
+  useLocale();
   return (
     <div>
-      <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{label}</div>
+      <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t(label)}</div>
       <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700 border border-slate-100">{value || "—"}</div>
     </div>
   );
 }
 
 function SignaturePad({ onChange }) {
+  useLocale();
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [empty, setEmpty] = useState(true);
@@ -301,8 +300,8 @@ function SignaturePad({ onChange }) {
 
   function pointerXY(e) {
     const rect = canvasRef.current.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+    const localItem = e.touches ? e.touches[0] : e;
+    return { x: localItem.clientX - rect.left, y: localItem.clientY - rect.top };
   }
   function start(e) { e.preventDefault(); const { x, y } = pointerXY(e); const ctx = canvasRef.current.getContext("2d"); ctx.beginPath(); ctx.moveTo(x, y); setDrawing(true); }
   function move(e) { if (!drawing) return; e.preventDefault(); const { x, y } = pointerXY(e); const ctx = canvasRef.current.getContext("2d"); ctx.lineTo(x, y); ctx.stroke(); setEmpty(false); }
@@ -317,13 +316,13 @@ function SignaturePad({ onChange }) {
           onTouchStart={start} onTouchMove={move} onTouchEnd={end} />
         {empty && (
           <div className="absolute inset-0 grid place-items-center pointer-events-none">
-            <span className="text-xs text-slate-400">Firma aquí con el ratón o el dedo</span>
+            <span className="text-xs text-slate-400">{t("Firma aquí con el ratón o el dedo")}</span>
           </div>
         )}
       </div>
       <div className="flex items-center justify-between mt-2">
-        <span className="text-[11px] text-slate-400">La firma queda registrada con fecha y hora.</span>
-        <button type="button" onClick={clear} className="text-xs text-slate-500 hover:text-slate-800 underline">Borrar firma</button>
+        <span className="text-[11px] text-slate-400">{t("La firma queda registrada con fecha y hora.")}</span>
+        <button type="button" onClick={clear} className="text-xs text-slate-500 hover:text-slate-800 underline">{t("Borrar firma")}</button>
       </div>
     </div>
   );

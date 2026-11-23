@@ -1,3 +1,4 @@
+import { getLocale, t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for career requirements timeline; the application shell owns session state.
 import React from "react";
 import { CalendarDays, FileText, Flag } from "lucide-react";
@@ -23,19 +24,20 @@ export function careerTimelineItems(careers = []) {
 
 function formatDeadline(value) {
   if (!value) return "Deadline pendiente";
-  return new Date(`${value}T00:00:00`).toLocaleDateString("es-ES", {
+  return new Date(`${value}T00:00:00`).toLocaleDateString(getLocale(), {
     day: "2-digit", month: "long", year: "numeric",
   });
 }
 
 export function CareerRequirementsTimeline({ careers = [], title = "Timeline de requerimientos" }) {
+  useLocale();
   const items = careerTimelineItems(careers);
   return (
     <Card>
-      <CardHeader title={title} subtitle="Documentos y fechas clave de tus carreras, ordenados por deadline" icon={CalendarDays} />
+      <CardHeader title={t(title)} subtitle={t("Documentos y fechas clave de tus carreras, ordenados por deadline")} icon={CalendarDays} />
       <CardContent>
         {items.length === 0 ? (
-          <div className="text-sm text-slate-400 text-center py-8">Todavía no hay requerimientos asignados.</div>
+          <div className="text-sm text-slate-400 text-center py-8">{t("Todavía no hay requerimientos asignados.")}</div>
         ) : (
           <div className="relative ml-3 border-l-2 border-slate-100 space-y-1">
             {items.map((item) => {
@@ -53,7 +55,7 @@ export function CareerRequirementsTimeline({ careers = [], title = "Timeline de 
                         <div className="text-sm font-semibold text-slate-900">{item.name}</div>
                         <div className="text-xs text-slate-500 mt-1">{item.careerName}{item.university ? ` · ${item.university}` : ""}</div>
                       </div>
-                      <Badge tone={isEvent ? "amber" : "blue"}>{isEvent ? "Evento" : "Documento"}</Badge>
+                      <Badge tone={isEvent ? "amber" : "blue"}>{isEvent ? t("Evento") : t("Documento")}</Badge>
                     </div>
                     <div className={`mt-2 text-xs font-semibold ${item.deadline ? "text-slate-700" : "text-amber-600"}`}>
                       <CalendarDays className="inline h-3.5 w-3.5 mr-1.5 -mt-0.5" />{formatDeadline(item.deadline)}

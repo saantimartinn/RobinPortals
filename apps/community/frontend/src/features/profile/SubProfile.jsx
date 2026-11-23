@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Profile feature UI for sub profile; the application shell selects this view.
 import { Btn, Card, CardContent, CardHeader, Field, SelectField, TextareaField } from "../../shared/ui.jsx";
 import { CheckCircle2, Loader2, UploadCloud, User } from "lucide-react";
@@ -8,6 +9,7 @@ import { getRobinLevel, resizeImageFile, robinLevelDef } from "../../shared/util
 import { subscriberProfileUpdate } from "../../api/index.js";
 
 function SubProfile({ user, onUserRefresh, setActive }) {
+  useLocale();
   const rlevel = getRobinLevel(user);
   const rdef = robinLevelDef(rlevel.level);
   const rnext = rlevel.nextLevel ? robinLevelDef(rlevel.nextLevel) : null;
@@ -80,64 +82,64 @@ function SubProfile({ user, onUserRefresh, setActive }) {
   return (
     <div className="space-y-5">
       <Card>
-        <CardHeader title="Tu perfil" subtitle="Tus datos de suscriptor" icon={User}
+        <CardHeader title={t("Tu perfil")} subtitle={t("Tus datos de suscriptor")} icon={User}
           right={
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <div className="text-xs font-semibold text-slate-700">{rdef.emoji} Nivel <span style={{ color: "#ECB450" }}>{rdef.label}</span></div>
-                <div className="text-[11px] text-slate-400">{rlevel.nextLevel ? `Faltan ${rlevel.daysRemaining} ${rlevel.daysRemaining === 1 ? "día" : "días"} para ${rnext.label}` : "Nivel máximo"}</div>
+                <div className="text-xs font-semibold text-slate-700">{rdef.emoji}{t(" Nivel ")}<span style={{ color: "#ECB450" }}>{t(rdef.label)}</span></div>
+                <div className="text-[11px] text-slate-400">{rlevel.nextLevel ? t("Faltan {0} {1} para {2}", [rlevel.daysRemaining, rlevel.daysRemaining === 1 ? "día" : "días", rnext.label]) : t("Nivel máximo")}</div>
               </div>
-              <Btn size="sm" variant="secondary" onClick={() => setActive && setActive("beneficios")}>Ver beneficios</Btn>
+              <Btn size="sm" variant="secondary" onClick={() => setActive && setActive("beneficios")}>{t("Ver beneficios")}</Btn>
             </div>
           } />
         <CardContent className="space-y-3">
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 rounded-2xl overflow-hidden border border-slate-200 grid place-items-center flex-shrink-0" style={{ background: NAVY }}>
-              {avatar ? <img src={avatar} alt="Foto de perfil" className="h-full w-full object-cover" /> : <span className="text-white font-bold text-lg">{(nombre || user.email || "R").charAt(0).toUpperCase()}</span>}
+              {avatar ? <img src={avatar} alt={t("Foto de perfil")} className="h-full w-full object-cover" /> : <span className="text-white font-bold text-lg">{(nombre || user.email || "R").charAt(0).toUpperCase()}</span>}
             </div>
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-slate-800">Foto de perfil</div>
+              <div className="text-sm font-semibold text-slate-800">{t("Foto de perfil")}</div>
               <div className="flex gap-2 items-center">
                 <label className="cursor-pointer">
                   <span className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white" style={{ background: NAVY }}>
-                    {avatarBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />} {avatar ? "Cambiar foto" : "Subir foto"}
+                    {avatarBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />} {avatar ? t("Cambiar foto") : t("Subir foto")}
                   </span>
                   <input type="file" accept="image/*" className="hidden" onChange={onPickAvatar} disabled={avatarBusy} />
                 </label>
-                {avatar && <Btn size="sm" variant="ghost" onClick={removeAvatar} disabled={avatarBusy}>Quitar</Btn>}
+                {avatar && <Btn size="sm" variant="ghost" onClick={removeAvatar} disabled={avatarBusy}>{t("Quitar")}</Btn>}
               </div>
-              <div className="text-[11px] text-slate-400">JPG o PNG. Se recorta a un cuadrado.</div>
+              <div className="text-[11px] text-slate-400">{t("JPG o PNG. Se recorta a un cuadrado.")}</div>
             </div>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
-            <Field label="Nombre" value={nombre} onChange={setNombre} />
-            <Field label="Apellidos" value={apellidos} onChange={setApellidos} />
+            <Field label={t("Nombre")} value={nombre} onChange={setNombre} />
+            <Field label={t("Apellidos")} value={apellidos} onChange={setApellidos} />
           </div>
-          <Field label="Correo" value={email} onChange={setEmail} />
-          <SelectField label="Tu ciudad" value={ciudad} onChange={setCiudad} options={ROBIN_CITIES} placeholder="Selecciona tu ciudad" />
-          <div className="text-xs text-slate-400 -mt-1">Personalizamos tus eventos y grupos según tu ciudad.</div>
-          {msg && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">{msg}</div>}
-          {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{error}</div>}
-          <Btn disabled={saving} onClick={save}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar cambios</Btn>
+          <Field label={t("Correo")} value={email} onChange={setEmail} />
+          <SelectField label={t("Tu ciudad")} value={ciudad} onChange={setCiudad} options={ROBIN_CITIES} placeholder={t("Selecciona tu ciudad")} />
+          <div className="text-xs text-slate-400 -mt-1">{t("Personalizamos tus eventos y grupos según tu ciudad.")}</div>
+          {msg && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">{t(msg)}</div>}
+          {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{t(error)}</div>}
+          <Btn disabled={saving} onClick={save}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}{t(" Guardar cambios")}</Btn>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader title="Sobre ti" subtitle="Más adelante tu perfil formará parte de la comunidad Robin" icon={User} />
+        <CardHeader title={t("Sobre ti")} subtitle={t("Más adelante tu perfil formará parte de la comunidad Robin")} icon={User} />
         <CardContent className="space-y-3">
-          <TextareaField label="Sobre mí" value={extra.bio} onChange={setEx("bio")} rows={3} placeholder="Cuéntale a la comunidad quién eres, qué estudias o buscas..." />
+          <TextareaField label={t("Sobre mí")} value={extra.bio} onChange={setEx("bio")} rows={3} placeholder={t("Cuéntale a la comunidad quién eres, qué estudias o buscas...")} />
           <div className="grid sm:grid-cols-2 gap-3">
-            <Field label="Teléfono" value={extra.phone} onChange={setEx("phone")} placeholder="+31 ..." />
-            <Field label="Fecha de nacimiento" value={extra.birthdate} onChange={setEx("birthdate")} placeholder="DD/MM/AAAA" />
-            <Field label="Nacionalidad" value={extra.nationality} onChange={setEx("nationality")} placeholder="Ej. Española" />
-            <Field label="Idiomas" value={extra.languages} onChange={setEx("languages")} placeholder="Español, Inglés..." />
-            <Field label="Universidad / centro" value={extra.university} onChange={setEx("university")} placeholder="Ej. Maastricht University" />
-            <Field label="Estudios / grado" value={extra.studies} onChange={setEx("studies")} placeholder="Ej. International Business" />
-            <Field label="Instagram" value={extra.instagram} onChange={setEx("instagram")} placeholder="@usuario" />
+            <Field label={t("Teléfono")} value={extra.phone} onChange={setEx("phone")} placeholder="+31 ..." />
+            <Field label={t("Fecha de nacimiento")} value={extra.birthdate} onChange={setEx("birthdate")} placeholder={t("DD/MM/AAAA")} />
+            <Field label={t("Nacionalidad")} value={extra.nationality} onChange={setEx("nationality")} placeholder={t("Ej. Española")} />
+            <Field label={t("Idiomas")} value={extra.languages} onChange={setEx("languages")} placeholder={t("Español, Inglés...")} />
+            <Field label={t("Universidad / centro")} value={extra.university} onChange={setEx("university")} placeholder={t("Ej. Maastricht University")} />
+            <Field label={t("Estudios / grado")} value={extra.studies} onChange={setEx("studies")} placeholder={t("Ej. International Business")} />
+            <Field label="Instagram" value={extra.instagram} onChange={setEx("instagram")} placeholder={t("@usuario")} />
             <Field label="LinkedIn" value={extra.linkedin} onChange={setEx("linkedin")} placeholder="linkedin.com/in/..." />
           </div>
-          {extraMsg && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">{extraMsg}</div>}
-          <Btn disabled={savingExtra} onClick={saveExtra}>{savingExtra ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar perfil</Btn>
+          {extraMsg && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">{t(extraMsg)}</div>}
+          <Btn disabled={savingExtra} onClick={saveExtra}>{savingExtra ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}{t(" Guardar perfil")}</Btn>
         </CardContent>
       </Card>
 

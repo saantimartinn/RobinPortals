@@ -82,14 +82,14 @@ async function buildStudentContext(sb, user) {
   return lines.join('\n');
 }
 
-function systemPrompt(studentContext) {
+function systemPrompt(studentContext, language = 'es') {
   return (
     'Eres el asistente virtual de Project Robin, una consultora que ayuda a estudiantes ' +
     'españoles a estudiar un grado universitario en el extranjero (principalmente Países Bajos). ' +
     'Hablas con un ALUMNO cliente dentro de su portal. Tu trabajo es resolver sus dudas de forma ' +
     'cercana, clara y honesta.\n\n' +
     'REGLAS:\n' +
-    '- Responde SIEMPRE en español, con tono amable y cercano (tuteo).\n' +
+    (language === 'en' ? '- Always reply in English, in a friendly and approachable tone.\n' : '- Responde SIEMPRE en español, con tono amable y cercano (tuteo).\n') +
     '- Basa tus respuestas en la sección PREGUNTAS FRECUENTES de abajo. Es tu fuente principal.\n' +
     '- Cuando uses información de una FAQ, debes citarla al final de la frase o del párrafo con su ' +
     'identificador exacto, por ejemplo [[FAQ:12]]. Usa como máximo tres citas relevantes. No inventes ' +
@@ -192,7 +192,7 @@ exports.handler = async (event) => {
       const apiMessages = toApiMessages(history.slice(-HISTORY_MAX));
       if (apiMessages.length) {
         const { text } = await chatCompletion({
-          system: systemPrompt(ctx),
+          system: systemPrompt(ctx, body.language === 'en' ? 'en' : 'es'),
           messages: apiMessages,
           maxTokens: 700,
         });

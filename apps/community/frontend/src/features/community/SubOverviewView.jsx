@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Community feature UI for sub overview view; the application shell selects this view.
 import { Badge, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
 import { COMMUNITY_TYPE_LABELS } from "../../shared/constants.js";
@@ -9,6 +10,7 @@ import { cityVisible } from "./cityVisible.js";
 import { formatDate } from "../../shared/utils.js";
 
 function SubOverviewView({ events = [], partners = [], ciudad, setTab }) {
+  useLocale();
   const now = Date.now();
   const inCity = (e) => cityVisible(e, ciudad, false);
   const upcomingEvents = events
@@ -26,23 +28,21 @@ function SubOverviewView({ events = [], partners = [], ciudad, setTab }) {
   return (
     <div className="space-y-5">
       {empty && (
-        <Card><CardContent className="py-8 text-center text-sm text-slate-400">
-          Todavía no hay contenido para tu ciudad. En cuanto el equipo publique eventos, grupos o perks, aparecerán aquí.
-        </CardContent></Card>
+        <Card><CardContent className="py-8 text-center text-sm text-slate-400">{t("Todavía no hay contenido para tu ciudad. En cuanto el equipo publique eventos, grupos o perks, aparecerán aquí.")}</CardContent></Card>
       )}
 
       <Card>
-        <CardHeader title="Eventos para ti" subtitle={ciudad ? `Personalizado para ${ciudad}` : undefined} icon={CalendarCheck}
-          right={<button onClick={() => setTab("eventos")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
+        <CardHeader title={t("Eventos para ti")} subtitle={ciudad ? t("Personalizado para {0}", [ciudad]) : undefined} icon={CalendarCheck}
+          right={<button onClick={() => setTab("eventos")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
         <CardContent className="space-y-3">
-          {upcomingEvents.length === 0 && <div className="text-sm text-slate-400">No hay eventos próximos por ahora.</div>}
+          {upcomingEvents.length === 0 && <div className="text-sm text-slate-400">{t("No hay eventos próximos por ahora.")}</div>}
           {upcomingEvents.map((e) => (
             <div key={e.id} className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-sm font-medium text-slate-800 truncate">{e.title}</div>
-                <div className="text-xs text-slate-400">{formatDate(e.starts_at)} · {e.location || "Por confirmar"}</div>
+                <div className="text-sm font-medium text-slate-800 truncate">{t(e.title)}</div>
+                <div className="text-xs text-slate-400">{formatDate(e.starts_at)} · {e.location || t("Por confirmar")}</div>
               </div>
-              <Badge tone={(COMMUNITY_TYPE_LABELS[e.type] || {}).tone || "slate"}>{(COMMUNITY_TYPE_LABELS[e.type] || {}).label || e.type}</Badge>
+              <Badge tone={(COMMUNITY_TYPE_LABELS[e.type] || {}).tone || "slate"}>{t((COMMUNITY_TYPE_LABELS[e.type] || {}).label || e.type)}</Badge>
             </div>
           ))}
         </CardContent>
@@ -50,15 +50,15 @@ function SubOverviewView({ events = [], partners = [], ciudad, setTab }) {
 
       <div className="grid lg:grid-cols-2 gap-5">
         <Card>
-          <CardHeader title="Grupos para ti" subtitle="Conecta con miembros de tu ciudad" icon={Users}
-            right={<button onClick={() => setTab("grupos")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
+          <CardHeader title={t("Grupos para ti")} subtitle={t("Conecta con miembros de tu ciudad")} icon={Users}
+            right={<button onClick={() => setTab("grupos")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
           <CardContent className="space-y-2.5">
-            {groups.length === 0 && <div className="text-sm text-slate-400">Aún no hay grupos para tu ciudad.</div>}
+            {groups.length === 0 && <div className="text-sm text-slate-400">{t("Aún no hay grupos para tu ciudad.")}</div>}
             {groups.map((g) => (
               <div key={g.id} className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-sm font-medium text-slate-800 truncate">{g.title}</div>
-                  <div className="text-xs text-slate-400">{g.city || "Nacional"}{g.meta && g.meta.members ? ` · ${g.meta.members} miembros` : ""}</div>
+                  <div className="text-sm font-medium text-slate-800 truncate">{t(g.title)}</div>
+                  <div className="text-xs text-slate-400">{g.city || t("Nacional")}{g.meta && g.meta.members ? t(" · {0} miembros", [g.meta.members]) : ""}</div>
                 </div>
                 {g.meta && g.meta.category && <Badge tone="navy">{g.meta.category}</Badge>}
               </div>
@@ -67,17 +67,17 @@ function SubOverviewView({ events = [], partners = [], ciudad, setTab }) {
         </Card>
 
         <Card>
-          <CardHeader title="Perks para ti" subtitle="Ventajas y descuentos para miembros" icon={Tag}
-            right={<button onClick={() => setTab("ofertas")} className="text-xs font-semibold" style={{ color: NAVY }}>Ver todos</button>} />
+          <CardHeader title={t("Perks para ti")} subtitle={t("Ventajas y descuentos para miembros")} icon={Tag}
+            right={<button onClick={() => setTab("ofertas")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
           <CardContent className="space-y-2.5">
-            {perks.length === 0 && <div className="text-sm text-slate-400">No hay perks activos ahora mismo.</div>}
+            {perks.length === 0 && <div className="text-sm text-slate-400">{t("No hay perks activos ahora mismo.")}</div>}
             {perks.map((o) => (
               <div key={o.id} className="rounded-xl border border-slate-100 p-3">
-                <div className="text-sm font-semibold text-slate-800">{(o.meta && o.meta.partner) || o.title}</div>
-                <div className="text-xs text-slate-500 mt-0.5">{o.title}</div>
+                <div className="text-sm font-semibold text-slate-800">{(o.meta && o.meta.partner) || t(o.title)}</div>
+                <div className="text-xs text-slate-500 mt-0.5">{t(o.title)}</div>
                 <div className="text-[11px] mt-2 flex items-center gap-2">
                   {o.meta && o.meta.tag && <Badge tone="gold">{o.meta.tag}</Badge>}
-                  {o.expires_at && <span className="text-slate-400">Hasta {formatDate(o.expires_at)}</span>}
+                  {o.expires_at && <span className="text-slate-400">{t("Hasta ")}{formatDate(o.expires_at)}</span>}
                 </div>
               </div>
             ))}

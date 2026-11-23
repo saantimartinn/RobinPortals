@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for faqs; the application shell owns session state.
 import React, { useEffect, useMemo, useState } from "react";
 import { HelpCircle, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
@@ -5,6 +6,7 @@ import { faqsList, adminFaqMutate } from "../api.js";
 import { Badge, Btn, Card, CardContent, CardHeader, Field, TextareaField } from "../ui.jsx";
 
 export function FaqsPage() {
+  const language = useLocale();
   const [faqs, setFaqs] = useState([]), [loading, setLoading] = useState(true), [error, setError] = useState(''), [query, setQuery] = useState('');
   useEffect(() => { faqsList().then(r => setFaqs(r.faqs || [])).catch(e => setError(e.message || 'No se pudieron cargar las FAQs.')).finally(() => setLoading(false)); }, []);
   useEffect(() => {
@@ -16,13 +18,13 @@ export function FaqsPage() {
       target.focus({ preventScroll: true });
     });
   }, [loading, faqs]);
-  const visible = useMemo(() => { const q = query.trim().toLowerCase(); return q ? faqs.filter(f => `${f.question} ${f.answer} ${f.category}`.toLowerCase().includes(q)) : faqs; }, [faqs, query]);
+  const visible = useMemo(() => { const q = query.trim().toLowerCase(); return q ? faqs.filter(f => `${t(f.question)} ${t(f.answer)} ${t(f.category)}`.toLowerCase().includes(q)) : faqs; }, [faqs, query, language]);
   return <div className="space-y-5">
-    <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3"><Search size={18} className="text-slate-400" /><input className="w-full bg-transparent text-sm outline-none" value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar una pregunta…" /></label>
-    {loading && <p className="flex items-center gap-2 text-sm text-slate-500"><Loader2 size={16} className="animate-spin" />Cargando preguntas…</p>}
-    {error && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
-    {!loading && !error && visible.length === 0 && <Card><CardContent><p className="text-sm text-slate-500">{faqs.length ? 'No hay resultados para esa búsqueda.' : 'Todavía no hay preguntas publicadas.'}</p></CardContent></Card>}
-    <div className="space-y-3">{visible.map(f => <article id={f.builtin ? `faq-${f.sort_order}` : `faq-custom-${f.id}`} key={f.id} tabIndex={0} className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover: focus-visible:-translate-y-0.5 focus-visible:border-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/50 target:border-amber-400 target:ring-4 target:ring-amber-200/50"><small className="mb-2 block text-[10px] font-semibold text-amber-600">{f.category}</small><h2 className="text-sm font-semibold leading-6 text-slate-900">{f.question}</h2><p className="mt-3 whitespace-pre-wrap border-t border-slate-100 pt-3 text-sm leading-7 text-slate-600">{f.answer}</p></article>)}</div>
+    <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3"><Search size={18} className="text-slate-400" /><input className="w-full bg-transparent text-sm outline-none" value={query} onChange={e => setQuery(e.target.value)} placeholder={t("Buscar una pregunta…")} /></label>
+    {loading && <p className="flex items-center gap-2 text-sm text-slate-500"><Loader2 size={16} className="animate-spin" />{t("Cargando preguntas…")}</p>}
+    {error && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{t(error)}</p>}
+    {!loading && !error && visible.length === 0 && <Card><CardContent><p className="text-sm text-slate-500">{faqs.length ? t('No hay resultados para esa búsqueda.') : t('Todavía no hay preguntas publicadas.')}</p></CardContent></Card>}
+    <div className="space-y-3">{visible.map(f => <article id={f.builtin ? `faq-${f.sort_order}` : `faq-custom-${f.id}`} key={f.id} tabIndex={0} className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white px-5 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover: focus-visible:-translate-y-0.5 focus-visible:border-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/50 target:border-amber-400 target:ring-4 target:ring-amber-200/50"><small className="mb-2 block text-[10px] font-semibold text-amber-600">{t(f.category)}</small><h2 className="text-sm font-semibold leading-6 text-slate-900">{t(f.question)}</h2><p className="mt-3 whitespace-pre-wrap border-t border-slate-100 pt-3 text-sm leading-7 text-slate-600">{t(f.answer)}</p></article>)}</div>
   </div>;
 }
 

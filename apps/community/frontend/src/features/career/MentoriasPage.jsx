@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Career feature UI for mentorias page; the application shell selects this view.
 import { Calendar, CalendarCheck, ChevronRight, Compass } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../shared/ui.jsx";
@@ -8,6 +9,7 @@ import { SubIntro } from "../services/SubIntro.jsx";
 import { formatDate } from "../../shared/utils.js";
 
 function MentoriasPage({ events = [], onBack }) {
+  useLocale();
   const [sector, setSector] = useState("");
   const [selMentor, setSelMentor] = useState(null);
   const mentors = events.filter((e) => e.type === "mentor" && (e.active === undefined || e.active));
@@ -27,16 +29,16 @@ function MentoriasPage({ events = [], onBack }) {
 
   return (
     <div className="space-y-5">
-      <SubIntro title="Mentorías" subtitle="Elige un sector y reserva con un mentor disponible." onBack={sector ? () => setSector("") : onBack} />
+      <SubIntro title={t("Mentorías")} subtitle={t("Elige un sector y reserva con un mentor disponible.")} onBack={sector ? () => setSector("") : onBack} />
       {!sector && (
         <Card>
-          <CardHeader title="Elige tu sector" subtitle="Selecciona el área en la que quieres orientación" icon={Compass} />
+          <CardHeader title={t("Elige tu sector")} subtitle={t("Selecciona el área en la que quieres orientación")} icon={Compass} />
           <CardContent className="grid sm:grid-cols-2 gap-3">
-            {sectors.length === 0 && <div className="text-sm text-slate-400">Todavía no hay mentores disponibles. Vuelve pronto.</div>}
+            {sectors.length === 0 && <div className="text-sm text-slate-400">{t("Todavía no hay mentores disponibles. Vuelve pronto.")}</div>}
             {sectors.map((sec) => (
               <button key={sec} onClick={() => setSector(sec)} className="text-left rounded-2xl border border-[#DFDED2] bg-[#F6F3E0] p-5 hover: transition">
-                <div className="text-sm font-semibold text-slate-800">{sec}</div>
-                <div className="text-xs text-slate-500 mt-0.5">{mentors.filter((m) => (m.meta && m.meta.sector) === sec).length} mentor(es)</div>
+                <div className="text-sm font-semibold text-slate-800">{t(sec)}</div>
+                <div className="text-xs text-slate-500 mt-0.5">{mentors.filter((m) => (m.meta && m.meta.sector) === sec).length}{t(" mentor(es)")}</div>
               </button>
             ))}
           </CardContent>
@@ -44,9 +46,9 @@ function MentoriasPage({ events = [], onBack }) {
       )}
       {sector && (
         <Card>
-          <CardHeader title={`Disponibilidad · ${sector}`} subtitle="Fechas disponibles. Pulsa para ver el perfil del mentor." icon={CalendarCheck} />
+          <CardHeader title={t("Disponibilidad · {0}", [sector])} subtitle={t("Fechas disponibles. Pulsa para ver el perfil del mentor.")} icon={CalendarCheck} />
           <CardContent className="space-y-2.5">
-            {slots.length === 0 && <div className="text-sm text-slate-400">No hay fechas disponibles en este sector por ahora.</div>}
+            {slots.length === 0 && <div className="text-sm text-slate-400">{t("No hay fechas disponibles en este sector por ahora.")}</div>}
             {slots.map((s) => {
               const m = s.meta && mentorById[s.meta.mentor_id];
               return (
@@ -58,7 +60,7 @@ function MentoriasPage({ events = [], onBack }) {
                       <div className="text-xs text-slate-500 truncate">{m ? m.title : "Mentor"}{m && m.meta && m.meta.job ? ` · ${m.meta.job}` : ""}</div>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold inline-flex items-center gap-1 flex-shrink-0" style={{ color: NAVY }}>Ver perfil <ChevronRight className="h-4 w-4" /></span>
+                  <span className="text-sm font-semibold inline-flex items-center gap-1 flex-shrink-0" style={{ color: NAVY }}>{t("Ver perfil ")}<ChevronRight className="h-4 w-4" /></span>
                 </button>
               );
             })}

@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Community feature UI for sub events view; the application shell selects this view.
 import { Badge, Btn, Card, CardContent } from "../../shared/ui.jsx";
 import { COMMUNITY_TYPE_LABELS } from "../../shared/constants.js";
@@ -11,6 +12,7 @@ import { communityRsvp } from "../../api/index.js";
 import { formatDate } from "../../shared/utils.js";
 
 function SubEventsView({ events, ciudad, onRefresh }) {
+  useLocale();
   const [filter, setFilter] = useState("all");
   const [showAll, setShowAll] = useState(false);
   const [busyId, setBusyId] = useState(null);
@@ -29,11 +31,11 @@ function SubEventsView({ events, ciudad, onRefresh }) {
       <Card>
         <CardContent className="space-y-3">
           <div className="flex gap-1.5 overflow-x-auto pb-1">
-            {types.map((t) => (
-              <button key={t} onClick={() => setFilter(t)}
+            {types.map((localItem) => (
+              <button key={localItem} onClick={() => setFilter(localItem)}
                 className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition"
-                style={filter === t ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
-                {t === "all" ? "Todos" : (COMMUNITY_TYPE_LABELS[t] || {}).label || t}
+                style={filter === localItem ? { background: NAVY, color: "#FEFBE5" } : { background: "#F6F3E0", color: "#4E5979" }}>
+                {localItem === "all" ? t("Todos") : t((COMMUNITY_TYPE_LABELS[localItem] || {}).label || localItem)}
               </button>
             ))}
           </div>
@@ -41,35 +43,32 @@ function SubEventsView({ events, ciudad, onRefresh }) {
         </CardContent>
       </Card>
 
-      {filtered.length === 0 && <div className="text-sm text-slate-400 px-2">No hay actividades para tu ciudad por ahora.</div>}
+      {filtered.length === 0 && <div className="text-sm text-slate-400 px-2">{t("No hay actividades para tu ciudad por ahora.")}</div>}
 
       <div className="grid sm:grid-cols-2 gap-4">
         {filtered.map((e) => {
-          const t = COMMUNITY_TYPE_LABELS[e.type] || { label: e.type, tone: "slate" };
+          const localItem = COMMUNITY_TYPE_LABELS[e.type] || { label: e.type, tone: "slate" };
           return (
             <Card key={e.id}>
               <CardContent className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="font-semibold text-slate-900">{e.title}</div>
-                  <Badge tone={t.tone}>{t.label}</Badge>
+                  <div className="font-semibold text-slate-900">{t(e.title)}</div>
+                  <Badge tone={localItem.tone}>{t(localItem.label)}</Badge>
                 </div>
                 {e.description && <div className="text-sm text-slate-600">{e.description}</div>}
                 <div className="text-xs text-slate-400 flex flex-wrap gap-3">
                   {e.starts_at && <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" /> {formatDate(e.starts_at)}</span>}
                   {(e.city || e.location) && <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {e.city || e.location}</span>}
-                  {e.capacity && <span className="inline-flex items-center gap-1"><Users className="h-3 w-3" /> {e.capacity} plazas</span>}
+                  {e.capacity && <span className="inline-flex items-center gap-1"><Users className="h-3 w-3" /> {e.capacity}{t(" plazas")}</span>}
                 </div>
                 <div className="flex gap-2 pt-1">
                   <Btn size="sm" variant={e.my_rsvp === "going" ? "primary" : "secondary"} disabled={busyId === e.id} onClick={() => rsvp(e, "going")}>
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Voy
-                  </Btn>
+                    <CheckCircle2 className="h-3.5 w-3.5" />{t(" Voy")}</Btn>
                   <Btn size="sm" variant={e.my_rsvp === "interested" ? "primary" : "secondary"} disabled={busyId === e.id} onClick={() => rsvp(e, "interested")}>
-                    <Star className="h-3.5 w-3.5" /> Me interesa
-                  </Btn>
+                    <Star className="h-3.5 w-3.5" />{t(" Me interesa")}</Btn>
                   {e.my_rsvp && (
                     <Btn size="sm" variant="ghost" disabled={busyId === e.id} onClick={() => rsvp(e, "cancelled")}>
-                      <XCircle className="h-3.5 w-3.5" /> Quitar
-                    </Btn>
+                      <XCircle className="h-3.5 w-3.5" />{t(" Quitar")}</Btn>
                   )}
                 </div>
               </CardContent>

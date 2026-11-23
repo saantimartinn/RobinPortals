@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for student status; the application shell owns session state.
 import { motion } from "framer-motion";
 import { Calendar, FileText, CheckCircle2, GraduationCap, Compass, ArrowUpRight } from "lucide-react";
@@ -6,22 +7,23 @@ import { SOFT, GOLD, NAVY } from "../theme.js";
 import { Card, CardContent, CardHeader } from "../ui.jsx";
 
 export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
+  useLocale();
   const current = APP_STEPS.find((s) => s.key === step);
   const pct = Math.round(((step - 1) / (APP_STEPS.length - 1)) * 100);
 
   return (
     <div className="space-y-5 student-overview">
-      <div className="student-page-heading"><h1 className="student-eyebrow student-page-title">Mi camino</h1></div>
+      <div className="student-page-heading"><h1 className="student-eyebrow student-page-title">{t("Mi camino")}</h1></div>
       <div className="student-progress-card rounded-2xl p-6 relative overflow-hidden">
         <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none select-none">
           <div className="text-[140px] font-black text-white leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>R</div>
         </div>
         <div className="relative">
-          <div className="student-step-pill"><span />PASO {step} DE {APP_STEPS.length} · EN CURSO</div>
-          <h2 className="text-white text-2xl font-bold mb-2">{current?.label}</h2>
-          <div className="text-white/60 text-sm">{current?.desc}</div>
+          <div className="student-step-pill"><span />{t("PASO ")}{step}{t(" DE ")}{APP_STEPS.length}{t(" · EN CURSO")}</div>
+          <h2 className="text-white text-2xl font-bold mb-2">{t(current?.label)}</h2>
+          <div className="text-white/60 text-sm">{t(current?.desc)}</div>
           <div className="mt-5">
-            <div className="flex justify-between text-white/80 text-xs mb-2"><span>Tu progreso hasta el destino</span><strong>{pct}%</strong></div>
+            <div className="flex justify-between text-white/80 text-xs mb-2"><span>{t("Tu progreso hasta el destino")}</span><strong>{pct}%</strong></div>
             <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
               <motion.div className="h-full rounded-full" style={{ backgroundColor: GOLD }}
                 initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.7, delay: 0.1 }} />
@@ -36,12 +38,12 @@ export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
           { label: "Próximas llamadas", value: bookingsCount ?? "—", hint: "Ver disponibilidad", key: "reservas", icon: Calendar },
           { label: "Tu futuro académico", value: "Mis carreras", hint: "Explorar mis opciones", key: "carreras", icon: GraduationCap },
         ].map(({ label, value, hint, key, icon: Icon }) => (
-          <button key={key} onClick={() => onNavigate(key)} className="student-quick-action"><span className="student-quick-icon"><Icon size={20} /></span><span className="student-quick-label">{label}</span><strong>{value}</strong><span className="student-quick-link">{hint}<ArrowUpRight size={16} /></span></button>
+          <button key={key} onClick={() => onNavigate(key)} className="student-quick-action"><span className="student-quick-icon"><Icon size={20} /></span><span className="student-quick-label">{t(label)}</span><strong>{value}</strong><span className="student-quick-link">{t(hint)}<ArrowUpRight size={16} /></span></button>
         ))}
       </div>
 
       <Card className="student-roadmap">
-        <CardHeader title="Tu hoja de ruta" subtitle="Un paso a la vez. Nosotros te acompañamos." icon={Compass} />
+        <CardHeader title={t("Tu hoja de ruta")} subtitle={t("Un paso a la vez. Nosotros te acompañamos.")} icon={Compass} />
         <CardContent className="space-y-2">
           {APP_STEPS.map((s) => {
             const done = s.key < step;
@@ -56,10 +58,10 @@ export function Estado({ step, onNavigate, docsPendingCount, bookingsCount }) {
                   {done ? <CheckCircle2 className="h-4 w-4" /> : s.key}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-semibold ${act ? "text-slate-900" : done ? "text-slate-400 line-through" : "text-slate-500"}`}>{s.label}</div>
-                  <div className="text-xs text-slate-400 mt-0.5">{s.desc}</div>
+                  <div className={`text-sm font-semibold ${act ? "text-slate-900" : done ? "text-slate-400 line-through" : "text-slate-500"}`}>{t(s.label)}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{t(s.desc)}</div>
                 </div>
-                {act && <span className="student-current-label">Estás aquí</span>}
+                {act && <span className="student-current-label">{t("Estás aquí")}</span>}
               </div>
             );
           })}

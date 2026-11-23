@@ -1,9 +1,10 @@
+import { getLocale, t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for payment utils; the application shell owns session state.
 import React from 'react';
 import { Badge } from '../../ui.jsx';
 
 export function eur(value) {
-  return Number(value || 0).toLocaleString('es-ES', {
+  return Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }) + ' €';
@@ -16,12 +17,13 @@ export function daysBetween(startIso, endIso) {
 }
 
 export function PaymentStatusBadge({ status }) {
-  if (status === 'paid') return <Badge tone="green">Pagado</Badge>;
-  if (status === 'unlocked') return <Badge tone="amber">Disponible</Badge>;
-  return <Badge tone="slate">Bloqueado</Badge>;
+  useLocale();
+  if (status === 'paid') return <Badge tone="green">{t("Pagado")}</Badge>;
+  if (status === 'unlocked') return <Badge tone="amber">{t("Disponible")}</Badge>;
+  return <Badge tone="slate">{t("Bloqueado")}</Badge>;
 }
 
 export function paymentTitle(payment, total) {
   if (payment && payment.concept) return payment.concept;
-  return `Cuota ${payment ? payment.installment : ''} de ${total || 3}`;
+  return t("Cuota {0} de {1}", [payment ? payment.installment : '', total || 3]);
 }

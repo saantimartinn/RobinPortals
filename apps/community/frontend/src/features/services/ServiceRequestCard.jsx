@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
 // Services feature UI for service request card; the application shell selects this view.
 import { Badge, Btn, TextareaField } from "../../shared/ui.jsx";
 import { Loader2, Send } from "lucide-react";
@@ -6,6 +7,7 @@ import React, { useState } from "react";
 import { serviceRequestCreate } from "../../api/index.js";
 
 function ServiceRequestCard({ service, requests = [], onRefresh, section }) {
+  useLocale();
   const [open, setOpen] = useState(false);
   const [details, setDetails] = useState("");
   const [sending, setSending] = useState(false);
@@ -27,24 +29,24 @@ function ServiceRequestCard({ service, requests = [], onRefresh, section }) {
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <div className="text-[15px] font-semibold text-slate-800">{service.title}</div>
-          <div className="text-xs text-slate-500 mt-0.5">{service.desc}</div>
+          <div className="text-[15px] font-semibold text-slate-800">{t(service.title)}</div>
+          <div className="text-xs text-slate-500 mt-0.5">{t(service.desc)}</div>
         </div>
       </div>
       {already && (
         <div className="flex items-center gap-2 pt-2">
-          <Badge tone="amber">Solicitado</Badge>
+          <Badge tone="amber">{t("Solicitado")}</Badge>
         </div>
       )}
       <div className="mt-auto pt-3">
         {!open ? (
-          <Btn size="sm" variant="secondary" onClick={() => { setOpen(true); setDetails(""); }}>Solicitar</Btn>
+          <Btn size="sm" variant="secondary" onClick={() => { setOpen(true); setDetails(""); }}>{t("Solicitar")}</Btn>
         ) : (
           <div className="space-y-2">
-            <TextareaField label="Cuéntanos qué necesitas" value={details} onChange={setDetails} rows={3} placeholder="Detalles de tu solicitud..." />
+            <TextareaField label={t("Cuéntanos qué necesitas")} value={details} onChange={setDetails} rows={3} placeholder={t("Detalles de tu solicitud...")} />
             <div className="flex gap-2">
-              <Btn size="sm" disabled={sending} onClick={submit}>{sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />} Enviar</Btn>
-              <Btn size="sm" variant="ghost" onClick={() => setOpen(false)}>Cancelar</Btn>
+              <Btn size="sm" disabled={sending} onClick={submit}>{sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}{t(" Enviar")}</Btn>
+              <Btn size="sm" variant="ghost" onClick={() => setOpen(false)}>{t("Cancelar")}</Btn>
             </div>
           </div>
         )}

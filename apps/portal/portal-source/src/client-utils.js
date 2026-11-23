@@ -1,3 +1,4 @@
+import { getLocale } from "../../../../packages/i18n/language.js";
 // Browser-side client utils helper used by the application.
 export function reportClientError(operation, error) {
   console.warn(JSON.stringify({
@@ -8,7 +9,7 @@ export function reportClientError(operation, error) {
 }
 
 export function formatDateTime(value, options) {
-  return new Intl.DateTimeFormat("es-ES", { ...options, timeZone: "Europe/Madrid" }).format(new Date(value));
+  return new Intl.DateTimeFormat(getLocale(), { ...options, timeZone: "Europe/Madrid" }).format(new Date(value));
 }
 
 export function formatTime(date) {
@@ -27,7 +28,7 @@ export function formatDate(d) {
 
 export function formatMoney(amount, currency) {
   if (amount == null) return null;
-  try { return new Intl.NumberFormat("es-ES", { style: "currency", currency: currency || "EUR" }).format(amount); }
+  try { return new Intl.NumberFormat(getLocale(), { style: "currency", currency: currency || "EUR" }).format(amount); }
   catch { return amount + " " + (currency || "EUR"); }
 }
 

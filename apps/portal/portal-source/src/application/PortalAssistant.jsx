@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for portal assistant; the application shell owns session state.
 import { useState, useEffect, useRef } from "react";
 import { Shield, Loader2, Sparkles, Send, X, ArrowUpRight, ArrowRight } from "lucide-react";
@@ -6,6 +7,7 @@ import { formatTime } from "../client-utils.js";
 import { chatAiList, chatAiSend } from "../api.js";
 
 export function StudentAssistant({ open, onOpenChange, mascot, onOpenFaq }) {
+  useLocale();
   const launcherRef = useRef(null);
   const dialogRef = useRef(null);
   useEffect(() => {
@@ -28,16 +30,17 @@ export function StudentAssistant({ open, onOpenChange, mascot, onOpenFaq }) {
   return <>
     {open && <div className="student-chat-scrim" onClick={() => onOpenChange(false)} aria-hidden="true" />}
     <section ref={dialogRef} hidden={!open} className="student-chat-panel" role="dialog" aria-modal="true" aria-labelledby="robin-assistant-title">
-      <header className="student-chat-header"><img src={mascot} alt="" /><div><h2 id="robin-assistant-title">Tu copiloto Robin</h2><p><span />Asistente IA · Tu asesor puede unirse</p></div><button onClick={() => onOpenChange(false)} aria-label="Cerrar asistente"><X size={20} /></button></header>
+      <header className="student-chat-header"><img src={mascot} alt="" /><div><h2 id="robin-assistant-title">{t("Tu copiloto Robin")}</h2><p><span />{t("Asistente IA · Tu asesor puede unirse")}</p></div><button onClick={() => onOpenChange(false)} aria-label={t("Cerrar asistente")}><X size={20} /></button></header>
       <ChatIA active={open} mascot={mascot} onOpenFaq={(number) => { onOpenChange(false); onOpenFaq(number); }} />
     </section>
-    <button ref={launcherRef} className="student-chat-launcher" onClick={() => onOpenChange(!open)} aria-label={open ? "Cerrar asistente Robin" : "Abrir asistente Robin"} aria-expanded={open} aria-haspopup="dialog" hidden={open}>
-      <span className="student-chat-label"><strong>¿Te echamos una mano?</strong><span>Pregunta a Robin</span></span><span className="student-chat-mascot"><img src={mascot} alt="" /><span className="student-chat-spark"><Sparkles size={12} /></span></span>
+    <button ref={launcherRef} className="student-chat-launcher" onClick={() => onOpenChange(!open)} aria-label={open ? t("Cerrar asistente Robin") : t("Abrir asistente Robin")} aria-expanded={open} aria-haspopup="dialog" hidden={open}>
+      <span className="student-chat-label"><strong>{t("¿Te echamos una mano?")}</strong><span>{t("Pregunta a Robin")}</span></span><span className="student-chat-mascot"><img src={mascot} alt="" /><span className="student-chat-spark"><Sparkles size={12} /></span></span>
     </button>
   </>;
 }
 
 export function ChatIA({ active, mascot, onOpenFaq }) {
+  useLocale();
   const [messages, setMessages] = useState([]);
   const [aiPaused, setAiPaused] = useState(false);
   const [draft, setDraft] = useState("");
@@ -63,8 +66,8 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
   useEffect(() => {
     if (!active) return;
     load(true);
-    const t = setInterval(() => load(false), 15000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => load(false), 15000);
+    return () => clearInterval(timer);
   }, [active]);
   useEffect(scrollToEnd, [messages, loading]);
 
@@ -93,13 +96,12 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
         {aiPaused && (
           <div className="mb-3 flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
             style={{ background: "#FCF2D3", borderColor: "#ECB450", color: "#2D3A64" }}>
-            <Shield className="h-4 w-4 flex-shrink-0" /> Tu asesor/a está atendiendo esta conversación en persona.
-          </div>
+            <Shield className="h-4 w-4 flex-shrink-0" />{t(" Tu asesor/a está atendiendo esta conversación en persona.")}</div>
         )}
-        <div ref={scrollRef} className="student-chat-messages" role="log" aria-label="Conversación con Robin" aria-live="polite" aria-busy={loading}>
-          {loading && <div className="text-sm text-slate-400 text-center py-8 flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Cargando…</div>}
+        <div ref={scrollRef} className="student-chat-messages" role="log" aria-label={t("Conversación con Robin")} aria-live="polite" aria-busy={loading}>
+          {loading && <div className="text-sm text-slate-400 text-center py-8 flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando…")}</div>}
           {!loading && messages.length === 0 && (
-            <div className="student-chat-welcome"><img src={mascot} alt="La mascota de Robin" /><span className="student-eyebrow">UN POCO DE AYUDA, UN GRAN PASO</span><h3>¡Hola! Soy tu copiloto.</h3><p>Pregúntame sobre tu proceso, documentos o la vida universitaria.</p><div>{["¿Qué documentos necesito?", "¿Cómo preparo mi llegada?"].map(question => <button key={question} onClick={() => setDraft(question)}>{question}<ArrowUpRight size={15} /></button>)}</div></div>
+            <div className="student-chat-welcome"><img src={mascot} alt={t("La mascota de Robin")} /><span className="student-eyebrow">{t("UN POCO DE AYUDA, UN GRAN PASO")}</span><h3>{t("¡Hola! Soy tu copiloto.")}</h3><p>{t("Pregúntame sobre tu proceso, documentos o la vida universitaria.")}</p><div>{["¿Qué documentos necesito?", "¿Cómo preparo mi llegada?"].map(question => <button key={question} onClick={() => setDraft(question)}>{t(question)}<ArrowUpRight size={15} /></button>)}</div></div>
           )}
           {messages.map((m) => {
             const mine = m.role === "user";
@@ -114,7 +116,7 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
                 )}
                 <div className="max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap break-words min-w-0"
                   style={mine ? { background: NAVY, color: "#FEFBE5" } : { background: "#FFFDF5", color: "#2D3A64", border: "1px solid #EDECDB" }}>
-                  {!mine && <div className="text-[11px] font-semibold mb-0.5" style={{ color: isAdvisor ? "#0F6E56" : NAVY }}>{isAdvisor ? "Tu asesor/a" : "Asistente IA"}</div>}
+                  {!mine && <div className="text-[11px] font-semibold mb-0.5" style={{ color: isAdvisor ? "#0F6E56" : NAVY }}>{isAdvisor ? t("Tu asesor/a") : t("Asistente IA")}</div>}
                   <div>{m.content}</div>
                   {!mine && !isAdvisor && m.faq_citations?.length > 0 && <div className="student-chat-faq-links">{m.faq_citations.map(citation => <button key={citation.number} onClick={() => onOpenFaq(citation.number)} title={citation.question}>FAQ {citation.number}<ArrowRight size={12} /></button>)}</div>}
                   <div className={`text-[11px] mt-1 ${mine ? "text-white/50" : "text-slate-400"}`}>{formatTime(new Date(m.created_at))}</div>
@@ -122,19 +124,19 @@ export function ChatIA({ active, mascot, onOpenFaq }) {
               </div>
             );
           })}
-          {sending && <div className="student-chat-typing" role="status"><Loader2 size={14} className="animate-spin" />{aiPaused ? "Enviando a tu asesor…" : "Robin está pensando…"}</div>}
+          {sending && <div className="student-chat-typing" role="status"><Loader2 size={14} className="animate-spin" />{aiPaused ? t("Enviando a tu asesor…") : t("Robin está pensando…")}</div>}
         </div>
-        {error && <div className="student-chat-error" role="alert">{error}</div>}
+        {error && <div className="student-chat-error" role="alert">{t(error)}</div>}
         <div className="student-chat-compose">
           <textarea value={draft} onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}
-            rows={2} placeholder="Escribe tu pregunta…" aria-label="Tu mensaje para Robin"
+            rows={2} placeholder={t("Escribe tu pregunta…")} aria-label={t("Tu mensaje para Robin")}
             className="flex-1 min-w-0 resize-none" />
-          <button onClick={send} disabled={!draft.trim() || sending || loading} aria-label="Enviar mensaje">
+          <button onClick={send} disabled={!draft.trim() || sending || loading} aria-label={t("Enviar mensaje")}>
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
         </div>
-        <p className="student-chat-disclaimer">Robin usa IA y puede equivocarse. Confirma lo importante con tu asesor.</p>
+        <p className="student-chat-disclaimer">{t("Robin usa IA y puede equivocarse. Confirma lo importante con tu asesor.")}</p>
     </div>
   );
 }

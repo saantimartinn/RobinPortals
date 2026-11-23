@@ -1,3 +1,4 @@
+import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
 // Portal view or navigation module for student profile; the application shell owns session state.
 import "./student-portal.css";
 import { useState, useEffect, useRef } from "react";
@@ -8,6 +9,7 @@ import { formatTime } from "../client-utils.js";
 import { changePassword, livedAbroadSave } from "../api.js";
 
 export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBusy, photoError, intereses, onUserRefresh }) {
+  useLocale();
   const photoInputRef = useRef(null);
   return (
     <div className="space-y-5">
@@ -21,10 +23,10 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
             </div>
           </div>
           <div className="absolute bottom-3 right-4">
-            <input ref={photoInputRef} aria-label="Seleccionar foto de perfil" type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={photoBusy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhotoChange(f); e.target.value = ""; }} />
+            <input ref={photoInputRef} aria-label={t("Seleccionar foto de perfil")} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={photoBusy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPhotoChange(f); e.target.value = ""; }} />
             <button type="button" disabled={photoBusy} onClick={() => photoInputRef.current?.click()} className="text-xs text-white hover:text-white bg-white/10 rounded-lg px-3 py-2.5 transition cursor-pointer">
               {photoBusy ? <Loader2 className="h-3 w-3 inline mr-1 animate-spin" /> : <UploadCloud className="h-3 w-3 inline mr-1" />}
-              {photoBusy ? "Guardando…" : "Cambiar foto"}
+              {photoBusy ? t("Guardando…") : t("Cambiar foto")}
             </button>
           </div>
         </div>
@@ -32,14 +34,14 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
           <div className="text-xl font-bold text-slate-900" style={{ fontFamily: "var(--robin-font-display)" }}>{clientName}</div>
           <div className="text-sm text-slate-500">{user.email || user.username}</div>
         </div>
-        {photoError && <div className="mx-6 mb-3 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{photoError}</div>}
+        {photoError && <div className="mx-6 mb-3 text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{t(photoError)}</div>}
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Nombre</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t("Nombre")}</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.nombre || "—"}</div>
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Apellidos</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t("Apellidos")}</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.apellidos || "—"}</div>
           </div>
           <div>
@@ -47,23 +49,23 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.email || "—"}</div>
           </div>
           <div>
-            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">Usuario</div>
+            <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t("Usuario")}</div>
             <div className="rounded-xl bg-slate-50 px-4 py-2.5 text-sm text-slate-700">{user.username || "—"}</div>
           </div>
           <div className="md:col-span-2">
-            <div className="text-xs font-semibold text-slate-600 mb-2 ">Áreas de interés</div>
+            <div className="text-xs font-semibold text-slate-600 mb-2 ">{t("Áreas de interés")}</div>
             <div className="flex flex-wrap gap-2">
               {intereses.length === 0
-                ? <span className="text-sm text-slate-400">Aún no has indicado intereses.</span>
+                ? <span className="text-sm text-slate-400">{t("Aún no has indicado intereses.")}</span>
                 : intereses.map((it) => (
                     <span key={it} className="rounded-full px-3 py-1.5 text-xs font-medium border"
-                      style={{ background: NAVY, color: "#FEFBE5", borderColor: NAVY }}>{it}</span>
+                      style={{ background: NAVY, color: "#FEFBE5", borderColor: NAVY }}>{t(it)}</span>
                   ))}
             </div>
           </div>
           <div className="md:col-span-2 flex items-center justify-between">
-            <span className="text-xs text-slate-400">Tus datos de DNI están confirmados</span>
-            <Badge tone="green">✓ Identidad verificada</Badge>
+            <span className="text-xs text-slate-400">{t("Tus datos de DNI están confirmados")}</span>
+            <Badge tone="green">{t("✓ Identidad verificada")}</Badge>
           </div>
         </CardContent>
       </Card>
@@ -79,6 +81,7 @@ export function Perfil({ user, clientName, profilePhoto, onPhotoChange, photoBus
 }
 
 function ChangePasswordCard() {
+  useLocale();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
@@ -105,23 +108,20 @@ function ChangePasswordCard() {
   }
 
   return <Card>
-    <CardHeader title="Seguridad" icon={Shield} subtitle="Controla el acceso a tu cuenta." />
+    <CardHeader title={t("Seguridad")} icon={Shield} subtitle={t("Controla el acceso a tu cuenta.")} />
     <CardContent>
-      {success && <p className="text-sm text-emerald-700 mb-4" role="status">Contraseña actualizada correctamente.</p>}
-      {!open ? <Btn onClick={() => { setSuccess(false); setOpen(true); }}>Cambiar contraseña</Btn> : <form className="grid gap-4 max-w-md" onSubmit={submit}>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Contraseña actual
-          <input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required autoComplete="current-password" value={current} onChange={(event) => setCurrent(event.target.value)} />
+      {success && <p className="text-sm text-emerald-700 mb-4" role="status">{t("Contraseña actualizada correctamente.")}</p>}
+      {!open ? <Btn onClick={() => { setSuccess(false); setOpen(true); }}>{t("Cambiar contraseña")}</Btn> : <form className="grid gap-4 max-w-md" onSubmit={submit}>
+        <label className="grid gap-1 text-sm font-medium text-slate-700">{t("Contraseña actual")}<input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required autoComplete="current-password" value={current} onChange={(event) => setCurrent(event.target.value)} />
         </label>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Nueva contraseña
-          <input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={next} onChange={(event) => setNext(event.target.value)} />
+        <label className="grid gap-1 text-sm font-medium text-slate-700">{t("Nueva contraseña")}<input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={next} onChange={(event) => setNext(event.target.value)} />
         </label>
-        <label className="grid gap-1 text-sm font-medium text-slate-700">Repetir nueva contraseña
-          <input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
+        <label className="grid gap-1 text-sm font-medium text-slate-700">{t("Repetir nueva contraseña")}<input className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm" type="password" required minLength={8} autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} />
         </label>
-        {error && <p className="text-sm text-rose-600" role="alert">{error}</p>}
+        {error && <p className="text-sm text-rose-600" role="alert">{t(error)}</p>}
         <div className="flex flex-wrap gap-2">
-          <Btn type="submit" disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Guardando…</> : "Guardar contraseña"}</Btn>
-          <button type="button" className="px-3 py-2 text-sm text-slate-600" onClick={() => { setOpen(false); setCurrent(""); setNext(""); setConfirm(""); setError(""); }}>Cancelar</button>
+          <Btn type="submit" disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" />{t(" Guardando…")}</> : t("Guardar contraseña")}</Btn>
+          <button type="button" className="px-3 py-2 text-sm text-slate-600" onClick={() => { setOpen(false); setCurrent(""); setNext(""); setConfirm(""); setError(""); }}>{t("Cancelar")}</button>
         </div>
       </form>}
     </CardContent>
@@ -129,6 +129,7 @@ function ChangePasswordCard() {
 }
 
 export function LivedAbroadCard({ value, editable, onSaved, userId }) {
+  useLocale();
   const COUNTRIES = ["UK", "US", "Francia", "otros"];
   const [lived, setLived] = useState(!!(value && value.lived_abroad));
   const [country, setCountry] = useState((value && value.lived_abroad_country) || "");
@@ -169,43 +170,43 @@ export function LivedAbroadCard({ value, editable, onSaved, userId }) {
 
   return (
     <Card>
-      <CardHeader title="Experiencia internacional" icon={MapPin}
-        subtitle="¿Ha vivido fuera de España en alguno de los 3 últimos años?"
-        right={savedAt && <span className="text-xs text-emerald-600">Guardado · {formatTime(savedAt)}</span>} />
+      <CardHeader title={t("Experiencia internacional")} icon={MapPin}
+        subtitle={t("¿Ha vivido fuera de España en alguno de los 3 últimos años?")}
+        right={savedAt && <span className="text-xs text-emerald-600">{t("Guardado · ")}{formatTime(savedAt)}</span>} />
       <CardContent className="space-y-4">
         {editable ? (
           <>
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={lived} onChange={(e) => setLived(e.target.checked)} className="h-4 w-4" />
-              <span className="text-sm text-slate-700">Ha vivido fuera de España en alguno de los 3 últimos años</span>
+              <span className="text-sm text-slate-700">{t("Ha vivido fuera de España en alguno de los 3 últimos años")}</span>
             </label>
             {lived && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <div className="text-xs font-semibold text-slate-600 mb-1.5 ">País</div>
+                  <div className="text-xs font-semibold text-slate-600 mb-1.5 ">{t("País")}</div>
                   <select value={country} onChange={(e) => setCountry(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm">
-                    <option value="">Selecciona…</option>
-                    {COUNTRIES.map((c) => <option key={c} value={c}>{countryLabel(c)}</option>)}
+                    <option value="">{t("Selecciona…")}</option>
+                    {COUNTRIES.map((c) => <option key={c} value={c}>{t(countryLabel(c))}</option>)}
                   </select>
                 </div>
                 {country === "otros" && (
-                  <Field label="¿Dónde?" value={other} onChange={setOther} />
+                  <Field label={t("¿Dónde?")} value={other} onChange={setOther} />
                 )}
               </div>
             )}
-            {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{error}</div>}
+            {error && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{t(error)}</div>}
             <div className="flex justify-end">
-              <Btn onClick={save} disabled={busy}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Guardar</Btn>
+              <Btn onClick={save} disabled={busy}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}{t(" Guardar")}</Btn>
             </div>
           </>
         ) : (
           <div className="text-sm text-slate-700">
             {value && value.lived_abroad
-              ? <>Sí · {value.lived_abroad_country === "otros" ? (value.lived_abroad_other || "Otros") : (value.lived_abroad_country || "—")}</>
-              : <>No ha vivido fuera de España en los últimos 3 años.</>}
+              ? <>{t("Sí · ")}{value.lived_abroad_country === "otros" ? (value.lived_abroad_other || t("Otros")) : (value.lived_abroad_country || "—")}</>
+              : <>{t("No ha vivido fuera de España en los últimos 3 años.")}</>}
             {value && value.lived_abroad_set && (
-              <div className="text-xs text-slate-400 mt-2">Para modificarlo, contacta con tu asesor.</div>
+              <div className="text-xs text-slate-400 mt-2">{t("Para modificarlo, contacta con tu asesor.")}</div>
             )}
           </div>
         )}
