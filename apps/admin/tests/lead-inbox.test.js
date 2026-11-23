@@ -10,6 +10,39 @@ const day = 86400000;
 const now = Date.parse('2026-11-18T12:00:00Z');
 const pending = { stage: 'Por contactar', owner: '' };
 
+test('los leads del recomendador solo aparecen en Recomendador, no en España ni General', async () => {
+  const { matchesInboxView } = await shared;
+  for (const field of ['campaign', 'formName', 'source']) {
+    for (const country of ['España', 'Portugal', 'Otros', undefined]) {
+      const lead = Object.freeze({ source: 'Página web', country, [field]: '  ReCoMeNdAdOr  ' });
+      const views = ['all', 'España', 'Portugal', 'recomendador', 'eventos', 'reservas'];
+      assert.deepEqual(views.filter(view => matchesInboxView(lead, view)), ['recomendador']);
+      assert.equal(lead.country, country);
+      assert.equal(lead[field], '  ReCoMeNdAdOr  ');
+    }
+  }
+});
+
+test('los contactos españoles normales siguen en España y General', async () => {
+  const { matchesInboxView } = await shared;
+  const lead = { source: 'Página web', campaign: 'Contacto', formName: 'contacto', country: 'España' };
+  assert.equal(matchesInboxView(lead, 'España'), true);
+  assert.equal(matchesInboxView(lead, 'all'), true);
+  assert.equal(matchesInboxView(lead, 'recomendador'), false);
+});
+
+test('las campañas de eventos y las reservas conservan su prioridad sobre el recomendador', async () => {
+  const { matchesInboxView } = await shared;
+  const event = { source: 'Eventos', campaign: 'Unitour Lisboa', formName: 'recomendador', country: 'España' };
+  assert.equal(matchesInboxView(event, 'eventos', 'lisboa'), true);
+  assert.equal(matchesInboxView(event, 'recomendador'), false);
+  assert.equal(matchesInboxView(event, 'España'), false);
+  const booking = { source: 'Página web', campaign: 'Recomendador', formName: 'reserva', country: 'España' };
+  assert.equal(matchesInboxView(booking, 'reservas'), true);
+  assert.equal(matchesInboxView(booking, 'recomendador'), false);
+  assert.equal(matchesInboxView(booking, 'España'), false);
+});
+
 test('solo archiva al superar 30 días completos desde la entrada', async () => {
   const { leadInboxSection } = await shared;
   for (const [age, expected] of [[29 * day, 'active'], [30 * day, 'active'], [30 * day + 1, 'overdue'], [31 * day, 'overdue']]) {

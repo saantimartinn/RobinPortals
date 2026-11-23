@@ -189,7 +189,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
         <p className="assignment-note">Leads de {EVENT_SECTIONS.find(([key]) => key === eventSection)?.[2]}.</p>
       </section>}
       {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
-      {view === "recomendador" && <p className="assignment-note">Leads procedentes del recomendador de carreras. También aparecen en la bandeja General.</p>}
+      {view === "recomendador" && <p className="assignment-note">Leads procedentes del recomendador de carreras. Se muestran únicamente en esta pestaña.</p>}
       {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario ({bookingError}). <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
       {isFuture && futureError && <p className="assignment-note" role="alert">{futureError}. <button type="button" onClick={() => setFutureRetry((retry) => retry + 1)}>Reintentar</button></p>}
       <section className="panel inbox-panel" aria-busy={isFuture && futureLoading}>

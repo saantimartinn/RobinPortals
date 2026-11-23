@@ -23,10 +23,10 @@ export function matchesInboxView(contact: Pick<Contact, "source" | "campaign" | 
   if (event) return false;
   if (view === "reservas") return contact.formName === "reserva";
   if (contact.formName === "reserva") return false;
-  if (view === "recomendador") {
-    return [contact.campaign, contact.formName, contact.source]
-      .some((value) => String(value || "").trim().toLowerCase() === "recomendador");
-  }
+  const isRecommender = [contact.campaign, contact.formName, contact.source]
+    .some((value) => String(value || "").trim().toLowerCase() === "recomendador");
+  if (view === "recomendador") return isRecommender;
+  if (isRecommender) return false;
   return view === "all" || (contact.country || "Otros") === view;
 }
 
