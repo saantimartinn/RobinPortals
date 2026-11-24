@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LayoutDashboard, Users, Bell, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap, Database } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";
+import arrivalPack from '../../../shared/arrival-pack.cjs';
+import { adminClientSections } from './admin-navigation.js';
 import "./admin-portal.css";
 
 export const CLIENT_TABS = [
@@ -31,6 +33,9 @@ function adminName(user) {
 
 export function AdminWorkspace({ user, active, client, clients, loading, error, onNavigate, onSwitchClient, isDeveloper = false, children }) {
   const name = adminName(user);
+  const arrival = arrivalPack.isArrivalClient(client);
+  const clientTabs = CLIENT_TABS.filter(tab => adminClientSections(client).includes(tab.key))
+    .map(tab => arrival && tab.key === 'estado' ? { ...tab, label: 'Pack Llegada' } : tab);
   const globalTabs = isDeveloper ? [...GLOBAL_TABS, { key: "base-datos", label: "Base de datos", icon: Database }] : GLOBAL_TABS;
   const [pickerOpen, setPickerOpen] = useState(false);
   const switchRef = useRef(null);
@@ -60,8 +65,8 @@ export function AdminWorkspace({ user, active, client, clients, loading, error, 
             <div className="admin-client-identity"><span className="admin-eyebrow">Estás gestionando a</span><h1>{fullName(client)}</h1><p>{client.email || client.username || "Sin email"}<span> · ID: {client.lead_id || client.username || client.id}</span></p></div>
             <button ref={switchRef} className="admin-switch" onClick={() => setPickerOpen(true)}><ArrowLeftRight size={16} />Cambiar cliente</button>
           </div>
-          <div className="admin-client-phase"><span className={client.requires_onboarding ? "is-onboarding" : ""}>{client.requires_onboarding ? "Registro pendiente" : "Expediente activo"}</span><p>Paso {client.application_phase || 1} · {APP_STEPS.find(s => s.key === (client.application_phase || 1))?.label || "Proceso de admisión"}</p></div>
-          <nav ref={tabRef} className="admin-client-tabs" aria-label="Expediente del alumno">{CLIENT_TABS.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key ? "page" : undefined}><Icon size={16} />{label}</button>)}</nav>
+          <div className="admin-client-phase"><span className={client.requires_onboarding ? "is-onboarding" : ""}>{client.requires_onboarding ? "Registro pendiente" : arrival ? "Registro completado" : "Expediente activo"}</span><p>{arrival ? 'Pack Llegada' : `Paso ${client.application_phase || 1} · ${APP_STEPS.find(s => s.key === (client.application_phase || 1))?.label || "Proceso de admisión"}`}</p></div>
+          <nav ref={tabRef} className="admin-client-tabs" aria-label="Expediente del alumno">{clientTabs.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key ? "page" : undefined}><Icon size={16} />{label}</button>)}</nav>
         </div> : <div className="admin-empty-context" role="status"><h1>{loading ? "Cargando expediente…" : "Este expediente no está disponible"}</h1><p>{error || "Vuelve a tus clientes y selecciona un alumno asignado."}</p><button onClick={() => onNavigate("clientes")}>Ir a mis clientes</button></div>
         : <div className="admin-page-heading"><h1 className="admin-eyebrow admin-page-title">{page?.label}</h1></div>}
         {children}

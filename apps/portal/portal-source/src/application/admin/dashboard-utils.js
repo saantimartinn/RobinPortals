@@ -1,9 +1,11 @@
 // Admin workspace module for dashboard utils; AdminPortal composes these views.
+import arrivalPack from '../../../../shared/arrival-pack.cjs';
 export function dashboardPhaseMetrics(clients = []) {
   const phaseCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
   const sums = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
   const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
   clients.forEach((client) => {
+    if (arrivalPack.isArrivalClient(client)) return;
     const phase = client.application_phase || 1;
     if (phaseCounts[phase] == null) return;
     phaseCounts[phase] += 1;
@@ -39,7 +41,7 @@ export function dashboardAlerts({ clients = [], payments = [], documents = [], s
   const alerts = [];
   const clientById = new Map(clients.map((client) => [client.id, client]));
   clients.forEach((client) => {
-    if (client.application_phase === 3 && (client.days_in_phase || 0) > 14) {
+    if (!arrivalPack.isArrivalClient(client) && client.application_phase === 3 && (client.days_in_phase || 0) > 14) {
       alerts.push({
         kind: "fuego",
         urgency: 100 + (client.days_in_phase - 14),
@@ -67,7 +69,7 @@ export function dashboardAlerts({ clients = [], payments = [], documents = [], s
   });
   Object.entries(requiredByUser).forEach(([userId, count]) => {
     const client = clientById.get(userId);
-    if (client) alerts.push({
+    if (client && !arrivalPack.isArrivalClient(client)) alerts.push({
       kind: "docs",
       urgency: 60 + count,
       client,
@@ -75,7 +77,7 @@ export function dashboardAlerts({ clients = [], payments = [], documents = [], s
     });
   });
   clients.forEach((client) => {
-    if (client.application_phase === 4 && (client.days_in_phase || 0) > 30) {
+    if (!arrivalPack.isArrivalClient(client) && client.application_phase === 4 && (client.days_in_phase || 0) > 30) {
       alerts.push({
         kind: "deadline",
         urgency: 40 + Math.floor((client.days_in_phase - 30) / 5),

@@ -2,6 +2,7 @@
 const { ADMIN_EMAILS } = require('./admins');
 const { hasApplicationAdminRole, isDeveloperAdmin } = require('./authorization');
 const { attachStudentPhones } = require('./student-phone');
+const { isArrivalClient } = require('../shared/arrival-pack.cjs');
 
 function daysBetween(a, b) {
   if (!a) return null;
@@ -14,7 +15,7 @@ function daysBetween(a, b) {
 async function loadAdminDashboard(sb, admin, adminEmail) {
   // --- 2) Clientes asignados ---
   const baseSelect =
-    'id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, pago_completed, nombre, apellidos, questionnaire, intereses, assigned_to, application_phase, phase_changed_at, tipo, num_carreras, created_at, updated_at';
+    'id, lead_id, username, email, role, requires_onboarding, dni_completed, contract_signed, contract_signed_at, contract_data, profile_completed, pago_completed, origin, nombre, apellidos, questionnaire, intereses, assigned_to, application_phase, phase_changed_at, tipo, num_carreras, created_at, updated_at';
 
   let clientsQuery = sb
     .from('users')
@@ -132,7 +133,7 @@ async function loadAdminDashboard(sb, admin, adminEmail) {
 
   // Cambios de fase
   clientsEnriched.forEach((c) => {
-    if (c.phase_changed_at) {
+    if (!isArrivalClient(c) && c.phase_changed_at) {
       activity.push({
         at: c.phase_changed_at,
         type: 'phase_change',

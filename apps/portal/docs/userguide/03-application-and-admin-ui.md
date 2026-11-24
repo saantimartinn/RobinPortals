@@ -16,6 +16,8 @@ Las traducciones, los placeholders y la suscripción React viven en `packages/i1
 
 `AdminPortal.jsx` compone el espacio de trabajo admin. Los submódulos en `application/admin/` implementan dashboard y utilities, gestión de usuarios/clientes, progreso, configuración académica, carreras, pagos, reservas, documentos, chat y notificaciones. `AdminWorkspace.jsx` proporciona el layout común, `admin-navigation.js` define items, `CrossPortalNav.jsx` conecta los tres productos.
 
+Para `tipo = llegada`, `adminClientSections` limita la ficha a **Pack Llegada, Perfil, Pagos y Llamadas**, también antes de firmar. `AdminArrivalSummary.jsx` muestra el estado del servicio y las cuatro etapas reales del onboarding, sin cuestionario académico. Carreras, Documentos, Chat del alumno, Perfil académico y fases de admisión quedan fuera de esta ficha; al cambiar desde otra sección o producto se vuelve al resumen del pack. Los demás tipos conservan sus módulos. Las listas de clientes devuelven los indicadores reales de contrato y onboarding, y el backend rechaza asignar fases de admisión a Llegada. Estos clientes siguen contando en los resúmenes financieros y de cartera, pero no en fases, alertas de documentos ni cuellos de botella de admisión.
+
 `admin-permissions.js` expresa claves visibles. La Function correspondiente vuelve a comprobar admin/pro scope y el target user/record. En Robin Admin, `src/features/admin/settings.tsx` administra permisos expuestos; preservar compatibilidad de claves entre repos.
 
 Una ficha de cliente de tipo Mentoría muestra **Convertir a cliente** tras pagar

@@ -4,6 +4,7 @@
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
 const { isApplicationAdmin } = require('../../lib/authorization');
+const { isArrivalClient } = require('../../shared/arrival-pack.cjs');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../../lib/http');
 
 exports.handler = async (event) => {
@@ -25,7 +26,9 @@ exports.handler = async (event) => {
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
 
     // 1) Leer fase actual para detectar cambio real
-    const { data: cur } = await sb.from('users').select('application_phase').eq('id', user_id).single();
+    const { data: cur, error: userError } = await sb.from('users').select('application_phase,tipo').eq('id', user_id).single();
+    if (userError || !cur) return json({ error: 'user_not_found' }, { statusCode: 404 });
+    if (isArrivalClient(cur)) return json({ error: 'admission_not_in_arrival_pack' }, { statusCode: 403 });
     const changed = !cur || Number(cur.application_phase) !== phase;
     const patch = { application_phase: phase };
     // 2) Si la fase cambia, marcar timestamp

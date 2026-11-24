@@ -12,7 +12,7 @@ Contenido mantenido de `portal-source/src/application/careers/`.
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
-| [`CareerRequirementsTimeline.jsx`](../../../../../../portal-source/src/application/careers/CareerRequirementsTimeline.jsx) | Módulo frontend de CareerRequirementsTimeline. | `../../ui.jsx`<br>`../../theme.js` | Al cambiar esa parte de la experiencia React. |
+| [`CareerRequirementsTimeline.jsx`](../../../../../../portal-source/src/application/careers/CareerRequirementsTimeline.jsx) | Módulo frontend de CareerRequirementsTimeline. | `../../../../../../packages/i18n/react.jsx`<br>`../../ui.jsx`<br>`../../theme.js` | Al cambiar esa parte de la experiencia React. |
 
 ---
 

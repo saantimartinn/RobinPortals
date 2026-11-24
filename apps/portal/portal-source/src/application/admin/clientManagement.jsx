@@ -6,6 +6,7 @@ import { ClientAvatar } from "./ClientAvatar.jsx";
 import { useDebounced } from "./useDebounced.js";
 import { api } from "../../api/core.js";
 import { APP_STEPS } from "../../application-steps.js";
+import arrivalPack from '../../../../shared/arrival-pack.cjs';
 import { clientsInFolder, folderPath } from "../../../../../../packages/client-folders/model.mjs";
 import "../../../../../../packages/client-folders/folders.css";
 
@@ -15,6 +16,7 @@ const PHASE_COLORS = [
   ["#e8ebfa", "#465396"], ["#e7f4e8", "#397441"], ["#ddf3e6", "#22633f"],
 ];
 function ClientPhaseBadge({ client }) {
+  if (arrivalPack.isArrivalClient(client)) return <div className="admin-client-phase-label">{client.requires_onboarding && <Badge tone="amber">Registro pendiente</Badge>}<Badge tone="navy">Pack Llegada</Badge></div>;
   const phase = APP_STEPS.find((step) => step.key === Number(client.application_phase || 1)) || APP_STEPS[0];
   const [background, color] = PHASE_COLORS[phase.key - 1];
   return <div className="admin-client-phase-label">

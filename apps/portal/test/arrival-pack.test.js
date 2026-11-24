@@ -13,6 +13,50 @@ function load(name, mocks) {
   return module.exports.handler;
 }
 
+test('admin client lists return actual contract and onboarding flags instead of an absent contract state', async () => {
+  const client = { ...user, assigned_to: 'admin@example.test', origin: 'espana', dni_completed: true, profile_completed: false, contract_signed_at: '2026-11-24T10:00:00Z', requires_onboarding: false };
+  for (const endpoint of ['admin-clients-list', 'admin-clients-all']) {
+    const filters = [];
+    const handler = load(endpoint, {
+      '../../lib/auth': { readSessionFromEvent: () => ({ uid: 'admin' }) },
+      '../../lib/student-phone': { attachStudentPhones: async (_sb, rows) => rows },
+      '../../lib/supabase': { getSupabase: () => ({ from(table) {
+        if (table === 'crm_client_notes') return { select() { return this; }, in: async () => ({ data: [] }) };
+        let fields;
+        const project = row => Object.fromEntries(fields.split(',').map(key => key.trim()).filter(key => key in row).map(key => [key, row[key]]));
+        return {
+          select(columns) { fields = columns; return this; }, eq(key, value) { filters.push([key, value]); return this; },
+          single: async () => ({ data: { id: 'admin', email: 'admin@example.test', role: 'admin', visible_tabs: ['platform.student_portal'] } }),
+          order: async () => ({ data: [project(client)] }),
+        };
+      } }) },
+    });
+    const response = await handler({ httpMethod: 'GET', headers: {} });
+    assert.equal(response.statusCode, 200);
+    const actual = JSON.parse(response.body).clients[0];
+    for (const field of ['contract_signed', 'contract_signed_at', 'contract_data', 'pago_completed', 'dni_completed', 'profile_completed']) assert.deepEqual(actual[field], client[field], `${endpoint}: ${field}`);
+    if (endpoint === 'admin-clients-list') assert.ok(filters.some(([key, value]) => key === 'assigned_to' && value === client.assigned_to));
+  }
+});
+
+test('administration cannot assign an admission phase to Llegada, while other products retain the operation', async () => {
+  for (const client of [{ tipo: 'llegada', application_phase: 3 }, { tipo: 'general', application_phase: 3 }, null]) {
+    const writes = [];
+    const handler = load('admin-phase-set', {
+      '../../lib/auth': { readSessionFromEvent: () => ({ uid: 'admin' }) },
+      '../../lib/http': { ...require('../lib/http'), verifyOrigin: () => true },
+      '../../lib/supabase': { getSupabase: () => ({ from() { let id; return {
+        select() { return this; }, eq(_key, value) { id = value; return this; },
+        single: async () => ({ data: id === 'admin' ? { id, email: 'admin@example.test', role: 'admin' } : client }),
+        update(patch) { writes.push(patch); return { eq: async () => ({ error: null }) }; },
+      }; } }) },
+    });
+    const response = await handler({ httpMethod: 'POST', headers: {}, body: JSON.stringify({ user_id: 'client', phase: 4 }) });
+    assert.equal(response.statusCode, !client ? 404 : client.tipo === 'llegada' ? 403 : 200);
+    assert.equal(writes.length, client?.tipo === 'general' ? 1 : 0);
+  }
+});
+
 test('Pack Llegada derives from the signed product; unrelated roles, unsigned and other contracts are excluded', () => {
   for (const patch of [{ tipo: 'general' }, { contract_signed: false }, { role: 'admin' }, { auth_source: 'external_client' }, { contract_data: { variant: 'general_noes' } }]) assert.equal(arrivalPackForUser({ ...user, ...patch }), null);
   const pack = arrivalPackForUser(user, Date.parse('2026-11-19'));

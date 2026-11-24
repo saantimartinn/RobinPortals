@@ -12,8 +12,8 @@ Presentación de pagos, facturas y justificantes.
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
-| [`InvoiceReceipt.jsx`](../../../../../../portal-source/src/application/payments/InvoiceReceipt.jsx) | Justificante de pago preparado para impresión. | `../../../../shared/financial-config.cjs`<br>`../../ui.jsx`<br>`./payment-utils.jsx` | Al cambiar esa parte de la experiencia React. |
-| [`payment-utils.jsx`](../../../../../../portal-source/src/application/payments/payment-utils.jsx) | Módulo frontend de payment utils. | `../../ui.jsx` | Al cambiar esa parte de la experiencia React. |
+| [`InvoiceReceipt.jsx`](../../../../../../portal-source/src/application/payments/InvoiceReceipt.jsx) | Justificante de pago preparado para impresión. | `../../../../../../packages/i18n/react.jsx`<br>`../../../../shared/financial-config.cjs`<br>`../../ui.jsx`<br>`./payment-utils.jsx` | Al cambiar esa parte de la experiencia React. |
+| [`payment-utils.jsx`](../../../../../../portal-source/src/application/payments/payment-utils.jsx) | Módulo frontend de payment utils. | `../../../../../../packages/i18n/react.jsx`<br>`../../ui.jsx` | Al cambiar esa parte de la experiencia React. |
 
 ---
 

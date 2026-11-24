@@ -12,12 +12,14 @@ import { AdminClientesList } from "./admin/clientManagement.jsx";
 import { AssignClientModal } from "./admin/clientManagement.jsx";
 import { AdminPerfil } from "./admin/profile.jsx";
 import { AdminEstadoFases } from "./admin/progress.jsx";
+import { AdminArrivalSummary } from './admin/AdminArrivalSummary.jsx';
+import arrivalPack from '../../../shared/arrival-pack.cjs';
 import { AdminReservas } from "./admin/AdminReservas.jsx";
 import { AdminPagos } from "./admin/AdminPagos.jsx";
 import { AdminCarrerasNew } from "./admin/AdminCarrerasNew.jsx";
 import { AdminDocumentosNew } from "./admin/AdminDocumentosNew.jsx";
 import { DeveloperClientsTable } from "./DeveloperClientsTable.jsx";
-import { adminNavigation, INITIAL_ADMIN_NAVIGATION } from "./admin-navigation.js";
+import { adminNavigation, adminSectionForClient, INITIAL_ADMIN_NAVIGATION } from "./admin-navigation.js";
 import robinKeys from "../assets/robin-keys.webp";
 import robinGraduate from "../assets/robin-graduate.jpg";
 import robinSkate from "../assets/robin-skate.png";
@@ -104,7 +106,7 @@ export function AdminPortal({ user }) {
   const adminId = (user.email || user.username || "").toLowerCase();
   const isDeveloper = adminId === "santimartin1203@gmail.com";
   const [data, setData] = useState({ clients: [] });
-  const [{ active, selectedClientId }, dispatchNavigation] = useReducer(adminNavigation, INITIAL_ADMIN_NAVIGATION);
+  const [{ active: requestedActive, selectedClientId }, dispatchNavigation] = useReducer(adminNavigation, INITIAL_ADMIN_NAVIGATION);
   const [mascot] = useState(() => [robinKeys, robinGraduate, robinSkate, robinBike][Math.floor(Math.random() * 4)]);
   const [searchQ, setSearchQ] = useState("");
   const debouncedQ = useDebounced(searchQ, 250);
@@ -140,6 +142,8 @@ export function AdminPortal({ user }) {
     () => (data.clients || []).find((c) => c.id === selectedClientId) || null,
     [data.clients, selectedClientId]
   );
+  const active = adminSectionForClient(selectedClient, requestedActive);
+  const arrival = arrivalPack.isArrivalClient(selectedClient);
 
   function updateClient(clientId, mut) {
     setData((d) => ({
@@ -153,11 +157,11 @@ export function AdminPortal({ user }) {
   }
 
   function navigate(section) {
-    dispatchNavigation({ type: "navigate", section });
+    dispatchNavigation({ type: "navigate", section, client: selectedClient });
   }
 
   function switchClient(client) {
-    dispatchNavigation({ type: "switch", clientId: client.id });
+    dispatchNavigation({ type: "switch", clientId: client.id, client });
   }
 
   // ----- Asignación manual -----
@@ -242,7 +246,8 @@ export function AdminPortal({ user }) {
             )}
 
             {active === "estado" && selectedClient && (
-              <AdminEstadoFases client={selectedClient} onChangedPhase={(n) => updateClient(selectedClient.id, (c) => ({ ...c, application_phase: n }))} />
+              arrival ? <AdminArrivalSummary client={selectedClient} onNavigate={navigate} />
+                : <AdminEstadoFases client={selectedClient} onChangedPhase={(n) => updateClient(selectedClient.id, (c) => ({ ...c, application_phase: n }))} />
             )}
             {active === "perfil" && selectedClient && (
               <AdminPerfil client={selectedClient} onRefresh={reloadAssigned} />

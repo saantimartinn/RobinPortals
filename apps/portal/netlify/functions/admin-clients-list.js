@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     let clientsQuery = sb
       .from('users')
       .select(
-        'id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, pago_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, application_phase, created_at, updated_at'
+        'id, lead_id, username, email, role, requires_onboarding, dni_completed, contract_signed, contract_signed_at, contract_data, profile_completed, pago_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, application_phase, created_at, updated_at'
       );
     if (!isDeveloperAdmin(admin)) clientsQuery = clientsQuery.eq('assigned_to', adminEmail);
     const { data: clients, error: e2 } = await clientsQuery.order('created_at', { ascending: false });

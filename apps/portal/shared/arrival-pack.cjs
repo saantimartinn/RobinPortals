@@ -1,6 +1,10 @@
 // The signed Portal contract is the source of Pack Llegada entitlement.
 const SERVICE_END = '2027-09-15T00:00:00+02:00';
 
+function isArrivalClient(user) {
+  return String(user?.tipo || '').toLowerCase() === 'llegada';
+}
+
 function arrivalPackForUser(user, now = Date.now()) {
   if (!user || user.is_application_admin || user.auth_source === 'external_client'
     || (user.role && user.role !== 'client') || user.tipo !== 'llegada' || !user.contract_signed) return null;
@@ -19,4 +23,4 @@ function arrivalPackForUser(user, now = Date.now()) {
   };
 }
 
-module.exports = { arrivalPackForUser, SERVICE_END };
+module.exports = { isArrivalClient, arrivalPackForUser, SERVICE_END };

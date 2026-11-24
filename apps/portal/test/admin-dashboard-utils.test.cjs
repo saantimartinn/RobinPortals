@@ -39,3 +39,15 @@ test('dashboard summaries preserve phase, payment, priority and sorting rules', 
     total: 2, new7: 0, new30: 0, inactive: 2, highPriority: 1,
   });
 });
+
+test('Llegada queda fuera de las fases y alertas de admisión y conserva las alertas de pago', async () => {
+  const dashboard = await import('../portal-source/src/application/admin/dashboard-utils.js');
+  const clients = [{ id: 'arrival', tipo: 'llegada', application_phase: 3, days_in_phase: 50 }, { id: 'general', tipo: 'general', application_phase: 3, days_in_phase: 20 }];
+  const phases = dashboard.dashboardPhaseMetrics(clients);
+  assert.equal(phases.phaseCounts[3], 1);
+  assert.equal(phases.avgPhaseDays[3], 20);
+  assert.equal(dashboard.dashboardPhaseMetrics([clients[0]]).bottleneck, null);
+  const now = Date.parse('2026-11-24T12:00:00Z');
+  const alerts = dashboard.dashboardAlerts({ clients, payments: [{ user_id: 'arrival', status: 'unlocked', unlocked_at: '2026-11-01', installment: 2, amount: 850 }], documents: [{ user_id: 'arrival', required: true, status: 'required' }], now });
+  assert.deepEqual(alerts.map(a => [a.kind, a.client.id]), [['impago', 'arrival'], ['fuego', 'general']]);
+});

@@ -7,8 +7,10 @@ import { adminCareerSuggestions, adminCareerSuggestionsRegenerate, adminCareerSu
 import { LivedAbroadCard } from "../StudentProfile.jsx";
 import { ConvertMentoria } from "./ConvertMentoria.jsx";
 import { AdminProfileEditor, CommercialNotesEditor, INTERESTS, OnboardingQuestionnaire } from "./profile-editors.jsx";
+import arrivalPack from '../../../../shared/arrival-pack.cjs';
 
 export function AdminPerfil({ client, onRefresh }) {
+  const arrival = arrivalPack.isArrivalClient(client);
   // --- Sugerencias de carreras (IA) ---
   const [sugg, setSugg] = useState(null);
   const [suggLoading, setSuggLoading] = useState(true);
@@ -19,6 +21,7 @@ export function AdminPerfil({ client, onRefresh }) {
   useEffect(() => {
     let cancel = false;
     setSuggLoading(true); setSuggErr(""); setSugg(null);
+    if (arrival) { setSuggLoading(false); return; }
     (async () => {
       try {
         const r = await adminCareerSuggestions(client.id);
@@ -30,7 +33,7 @@ export function AdminPerfil({ client, onRefresh }) {
       }
     })();
     return () => { cancel = true; };
-  }, [client.id, client.updated_at]);
+  }, [client.id, client.updated_at, arrival]);
 
   async function regenerate() {
     setRegening(true); setSuggErr("");
@@ -105,6 +108,7 @@ export function AdminPerfil({ client, onRefresh }) {
       <AdminProfileEditor client={client} onRefresh={onRefresh} personalOnly />
       <CommercialNotesEditor client={client} onRefresh={onRefresh} />
 
+      {!arrival && <>
       <Card>
         <CardHeader title="Intereses de carrera" subtitle="Los marca el alumno en su onboarding · puedes cambiarlos en Modificar formulario" icon={BookOpen} />
         <CardContent><div className="flex flex-wrap gap-2">
@@ -232,6 +236,7 @@ export function AdminPerfil({ client, onRefresh }) {
       </Card>
 
       <OnboardingQuestionnaire client={client} questionnaire={client.questionnaire || sugg?.questionnaire} onRefresh={onRefresh} />
+      </>}
     </div>
   );
 }

@@ -17,7 +17,7 @@ Contenido mantenido de `portal-source/src/api/`.
 | [`auth-onboarding.js`](../../../../../portal-source/src/api/auth-onboarding.js) | Módulo frontend de auth onboarding. | `./core.js` | Al cambiar esa parte de la experiencia React. |
 | [`bookings.js`](../../../../../portal-source/src/api/bookings.js) | Módulo frontend de bookings. | `./core.js` | Al cambiar esa parte de la experiencia React. |
 | [`careers.js`](../../../../../portal-source/src/api/careers.js) | Módulo frontend de careers. | `./core.js`<br>`./uploads.js` | Al cambiar esa parte de la experiencia React. |
-| [`chat.js`](../../../../../portal-source/src/api/chat.js) | Módulo frontend de chat. | `./core.js` | Al cambiar esa parte de la experiencia React. |
+| [`chat.js`](../../../../../portal-source/src/api/chat.js) | Módulo frontend de chat. | `../../../../../packages/i18n/language.js`<br>`./core.js` | Al cambiar esa parte de la experiencia React. |
 | [`core.js`](../../../../../portal-source/src/api/core.js) | Módulo frontend de core. | `../preview-api.js` | Al cambiar esa parte de la experiencia React. |
 | [`documents.js`](../../../../../portal-source/src/api/documents.js) | Módulo frontend de documents. | `./core.js`<br>`./uploads.js` | Al cambiar esa parte de la experiencia React. |
 | [`faqs.js`](../../../../../portal-source/src/api/faqs.js) | Módulo frontend de faqs. | `./core.js` | Al cambiar esa parte de la experiencia React. |

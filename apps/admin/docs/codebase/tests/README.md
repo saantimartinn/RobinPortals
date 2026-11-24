@@ -36,6 +36,7 @@ Node test-runner regression tests.
 | [`recommender-history.test.js`](../../../tests/recommender-history.test.js) | Automated regression coverage for recommender-history.test. |
 | [`release-test-user.test.js`](../../../tests/release-test-user.test.js) | Automated regression coverage for release-test-user.test. |
 | [`sales-personal-scope.test.js`](../../../tests/sales-personal-scope.test.js) | Automated regression coverage for sales-personal-scope.test. |
+| [`students-arrival.test.js`](../../../tests/students-arrival.test.js) | Automated regression coverage for students-arrival.test. |
 | [`unitour-lisboa.test.js`](../../../tests/unitour-lisboa.test.js) | Automated regression coverage for unitour-lisboa.test. |
 | [`webinar-inbox.test.js`](../../../tests/webinar-inbox.test.js) | Automated regression coverage for webinar-inbox.test. |
 | [`website-lead-recommender.test.js`](../../../tests/website-lead-recommender.test.js) | Automated regression coverage for website-lead-recommender.test. |

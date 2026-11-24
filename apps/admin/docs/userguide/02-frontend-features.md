@@ -16,6 +16,8 @@
 | Configuración | [`settings.tsx`](../../src/features/admin/settings.tsx) | Gestión de admins, permisos e información de integraciones mediante callbacks del shell. |
 | Correo CRM | [`email-composer.tsx`](../../src/features/admin/email-composer.tsx) | Edición/selección de campañas, contactos, plantillas y envío a través de `adminDataClient`. |
 
+En Alumnos, los clientes `tipo = llegada` se identifican como **Pack Llegada** en el listado y en la cabecera de su ficha, sin fase de admisión. El registro muestra Solicitud, Identidad, Contrato y Primer pago; el listado usa `hasCompletedOnboarding` de `packages/onboarding/flow.mjs` para determinar su estado sin exigir perfil académico. La ficha oculta Nivel de aplicación e intereses académicos para este producto. General, Delft y Mentoría conservan su presentación y estados anteriores.
+
 La conversión de un cliente de Mentoría ya abonada se realiza en la **ficha del
 Portal del Alumno**, no en el CRM de este panel. En ese portal, el precio de Mentoría es
 666,33 €; su pago se descuenta de la primera cuota de General, Delft o Llegada.

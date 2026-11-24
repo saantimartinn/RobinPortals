@@ -30,7 +30,7 @@ exports.handler = async (event) => {
     const { data: rows, error: e2 } = await sb
       .from('users')
       .select(
-        'id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, created_at'
+        'id, lead_id, username, email, role, requires_onboarding, dni_completed, contract_signed, contract_signed_at, contract_data, profile_completed, pago_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, created_at'
       )
       .order('created_at', { ascending: false });
     if (e2) throw e2;

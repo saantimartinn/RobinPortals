@@ -41,7 +41,7 @@ Documentación mantenida sobre arquitectura, seguridad, operación, datos e inve
 | [`MENTORIA_CONVERSION.md`](../../MENTORIA_CONVERSION.md) | Documenta: Mentoría y conversión a cliente. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`OBSERVABILITY.md`](../../OBSERVABILITY.md) | Documenta: Observability. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`OPERATIONS.md`](../../OPERATIONS.md) | Documenta: Operaciones. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
-| [`PASSWORD_POLICY.md`](../../PASSWORD_POLICY.md) | Documenta: Password policy. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
+| [`PASSWORD_POLICY.md`](../../PASSWORD_POLICY.md) | Documenta: Password storage policy. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`PRIVACY_DATA_MAP.md`](../../PRIVACY_DATA_MAP.md) | Documenta: Privacy and personal-data map. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 | [`TESTING.md`](../../TESTING.md) | Documenta: Testing and CI. | — | Al actualizar la decisión, contrato o procedimiento descrito. |
 

@@ -14,7 +14,7 @@ Punto de entrada para entender el repositorio completo antes de bajar a una capa
 4. Consulta `shared/` para reglas idénticas en frontend y backend.
 5. Usa `test/` y `scripts/` para saber qué contrato protege CI.
 
-Este árbol cubre 393 archivos mantenidos en 30 carpetas. Los propios READMEs generados se excluyen para evitar una referencia recursiva.
+Este árbol cubre 395 archivos mantenidos en 30 carpetas. Los propios READMEs generados se excluyen para evitar una referencia recursiva.
 
 ## Subcarpetas
 
