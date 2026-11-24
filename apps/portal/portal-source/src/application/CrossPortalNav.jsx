@@ -10,7 +10,7 @@ import "../../../../../packages/portal-nav/cross-portal-nav.css";
 
 const STUDENT_LINKS = new Set(["robinjr", "application", "subscriptions"]);
 
-export function CrossPortalNav({ current = "application", user = null, onLogout, onRefresh, onReportProblem, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" }) {
+export function CrossPortalNav({ current = "application", user = null, onLogout, onRefresh, onReportProblem, reportInSidebar = false, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" }) {
   useLocale();
   const [notice, setNotice] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,7 +77,7 @@ export function CrossPortalNav({ current = "application", user = null, onLogout,
       {accountName ? (
         <div className="robin-cross-actions">
           {!isAdmin && <LanguageSelector />}
-          {onReportProblem && <button className="robin-cross-report" type="button" onClick={onReportProblem} aria-label={t("Reportar problema")} title={t("Reportar problema")}><AlertCircle size={16} />{t(" Reportar problema")}</button>}
+          {onReportProblem && <button className={`robin-cross-report${reportInSidebar ? " robin-cross-report-fallback" : ""}`} type="button" onClick={onReportProblem} aria-label={t("Reportar problema")} title={t("Reportar problema")}><AlertCircle size={16} />{t(" Reportar problema")}</button>}
           <span className="robin-cross-account">{accountName}</span>
           {onRefresh && <button className="robin-cross-icon-button" type="button" onClick={onRefresh} aria-label={t("Recargar")} title={t("Recargar")}><RefreshCw size={18} /></button>}
           {onLogout && <button className="robin-cross-icon-button" type="button" onClick={onLogout} aria-label={t("Cerrar sesión")} title={t("Cerrar sesión")}><LogOut size={18} /></button>}

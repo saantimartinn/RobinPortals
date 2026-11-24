@@ -7,25 +7,25 @@ import React, { useEffect, useState } from "react";
 import { loginUrl } from "../../../../packages/portal-nav/links.js";
 import { SubscriberAdmin } from "./features/admin/SubscriberAdmin.jsx";
 import { SubscriberPortal } from "./application/SubscriberPortal.jsx";
-import { logout as apiLogout, me as apiMe, exchangeApplicationSession } from "./api/index.js";
+import { logout as apiLogout, me as apiMe, restoreSession } from "./api/index.js";
 import { isSubscriberAdmin, isSubscriberUser } from "./shared/utils.js";
 import { CrossPortalNav } from "./application/CrossPortalNav.jsx";
 
 function PortalRobin() {
   useLocale();
-  const [state, setState] = useState({ loading: true, user: null });
+  const [state, setState] = useState({ loading: true, user: null, error: null });
   useEffect(() => { setTranslationsEnabled(!isSubscriberAdmin(state.user)); }, [state.user]);
   const [applicationIdentity, setApplicationIdentity] = useState(null);
   const [checkingAdminPermission, setCheckingAdminPermission] = useState(true);
   useEffect(() => {
     let mounted = true;
-    exchangeApplicationSession().then(() => apiMe()).then(user => { if (mounted) setState({ loading: false, user }); })
-      .catch(() => { if (mounted) setState({ loading: false, user: null }); });
+    restoreSession().then(user => { if (mounted) setState({ loading: false, user }); })
+      .catch(error => { if (mounted) setState({ loading: false, user: null, error: [401, 403].includes(error.status) ? null : 'No hemos podido cargar tu portal. Inténtalo de nuevo.' }); });
     return () => { mounted = false; };
   }, []);
   useEffect(() => {
-    if (!state.loading && !state.user) window.location.replace(loginUrl("/therobinplan/"));
-  }, [state.loading, state.user]);
+    if (!state.loading && !state.user && !state.error) window.location.replace(loginUrl("/therobinplan/"));
+  }, [state.loading, state.user, state.error]);
   useEffect(() => {
     if (!isSubscriberAdmin(state.user)) { setApplicationIdentity(null); setCheckingAdminPermission(false); return undefined; }
     let active = true;
@@ -54,6 +54,7 @@ function PortalRobin() {
     window.location.replace("/portal/logout");
   }
   if (state.loading || (isSubscriberAdmin(state.user) && checkingAdminPermission)) return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label={t("Cargando portal")} /></div>;
+  if (state.error) return <main role="alert" className="min-h-screen grid place-content-center gap-4 px-6 text-center" style={{ background: CANVAS }}><h1>{t('No se ha podido abrir tu portal')}</h1><p>{t(state.error)}</p><button className="underline" onClick={() => window.location.reload()}>{t('Reintentar')}</button></main>;
   if (!state.user) {
     return <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}><Loader2 className="h-5 w-5 animate-spin" aria-label={t("Redirigiendo al acceso común")} /></div>;
   }
@@ -63,7 +64,7 @@ function PortalRobin() {
   </>;
   if (isSubscriberUser(state.user)) return <>
     <CrossPortalNav current="subscriptions" user={state.user} onLogout={handleLogout} />
-    <SubscriberPortal user={state.user} onLogout={handleLogout} onUserRefresh={refreshUser} />
+    <SubscriberPortal key={state.user.id} user={state.user} onLogout={handleLogout} onUserRefresh={refreshUser} />
   </>;
   return <div role="alert">{t("Esta cuenta no pertenece a The Robin Plan. ")}<button onClick={handleLogout}>{t("Cerrar sesión")}</button></div>;
 }

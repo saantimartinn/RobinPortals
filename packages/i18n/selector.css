@@ -1,6 +1,7 @@
-.robin-language { display: inline-flex; flex-direction: column; gap: 2px; flex-shrink: 0; color: var(--robin-navy, #2D3A64); }
-.robin-language-label { font-size: 10px; line-height: 1.2; }
-.robin-language select { font: inherit; font-size: 12px; font-weight: 600; color: inherit; background: #fff; border: 1px solid #C3C5C1; border-radius: 6px; padding: 6px 22px 6px 8px; min-height: 34px; max-width: 130px; cursor: pointer; }
+.robin-language { display: inline-flex; align-items: center; flex-shrink: 0; color: var(--robin-navy, #2D3A64); vertical-align: middle; }
+.robin-language-label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.robin-language select { margin: 0; padding: .5rem .7rem; min-height: 34px; max-width: 130px; border: 1px solid var(--robin-navy, #2D3A64); border-radius: 9px; background: transparent; color: inherit; font: 600 .78rem var(--robin-font-text, sans-serif); cursor: pointer; }
+.robin-language select:hover { background: var(--robin-ink-50, #f4f5f7); }
 .robin-language select:focus-visible { outline: 2px solid #2D3A64; outline-offset: 2px; }
 .robin-login-language { position: absolute; top: 16px; right: 20px; z-index: 2; }
 .guided-topbar .robin-language { margin-left: auto; }

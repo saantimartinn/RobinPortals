@@ -50,6 +50,16 @@ function detectedCourse(input) {
   return clean(input.course, 240) || payloadCourse(input.payload) || labeledCourse(input.comment || input.bodyText || input.summary);
 }
 
+function isRetargetingReservation(payload) {
+  if (clean(payload?.form_name, 120).toLowerCase() !== 'reserva') return false;
+  try {
+    const url = new URL(payload.page_url, 'https://project-robin.com');
+    return ['http:', 'https:'].includes(url.protocol)
+      && ['project-robin.com', 'www.project-robin.com'].includes(url.hostname)
+      && url.pathname.replace(/\/+$/, '').toLowerCase() === '/retarwebinar21-11';
+  } catch (_) { return false; }
+}
+
 async function findExisting(crm, { source, externalId, email, phone }) {
   if (externalId) {
     const { data } = await crm.from('crm_leads').select('*').contains('source_payload', { source, external_id: externalId }).limit(1);
@@ -143,12 +153,31 @@ async function ingestCrmLead(input, crm = getAdminSupabase()) {
   const phone = clean(input.phone, 80) || null;
   const name = clean(input.name, 240) || email || phone || 'Lead sin nombre';
   if (isBlockedLeadName(name)) return { result: 'ignored', lead: null };
-  if (input.createOnlyEmail && await findExistingEmail(crm, email)) {
+  let retargeting = isRetargetingReservation(input.payload);
+  const receivedAt = new Date().toISOString();
+  let reservation = retargeting ? { ...input.payload, email, external_id: externalId, received_at: input.createdAt || receivedAt } : null;
+  if (!retargeting && input.createOnlyEmail && await findExistingEmail(crm, email)) {
     return { result: 'skipped_existing', lead: null };
   }
-  const existing = input.createOnlyEmail ? null : await findExisting(crm, { source, externalId, email, phone });
+  const existing = !retargeting && input.createOnlyEmail ? null : await findExisting(crm, { source, externalId, email, phone });
+  if (!retargeting && existing?.source_payload?.reactivation_30d?.campaign_id === 'holanda-inactive-30d-v1' && clean(input.payload?.form_name, 120).toLowerCase() === 'reserva') {
+    retargeting = true;
+    reservation = { ...input.payload, email, external_id: externalId, received_at: input.createdAt || receivedAt, campaign_id: 'holanda-inactive-30d-v1' };
+  }
+  if (retargeting && existing) {
+    // A new booking is a reactivation, not a new acquisition. Keep the original
+    // source, campaign, entry date, owner and stage on the same CRM contact.
+    const { data, error } = await crm.from('crm_leads').update({
+      source_payload: { ...(existing.source_payload || {}), retargeting_reservation: reservation },
+      source_updated_at: receivedAt,
+    }).eq('id', existing.id).select('*').single();
+    if (error) throw error;
+    return { result: 'updated', lead: data };
+  }
   const course = detectedCourse(input);
-  const payload = { ...(existing?.source_payload || {}), ...(input.payload || {}), ...(course ? { course } : {}), ...(campaign ? { campaign_name: clean(campaign, 500) } : {}), source, external_id: externalId, received_at: new Date().toISOString() };
+  const payload = { ...(existing?.source_payload || {}), ...(input.payload || {}), ...(course ? { course } : {}), ...(campaign ? { campaign_name: clean(campaign, 500) } : {}), source, external_id: externalId, received_at: receivedAt,
+    ...(retargeting ? { retargeting_reservation: reservation, exclude_from_acquisition: true } : {}),
+  };
   const sourceComment = clean(input.comment || input.bodyText || input.summary, 10000) || null;
   const row = {
     name, email, phone,
@@ -164,7 +193,7 @@ async function ingestCrmLead(input, crm = getAdminSupabase()) {
     source_created_at: input.createdAt || existing?.source_created_at || new Date().toISOString(),
     source_updated_at: new Date().toISOString(),
   };
-  if (isFirstBachillerato(course)) {
+  if (!retargeting && isFirstBachillerato(course)) {
     if (existing) {
       const { error: updateError } = await crm.from('crm_leads').update(row).eq('id', existing.id);
       if (updateError) throw updateError;

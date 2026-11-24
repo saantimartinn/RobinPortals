@@ -94,6 +94,8 @@ Para un cambio revisa creación/emisión de ticket, subida, confirmación, lista
 
 Los endpoints de onboarding/payment llevan el pedido al backend. Allí se valida cuenta, concepto/importes y configuración de proveedor. Platform integra pagos con Revolut; handlers reciben/validan callbacks o webhooks y módulos de `lib/` actualizan la representación local y procesos ligados a factura/contabilidad.
 
+Al crear facturas de clientes LATAM, `lib/holded.js` conserva la referencia del cliente y añade la observación literal de `packages/billing/holded-invoice-notes.cjs` en las notas internas y las observaciones impresas de Holded. Incluye cuotas, extras e IELTS; sustituye cualquier observación de exención anterior para LATAM y no reemite ni modifica las facturas existentes.
+
 ```text
 Checkout UI → API client → payments/onboarding Function
   → principal + plan/amount validation → Revolut checkout

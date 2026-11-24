@@ -1,5 +1,41 @@
 # Pack Llegada inside Robin Community
 
+## Unified member interface and local review
+
+All subscription and Llegada members now use the Llegada layout and navigation:
+Inicio, Llamadas, Tu habitación, Partners, Pagos, Soporte, FAQs and Ajustes.
+The previous Lifestyle, Career Support, Community, Social and levels pages are
+retired from the member frontend; their backend records are retained.
+Monthly/annual billing and cancellation controls remain available. A subscription
+alone does not enable advisor bookings: its Llamadas page explains access and
+links to Soporte. Llegada retains its existing contract, payments and booking rules.
+
+For an isolated preview, build the two frontends, then start from the repository root:
+
+```sh
+npm --prefix apps/community/frontend run build
+npm --prefix apps/portal/portal-source run build
+node dev/preview-member-portal.mjs
+```
+
+Open `http://localhost:8895/` to choose a subscription, Llegada or pending first
+payment scenario. These are fictitious in-memory accounts. All API requests stay
+in the local fixture server; it does not send email, access Calendar or create charges.
+
+`node dev/preview-arrival-transfer.mjs` inventories the two connected databases
+without writing to them. It checks identity collisions and credential format,
+preserves pending onboarding flags, counts owned/indirect history and inventories
+Storage files under each source user ID. It does not export password hashes,
+copy records, delete source accounts or provide an apply flag.
+
+**The real account transfer is pending local review.** Before cutover, stage and
+verify every row and file, reconcile logs without ownership foreign keys, preserve
+existing subscription identities on collisions, and retarget booking, onboarding,
+payment, webhook and administrative writes to the subscription database. Native
+login must be tested with account switching and incomplete onboarding before
+disabling the previous login. A new table entry alone is not a completed migration.
+
+
 ## Identity and access
 
 The Portal's `users.tipo = 'llegada'` and signed contract identify the product.
@@ -15,15 +51,15 @@ retried on the same account; provider idempotency and recorded delivery state
 avoid duplicate emails, and client-chosen passwords are never reset.
 
 Community's existing SSO first checks for a matching subscriber. An active or
-trialing Community subscription keeps the full experience and also receives the
-Pack's calls/payments. Otherwise SSO reuses the Portal user ID in the existing
+trialing Community subscription retains its subscription billing and also receives
+the Pack's calls/payments in the unified layout. Otherwise SSO reuses the Portal user ID in the existing
 Community cookie, with `auth_source = application_arrival`. No subscriber,
 password, second login or booking identity is created.
 
 Ordinary Community APIs reject that restricted session by default. Only `me`,
 support, FAQs and eligible partners opt in, and revalidate the common Portal cookie and current
 product on each request. The shared `shared/product-access.cjs` view policy
-limits navigation to Inicio, Llamadas, Partners, Pagos, Soporte, FAQs and Ajustes. URL
+uses the same navigation allowlist for every member. URL
 parameters cannot grant another module. Calls/payments use the existing Portal
 APIs, which derive ownership from their own authenticated session.
 

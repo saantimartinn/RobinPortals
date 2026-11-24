@@ -121,7 +121,7 @@ function buildSalesDashboard({ period, bounds: suppliedBounds, leads, users, pay
 
   const cohort = nativeLeads.filter((lead) => {
     const raw = leadDate(lead);
-    return raw && inBounds(new Date(raw), bounds);
+    return lead.source_payload?.exclude_from_acquisition !== true && raw && inBounds(new Date(raw), bounds);
   }).map((lead) => {
     const user = userForLead(lead, indexes);
     return {

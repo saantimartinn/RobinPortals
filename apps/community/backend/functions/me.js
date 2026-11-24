@@ -39,13 +39,17 @@ exports.handler = async (event) => {
         cancel_at_period_end: false,
       });
     }
+    const identity = await readApplicationIdentity(event);
+    if (!identity || identity.id !== session.application_uid
+      || (session.role === 'subscriber_admin' && !canUseRobinPlan(identity))) {
+      return json({ error: 'unauthorized' }, { statusCode: 401 });
+    }
     const sb = getSupabase();
     const { data: u, error } = await sb.from(principalTable(session.role)).select('*').eq('id', session.uid).single();
     if (error || !u) return json({ error: 'unauthorized' }, { statusCode: 401 });
     let paymentProvider = u.stripe_subscription_id ? 'stripe' : null;
     const { data: revolut } = await sb.from('revolut_subscriptions').select('subscription_id').eq('subscriber_id', u.id).maybeSingle();
     if (revolut?.subscription_id) paymentProvider = 'revolut';
-    const identity = session.application_uid ? await readApplicationIdentity(event).catch(() => null) : null;
     const arrivalPack = identity?.id === session.application_uid ? identity.arrival_pack : null;
     return json({
       id: u.id,

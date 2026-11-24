@@ -139,6 +139,13 @@ export default function PortalRobin() {
       setSubscriptionAccessResolved(!!authState.user);
       return undefined;
     }
+    // The Portal already verified this product; Community validates its own session.
+    if (authState.user.arrival_pack?.contracted) {
+      setSubscriptionAccess(true);
+      setCheckingSubscriptionAccess(false);
+      setSubscriptionAccessResolved(true);
+      return undefined;
+    }
     let mounted = true;
     setCheckingSubscriptionAccess(true);
     setSubscriptionAccessResolved(false);
@@ -354,13 +361,14 @@ export default function PortalRobin() {
   const clientName = (user.nombre ? `${user.nombre} ${user.apellidos || ""}` : user.email || user.username || "").trim();
   return withSupport(
     <>
-      <CrossPortalNav current="application" user={user} onLogout={handleLogout} onReportProblem={() => setReportOpen(true)} hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
+      <CrossPortalNav current="application" user={user} onLogout={handleLogout} onReportProblem={() => setReportOpen(true)} reportInSidebar hasSubscriptionAccess={subscriptionAccess} checkingSubscriptionAccess={checkingSubscriptionAccess} entryNotice={entryNotice} />
       <PortalShell
         user={user}
         clientName={clientName}
         active={active}
         setActive={setActive}
         onUserRefresh={refreshUser}
+        onReportProblem={() => setReportOpen(true)}
       />
     </>
   );

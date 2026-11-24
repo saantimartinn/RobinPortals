@@ -7,7 +7,7 @@ import type { Contact, LostReason } from "@/types/domain";
 import { adminDataClient, type FutureLead, type WebBooking } from "@/services/admin-data";
 import type { FeatureModuleProps } from './feature-shared';
 import { lostReasonLabel, lostReasonOptions, Title, ContactDrawer } from './feature-shared';
-import { type InboxView, type LostLeadSection, type EventLeadSection, LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel, matchesInboxView, leadInboxSection } from "./lead-shared";
+import { type InboxView, type LostLeadSection, type EventLeadSection, type ReservationLeadSection, LeadGroupRow, emptyLeadGroupRow, leadEntryTimestamp, leadDaysWithoutContact, formatLeadEntry, inboxCampaignLabel, matchesInboxView, leadInboxSection } from "./lead-shared";
 import { leadCourseGroup, leadCourseGroups } from "./lead-course-group.mjs";
 
 export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStages, leadLostDates, onAssignLead, onMoveLead, onDeleteLead, onAddLead, onAddLeads, onSetLeadHeat, onSetLeadContactRole, onSetLeadCourse, notify }: FeatureModuleProps) {
@@ -19,7 +19,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
   const [courseFilter, setCourseFilter] = useState("all");
   const [view, setView] = useState<InboxView>(() => {
     const initialView = new URLSearchParams(window.location.search).get("view");
-    return initialView === "lost" || initialView === "eventos" ? initialView : "all";
+    return initialView === "lost" || initialView === "eventos" || initialView === "reservas" ? initialView : "all";
   });
   const [lostSection, setLostSection] = useState<LostLeadSection>(() => {
     const section = new URLSearchParams(window.location.search).get("section");
@@ -29,6 +29,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     const section = new URLSearchParams(window.location.search).get("section");
     return section === "canarias" || section === "valencia" || section === "webinar-21-11" ? section : "lisboa";
   });
+  const [reservationSection, setReservationSection] = useState<ReservationLeadSection>(() => new URLSearchParams(window.location.search).get("section") === "retargeting" ? "retargeting" : "general");
   const [now, setNow] = useState(Date.now);
   const [futureLeads, setFutureLeads] = useState<FutureLead[]>([]);
   const [futureLoading, setFutureLoading] = useState(false);
@@ -62,9 +63,10 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
     const url = new URL(window.location.href);
     if (isLost) { url.searchParams.set("view", "lost"); url.searchParams.set("section", lostSection); }
     else if (isEvents) { url.searchParams.set("view", "eventos"); url.searchParams.set("section", eventSection); }
+    else if (view === "reservas") { url.searchParams.set("view", "reservas"); url.searchParams.set("section", reservationSection); }
     else { url.searchParams.delete("view"); url.searchParams.delete("section"); }
     window.history.replaceState(null, "", url);
-  }, [isLost, isEvents, lostSection, eventSection]);
+  }, [isLost, isEvents, lostSection, eventSection, view, reservationSection]);
   useEffect(() => {
     if (!isFuture) return;
     let active = true;
@@ -81,15 +83,15 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
   const sectionContacts = useMemo(() => isFuture ? futureLeads : contacts.filter((contact) => {
     const stage = leadStages[contact.id] || contact.stage || "Por contactar";
     const section = leadInboxSection(contact, stage, leadOwners[contact.id] ?? contact.owner, now);
-    return isLost ? section === lostSection : section === "active" && matchesInboxView(contact, view, eventSection);
-  }), [contacts, futureLeads, isFuture, isLost, lostSection, eventSection, leadOwners, leadStages, now, view]);
+    return isLost ? section === lostSection : section === "active" && matchesInboxView(contact, view, eventSection, reservationSection);
+  }), [contacts, futureLeads, isFuture, isLost, lostSection, eventSection, reservationSection, leadOwners, leadStages, now, view]);
   const list = useMemo(() => sectionContacts.filter((contact) => {
     if (!`${contact.name} ${contact.email} ${contact.phone} ${contact.source} ${contact.campaign} ${inboxCampaignLabel(contact)} ${contact.formName || ""} ${contact.course || ""} ${contact.country || ""} ${contact.comment || ""}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
     if (sourceFilter !== "all" && contact.source !== sourceFilter) return false;
     if (campaignFilter !== "all" && inboxCampaignLabel(contact) !== campaignFilter) return false;
     if (courseFilter !== "all" && leadCourseGroup(contact.course) !== courseFilter) return false;
     return true;
-  }).sort((a, b) => leadEntryTimestamp(b.createdAt) - leadEntryTimestamp(a.createdAt) || b.id.localeCompare(a.id)), [sectionContacts, query, sourceFilter, campaignFilter, courseFilter]);
+  }).sort((a, b) => leadEntryTimestamp(view === "reservas" ? b.retargetingReservationAt || b.createdAt : b.createdAt) - leadEntryTimestamp(view === "reservas" ? a.retargetingReservationAt || a.createdAt : a.createdAt) || b.id.localeCompare(a.id)), [sectionContacts, query, sourceFilter, campaignFilter, courseFilter, view]);
   useEffect(() => {
     if (view !== "reservas") return;
     let active = true;
@@ -163,7 +165,7 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
   return (
     <div className="page">
       <Title name="Bandeja de entrada de leads" sub="Asigna cada nuevo lead o márcalo como Lost." eyebrow="Inicio / Vista global">
-        <Badge variant="outline">{list.length} leads</Badge>
+        <Badge variant="outline">{list.length} {view === "reservas" ? list.length === 1 ? "reserva" : "reservas" : "leads"}</Badge>
       </Title>
       <div className="module-toolbar">
         <label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nombre, email o canal…" /></label>
@@ -188,7 +190,12 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
         </nav>
         <p className="assignment-note">Leads de {EVENT_SECTIONS.find(([key]) => key === eventSection)?.[2]}.</p>
       </section>}
-      {view === "reservas" && <p className="assignment-note">Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación.</p>}
+      {view === "reservas" && <section className="inbox-subsections" aria-label="Reservas">
+        <nav className="inbox-views" aria-label="Subsecciones de Reservas">
+          {RESERVATION_SECTIONS.map(([key, label]) => <button key={key} type="button" aria-pressed={reservationSection === key} onClick={() => { setReservationSection(key); resetFilters(); }}>{label}</button>)}
+        </nav>
+        <p className="assignment-note">{reservationSection === "retargeting" ? "Reservas de reactivación y retargeting. Conservan la campaña original y cuentan como llamadas reservadas, sin añadir leads nuevos a las métricas de captación." : "Leads recibidos mediante el formulario «Reserva de consulta», pendientes de asignación."}</p>
+      </section>}
       {view === "recomendador" && <p className="assignment-note">Leads procedentes del recomendador de carreras. Se muestran únicamente en esta pestaña.</p>}
       {view === "reservas" && bookingError && <p className="assignment-note" role="alert">No se pudieron cargar las fechas del calendario ({bookingError}). <button type="button" onClick={() => setBookingRetry((retry) => retry + 1)}>Reintentar</button></p>}
       {isFuture && futureError && <p className="assignment-note" role="alert">{futureError}. <button type="button" onClick={() => setFutureRetry((retry) => retry + 1)}>Reintentar</button></p>}
@@ -197,12 +204,12 @@ export function LeadInbox({ currentUser, admins, contacts, leadOwners, leadStage
           <table>
             <thead><tr><th>Lead</th><th>Entrada</th>{view === "reservas" && <th>Cita (hora de Madrid)</th>}<th>Origen</th><th>Campaña</th><th>Curso</th><th>País</th><th>Interés</th><th>{canAssign ? "Asignar a" : "Responsable"}</th>{isFuture ? <><th>Curso académico</th><th>Fecha de archivo</th></> : <><th>Días sin contactar</th><th>{canAssign ? "Marcar como Lost" : "Motivo Lost"}</th>{isLost && <th>{lostSection === "overdue" ? "Desde" : "Fecha Lost"}</th>}</>}</tr></thead>
             <tbody>
-              {isFuture && (futureLoading || futureError) ? <tr><td colSpan={10} className="empty-copy">{futureLoading ? "Cargando leads de próximos cursos…" : "No se ha podido cargar esta sección."}</td></tr> : list.length === 0 && <tr><td colSpan={view === "reservas" || isLost && !isFuture ? 11 : 10} className="empty-copy">{query || activeFilters ? "No hay leads que coincidan con la búsqueda y los filtros." : isLost ? lostSection === "future" ? "No hay leads guardados para próximos cursos." : lostSection === "definitive" ? "No hay lost definitivos." : "No hay leads con más de 30 días en la bandeja." : view === "reservas" ? "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
+              {isFuture && (futureLoading || futureError) ? <tr><td colSpan={10} className="empty-copy">{futureLoading ? "Cargando leads de próximos cursos…" : "No se ha podido cargar esta sección."}</td></tr> : list.length === 0 && <tr><td colSpan={view === "reservas" || isLost && !isFuture ? 11 : 10} className="empty-copy">{query || activeFilters ? "No hay leads que coincidan con la búsqueda y los filtros." : isLost ? lostSection === "future" ? "No hay leads guardados para próximos cursos." : lostSection === "definitive" ? "No hay lost definitivos." : "No hay leads con más de 30 días en la bandeja." : view === "reservas" ? reservationSection === "retargeting" ? "No hay reservas de retargeting pendientes de asignación." : "No hay leads del formulario «Reserva de consulta» pendientes." : "No hay leads pendientes en esta sección."}</td></tr>}
               {!(isFuture && (futureLoading || futureError)) && list.map((contact) => (
                 <tr key={contact.id} className={isFuture ? "archived-lead" : canAssign ? "unassigned-lead" : ""} onClick={isFuture ? undefined : () => setSelected(contact)}>
                   <td>{isFuture ? <><b>{contact.name}</b><small>{contact.email}</small><small>{contact.phone}</small></> : <button type="button" className="lead-name-button" onClick={() => setSelected(contact)}>{contact.formName === "colegios" && <small className="school-lead-label">Colegios</small>}<b className={contact.formName === "colegios" ? "school-lead-name" : ""}>{contact.name}</b><small>{contact.email}</small></button>}</td>
-                  <td><time className="lead-entry-time" dateTime={contact.createdAt}>{formatLeadEntry(contact.createdAt)}</time></td>
-                  {view === "reservas" && <td>{bookings === null ? "Cargando…" : bookingError ? "No disponible" : <BookingDate booking={bookingByEmail.get(contact.email.trim().toLowerCase())} />}</td>}
+                  <td><time className="lead-entry-time" dateTime={view === "reservas" ? contact.retargetingReservationAt || contact.createdAt : contact.createdAt}>{formatLeadEntry(view === "reservas" ? contact.retargetingReservationAt || contact.createdAt : contact.createdAt)}</time></td>
+                  {view === "reservas" && <td>{bookings === null ? "Cargando…" : bookingError ? "No disponible" : <BookingDate booking={bookingByEmail.get((contact.retargetingReservationEmail || contact.email).trim().toLowerCase())} />}</td>}
                   <td><span className="lead-source-readonly">{contact.source || "—"}</span></td>
                   <td><span className="lead-source-readonly">{inboxCampaignLabel(contact)}</span></td>
                   <td>{leadCourseGroup(contact.course)}</td>
@@ -300,3 +307,4 @@ function BookingDate({ booking }: { booking?: WebBooking }) {
 const INBOX_VIEWS: Array<[InboxView, string]> = [["all", "General"], ["España", "España"], ["Portugal", "Portugal"], ["recomendador", "Recomendador"], ["eventos", "Eventos"], ["reservas", "Reservas"], ["lost", "Lost leads"]];
 const LOST_SECTIONS: Array<[LostLeadSection, string]> = [["future", "Año que viene"], ["definitive", "Lost definitivos"], ["overdue", ">30 days leads"]];
 const EVENT_SECTIONS: Array<[EventLeadSection, string, string]> = [["lisboa", "U Lisboa", "Unitour Lisboa"], ["canarias", "U Canarias", "Unitour Canarias"], ["valencia", "U Valencia", "Unitour Valencia"], ["webinar-21-11", "Webinar 21-11", "Webinar 21-11"]];
+const RESERVATION_SECTIONS: Array<[ReservationLeadSection, string]> = [["general", "General"], ["retargeting", "Retargeting"]];

@@ -1,6 +1,9 @@
 .robin-report-floating{position:fixed;top:1rem;right:1rem;z-index:140;display:inline-flex;align-items:center;gap:.45rem;padding:.65rem .9rem;border:1px solid var(--robin-navy);border-radius:9px;background:var(--robin-paper);color:var(--robin-navy);font:600 .85rem var(--robin-font-text);box-shadow:0 4px 18px #17274618;cursor:pointer}
-.robin-report-floating:hover,.robin-cross-report:hover{background:var(--robin-ink-50)}
-.robin-cross-report{display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;padding:.5rem .7rem;border:1px solid var(--robin-navy);border-radius:9px;background:transparent;color:var(--robin-navy);font:600 .78rem var(--robin-font-text);cursor:pointer}
+.robin-report-floating:hover,.robin-cross-report:hover,.robin-sidebar-report:hover{background:var(--robin-ink-50)}
+.robin-cross-report,.robin-sidebar-report{display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap;padding:.5rem .7rem;border:1px solid var(--robin-navy);border-radius:9px;background:transparent;color:var(--robin-navy);font:600 .78rem var(--robin-font-text);cursor:pointer}
+.student-portal .student-support .robin-sidebar-report{font:600 .78rem var(--robin-font-text)}
+.robin-cross-report-fallback{display:none}
+@media(max-width:1023px),(max-height:820px){.robin-cross-report-fallback{display:inline-flex}}
 .robin-support-backdrop{position:fixed;inset:0;z-index:500;display:grid;place-items:center;overflow-y:auto;padding:1rem;background:#14213d99;backdrop-filter:blur(3px)}
 .robin-support-modal{position:relative;width:min(31rem,100%);max-height:calc(100vh - 2rem);overflow-y:auto;padding:2rem;background:var(--robin-paper);border:var(--robin-line);border-radius:18px;box-shadow:0 22px 70px #14213d35;color:var(--robin-navy);font-family:var(--robin-font-text)}
 .robin-support-close{position:absolute;top:.9rem;right:.9rem;display:grid;place-items:center;width:2rem;height:2rem;border:0;border-radius:8px;background:transparent;color:var(--robin-ink-600);cursor:pointer}

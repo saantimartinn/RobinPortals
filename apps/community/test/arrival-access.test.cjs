@@ -69,12 +69,15 @@ test('permitted Llegada APIs revalidate common identity and current product, inc
   assert.equal(JSON.parse(response.body).community_access, 'arrival');
 });
 
-test('tab policy blocks direct URLs to premium modules without reducing full access', () => {
+test('all members share the same explicit tab allowlist', () => {
   const user = { community_access: 'arrival' };
   assert.deepEqual(ARRIVAL_TABS, ['home', 'llamadas', 'partners', 'pagos', 'soporte', 'faqs', 'ajustes']);
   for (const tab of ['personal', 'profesional', 'comunidad', 'social', 'beneficios', 'acelerar', 'perfil', 'unknown']) assert.equal(canOpenTab(user, tab), false);
   for (const tab of ARRIVAL_TABS) assert.equal(canOpenTab(user, tab), true);
-  assert.equal(canOpenTab({ community_access: 'full', arrival_pack: identity.arrival_pack }, 'comunidad'), true);
+  for (const member of [{ community_access: 'full' }, { community_access: 'full', arrival_pack: identity.arrival_pack }]) {
+    for (const tab of ARRIVAL_TABS) assert.equal(canOpenTab(member, tab), true);
+    for (const tab of ['personal', 'profesional', 'comunidad', 'social', 'beneficios', 'perfil', 'unknown']) assert.equal(canOpenTab(member, tab), false);
+  }
 });
 
 test('FAQs are explicitly scoped; legacy subscription answers are never disclosed to Llegada', async () => {
@@ -120,4 +123,23 @@ test('Llegada support scopes ownership to Portal ID and rejects premium service 
   assert.equal(inserts[0][1].portal_user_id, identity.id);
   assert.equal(inserts[0][1].user_id, undefined);
   assert.equal(inserts[0][1].service_key, null);
+});
+
+test('restoring a Community session rejects a changed common account before reading subscriber data', async () => {
+  for (const current of [null, { id: 'other-user' }, { id: 'linked-user' }]) {
+    let queried = false;
+    const handler = load('backend/functions/me.js', {
+      '../lib/auth': { readSessionFromEvent: () => ({ uid: 'subscriber-id', role: 'subscriber', auth_source: 'application_sso', application_uid: 'linked-user' }) },
+      '../lib/application-permissions': { readApplicationIdentity: async () => current, canUseRobinPlan: () => false },
+      '../lib/supabase': { getSupabase: () => ({ from(table) {
+        queried = true;
+        return { select() { return this; }, eq() { return this; },
+          single: async () => ({ data: { id: 'subscriber-id', role: 'subscriber', subscription_status: 'active' } }),
+          maybeSingle: async () => ({ data: null }) };
+      } }) },
+    }).handler;
+    const response = await handler({ httpMethod: 'GET' });
+    assert.equal(response.statusCode, current?.id === 'linked-user' ? 200 : 401);
+    assert.equal(queried, current?.id === 'linked-user');
+  }
 });

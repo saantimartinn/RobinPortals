@@ -39,19 +39,24 @@ for (const file of files) {
   let ast;
   try { ast = parse(source, { sourceType: 'module', plugins: ['jsx'] }); } catch(e) { errors.push(`${file}: ${e.message}`); continue; }
   const deps = [];
-  for (const n of ast.program.body.filter(n => n.type === 'ImportDeclaration')) {
-    if (n.source.value.startsWith('.')) {
-      const target = path.resolve(path.dirname(file), n.source.value);
-      if (!fs.existsSync(target)) errors.push(`${file}: missing ${n.source.value}`);
-      if (target.includes(`${path.sep}backend${path.sep}`)) errors.push(`${file}: imports backend`);
-      if (/\.jsx?$/.test(target)) deps.push(target);
-    }
+  function addDependency(request) {
+    if (!request.startsWith('.')) return;
+    const target = path.resolve(path.dirname(file), request);
+    if (!fs.existsSync(target)) errors.push(`${file}: missing ${request}`);
+    if (target.includes(`${path.sep}backend${path.sep}`)) errors.push(`${file}: imports backend`);
+    if (/\.jsx?$/.test(target)) deps.push(target);
   }
+  for (const n of ast.program.body.filter(n => n.type === 'ImportDeclaration')) addDependency(n.source.value);
   graph.set(path.resolve(file), deps);
-  traverse(ast, { ReferencedIdentifier(p) {
-    const name = p.node.name;
-    if (!p.scope.hasBinding(name) && !globals.has(name)) errors.push(`${file}:${p.node.loc.start.line}: unbound ${name}`);
-  }});
+  traverse(ast, {
+    CallExpression(p) {
+      if (p.node.callee.type === 'Import' && p.node.arguments[0]?.type === 'StringLiteral') addDependency(p.node.arguments[0].value);
+    },
+    ReferencedIdentifier(p) {
+      const name = p.node.name;
+      if (!p.scope.hasBinding(name) && !globals.has(name)) errors.push(`${file}:${p.node.loc.start.line}: unbound ${name}`);
+    },
+  });
   for (const m of source.matchAll(/["'`](\/api\/[^"'`?\s]+)["'`?]/g)) if (!routes.has(m[1])) errors.push(`${file}: unmapped API ${m[1]}`);
   if (/process\.env|SUPABASE_SERVICE_ROLE_KEY|STRIPE_SECRET_KEY/.test(source)) errors.push(`${file}: backend environment in browser code`);
 }

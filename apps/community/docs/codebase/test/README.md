@@ -8,9 +8,11 @@ Pruebas automatizadas sin credenciales ni proveedores reales.
 
 - [application-permissions.test.cjs](../../../test/application-permissions.test.cjs): Configuración, herramienta o prueba.
 - [arrival-access.test.cjs](../../../test/arrival-access.test.cjs): Configuración, herramienta o prueba.
+- [arrival-partners.test.cjs](../../../test/arrival-partners.test.cjs): Configuración, herramienta o prueba.
 - [auth.test.cjs](../../../test/auth.test.cjs): Configuración, herramienta o prueba.
 - [frontend.test.cjs](../../../test/frontend.test.cjs): Configuración, herramienta o prueba.
 - [handlers.test.cjs](../../../test/handlers.test.cjs): Configuración, herramienta o prueba.
+- [holded-latam-notes.test.cjs](../../../test/holded-latam-notes.test.cjs): Configuración, herramienta o prueba.
 - [http.test.cjs](../../../test/http.test.cjs): Configuración, herramienta o prueba.
 - [partners.test.cjs](../../../test/partners.test.cjs): Configuración, herramienta o prueba.
 - [password-reset.test.cjs](../../../test/password-reset.test.cjs): Configuración, herramienta o prueba.

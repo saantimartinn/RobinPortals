@@ -26,6 +26,7 @@ function SubPayments({ user }) {
 
   return (
     <div className="space-y-5">
+      <div className="student-page-heading"><h1>{t('Pagos')}</h1><p>{t('Importes y estados de tu suscripción y facturación.')}</p></div>
       {user.subscription_status === "past_due" && (
         <div className="flex items-start gap-2 text-sm text-rose-700 bg-rose-50 border border-rose-100 rounded-xl px-4 py-3">
           <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />

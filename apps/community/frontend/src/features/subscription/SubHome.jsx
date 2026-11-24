@@ -1,136 +1,49 @@
-import { t, useLocale } from "../../../../../../packages/i18n/react.jsx";
-// Subscription feature UI for sub home; the application shell selects this view.
-import { Badge, Btn, Card, CardContent, CardHeader } from "../../shared/ui.jsx";
-import { Briefcase, CalendarCheck, ChevronRight, HeartHandshake, Tag, Users } from "lucide-react";
-import { COMMUNITY_TYPE_LABELS, SUB_STATUS_LABELS } from "../../shared/constants.js";
-import { EVENT_TAB_TYPES } from "../community/EVENT_TAB_TYPES.js";
-import { GOLD, NAVY } from "../../shared/theme.js";
-import React from "react";
-import { RobinProgressBar } from "../levels/RobinProgressBar.jsx";
-import { cityVisible } from "../community/cityVisible.js";
-import { formatDate, getRobinLevel, robinLevelDef } from "../../shared/utils.js";
+import { getLocale, t, useLocale } from "../../../../../../packages/i18n/react.jsx";
+import React, { useEffect, useState } from 'react';
+import { Calendar, Loader2 } from 'lucide-react';
+import { Badge, Btn, Card, CardContent, CardHeader } from '../../shared/ui.jsx';
+import { NAVY } from '../../shared/theme.js';
+import { bookingsList } from '../../api/arrival.js';
+import { SUB_STATUS_LABELS } from '../../shared/constants.js';
 
-function SubHome({ user, events, partners, requests, setActive }) {
+export function SubHome({ user, setActive }) {
   useLocale();
-  const statusInfo = SUB_STATUS_LABELS[user.subscription_status] || SUB_STATUS_LABELS.none;
-  const ciudad = user.ciudad || "";
-  const now = Date.now();
-  const inCity = (e) => cityVisible(e, ciudad, false);
-  const isActive = (e) => e.active === undefined || e.active === null || e.active === true;
-  const visibleEvents = events.filter((e) => EVENT_TAB_TYPES.includes(e.type) && isActive(e) && inCity(e));
-  const upcomingEvents = visibleEvents
-    .filter((e) => !e.starts_at || new Date(e.starts_at).getTime() >= now - 86400000)
-    .sort((a, b) => new Date(a.starts_at || 0) - new Date(b.starts_at || 0));
-  const eventsCount = upcomingEvents.length;
-  const homeOffers = events.filter((e) => e.type === "announcement" && (!e.expires_at || new Date(e.expires_at).getTime() >= now) && inCity(e));
-  const homeGroups = events.filter((e) => e.type === "group" && inCity(e));
-
-  const startRef = user.subscription_started_at || user.created_at;
-  const daysAsRobin = startRef ? Math.max(0, Math.floor((now - new Date(startRef).getTime()) / 86400000)) : null;
-  const rlevel = getRobinLevel(user);
-  const rdef = robinLevelDef(rlevel.level);
-
-  const tiles = [
-    { id: "eventos", target: "comunidad", label: "Mis eventos", icon: CalendarCheck, value: eventsCount, hint: "Próximos para ti" },
-    { id: "lifestyle", target: "personal", label: "Lifestyle", icon: HeartHandshake, hint: "Trámites, vivienda y bienestar" },
-    { id: "career", target: "profesional", label: "Career Support", icon: Briefcase, hint: "Empleo, CV, mentorías, networking" },
-    { id: "community", target: "comunidad", label: "Community", icon: Users, hint: "Eventos, grupos y perks" },
-  ];
-
-  return (
-    <div className="space-y-5">
-      <div className="rounded-2xl p-6 relative overflow-hidden" style={{ background: NAVY }}>
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.07] pointer-events-none select-none">
-          <div className="text-[140px] font-black text-white leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>R</div>
-        </div>
-        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-          <div>
-            <div className="text-white/50 text-xs font-semibold mb-2">The Robin Plan</div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="text-white text-2xl font-bold" style={{ fontFamily: "var(--robin-font-display)" }}>
-                {user.subscription_plan === "annual" ? t("Plan Anual") : t("Plan Mensual")}
-              </div>
-              <Badge tone={statusInfo.tone}>{t(statusInfo.label)}</Badge>
-            </div>
-            <div className="text-white/60 text-sm mt-2">{t("Bienvenido/a a tu portal de suscriptor.")}</div>
-          </div>
-          {daysAsRobin != null && (
-            <div className="rounded-2xl px-5 py-4 text-center flex-shrink-0 bg-white/10 border border-white/15">
-              <div className="text-white/60 text-[11px] font-semibold ">{t("Robin desde hace")}</div>
-              <div className="text-3xl font-bold mt-1" style={{ fontFamily: "var(--robin-font-display)", color: GOLD }}>{daysAsRobin}</div>
-              <div className="text-white/60 text-[11px] ">{daysAsRobin === 1 ? t("día") : t("días")}</div>
-            </div>
-          )}
-        </div>
-        <div className="relative mt-4 pt-4 border-t border-white/10 flex items-center gap-3 flex-wrap">
-          <span className="text-xl leading-none">{rdef.emoji}</span>
-          <span className="text-white text-sm font-semibold">{t("Nivel ")}<span style={{ color: GOLD }}>{t(rdef.label)}</span></span>
-          <div className="flex-1 min-w-[140px]"><RobinProgressBar value={rlevel.progress} light /></div>
-          <span className="text-white/70 text-xs">{rlevel.nextLevel ? t("Faltan {0} {1} para {2}", [rlevel.daysRemaining, rlevel.daysRemaining === 1 ? t("día") : t("días"), robinLevelDef(rlevel.nextLevel).label]) : t("Nivel máximo")}</span>
-          <Btn size="sm" variant="secondary" onClick={() => setActive("beneficios")}>{t("Ver beneficios")}</Btn>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {tiles.map((localItem) => {
-          const Icon = localItem.icon;
-          const orange = localItem.id === "eventos";
-          const bg = orange ? GOLD : NAVY;
-          const fg = orange ? NAVY : "#FEFBE5";
-          return (
-            <button key={localItem.id} onClick={() => setActive(localItem.target)}
-              className="rounded-2xl p-5 text-left min-h-[140px] flex flex-col justify-between"
-              style={{ background: bg, color: fg }}>
-              <div className="flex items-center gap-2 text-sm font-semibold">
-                <Icon className="h-4 w-4" style={orange ? {} : { color: GOLD }} /> {t(localItem.label)}
-              </div>
-              {localItem.value !== undefined ? (
-                <div className="text-4xl font-bold leading-none" style={{ fontFamily: "var(--robin-font-display)" }}>{localItem.value}</div>
-              ) : (
-                <div className="text-sm font-semibold inline-flex items-center gap-1">{t("Abrir ")}<ChevronRight className="h-4 w-4" style={orange ? {} : { color: GOLD }} /></div>
-              )}
-              <div className="text-[13px] opacity-80">{t(localItem.hint)}</div>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-5">
-        <Card>
-          <CardHeader title={t("Próximos eventos")} subtitle={ciudad ? t("Personalizado para {0}", [ciudad]) : undefined} icon={CalendarCheck} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
-          <CardContent className="space-y-3">
-            {upcomingEvents.length === 0 && <div className="text-sm text-slate-400">{t("No hay eventos próximos por ahora.")}</div>}
-            {upcomingEvents.slice(0, 6).map((e) => (
-              <div key={e.id} className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium text-slate-800 truncate">{t(e.title)}</div>
-                  <div className="text-xs text-slate-400">{formatDate(e.starts_at)} · {e.location || t("Por confirmar")}</div>
-                </div>
-                <Badge tone={(COMMUNITY_TYPE_LABELS[e.type] || {}).tone || "slate"}>{t((COMMUNITY_TYPE_LABELS[e.type] || {}).label || e.type)}</Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader title="Perks & Partners" subtitle={t("Ventajas para miembros")} icon={Tag} right={<button onClick={() => setActive("comunidad")} className="text-xs font-semibold" style={{ color: NAVY }}>{t("Ver todos")}</button>} />
-          <CardContent className="space-y-2.5">
-            {homeOffers.length === 0 && <div className="text-sm text-slate-400">{t("No hay perks activos ahora mismo.")}</div>}
-            {homeOffers.slice(0, 6).map((o) => (
-              <div key={o.id} className="rounded-xl border border-slate-100 p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm font-semibold text-slate-800 truncate">{(o.meta && o.meta.partner) || t(o.title)}</div>
-                  {o.meta && o.meta.tag && <Badge tone="gold">{o.meta.tag}</Badge>}
-                </div>
-                <div className="text-xs text-slate-500 mt-0.5">{t(o.title)}</div>
-                {o.expires_at && <div className="text-[11px] mt-1 text-slate-400">{t("Hasta ")}{formatDate(o.expires_at)}</div>}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+  const hasArrival = !!user.arrival_pack;
+  const [bookings, setBookings] = useState([]), [loading, setLoading] = useState(hasArrival), [error, setError] = useState('');
+  async function load() {
+    setError('');
+    if (!hasArrival) { setBookings([]); setLoading(false); return; }
+    setLoading(true);
+    try { const data = await bookingsList(); setBookings(data.bookings || []); }
+    catch (_) { setError('No hemos podido cargar tus llamadas.'); }
+    finally { setLoading(false); }
+  }
+  useEffect(() => { void load(); }, [user.id, hasArrival]);
+  const upcoming = bookings.filter(booking => booking.status === 'scheduled' && Date.parse(booking.start_at) + Number(booking.duration_min || 30) * 60000 > Date.now());
+  const pack = user.arrival_pack || {};
+  const status = SUB_STATUS_LABELS[user.subscription_status] || SUB_STATUS_LABELS.none;
+  const productName = hasArrival ? 'Pack Llegada' : user.subscription_plan === 'annual' ? 'Plan Anual' : 'Plan Mensual';
+  const stateLabel = hasArrival ? pack.status === 'active' ? 'Activo' : pack.status === 'ended' ? 'Servicio finalizado' : 'Primer pago pendiente' : status.label;
+  return <div className="space-y-5">
+    <div className="rounded-2xl p-6" style={{ background: NAVY }}>
+      <p className="text-white/60 text-xs mb-2">The Robin Plan</p>
+      <div className="flex items-center gap-3 flex-wrap"><h1 className="text-white text-2xl font-bold" style={{ fontFamily: 'var(--robin-font-display)' }}>{t(productName)}</h1><Badge tone={hasArrival ? pack.status === 'active' ? 'green' : 'amber' : status.tone}>{t(stateLabel)}</Badge></div>
+      <p className="text-white/70 text-sm mt-2">{hasArrival ? t('Tus llamadas con el asesor y la gestión de tu Pack Llegada.') : t('Tus partners, soporte y gestiones, en un mismo lugar.')}</p>
     </div>
-  );
+    <button className="rounded-2xl p-5 text-left w-full flex items-center justify-between gap-4" style={{ background: '#ECB450', color: NAVY }} onClick={() => setActive('llamadas')}>
+      <span><span className="flex items-center gap-2 text-sm font-semibold"><Calendar size={18} />{t("Mis llamadas")}</span><span className="block text-sm mt-2">{hasArrival ? t('Próximas con tu asesor') : t('No incluidas en tu suscripción')}</span></span>
+      <span className="text-4xl font-bold" style={{ fontFamily: 'var(--robin-font-display)' }}>{!hasArrival || loading || error ? '—' : upcoming.length}</span>
+    </button>
+    <Card><CardHeader title={t("Mis llamadas")} icon={Calendar} /><CardContent className="space-y-4">
+      {!hasArrival && <p className="text-sm text-slate-500">{t("Las llamadas con asesor están incluidas en Pack Llegada. Tu suscripción no incluye este servicio.")}</p>}
+      {loading && <p role="status" className="flex gap-2 items-center text-sm text-slate-500"><Loader2 size={16} className="animate-spin" />{t("Cargando llamadas…")}</p>}
+      {error && <div role="alert"><p>{t(error)}</p><Btn variant="secondary" onClick={load}>{t("Reintentar")}</Btn></div>}
+      {hasArrival && !loading && !error && upcoming.length === 0 && <p className="text-sm text-slate-500">{t("Aún no tienes llamadas programadas. Reserva una llamada con tu asesor cuando lo necesites.")}</p>}
+      {hasArrival && !loading && !error && upcoming.map(booking => <div className="flex flex-wrap gap-3 items-center justify-between border-b border-slate-100 pb-3" key={booking.id}>
+        <div><time className="font-semibold" dateTime={booking.start_at}>{new Intl.DateTimeFormat(getLocale(), { dateStyle: 'long', timeStyle: 'short' }).format(new Date(booking.start_at))}</time><p className="text-sm text-slate-500">{booking.topic} · {booking.duration_min} min</p></div>
+        <div className="flex gap-3 items-center"><Badge tone={booking.cancellation_requested_at ? 'amber' : 'green'}>{booking.cancellation_requested_at ? t('Cancelación solicitada') : t('Confirmada')}</Badge>{booking.meet_join_url && <a href={booking.meet_join_url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold underline">{t("Entrar a la llamada")}</a>}</div>
+      </div>)}
+      <Btn onClick={() => setActive(hasArrival ? 'llamadas' : 'soporte')}>{hasArrival ? t("Reservar llamada con mi asesor") : t("Contactar con Soporte")}</Btn>
+    </CardContent></Card>
+  </div>;
 }
-
-export { SubHome };

@@ -9,6 +9,7 @@ const apiFetch = (input: RequestInfo | URL, init?: RequestInit) =>
 export type EditableMetricRecord = { id: string; label: string; value: string; detail: string; group?: string };
 export type CrmEmailDraft = { subject: string; body: string; recipientIds: string[]; campaignFilter: string };
 export type CrmEmailTemplate = { id: string; name: string; subject: string; body: string; updatedAt?: string };
+export type LeadReactivationStatus = { enabled: boolean; blocked?: boolean; enrollment: { status: string; stop_reason?: string; enrolled_at: string } | null; exclusion?: string; count: number; testTo: string; templates: Array<{ number: number; day: number; subject: string }>; messages: Array<{ id: string; message_number: number; status: string; scheduled_at: string; sent_at?: string; delivery_status?: string; error?: string }> };
 // Consultation booked on the website (hello@ calendar), matched to leads by email.
 export type WebBooking = { eventId: string; start: string; end?: string; emails: string[]; name?: string | null; meetUrl?: string | null };
 export type LeadTeamNote = { id: string; leadId: string; body: string; authorName: string; createdAt: string };
@@ -167,7 +168,7 @@ function toContact(row: Record<string, any>): Contact {
   // Website forms only tag Portugal pages; otherwise the form language tells the market.
   const webLang = row.source_payload?.source === "website" ? String(row.source_payload?.lang || "").toLowerCase() : "";
   const country = commentCountry !== "Otros" ? commentCountry : campaign.toLowerCase() === "webinar 21-11" ? "España" : webLang === "es" ? "España" : webLang === "pt" ? "Portugal" : "Otros";
-  return { id: row.id, crmNotes: Array.isArray(row.source_payload?.crm_notes) ? row.source_payload.crm_notes : [], displayId: row.display_id || undefined, name, initials: name.split(/\s+/).slice(0, 2).map((part: string) => part[0] || "").join("").toUpperCase(), email: row.email || fieldValue(fields, /^e?mail$/, /^correo/) || "", phone: row.phone || fieldValue(fields, /phone/, /telefono/, /movil/) || "", country, university: row.school_name || "", course, interest, comment, contactAt: row.contact_at || undefined, contactRole: row.contact_role || undefined, product: "Aplicación", status: statusFor(stage), source, campaign, owner: row.owner_names?.[0] || "", probability: Number(row.heat || 0), nextAction: "", lastContact: row.contact_at || "—", value: 0, tags: [], databaseFields: databaseFieldValues(row), formName, pageUrl: row.source_payload?.source === "website" ? String(row.source_payload?.page_url || "").trim() : undefined, category: category as LeadCategory | undefined, heat: Number(row.heat ?? 50), notes: comment, stage, lostAt: row.lost_at || undefined, lostReason: row.source_payload?.lost_reason || undefined, lostReasonDetail: row.source_payload?.lost_reason_detail || undefined, portalAccounts: row.source_payload?.portal_accounts || (row.source_payload?.target_portal && row.source_payload?.target_user_id ? { [row.source_payload.target_portal]: row.source_payload.target_user_id } : {}), createdAt: row.source_created_at || row.created_at || undefined, clientAt: row.inside_at || undefined };
+  return { id: row.id, crmNotes: Array.isArray(row.source_payload?.crm_notes) ? row.source_payload.crm_notes : [], displayId: row.display_id || undefined, name, initials: name.split(/\s+/).slice(0, 2).map((part: string) => part[0] || "").join("").toUpperCase(), email: row.email || fieldValue(fields, /^e?mail$/, /^correo/) || "", phone: row.phone || fieldValue(fields, /phone/, /telefono/, /movil/) || "", country, university: row.school_name || "", course, interest, comment, contactAt: row.contact_at || undefined, contactRole: row.contact_role || undefined, product: "Aplicación", status: statusFor(stage), source, campaign, owner: row.owner_names?.[0] || "", probability: Number(row.heat || 0), nextAction: "", lastContact: row.contact_at || "—", value: 0, tags: [], databaseFields: databaseFieldValues(row), formName, retargetingReservationAt: row.source_payload?.retargeting_reservation?.received_at || undefined, retargetingReservationEmail: row.source_payload?.retargeting_reservation?.email || undefined, pageUrl: row.source_payload?.source === "website" ? String(row.source_payload?.page_url || "").trim() : undefined, category: category as LeadCategory | undefined, heat: Number(row.heat ?? 50), notes: comment, stage, lostAt: row.lost_at || undefined, lostReason: row.source_payload?.lost_reason || undefined, lostReasonDetail: row.source_payload?.lost_reason_detail || undefined, portalAccounts: row.source_payload?.portal_accounts || (row.source_payload?.target_portal && row.source_payload?.target_user_id ? { [row.source_payload.target_portal]: row.source_payload.target_user_id } : {}), createdAt: row.source_created_at || row.created_at || undefined, clientAt: row.inside_at || undefined };
 }
 
 export const adminDataClient = {
@@ -228,6 +229,21 @@ export const adminDataClient = {
     const response = await apiFetch("/api/admin/crm/bookings", { credentials: "include" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return (await response.json()).bookings || [];
+  },
+  async leadReactivation(leadId: string): Promise<LeadReactivationStatus> {
+    const response = await apiFetch(`/api/admin/crm/reactivation?${new URLSearchParams({ leadId })}`, { credentials: "include" });
+    if (!response.ok) throw new Error("No se pudo cargar la secuencia de reactivación");
+    return response.json();
+  },
+  async previewReactivation(leadId: string, messageNumber: number): Promise<{ subject: string; html: string }> {
+    const response = await apiFetch(`/api/admin/crm/reactivation?${new URLSearchParams({ action: "preview", leadId, messageNumber: String(messageNumber) })}`, { credentials: "include" });
+    if (!response.ok) throw new Error("No se pudo cargar el correo");
+    return response.json();
+  },
+  async testReactivation(leadId: string, messageNumber: number): Promise<{ to: string }> {
+    const response = await apiFetch("/api/admin/crm/reactivation", { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "test", leadId, messageNumber }) });
+    if (!response.ok) throw new Error("No se pudo enviar el correo de prueba");
+    return response.json();
   },
   async listLeads(): Promise<Contact[]> {
     const response = await apiFetch("/api/admin/crm/leads", { credentials: "include" });

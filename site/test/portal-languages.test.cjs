@@ -14,10 +14,11 @@ for (const app of ['portal', 'robinjr', 'community']) {
     const { renderToStaticMarkup } = localRequire('react-dom/server');
     const cases = app === 'community' ? [
       ['application/SubscriberShell.jsx', 'SubscriberShell', { community_access: 'arrival', arrival_pack: { status: 'active', first_payment_completed: true } }, 'Tu Pack Llegada', 'Your Arrival Pack'],
-      ['features/services/SubPersonal.jsx', 'SubPersonal', {}, 'Instalación', 'Settling in'],
-      ['features/career/SubProfesional.jsx', 'SubProfesional', {}, 'Empleos Locales', 'Local jobs'],
-      ['features/community/SubEventsView.jsx', 'SubEventsView', {}, 'Todos', 'All'],
-      ['features/community/SubTripsView.jsx', 'SubTripsView', {}, 'Viajes', 'Trips'],
+      ['application/SubscriberShell.jsx', 'SubscriberShell', { subscription_plan: 'monthly' }, 'Tu espacio', 'Your space'],
+      ['features/subscription/SubHome.jsx', 'SubHome', { subscription_plan: 'monthly' }, 'Plan Mensual', 'Monthly plan'],
+      ['features/arrival/ArrivalCalls.jsx', 'ArrivalCalls', {}, 'Tu suscripción no incluye este servicio.', 'Your subscription does not include this service.'],
+      ['features/arrival/ArrivalSettings.jsx', 'ArrivalSettings', { arrival_pack: { status: 'active' } }, 'Datos personales', 'Personal details'],
+      ['features/subscription/SubPayments.jsx', 'SubPayments', {}, 'Pagos y facturación', 'Payments and billing'],
     ] : [
       ['application/ApplicationPortals.jsx', 'PortalShell', {}, app === 'portal' ? 'Mi camino' : 'Mi plan', app === 'portal' ? 'My journey' : 'My plan'],
       ['application/onboarding/origin.jsx', 'OnboardingOrigin', {}, 'Tu solicitud', 'Your application'],

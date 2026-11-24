@@ -94,3 +94,29 @@ test('otros webinars conservan su bandeja y las ferias mantienen su propia secci
   assert.equal(matchesInboxView(fair, 'eventos', 'lisboa'), true);
   assert.equal(matchesInboxView(fair, 'eventos', 'webinar-21-11'), false);
 });
+
+test('el cliente usa la marca persistida de la nueva reserva sin inferir retargeting de registros antiguos', async (t) => {
+  const leads = [
+    { id: 'reactivated', source_created_at: '2026-11-18T12:00:00Z', owner_names: ['Manuel'], crm_stage: 'Contactado', source_payload: {
+      source: 'meta', campaign_name: 'Webinar 21-11', form_name: 'contacto', page_url: '/webinar21-11/',
+      retargeting_reservation: { page_url: '/retarwebinar21-11/', email: 'new-booking@example.com', received_at: '2026-11-24T12:00:00Z' },
+    } },
+    { id: 'old', source_payload: { source: 'website', form_name: 'reserva', page_url: '/retarwebinar21-11/' } },
+  ];
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({ leads })));
+  const { adminDataClient } = await dataClient;
+  const { matchesInboxView } = await shared;
+  const [reactivated, old] = await adminDataClient.listLeads();
+  assert.equal(reactivated.retargetingReservationAt, '2026-11-24T12:00:00Z');
+  assert.equal(reactivated.retargetingReservationEmail, 'new-booking@example.com');
+  assert.equal(reactivated.source, 'Meta Ads');
+  assert.equal(reactivated.campaign, 'Webinar 21-11');
+  assert.equal(reactivated.createdAt, '2026-11-18T12:00:00Z');
+  assert.equal(reactivated.owner, 'Manuel');
+  assert.equal(reactivated.stage, 'Contactado');
+  assert.equal(matchesInboxView(reactivated, 'reservas', undefined, 'retargeting'), true);
+  assert.equal(matchesInboxView(reactivated, 'eventos', 'webinar-21-11'), false);
+  assert.equal(old.retargetingReservationAt, undefined);
+  assert.equal(matchesInboxView(old, 'reservas'), true);
+  assert.equal(matchesInboxView(old, 'reservas', undefined, 'retargeting'), false);
+});

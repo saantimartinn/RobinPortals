@@ -57,6 +57,9 @@ Server-side domain services and provider integrations consumed by Netlify Functi
 | [`identity.js`](../../../lib/identity.js) | Backend domain service or provider adapter for identity. |
 | [`integration-sync.js`](../../../lib/integration-sync.js) | Backend domain service or provider adapter for integration sync. |
 | [`junior-supabase.js`](../../../lib/junior-supabase.js) | Backend domain service or provider adapter for junior supabase. |
+| [`lead-reactivation-content.js`](../../../lib/lead-reactivation-content.js) | Backend domain service or provider adapter for lead reactivation content. |
+| [`lead-reactivation-templates.json`](../../../lib/lead-reactivation-templates.json) | Backend domain service or provider adapter for lead reactivation templates. |
+| [`lead-reactivation.js`](../../../lib/lead-reactivation.js) | Backend domain service or provider adapter for lead reactivation. |
 | [`meet-transcript.js`](../../../lib/meet-transcript.js) | Backend domain service or provider adapter for meet transcript. |
 | [`meeting-history.js`](../../../lib/meeting-history.js) | Backend domain service or provider adapter for meeting history. |
 | [`netlify-logs.js`](../../../lib/netlify-logs.js) | Backend domain service or provider adapter for netlify logs. |
@@ -69,6 +72,7 @@ Server-side domain services and provider integrations consumed by Netlify Functi
 | [`payments.js`](../../../lib/payments.js) | Backend domain service or provider adapter for payments. |
 | [`platform-logs.js`](../../../lib/platform-logs.js) | Backend domain service or provider adapter for platform logs. |
 | [`privacy.js`](../../../lib/privacy.js) | Backend domain service or provider adapter for privacy. |
+| [`reactivation-webhook.js`](../../../lib/reactivation-webhook.js) | Backend domain service or provider adapter for reactivation webhook. |
 | [`release-checks.js`](../../../lib/release-checks.js) | Backend domain service or provider adapter for release checks. |
 | [`release-dni-fixture.cjs`](../../../lib/release-dni-fixture.cjs) | Backend domain service or provider adapter for release dni fixture. |
 | [`release-live-flow.cjs`](../../../lib/release-live-flow.cjs) | Backend domain service or provider adapter for release live flow. |

@@ -4,19 +4,22 @@ import type { Contact } from "@/types/domain";
 export type InboxView = "all" | "España" | "Portugal" | "recomendador" | "eventos" | "reservas" | "lost";
 export type LostLeadSection = "future" | "definitive" | "overdue";
 export type EventLeadSection = "lisboa" | "canarias" | "valencia" | "webinar-21-11";
+export type ReservationLeadSection = "general" | "retargeting";
 
 export function unitourEvent(campaign?: string): EventLeadSection | undefined {
   return campaign?.trim().toLowerCase().match(/^unitour (lisboa|canarias|valencia)$/)?.[1] as EventLeadSection | undefined;
 }
 
-export function leadInboxSection(contact: Pick<Contact, "createdAt" | "stage" | "owner">, stage = contact.stage || "Por contactar", owner = contact.owner || "", now = Date.now()): "active" | "definitive" | "overdue" | null {
+export function leadInboxSection(contact: Pick<Contact, "createdAt" | "stage" | "owner" | "retargetingReservationAt">, stage = contact.stage || "Por contactar", owner = contact.owner || "", now = Date.now()): "active" | "definitive" | "overdue" | null {
   if (stage === "Lost") return "definitive";
   if (stage !== "Por contactar" || owner.trim()) return null;
-  const enteredAt = leadEntryTimestamp(contact.createdAt);
+  const enteredAt = leadEntryTimestamp(contact.retargetingReservationAt) || leadEntryTimestamp(contact.createdAt);
   return enteredAt > 0 && now - enteredAt > 30 * 86400000 ? "overdue" : "active";
 }
 
-export function matchesInboxView(contact: Pick<Contact, "source" | "campaign" | "formName" | "country">, view: InboxView, eventSection: EventLeadSection = "lisboa") {
+export function matchesInboxView(contact: Pick<Contact, "source" | "campaign" | "formName" | "country" | "retargetingReservationAt">, view: InboxView, eventSection: EventLeadSection = "lisboa", reservationSection: ReservationLeadSection = "general") {
+  if (contact.retargetingReservationAt) return view === "reservas" && reservationSection === "retargeting";
+  if (view === "reservas" && reservationSection === "retargeting") return false;
   const event = unitourEvent(contact.campaign)
     || (contact.source === "Meta Ads" && contact.campaign?.trim().toLowerCase() === "webinar 21-11" ? "webinar-21-11" : undefined);
   if (view === "eventos") return event === eventSection;

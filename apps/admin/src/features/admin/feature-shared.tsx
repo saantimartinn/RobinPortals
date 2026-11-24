@@ -9,6 +9,7 @@ import { adminDataClient } from "@/services/admin-data";
 import { FutureAcademicYear, LeadCall, LeadTeamNote, RecommenderHistory } from "@/services/admin-data";
 import { PortalAdmin, PortalSnapshot } from "@/services/portal";
 import { RecommenderModal } from "./recommender-modal";
+import { LeadReactivation } from "./lead-reactivation";
 import { leadCourseGroup, leadCourseGroups } from "./lead-course-group.mjs";
 
 export type FeatureModuleProps = {
@@ -256,6 +257,7 @@ export function ContactDrawer({ contact, admins = [], onClose, heat = contact.he
           <Button type="button" variant="outline" className="lead-call-add" onClick={() => setLeadCallFormOpen((open) => !open)}><Plus />{leadCallFormOpen ? "Cerrar" : "Registrar llamada o mensaje"}</Button>
           {leadCallError && <small className="team-note-error" role="alert">{leadCallError}</small>}
         </section>}
+        {leadMode && <LeadReactivation key={contact.id} leadId={contact.id} />}
         {leadMode && <section className="lead-comment"><h3>Comentario</h3><p>{contact.comment || "Sin comentario"}</p></section>}
         {leadMode && <section className="lead-team-notes"><h3>Nota de equipo</h3>{teamNotesLoading && <small>Cargando notas…</small>}{teamNotes.length > 0 && <div className="lead-team-note-history">{teamNotes.map((note) => <article key={note.id}><p>{note.body}</p><footer><time dateTime={note.createdAt}>{new Date(note.createdAt).toLocaleDateString("es-ES")}</time><span>{note.authorName}</span></footer></article>)}</div>}<form onSubmit={submitTeamNote}><textarea maxLength={4000} value={teamNoteDraft} onChange={(event) => setTeamNoteDraft(event.target.value)} placeholder="Escribe una nueva nota…" /><Button type="submit" disabled={teamNoteSaving || !teamNoteDraft.trim()}>{teamNoteSaving ? "Enviando…" : "Enviar"}</Button></form>{teamNotesError && <small className="team-note-error" role="alert">{teamNotesError}</small>}</section>}
         {leadMode && onDeleteLead && <section className="lead-delete-section"><Button type="button" variant="outline" className="delete-lead" disabled={deleting} onClick={deleteLead}><Trash2 />{deleting ? "Eliminando…" : "Eliminar lead"}</Button>{deleteError && <small role="alert">{deleteError}</small>}</section>}

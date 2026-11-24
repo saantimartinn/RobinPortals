@@ -106,6 +106,8 @@ Las consultas de planes y el portal de facturación usan handlers separados. El 
 
 Para investigar discrepancia de suscripción sigue, en orden: request de checkout, cliente/price IDs del entorno, resultado de Stripe, webhook recibido, verificación/idempotencia, mutation local, query posterior y estado que renderiza UI. Abre [`backend/functions/stripe-webhook.js`](../backend/functions/stripe-webhook.js), [`backend/lib/stripe.js`](../backend/lib/stripe.js) y [`backend/lib/subscription-billing.js`](../backend/lib/subscription-billing.js). No cambies directamente precios o condiciones solo en React.
 
+Las facturas nuevas de suscripciones LATAM (Stripe y Revolut) conservan su referencia de proveedor y añaden la observación literal de `packages/billing/holded-invoice-notes.cjs` en `notes` y `body`, sin «sin impuestos». Se usa la clasificación LATAM del portal; las facturas ya emitidas se conservan mediante los controles de idempotencia existentes.
+
 Descuentos tienen validación y servicio propios. La campaña/discount elegida por frontend se vuelve a validar server-side al crear checkout; no trates el precio mostrado como autorización para un importe.
 
 ## 4. Comunidad, mensajes y notificaciones

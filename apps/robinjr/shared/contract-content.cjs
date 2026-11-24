@@ -142,7 +142,7 @@ const SERVICIOS_TRANSICION = [
   { type: 'h3', text: '1.3 Charlas y sesiones con expertos' },
   { type: 'ul', items: ['Acceso a sesiones y charlas con perfiles relevantes (estudiantes, profesionales y alumni) que aporten contexto real sobre la experiencia universitaria y profesional.', 'Contenido orientado a facilitar la adaptación académica, social y personal del alumno.'] },
   { type: 'h3', text: '1.4 Acceso a la Comunidad Robin' },
-  { type: 'ul', items: ['Integración en la Comunidad Robin, incluyendo grupos y canales de comunicación con otros estudiantes.', 'Contacto directo con alumnos que comienzan su experiencia en Países Bajos durante el curso académico 2026-2027.', 'Fomento del apoyo mutuo, integración social y networking.'] },
+  { type: 'ul', items: ['Integración en la Comunidad Robin, incluyendo grupos y canales de comunicación con otros estudiantes.', 'Contacto directo con alumnos que comienzan su experiencia en Países Bajos durante el curso académico 2027-2028.', 'Fomento del apoyo mutuo, integración social y networking.'] },
   { type: 'h3', text: '1.5 Recomendaciones de asociaciones y eventos' },
   { type: 'ul', items: ['Información sobre asociaciones estudiantiles y actividades locales relevantes.', 'Sugerencias de eventos previos e inmediatamente posteriores al inicio de clases.'] },
 ];

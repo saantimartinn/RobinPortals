@@ -1,5 +1,7 @@
 // Server-side subscription billing helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { createClient } = require('@supabase/supabase-js');
+const { isLatamClient } = require('../../../portal/shared/financial-config.cjs');
+const { LATAM_INVOICE_NOTE } = require('../../../../packages/billing/holded-invoice-notes.cjs');
 
 const HOLDED_BASE = 'https://api.holded.com/api/v2';
 const EU_COUNTRIES = new Set([
@@ -124,7 +126,9 @@ async function createHoldedInvoice(portal, contactId, invoice) {
   const date = new Date((invoice.paid_at || new Date().toISOString())).toISOString().slice(0, 10);
   const account = process.env.HOLDED_ACCOUNT_SUBSCRIPTIONS || '70500005';
   const providerRef = invoice.order_id ? `Revolut ${invoice.order_id}` : `Stripe ${invoice.stripe_invoice_id}`;
-  const result = await holdedFetch('/invoices', { contact_id: contactId, date, due_date: date, currency: String(invoice.currency || 'eur').toLowerCase(), notes: `The Robin Plan · ${providerRef}`, items: [{ name: 'Suscripción The Robin Plan', desc: '', units: 1, price: net, taxes: rate ? [`s_iva_${rate}`] : [], account }] });
+  const reference = `The Robin Plan · ${providerRef}`;
+  const latamObservations = isLatamClient(portal) ? `${reference}\n${LATAM_INVOICE_NOTE}` : null;
+  const result = await holdedFetch('/invoices', { contact_id: contactId, date, due_date: date, currency: String(invoice.currency || 'eur').toLowerCase(), notes: latamObservations || reference, ...(latamObservations ? { body: latamObservations } : {}), items: [{ name: 'Suscripción The Robin Plan', desc: '', units: 1, price: net, taxes: rate ? [`s_iva_${rate}`] : [], account }] });
   const id = result && (result.id || result.invoice_id || (result.invoice && result.invoice.id));
   if (!id) throw new Error('holded_invoice_no_id');
   let number = null;

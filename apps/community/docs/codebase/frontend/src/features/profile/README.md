@@ -6,5 +6,4 @@ Perfil y ajustes.
 
 ## Archivos
 
-- [SubProfile.jsx](../../../../../../frontend/src/features/profile/SubProfile.jsx): Módulo frontend: SubProfile.
 - [SubSettings.jsx](../../../../../../frontend/src/features/profile/SubSettings.jsx): Módulo frontend: SubSettings.

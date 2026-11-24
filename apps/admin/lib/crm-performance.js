@@ -54,7 +54,8 @@ function buildCrmPerformance({ bounds, leads, events = [], sessions = [], crmUse
   const crmUserById = new Map(crmUsers.map((user) => [String(user.id), user]));
   const leadById = new Map(leads.map((lead) => [String(lead.id), lead]));
   const nativeLeads = leads.filter((lead) => !lead.is_test && lead.source_payload?.simulated !== true && isNativeLead(lead));
-  const periodLeads = nativeLeads.filter((lead) => !lead.is_test && isInBounds(leadCreatedAt(lead), bounds));
+  const acquisitionLeads = nativeLeads.filter((lead) => lead.source_payload?.exclude_from_acquisition !== true);
+  const periodLeads = acquisitionLeads.filter((lead) => isInBounds(leadCreatedAt(lead), bounds));
   const periodEvents = events.filter((event) => isInBounds(event.created_at, bounds));
   const eventTimes = events.map((event) => new Date(event.created_at).getTime()).filter(Number.isFinite);
   const sessionTimes = sessions.map((session) => new Date(session.started_at).getTime()).filter(Number.isFinite);
@@ -65,7 +66,7 @@ function buildCrmPerformance({ bounds, leads, events = [], sessions = [], crmUse
 
   const duration = bounds.end.getTime() - bounds.start.getTime();
   const previousBounds = { start: new Date(bounds.start.getTime() - duration), end: bounds.start };
-  const previousLeads = nativeLeads.filter((lead) => !lead.is_test && isInBounds(leadCreatedAt(lead), previousBounds)).length;
+  const previousLeads = acquisitionLeads.filter((lead) => isInBounds(leadCreatedAt(lead), previousBounds)).length;
   const leadVariation = previousLeads ? round((periodLeads.length - previousLeads) / previousLeads * 100) : null;
 
   const paidByUser = new Map();

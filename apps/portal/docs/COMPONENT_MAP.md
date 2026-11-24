@@ -8,7 +8,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 |---|---|---|---|---|---|---|---:|
 | sendNativeAuthEvent | app.jsx | app/auth | payload | none | none | none | 42 |
 | PortalRobin | app.jsx | app/auth | none | authState, onboardingOverride, active, subscriptionAccess, checkingSubscriptionAccess, subscriptionAccessResolved, entryNotice, reportOpen, introUserId, resetToken | apiLogin, apiLogout, apiMe, issueSsoTicket, onboardingState, paymentsVerify | SupportDialogs, ResetPasswordScreen, LoginScreen, CrossPortalNav, AdminPortal, OnboardingNavContext, Step, PortalShell | 46 |
-| LoginScreen | app.jsx | app/auth | { onLogin } | email, password, error, loading, recoveryOpen, biometryName | none | LanguageSelector, RecoveryRequest | 377 |
+| LoginScreen | app.jsx | app/auth | { onLogin } | email, password, error, loading, recoveryOpen, biometryName | none | LanguageSelector, RecoveryRequest | 385 |
 | AdminPerfilAcademico | application/admin/academic.jsx | shared/application | { client, onRefresh } | none | none | AdminProfileEditor | 3 |
 | AdminArrivalSummary | application/admin/AdminArrivalSummary.jsx | shared/application | { client, onNavigate } | none | none | Badge, Btn, Card, CardHeader, CardContent, AdminReservas | 9 |
 | AdminCarrerasNew | application/admin/AdminCarrerasNew.jsx | shared/application | { client } | library, assigned, loading, error, cName, cUni, cCity, cLevel, cDocs, editingId | adminCareersListAll, adminCareersCreate, adminCareersDelete, adminCareersAssign, adminCareersUnassign | Card, CardHeader, Btn, CardContent, Field, Divider, CareerRequirementsTimeline | 10 |
@@ -40,7 +40,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 | adminName | application/AdminWorkspace.jsx | shared/application | user | none | none | none | 28 |
 | AdminWorkspace | application/AdminWorkspace.jsx | shared/application | { user, active, client, clients, loading, error, onNavigate, onSwitchClient, isDeveloper = false, children } | pickerOpen | none | Icon, ClientPicker | 34 |
 | ClientPicker | application/AdminWorkspace.jsx | shared/application | { clients, selectedId, onSelect, onClose, returnRef } | query | none | none | 79 |
-| PortalShell | application/ApplicationPortals.jsx | application/client | { user, clientName, active, setActive, onUserRefresh } | profilePhoto, photoBusy, photoError, chatOpen, mascot, summary | documentsList, bookingsList, profileAvatarUpload | NotificationPopup, Icon, AnimatePresence, Estado, Perfil, CarrerasCliente, DocumentosCliente, Reservas, PagosCliente, FaqsPage | 52 |
+| PortalShell | application/ApplicationPortals.jsx | application/client | { user, clientName, active, setActive, onUserRefresh, onReportProblem } | profilePhoto, photoBusy, photoError, chatOpen, mascot, summary | documentsList, bookingsList, profileAvatarUpload | NotificationPopup, Icon, AnimatePresence, Estado, Perfil, CarrerasCliente, DocumentosCliente, Reservas, PagosCliente, FaqsPage | 52 |
 | Reservas | application/BookingsPortal.jsx | shared/application | { reserveLabel = 'Reservar Meet', timeZone, bookingNotice = '' } = {} | serverBookings, loading, error, busy, cancellingId, refreshKey, lastCreated, avDays, avLoading, advisorName | bookingsList, bookingsCreate, bookingsCancel, bookingsAvailability | Card, CardHeader, CardContent, Btn, Badge | 12 |
 | careerTimelineItems | application/careers/CareerRequirementsTimeline.jsx | shared/application | careers = [] | none | none | none | 8 |
 | formatDeadline | application/careers/CareerRequirementsTimeline.jsx | shared/application | value | none | none | none | 25 |
@@ -48,7 +48,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 | PagosCliente | application/ClientSections.jsx | application/payments | none | data, loading, loadError, facturaOpen, facturaPayment, payBusy | paymentsList, paymentsCheckout | Card, CardHeader, CardContent, PaymentStatusBadge, Btn, Factura | 18 |
 | CarrerasCliente | application/ClientSections.jsx | application/careers | none | careers, loading, error | careersListMine | Card, CardHeader, CardContent, Badge, CareerRequirementsTimeline | 125 |
 | DocumentosCliente | application/ClientSections.jsx | application/documents | none | docs, expandedGroups, careers, loading, error, careerError, uploadingId, documentsResult | careersListMine, documentsList, documentsGet, documentsUpload | Badge, Btn, Card, CardHeader, CardContent | 180 |
-| CrossPortalNav | application/CrossPortalNav.jsx | shared/application | { current = "application", user = null, onLogout, onRefresh, onReportProblem, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" } | notice, menuOpen | none | LanguageSelector | 13 |
+| CrossPortalNav | application/CrossPortalNav.jsx | shared/application | { current = "application", user = null, onLogout, onRefresh, onReportProblem, reportInSidebar = false, hasSubscriptionAccess = false, checkingSubscriptionAccess = false, entryNotice = "" } | notice, menuOpen | none | LanguageSelector | 13 |
 | display | application/DeveloperClientsTable.jsx | shared/application | value | none | none | none | 6 |
 | parseValue | application/DeveloperClientsTable.jsx | shared/application | text, original | none | none | none | 11 |
 | DeveloperClientsTable | application/DeveloperClientsTable.jsx | shared/application | none | page, rows, total, pageSize, busy, error, editing | adminDeveloperClients, adminDeveloperClientUpdate | none | 25 |
@@ -110,7 +110,7 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 
 | Module | Bytes | Responsibility |
 |---|---:|---|
-| app.jsx | 20040 | composition root and authentication screens |
+| app.jsx | 20397 | composition root and authentication screens |
 | application/admin/academic.jsx | 209 | focused frontend component module |
 | application/admin/AdminArrivalSummary.jsx | 2776 | focused frontend component module |
 | application/admin/AdminCarrerasNew.jsx | 13314 | focused frontend component module |
@@ -129,11 +129,11 @@ Module sizes are UTF-8 bytes after normalizing line endings to LF for cross-plat
 | application/AdminChatIA.jsx | 6040 | focused frontend component module |
 | application/AdminPortal.jsx | 14342 | advisor portal and application administration |
 | application/AdminWorkspace.jsx | 8192 | focused frontend component module |
-| application/ApplicationPortals.jsx | 9625 | application client portal composition |
+| application/ApplicationPortals.jsx | 9672 | application client portal composition |
 | application/BookingsPortal.jsx | 15221 | focused frontend component module |
 | application/careers/CareerRequirementsTimeline.jsx | 3530 | focused frontend component module |
 | application/ClientSections.jsx | 16855 | client payments, careers and documents |
-| application/CrossPortalNav.jsx | 5357 | focused frontend component module |
+| application/CrossPortalNav.jsx | 5440 | focused frontend component module |
 | application/DeveloperClientsTable.jsx | 4387 | focused frontend component module |
 | application/documents/document-utils.js | 3408 | document phases, defaults and status mapping |
 | application/Faqs.jsx | 6588 | focused frontend component module |

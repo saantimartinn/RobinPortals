@@ -6,6 +6,7 @@
  */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { createHmac } = require('node:crypto');
 const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
 const { createCookieHelpers } = require('../../../packages/auth/cookies.cjs');
 const sharedCookies = createCookieHelpers({ parse: parseCookies, serialize: serializeCookie });
@@ -13,10 +14,10 @@ const sharedCookies = createCookieHelpers({ parse: parseCookies, serialize: seri
 const COOKIE_NAME = 'robin_portal_session';
 const COOKIE_MAX_AGE_S = 60 * 60 * 24 * 7; // 7 dias
 
-function getJwtSecret() {
+function getJwtSecret(purpose) {
   const s = process.env.JWT_SECRET;
   if (!s) throw new Error('JWT_SECRET no configurado');
-  return s;
+  return purpose ? createHmac('sha256', s).update(`robin/${purpose}`).digest() : s;
 }
 
 function hashPassword(plain) {
@@ -55,6 +56,7 @@ function readSessionFromEvent(event) {
 
 module.exports = {
   COOKIE_NAME,
+  getJwtSecret,
   hashPassword,
   verifyPassword,
   signSession,

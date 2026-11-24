@@ -23,3 +23,6 @@ navegador.
   los leads; conserva sus UUID internos como claves y referencias.
 - `202611040001_add_crm_lead_messages.sql`: permite registrar mensajes sin
   duración junto a las llamadas del historial comercial.
+- `202611240001_create_lead_reactivation.sql`: secuencia de Holanda >30 días,
+  historial, claims y bajas con acceso solo de servicio. Se instala desactivada;
+  seguir [REACTIVATION_30D.md](../../docs/REACTIVATION_30D.md) antes de activarla.

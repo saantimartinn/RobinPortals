@@ -46,6 +46,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [backend/lib/anthropic-chat.js](../backend/lib/anthropic-chat.js) | Servicio servidor: anthropic-chat | chatCompletion |
 | [backend/lib/application-permissions.js](../backend/lib/application-permissions.js) | Servicio servidor: application-permissions | canUseRobinPlan, readApplicationIdentity |
 | [backend/lib/arrival-access.js](../backend/lib/arrival-access.js) | Servicio servidor: arrival-access | arrivalUser, readArrivalIdentity |
+| [backend/lib/arrival-partners.js](../backend/lib/arrival-partners.js) | Servicio servidor: arrival-partners | partnerKey, partnersForArrival, rank |
 | [backend/lib/auth.js](../backend/lib/auth.js) | Servicio servidor: auth | COOKIE_NAME, buildSessionCookie, clearApplicationSessionCookie, getJwtSecret, hashPassword, isCurrentPasswordResetToken, passwordResetVersion, readSessionFromEvent, signPasswordResetToken, signSession, verifyPassword, verifyPasswordResetToken |
 | [backend/lib/discounts.js](../backend/lib/discounts.js) | Servicio servidor: discounts | lookupCode |
 | [backend/lib/email.js](../backend/lib/email.js) | Servicio servidor: email | sendEmail |
@@ -85,11 +86,11 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/public/recursos/tranquilidad-para-los-padres.pdf](../frontend/public/recursos/tranquilidad-para-los-padres.pdf) | Recurso público | — |
 | [frontend/src/admin-permissions.js](../frontend/src/admin-permissions.js) | Módulo frontend: admin-permissions | canAdminSee, firstAllowedAdminUrl, isDeveloperAdminEmail |
 | [frontend/src/api/arrival.js](../frontend/src/api/arrival.js) | Módulo frontend: arrival | arrivalCheckout, arrivalPayments |
-| [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, changePassword, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMentorPhotoUpload, subAdminMutate, subscriberAvatarDelete, subscriberAvatarUpload, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCancel, subscriptionCheckout, subscriptionPlans, subscriptionPortal, subscriptionSync |
+| [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, changePassword, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, restoreSession, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMentorPhotoUpload, subAdminMutate, subscriberAvatarDelete, subscriberAvatarUpload, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCancel, subscriptionCheckout, subscriptionPlans, subscriptionPortal, subscriptionSync |
 | [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app | PortalRobin, handleLogout, onFocus, refresh, refreshUser |
 | [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav | CrossPortalNav, closeEscape, closeOutside, openRobinJr |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | Módulo frontend: SubscriberPortal | SubscriberPortal |
-| [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | Módulo frontend: SubscriberShell | SubscriberShell, initialTab, poll, refreshEvents, refreshRequests, setActive |
+| [frontend/src/application/SubscriberShell.jsx](../frontend/src/application/SubscriberShell.jsx) | Módulo frontend: SubscriberShell | SubscriberShell, refreshRequests, setActive |
 | [frontend/src/application/subscription-portal.css](../frontend/src/application/subscription-portal.css) | Módulo frontend: subscription-portal.css | — |
 | [frontend/src/application/SubscriptionPlanPicker.jsx](../frontend/src/application/SubscriptionPlanPicker.jsx) | Módulo frontend: SubscriptionPlanPicker | SubscriptionPlanPicker, startCheckout |
 | [frontend/src/assets/logo-r-azul.png](../frontend/src/assets/logo-r-azul.png) | Módulo frontend: logo-r-azul.png | — |
@@ -115,54 +116,15 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/src/features/admin/SubscriberAdmin.jsx](../frontend/src/features/admin/SubscriberAdmin.jsx) | Módulo frontend: SubscriberAdmin | SubscriberAdmin, load, refreshAdminData |
 | [frontend/src/features/admin/toLocalInput.js](../frontend/src/features/admin/toLocalInput.js) | Módulo frontend: toLocalInput | pad, toLocalInput |
 | [frontend/src/features/arrival/ArrivalCalls.jsx](../frontend/src/features/arrival/ArrivalCalls.jsx) | Módulo frontend: ArrivalCalls | ArrivalCalls |
-| [frontend/src/features/arrival/ArrivalHome.jsx](../frontend/src/features/arrival/ArrivalHome.jsx) | Módulo frontend: ArrivalHome | ArrivalHome, load |
 | [frontend/src/features/arrival/ArrivalPartners.jsx](../frontend/src/features/arrival/ArrivalPartners.jsx) | Módulo frontend: ArrivalPartners | ArrivalPartners, load |
 | [frontend/src/features/arrival/ArrivalPayments.jsx](../frontend/src/features/arrival/ArrivalPayments.jsx) | Módulo frontend: ArrivalPayments | ArrivalPayments, load, pay |
 | [frontend/src/features/arrival/ArrivalSettings.jsx](../frontend/src/features/arrival/ArrivalSettings.jsx) | Módulo frontend: ArrivalSettings | ArrivalSettings |
-| [frontend/src/features/career/CvAiPage.jsx](../frontend/src/features/career/CvAiPage.jsx) | Módulo frontend: CvAiPage | CvAiPage, onDrop, onFileInput, readFile, reset, run |
-| [frontend/src/features/career/cvBuildHtml.jsx](../frontend/src/features/career/cvBuildHtml.jsx) | Módulo frontend: cvBuildHtml | cvBuildHtml, sec |
-| [frontend/src/features/career/CvChoice.jsx](../frontend/src/features/career/CvChoice.jsx) | Módulo frontend: CvChoice | CvChoice |
-| [frontend/src/features/career/cvEsc.js](../frontend/src/features/career/cvEsc.js) | Módulo frontend: cvEsc | cvEsc |
-| [frontend/src/features/career/downloadCvDoc.jsx](../frontend/src/features/career/downloadCvDoc.jsx) | Módulo frontend: downloadCvDoc | downloadCvDoc |
-| [frontend/src/features/career/EmpleosLocalesPage.jsx](../frontend/src/features/career/EmpleosLocalesPage.jsx) | Módulo frontend: EmpleosLocalesPage | EmpleosLocalesPage |
-| [frontend/src/features/career/MentoriasPage.jsx](../frontend/src/features/career/MentoriasPage.jsx) | Módulo frontend: MentoriasPage | MentoriasPage |
-| [frontend/src/features/career/MentorProfileCard.jsx](../frontend/src/features/career/MentorProfileCard.jsx) | Módulo frontend: MentorProfileCard | MentorProfileCard |
-| [frontend/src/features/career/SubProfesional.jsx](../frontend/src/features/career/SubProfesional.jsx) | Módulo frontend: SubProfesional | SubProfesional |
-| [frontend/src/features/community/ChallengeCard.jsx](../frontend/src/features/community/ChallengeCard.jsx) | Módulo frontend: ChallengeCard | ChallengeCard, onPick, removeFile, submit |
-| [frontend/src/features/community/CityFilterBar.jsx](../frontend/src/features/community/CityFilterBar.jsx) | Módulo frontend: CityFilterBar | CityFilterBar |
-| [frontend/src/features/community/cityVisible.js](../frontend/src/features/community/cityVisible.js) | Módulo frontend: cityVisible | cityVisible |
-| [frontend/src/features/community/DEMO_ROBINS.js](../frontend/src/features/community/DEMO_ROBINS.js) | Módulo frontend: DEMO_ROBINS | — |
-| [frontend/src/features/community/EVENT_TAB_TYPES.js](../frontend/src/features/community/EVENT_TAB_TYPES.js) | Módulo frontend: EVENT_TAB_TYPES | — |
 | [frontend/src/features/community/fileToDataUrl.js](../frontend/src/features/community/fileToDataUrl.js) | Módulo frontend: fileToDataUrl | fileToDataUrl |
-| [frontend/src/features/community/OtrosRobinsCarousel.jsx](../frontend/src/features/community/OtrosRobinsCarousel.jsx) | Módulo frontend: OtrosRobinsCarousel | OtrosRobinsCarousel |
-| [frontend/src/features/community/OtrosRobinsPage.jsx](../frontend/src/features/community/OtrosRobinsPage.jsx) | Módulo frontend: OtrosRobinsPage | OtrosRobinsPage |
-| [frontend/src/features/community/RobinCard.jsx](../frontend/src/features/community/RobinCard.jsx) | Módulo frontend: RobinCard | RobinCard |
-| [frontend/src/features/community/SocialAvatar.jsx](../frontend/src/features/community/SocialAvatar.jsx) | Módulo frontend: SocialAvatar | SocialAvatar |
-| [frontend/src/features/community/SubAssociationsView.jsx](../frontend/src/features/community/SubAssociationsView.jsx) | Módulo frontend: SubAssociationsView | SubAssociationsView |
-| [frontend/src/features/community/SubChallenges.jsx](../frontend/src/features/community/SubChallenges.jsx) | Módulo frontend: SubChallenges | SubChallenges, afterSubmit, load |
-| [frontend/src/features/community/SubCommunity.jsx](../frontend/src/features/community/SubCommunity.jsx) | Módulo frontend: SubCommunity | SubCommunity |
-| [frontend/src/features/community/SubEventsView.jsx](../frontend/src/features/community/SubEventsView.jsx) | Módulo frontend: SubEventsView | SubEventsView, rsvp |
-| [frontend/src/features/community/SubGroupsView.jsx](../frontend/src/features/community/SubGroupsView.jsx) | Módulo frontend: SubGroupsView | SubGroupsView |
-| [frontend/src/features/community/SubMessageThread.jsx](../frontend/src/features/community/SubMessageThread.jsx) | Módulo frontend: SubMessageThread | SubMessageThread, load, send |
-| [frontend/src/features/community/SubOffersView.jsx](../frontend/src/features/community/SubOffersView.jsx) | Módulo frontend: SubOffersView | SubOffersView |
-| [frontend/src/features/community/SubOverviewView.jsx](../frontend/src/features/community/SubOverviewView.jsx) | Módulo frontend: SubOverviewView | SubOverviewView, inCity |
-| [frontend/src/features/community/SubPartners.jsx](../frontend/src/features/community/SubPartners.jsx) | Módulo frontend: SubPartners | SubPartners, copyCode, openPartner |
-| [frontend/src/features/community/SubSocial.jsx](../frontend/src/features/community/SubSocial.jsx) | Módulo frontend: SubSocial | SubSocial, act, loadConvs, loadSocial |
-| [frontend/src/features/community/SubTripsView.jsx](../frontend/src/features/community/SubTripsView.jsx) | Módulo frontend: SubTripsView | SubTripsView |
-| [frontend/src/features/levels/RobinBenefitsPage.jsx](../frontend/src/features/levels/RobinBenefitsPage.jsx) | Módulo frontend: RobinBenefitsPage | RobinBenefitsPage |
-| [frontend/src/features/levels/RobinLevelUpToast.jsx](../frontend/src/features/levels/RobinLevelUpToast.jsx) | Módulo frontend: RobinLevelUpToast | RobinLevelUpToast |
-| [frontend/src/features/levels/RobinLockedNotice.jsx](../frontend/src/features/levels/RobinLockedNotice.jsx) | Módulo frontend: RobinLockedNotice | RobinLockedNotice |
+| [frontend/src/features/community/SubPartners.jsx](../frontend/src/features/community/SubPartners.jsx) | Módulo frontend: SubPartners | SubPartners, copyCode, openPartner, showUnavailableLink |
 | [frontend/src/features/levels/RobinProgressBar.jsx](../frontend/src/features/levels/RobinProgressBar.jsx) | Módulo frontend: RobinProgressBar | RobinProgressBar |
-| [frontend/src/features/profile/SubProfile.jsx](../frontend/src/features/profile/SubProfile.jsx) | Módulo frontend: SubProfile | SubProfile, onPickAvatar, removeAvatar, save, saveExtra, setEx |
 | [frontend/src/features/profile/SubSettings.jsx](../frontend/src/features/profile/SubSettings.jsx) | Módulo frontend: SubSettings | ChangePasswordCard, SubSettings, submit |
-| [frontend/src/features/services/ComingSoon.jsx](../frontend/src/features/services/ComingSoon.jsx) | Módulo frontend: ComingSoon | ComingSoon |
-| [frontend/src/features/services/ResidenciasPage.jsx](../frontend/src/features/services/ResidenciasPage.jsx) | Módulo frontend: ResidenciasPage | ResidenciasPage |
-| [frontend/src/features/services/ServiceRequestCard.jsx](../frontend/src/features/services/ServiceRequestCard.jsx) | Módulo frontend: ServiceRequestCard | ServiceRequestCard, submit |
-| [frontend/src/features/services/SubIntro.jsx](../frontend/src/features/services/SubIntro.jsx) | Módulo frontend: SubIntro | SubIntro |
-| [frontend/src/features/services/SubNavCard.jsx](../frontend/src/features/services/SubNavCard.jsx) | Módulo frontend: SubNavCard | SubNavCard |
-| [frontend/src/features/services/SubPersonal.jsx](../frontend/src/features/services/SubPersonal.jsx) | Módulo frontend: SubPersonal | SubPersonal, svc |
 | [frontend/src/features/subscription/SubFaqs.jsx](../frontend/src/features/subscription/SubFaqs.jsx) | Módulo frontend: SubFaqs | SubFaqs |
-| [frontend/src/features/subscription/SubHome.jsx](../frontend/src/features/subscription/SubHome.jsx) | Módulo frontend: SubHome | SubHome, inCity, isActive |
+| [frontend/src/features/subscription/SubHome.jsx](../frontend/src/features/subscription/SubHome.jsx) | Módulo frontend: SubHome | SubHome, load |
 | [frontend/src/features/subscription/SubPayments.jsx](../frontend/src/features/subscription/SubPayments.jsx) | Módulo frontend: SubPayments | SubPayments, openPortal |
 | [frontend/src/features/subscription/SubSubscription.jsx](../frontend/src/features/subscription/SubSubscription.jsx) | Módulo frontend: SubSubscription | SubSubscription, cancelRevolut, openPortal |
 | [frontend/src/features/subscription/SubSupport.jsx](../frontend/src/features/subscription/SubSupport.jsx) | Módulo frontend: SubSupport | SubSupport, submit |
@@ -180,7 +142,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [package.json](../package.json) | Configuración, herramienta o prueba | — |
 | [README.md](../README.md) | Documentación | — |
 | [READMELONG.md](../READMELONG.md) | Documentación | — |
-| [scripts/check-architecture.cjs](../scripts/check-architecture.cjs) | Configuración, herramienta o prueba | cycle, markReachable, walk |
+| [scripts/check-architecture.cjs](../scripts/check-architecture.cjs) | Configuración, herramienta o prueba | addDependency, cycle, markReachable, walk |
 | [scripts/create-admin.cjs](../scripts/create-admin.cjs) | Configuración, herramienta o prueba | main |
 | [scripts/generate-docs.cjs](../scripts/generate-docs.cjs) | Configuración, herramienta o prueba | functionSymbols, link, purpose, walk |
 | [scripts/migrate-subscriber-avatars.mjs](../scripts/migrate-subscriber-avatars.mjs) | Configuración, herramienta o prueba | hasImageSignature, main, parseLegacyDataUrl, verifyStoredImage |
@@ -197,9 +159,11 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [supabase/seeds/demo.sql](../supabase/seeds/demo.sql) | Datos demo opcionales | — |
 | [test/application-permissions.test.cjs](../test/application-permissions.test.cjs) | Configuración, herramienta o prueba | — |
 | [test/arrival-access.test.cjs](../test/arrival-access.test.cjs) | Configuración, herramienta o prueba | load |
+| [test/arrival-partners.test.cjs](../test/arrival-partners.test.cjs) | Configuración, herramienta o prueba | — |
 | [test/auth.test.cjs](../test/auth.test.cjs) | Configuración, herramienta o prueba | event |
 | [test/frontend.test.cjs](../test/frontend.test.cjs) | Configuración, herramienta o prueba | noop |
 | [test/handlers.test.cjs](../test/handlers.test.cjs) | Configuración, herramienta o prueba | loadHandler |
+| [test/holded-latam-notes.test.cjs](../test/holded-latam-notes.test.cjs) | Configuración, herramienta o prueba | mockBilling, processInvoice, subscriptionDb |
 | [test/http.test.cjs](../test/http.test.cjs) | Configuración, herramienta o prueba | — |
 | [test/partners.test.cjs](../test/partners.test.cjs) | Configuración, herramienta o prueba | handler |
 | [test/password-reset.test.cjs](../test/password-reset.test.cjs) | Configuración, herramienta o prueba | loadModule |

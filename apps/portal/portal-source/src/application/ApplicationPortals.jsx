@@ -49,7 +49,7 @@ import {
 
 const { APPLICATION_TOTALS, FISCAL: ROBIN_FISCAL } = financialConfig;
 
-export function PortalShell({ user, clientName, active, setActive, onUserRefresh }) {
+export function PortalShell({ user, clientName, active, setActive, onUserRefresh, onReportProblem }) {
   useLocale();
   const [profilePhoto, setProfilePhoto] = useState(user.avatar_url || null);
   const [photoBusy, setPhotoBusy] = useState(false);
@@ -123,7 +123,7 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
           <div className="student-nav-items">
             {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{t(label)}</span></button>)}
           </div>
-          <div className="student-support"><span className="student-eyebrow">{t("Vamos contigo")}</span><h3>{t("Un equipo detrás de cada paso.")}</h3><p>{t("Habla con tu asesor y prepara lo que viene.")}</p><button onClick={() => setActive("reservas")}>{t("Reservar una llamada ")}<ArrowUpRight size={16} /></button></div>
+          <div className="student-support"><span className="student-eyebrow">{t("Vamos contigo")}</span><h3>{t("Un equipo detrás de cada paso.")}</h3><p>{t("Habla con tu asesor y prepara lo que viene.")}</p><button type="button" className="robin-sidebar-report" onClick={onReportProblem}><AlertCircle size={16} />{t("Reportar problema")}</button></div>
         </nav>
 
         <AnimatePresence mode="wait">

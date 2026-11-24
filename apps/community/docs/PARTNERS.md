@@ -6,8 +6,10 @@ contrastaron con [project-robin.com](https://project-robin.com/) el 19/11/2026.
 El código local antiguo de la web solo enumeraba ocho; se utiliza la lista
 completa del documento y de la web publicada.
 
-Orden: CJP, Revolut, The Social Hub, Linkmaas, The Circo, Student Experience,
-Scope Maastricht, Hispania Groningen, Swapfiets, Translayte y British Council.
+Orden de presentación en Llegada: Translayte, Revolut, The Social Hub, British
+Council, CJP, Linkmaas, The Circo, Student Experience, Scope Maastricht, Hispania
+Groningen y Swapfiets. Los cuatro primeros tienen prioridad; los demás conservan
+el orden configurado en el catálogo.
 Se conserva el Instagram de Linkmaas, la página Amsterdam NDSM de Student
 Experience y el referido `ref=281516` de Translayte. El aviso de Swapfiets ofrece
 el código público ROBIN y los 20 € adicionales indicados por la fuente. No se
@@ -37,7 +39,38 @@ del catálogo web. La presentación anterior de Community completo se conserva.
 El aviso de Swapfiets utiliza el diálogo nativo y permite copiar el código o
 abrir su enlace original.
 
-## Publicación
+## Descripciones y enlaces de Llegada
+
+`backend/lib/arrival-partners.js` añade una descripción breve de los once
+partners mediante `arrival_description`. Esta presentación se aplica después
+del filtro de permisos y solo a las sesiones Llegada. No modifica las filas de
+la base de datos ni las descripciones, el orden o los enlaces de Community y
+administración. Las descripciones tienen su traducción en `packages/i18n/en.json`.
+
+Revolut y The Social Hub no devuelven enlaces de contacto o reserva a Llegada.
+Tanto el logo como el botón abren el diálogo «El link único aún no está
+disponible.», que se cierra con el botón, Escape o el fondo. El resto conserva
+sus enlaces y el comportamiento de Swapfiets. Este ajuste no requiere migración.
+
+Las descripciones se contrastaron el 24/11/2026 con las fuentes de cada partner:
+
+- [Translayte](https://translayte.com/certified-translations),
+  [Revolut](https://www.revolut.com/),
+  [The Social Hub](https://news.thesocialhub.co/en/about/) y
+  [British Council](https://www.britishcouncil.es/).
+- [CJP](https://www.cjp.nl/),
+  [Linkmaas: presentación de su cofundador](https://es.linkedin.com/posts/noelcorteslink_no-soy-de-publicar-cada-d%C3%ADa-en-linkedin-activity-7260059244727586816-r6s7),
+  [The Circo](https://www.thecirco.nl/) y
+  [Student Experience](https://studentexperience.com/locations/4/amsterdam-ndsm).
+- [Scope Maastricht](https://www.scope-maastricht.nl/),
+  [Hispania Groningen](https://www.hispaniagroningen.com/) y
+  [Swapfiets](https://swapfiets.nl/en-NL/students).
+
+Linkmaas ofrece apoyo académico universitario; no se presenta como una
+asociación de estudiantes. No se prometen nuevas condiciones comerciales,
+descuentos o disponibilidad de alojamiento.
+
+## Importación inicial
 
 Primero deben publicarse los logos y el código, y después ejecutarse la migración
 008 en la base de Community. El API conserva la lectura de los partners antiguos
@@ -45,9 +78,8 @@ si todavía no existe la columna `products`, y no los expone a Llegada por defec
 La importación se puede repetir sin duplicar filas. No elimina otros partners.
 No requiere nuevos secretos ni proveedores.
 
-Durante este trabajo solo se consultó el catálogo real, que contenía The Circo
-y LinkMaas. No se escribieron datos ni se desplegó código en producción. La
-migración se comprobó con PostgreSQL aislado (PGlite), incluyendo repetición,
-conservación de registros, permisos por producto y rollback ante duplicados.
-El preview local utiliza el resultado de esa importación aislada y los logos
-originales, sin redirigir operaciones a las APIs reales.
+La migración inicial se comprobó con PostgreSQL aislado (PGlite), incluyendo
+repetición, conservación de registros, permisos por producto y rollback ante
+duplicados. Para la revisión de descripciones se consultó el catálogo real de
+once partners sin escribir datos. El preview local utiliza una copia de esos
+datos públicos y los logos originales, sin dirigir operaciones a las APIs reales.

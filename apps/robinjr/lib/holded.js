@@ -35,10 +35,12 @@ const {
   contractPricingVersion,
   invoiceBreakdown,
   isEuClient,
+  isLatamClient,
   taxRateForClient,
 } = require('../shared/financial-config.cjs');
 const { errorCode } = require('./observability');
 const { claimInvoice, recordInvoice, applyInvoice } = require('../../../packages/billing/holded-invoice-claim.cjs');
+const { LATAM_INVOICE_NOTE } = require('../../../packages/billing/holded-invoice-notes.cjs');
 const CONCEPTO = FISCAL.concepto;
 const IELTS_NOTE = 'Operación exenta de IVA conforme al artículo 20.Uno.9.º de la Ley 37/1992.';
 const IELTS_EVALUATION = 'Evaluación inicial de inglés/IELTS';
@@ -259,13 +261,16 @@ async function createInvoiceForPayment(sb, user, payment) {
 
   // La v2 acepta directamente el ID interno de la cuenta del plan contable.
   const acct = accountFor(user.tipo, user, payment);
+  const clientReference = 'Cliente Robin ' + (user.lead_id || user.id || '');
+  const latamObservations = isLatamClient(user) ? `${clientReference}\n${LATAM_INVOICE_NOTE}` : null;
 
   const body = {
     contact_id: contactId,
     date: ymd(now),
     due_date: dueDate,
     currency: String(payment.currency || 'eur').toLowerCase(),
-    notes: isIelts ? IELTS_NOTE : 'Cliente Robin ' + (user.lead_id || user.id || ''),
+    notes: latamObservations || (isIelts ? IELTS_NOTE : clientReference),
+    ...(latamObservations ? { body: latamObservations } : {}),
     retention: 0,
     items: [{
       name: invoiceConcept(user, payment) + (isRobinJrInstallment(user, payment) ? '' : suffixFor(user)),

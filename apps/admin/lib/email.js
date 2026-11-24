@@ -10,9 +10,9 @@
 const { getSupabase } = require('./supabase');
 const { emailLogMetadata } = require('./privacy');
 
-async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, reply_to, replyTo, idempotencyKey }) {
+async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, reply_to, replyTo, idempotencyKey, from: sender, headers: emailHeaders, timeoutMs, tags }) {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM || 'Project Robin <no-reply@project-robin.com>';
+  const from = sender || process.env.RESEND_FROM || 'Project Robin <no-reply@project-robin.com>';
   if (!to) return { sent: false, reason: 'missing_to' };
 
   if (!key) {
@@ -32,12 +32,13 @@ async function sendEmail({ to, subject, html, text, tag, attachments, cc, bcc, r
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
+      ...(timeoutMs ? { signal: AbortSignal.timeout(timeoutMs) } : {}),
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + key,
         ...(idempotencyKey ? { 'Idempotency-Key': String(idempotencyKey).slice(0, 256) } : {}),
       },
-      body: JSON.stringify({ from, to: Array.isArray(to) ? to : [to], subject, html, text, attachments, reply_to: reply_to || replyTo || undefined, cc: cc ? (Array.isArray(cc) ? cc : [cc]) : undefined, bcc: bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : undefined }),
+      body: JSON.stringify({ from, to: Array.isArray(to) ? to : [to], subject, html, text, attachments, headers: emailHeaders, tags, reply_to: reply_to || replyTo || undefined, cc: cc ? (Array.isArray(cc) ? cc : [cc]) : undefined, bcc: bcc ? (Array.isArray(bcc) ? bcc : [bcc]) : undefined }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return { sent: false, reason: 'provider_error', provider_status: res.status };

@@ -6,6 +6,7 @@ const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
 const { readArrivalIdentity } = require('../lib/arrival-access');
 const { readApplicationIdentity } = require('../lib/application-permissions');
+const { partnersForArrival } = require('../lib/arrival-partners');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -19,9 +20,10 @@ exports.handler = async (event) => {
     const sb = getSupabase();
     const { data, error } = await sb.from('partners').select('*').eq('active', true).order('sort_order', { ascending: true });
     if (error) throw error;
-    return json({ partners: (data || []).filter(partner => session.role === 'subscriber_admin'
+    const partners = (data || []).filter(partner => session.role === 'subscriber_admin'
       || (!arrival && (partner.products || ['community']).includes('community'))
-      || (hasArrival && (partner.products || []).includes('pack_llegada'))) });
+      || (hasArrival && (partner.products || []).includes('pack_llegada')));
+    return json({ partners: arrival ? partnersForArrival(partners) : partners });
   } catch (e) {
     console.error('partners-list error', e);
     return serverError(e);

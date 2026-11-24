@@ -26,6 +26,7 @@ HTTP and scheduled Netlify Function entrypoints.
 | [`admin-crm-lead-calls.js`](../../../../netlify/functions/admin-crm-lead-calls.js) | Netlify Function handler for admin-crm-lead-calls; route(s): /api/admin/crm/lead-calls. |
 | [`admin-crm-lead-notes.js`](../../../../netlify/functions/admin-crm-lead-notes.js) | Netlify Function handler for admin-crm-lead-notes; route(s): /api/admin/crm/lead-notes. |
 | [`admin-crm-leads.js`](../../../../netlify/functions/admin-crm-leads.js) | Netlify Function handler for admin-crm-leads; route(s): /api/admin/crm/leads. |
+| [`admin-crm-reactivation.js`](../../../../netlify/functions/admin-crm-reactivation.js) | Netlify Function handler for admin-crm-reactivation; route(s): /api/admin/crm/reactivation. |
 | [`admin-crm-recommender.js`](../../../../netlify/functions/admin-crm-recommender.js) | Netlify Function handler for admin-crm-recommender; route(s): /api/admin/crm/recommender. |
 | [`admin-dashboard.js`](../../../../netlify/functions/admin-dashboard.js) | Netlify Function handler for admin-dashboard; route(s): /api/admin/dashboard. |
 | [`admin-database.js`](../../../../netlify/functions/admin-database.js) | Netlify Function handler for admin-database; route(s): /api/admin/database. |
@@ -81,6 +82,8 @@ HTTP and scheduled Netlify Function entrypoints.
 | [`holded-invoice-numbers.js`](../../../../netlify/functions/holded-invoice-numbers.js) | Netlify Function handler for holded-invoice-numbers; route(s): schedule 0 */3 * * *. |
 | [`integration-retry.js`](../../../../netlify/functions/integration-retry.js) | Netlify Function handler for integration-retry; route(s): schedule */10 * * * *. |
 | [`invoice-pdf.js`](../../../../netlify/functions/invoice-pdf.js) | Netlify Function handler for invoice-pdf; route(s): /api/invoice-pdf. |
+| [`lead-reactivation-background.js`](../../../../netlify/functions/lead-reactivation-background.js) | Netlify Function handler for lead-reactivation-background; invoked by its function path or schedule. |
+| [`lead-reactivation.js`](../../../../netlify/functions/lead-reactivation.js) | Netlify Function handler for lead-reactivation; route(s): schedule */5 * * * *. |
 | [`me.js`](../../../../netlify/functions/me.js) | Netlify Function handler for me; route(s): /api/me. |
 | [`meet-health.js`](../../../../netlify/functions/meet-health.js) | Netlify Function handler for meet-health; route(s): /api/meet/health. |
 | [`meet-transcript-poll.js`](../../../../netlify/functions/meet-transcript-poll.js) | Netlify Function handler for meet-transcript-poll; route(s): schedule */15 * * * *. |
@@ -102,6 +105,8 @@ HTTP and scheduled Netlify Function entrypoints.
 | [`payments-verify.js`](../../../../netlify/functions/payments-verify.js) | Netlify Function handler for payments-verify; route(s): /api/payments/verify. |
 | [`profile-avatar.js`](../../../../netlify/functions/profile-avatar.js) | Netlify Function handler for profile-avatar; route(s): /api/profile/avatar. |
 | [`profile-lived-abroad.js`](../../../../netlify/functions/profile-lived-abroad.js) | Netlify Function handler for profile-lived-abroad; route(s): /api/profile/lived-abroad. |
+| [`reactivation-events.js`](../../../../netlify/functions/reactivation-events.js) | Netlify Function handler for reactivation-events; route(s): /api/admin/crm/reactivation-events. |
+| [`reactivation-unsubscribe.js`](../../../../netlify/functions/reactivation-unsubscribe.js) | Netlify Function handler for reactivation-unsubscribe; route(s): /api/admin/crm/reactivation-unsubscribe. |
 | [`stripe-webhook.js`](../../../../netlify/functions/stripe-webhook.js) | Netlify Function handler for stripe-webhook; route(s): /api/stripe/webhook. |
 | [`web-collect.js`](../../../../netlify/functions/web-collect.js) | Netlify Function handler for web-collect; route(s): /api/web/collect. |
 | [`web-retention.js`](../../../../netlify/functions/web-retention.js) | Netlify Function handler for web-retention; route(s): schedule 30 4 * * *. |

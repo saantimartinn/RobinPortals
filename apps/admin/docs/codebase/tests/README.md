@@ -29,6 +29,9 @@ Node test-runner regression tests.
 | [`in-celebration.test.js`](../../../tests/in-celebration.test.js) | Automated regression coverage for in-celebration.test. |
 | [`lead-course-group.test.js`](../../../tests/lead-course-group.test.js) | Automated regression coverage for lead-course-group.test. |
 | [`lead-inbox.test.js`](../../../tests/lead-inbox.test.js) | Automated regression coverage for lead-inbox.test. |
+| [`lead-reactivation-content.test.js`](../../../tests/lead-reactivation-content.test.js) | Automated regression coverage for lead-reactivation-content.test. |
+| [`lead-reactivation-handlers.test.js`](../../../tests/lead-reactivation-handlers.test.js) | Automated regression coverage for lead-reactivation-handlers.test. |
+| [`lead-reactivation.test.js`](../../../tests/lead-reactivation.test.js) | Automated regression coverage for lead-reactivation.test. |
 | [`mentoria-contract-parity.test.js`](../../../tests/mentoria-contract-parity.test.js) | Automated regression coverage for mentoria-contract-parity.test. |
 | [`meta-client-cache.test.js`](../../../tests/meta-client-cache.test.js) | Automated regression coverage for meta-client-cache.test. |
 | [`meta-date-range.test.js`](../../../tests/meta-date-range.test.js) | Automated regression coverage for meta-date-range.test. |

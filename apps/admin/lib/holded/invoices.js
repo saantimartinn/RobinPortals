@@ -32,6 +32,8 @@
 
 const { dateKey, addCalendarDays } = require('../../../../packages/time/madrid.cjs');
 const { FISCAL } = require('../../shared/financial-config.cjs');
+const { isLatamClient } = require('../../../portal/shared/financial-config.cjs');
+const { LATAM_INVOICE_NOTE } = require('../../../../packages/billing/holded-invoice-notes.cjs');
 const { IELTS_EXEMPTION_NOTE } = require('../extra-payments');
 const { holdedFetch, norm } = require('./client');
 const CONCEPTO = FISCAL.concepto;
@@ -250,13 +252,14 @@ async function createInvoiceForPayment(sb, user, payment) {
   const acct = accountFor(user.tipo);
 
   const clientReference = 'Cliente Robin ' + (user.lead_id || user.id || '');
+  const latamObservations = isLatamClient(user) ? `${clientReference}\n${LATAM_INVOICE_NOTE}` : null;
   const body = {
     contact_id: contactId,
     date: ymd(now),
     due_date: due,
     currency: String(payment.currency || 'eur').toLowerCase(),
-    notes: treatment.note ? `${clientReference}\n${treatment.note}` : clientReference,
-    ...(treatment.note ? { body: treatment.note } : {}),
+    notes: latamObservations || (treatment.note ? `${clientReference}\n${treatment.note}` : clientReference),
+    ...(latamObservations ? { body: latamObservations } : treatment.note ? { body: treatment.note } : {}),
     items: [{
       name: invoiceConceptFor(user, payment),
       desc: '',

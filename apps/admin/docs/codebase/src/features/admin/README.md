@@ -23,6 +23,7 @@ Maintained files in this directory and links to their responsibilities.
 | [`in-celebration.mjs`](../../../../../src/features/admin/in-celebration.mjs) | Admin feature module: in celebration. |
 | [`lead-course-group.mjs`](../../../../../src/features/admin/lead-course-group.mjs) | Admin feature module: lead course group. |
 | [`lead-inbox.tsx`](../../../../../src/features/admin/lead-inbox.tsx) | Admin feature module: lead inbox. |
+| [`lead-reactivation.tsx`](../../../../../src/features/admin/lead-reactivation.tsx) | Admin feature module: lead reactivation. |
 | [`lead-shared.tsx`](../../../../../src/features/admin/lead-shared.tsx) | Admin feature module: lead shared. |
 | [`leads.tsx`](../../../../../src/features/admin/leads.tsx) | Admin feature module: leads. |
 | [`recommender-modal.css`](../../../../../src/features/admin/recommender-modal.css) | Admin feature module: recommender modal. |

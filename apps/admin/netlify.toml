@@ -64,6 +64,18 @@
   to = "/.netlify/functions/admin-crm-email"
   status = 200
 [[redirects]]
+  from = "/api/admin/crm/reactivation"
+  to = "/.netlify/functions/admin-crm-reactivation"
+  status = 200
+[[redirects]]
+  from = "/api/admin/crm/reactivation-unsubscribe"
+  to = "/.netlify/functions/reactivation-unsubscribe"
+  status = 200
+[[redirects]]
+  from = "/api/admin/crm/reactivation-events"
+  to = "/.netlify/functions/reactivation-events"
+  status = 200
+[[redirects]]
   from = "/api/admin/crm/heartbeat"
   to = "/.netlify/functions/admin-crm-heartbeat"
   status = 200
@@ -454,3 +466,8 @@
 # Viernes a las 09:00 Europe/Madrid (07:00 UTC en verano; 08:00 UTC en invierno).
 [functions."yuselico-weekly-digest"]
   schedule = "0 7,8 * * 5"
+
+# Reconciles bookings/replies every five minutes; sends only at 20:00 Madrid.
+# The migration installs the campaign disabled. Installation cannot send emails.
+[functions."lead-reactivation"]
+  schedule = "*/5 * * * *"

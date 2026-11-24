@@ -17,6 +17,9 @@ Methods are statically inferred and should be confirmed in the handler; schedule
 | `/api/admin/crm/recommender` | [`admin-crm-recommender`](../netlify/functions/admin-crm-recommender.js) | GET |
 | `/api/admin/crm/future-leads` | [`admin-crm-future-leads`](../netlify/functions/admin-crm-future-leads.js) | GET, POST |
 | `/api/admin/crm/email` | [`admin-crm-email`](../netlify/functions/admin-crm-email.js) | GET, PATCH, POST, PUT |
+| `/api/admin/crm/reactivation` | [`admin-crm-reactivation`](../netlify/functions/admin-crm-reactivation.js) | GET, POST |
+| `/api/admin/crm/reactivation-unsubscribe` | [`reactivation-unsubscribe`](../netlify/functions/reactivation-unsubscribe.js) | GET |
+| `/api/admin/crm/reactivation-events` | [`reactivation-events`](../netlify/functions/reactivation-events.js) | POST |
 | `/api/admin/crm/heartbeat` | [`admin-crm-heartbeat`](../netlify/functions/admin-crm-heartbeat.js) | POST |
 | `/api/leads/website` | [`website-lead`](../netlify/functions/website-lead.js) | POST |
 | `/api/meta/lead-webhook` | [`meta-lead-webhook`](../netlify/functions/meta-lead-webhook.js) | GET, POST |

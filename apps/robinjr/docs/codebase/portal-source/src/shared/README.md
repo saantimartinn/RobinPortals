@@ -12,7 +12,7 @@ Componentes reutilizados por varias superficies autenticadas.
 
 | Archivo | Qué hace | Relaciones clave | Modifícalo cuando |
 |---|---|---|---|
-| [`PortalWidgets.jsx`](../../../../../portal-source/src/shared/PortalWidgets.jsx) | Widgets reutilizados por las experiencias autenticadas. | `../api.js`<br>`../client-utils.js`<br>`../theme.js`<br>`../ui.jsx` | Al cambiar esa parte de la experiencia React. |
+| [`PortalWidgets.jsx`](../../../../../portal-source/src/shared/PortalWidgets.jsx) | Widgets reutilizados por las experiencias autenticadas. | `../../../../../packages/i18n/react.jsx`<br>`../api.js`<br>`../client-utils.js`<br>`../theme.js`<br>`../ui.jsx` | Al cambiar esa parte de la experiencia React. |
 
 ---
 

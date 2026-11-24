@@ -60,6 +60,13 @@ export async function exchangeApplicationSession() {
   return api.post("/api/auth/sso");
 }
 
+export async function restoreSession() {
+  try { return await me(); }
+  catch (error) { if (error.status !== 401) throw error; }
+  await exchangeApplicationSession();
+  return me();
+}
+
 export async function subscriberSignup(name, email, password, ciudad, discountCode, tcAccepted) {
   return api.post("/api/subscriber/signup", { name, email, password, ciudad, discount_code: discountCode, tc_accepted: !!tcAccepted });
 }

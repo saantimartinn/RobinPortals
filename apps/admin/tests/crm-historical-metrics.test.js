@@ -7,6 +7,7 @@ const {
   normalizeHistoricalValue,
 } = require('../lib/crm-historical-metrics');
 const { buildSalesDashboard } = require('../lib/sales-dashboard');
+const { buildCrmPerformance } = require('../lib/crm-performance');
 
 test('classifies historical campaign channels without losing campaign names', () => {
   assert.equal(historicalCampaignChannel('Orgánico'), 'organic');
@@ -97,4 +98,44 @@ test('keeps an undated historical conversion in its acquisition cohort without i
   assert.deepEqual({ leads: october.kpis.leads, clients: october.kpis.contracts, conversion: october.kpis.conversion }, { leads: 0, clients: 0, conversion: null });
   assert.equal(october.acquisition.newClients, 1);
   assert.equal(october.buckets[0].contracts, 1);
+});
+
+test('el retargeting conserva la captación original y no infla totales, campañas, canales ni series', () => {
+  const bounds = { id: 'custom', start: new Date('2026-11-01T00:00:00Z'), end: new Date('2026-12-01T00:00:00Z'), granularity: 'month' };
+  const reservation = { page_url: '/retarwebinar21-11/', received_at: '2026-11-24T12:00:00Z' };
+  const leads = [
+    { id: 'original', source_created_at: '2026-11-18T12:00:00Z', owner_names: ['Manuel'], source_payload: { source: 'meta', campaign_name: 'Webinar 21-11', retargeting_reservation: reservation } },
+    { id: 'new-retargeting', source_created_at: '2026-11-24T12:00:00Z', owner_names: ['Manuel'], source_payload: { source: 'meta', campaign_name: 'Webinar 21-11', exclude_from_acquisition: true, retargeting_reservation: reservation } },
+    // Unmarked records from before this change keep counting exactly as before.
+    { id: 'old-reservation', source_created_at: '2026-11-20T12:00:00Z', source_payload: { source: 'website', form_name: 'reserva', page_url: '/retarwebinar21-11/' } },
+  ];
+  const dashboard = buildSalesDashboard({
+    period: 'custom', bounds, leads, users: [], payments: [], marketingExpense: 0, marketingAvailable: true,
+    metaCampaigns: [{ id: 'webinar', name: 'Webinar 21-11', spend: 100, leads: 25 }], metaAvailable: true,
+  });
+  assert.equal(dashboard.kpis.leads, 2);
+  assert.equal(dashboard.acquisition.leads, 2);
+  assert.equal(dashboard.team.summary.newLeads, 2);
+  assert.equal(dashboard.buckets.reduce((sum, row) => sum + row.leads, 0), 2);
+  assert.equal(dashboard.acquisition.buckets.reduce((sum, row) => sum + row.leads, 0), 2);
+  assert.equal(dashboard.channels.find((row) => row.key === 'meta').leads, 1);
+  assert.equal(dashboard.channels.find((row) => row.key === 'organic').leads, 1);
+  assert.equal(dashboard.campaigns.find((row) => row.id === 'webinar').leads, 1);
+  assert.equal(dashboard.campaigns.find((row) => row.id === 'webinar').cpl, 100);
+  assert.equal(dashboard.team.agents.find((row) => row.key === 'manuel').cohortLeads, 1);
+});
+
+test('la variación de leads nuevos excluye retargeting también del período anterior', () => {
+  const bounds = { start: new Date('2026-11-01T00:00:00Z'), end: new Date('2026-11-25T00:00:00Z') };
+  const lead = (id, date, excluded) => ({ id, source_created_at: date, source_payload: { source: 'website', exclude_from_acquisition: excluded } });
+  const result = buildCrmPerformance({
+    bounds, leads: [
+      lead('previous', '2026-10-20T12:00:00Z', false),
+      lead('previous-retargeting', '2026-10-20T12:00:00Z', true),
+      lead('current', '2026-11-18T12:00:00Z', false),
+      lead('current-retargeting', '2026-11-24T12:00:00Z', true),
+    ],
+  });
+  assert.equal(result.summary.newLeads, 1);
+  assert.equal(result.summary.leadVariation, 0);
 });

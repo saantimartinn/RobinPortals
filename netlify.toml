@@ -68,6 +68,9 @@ schedule = "30 4 * * *"
 [functions.admin-yuselico-weekly-digest]
 schedule = "0 7,8 * * 5"
 
+[functions.admin-lead-reactivation]
+schedule = "*/5 * * * *"
+
 [[redirects]]
 from = "/portal/api/auth/login"
 to = "/.netlify/functions/portal-auth-login"
@@ -973,6 +976,21 @@ status = 200
 [[redirects]]
 from = "/api/admin/crm/email"
 to = "/.netlify/functions/admin-admin-crm-email"
+status = 200
+
+[[redirects]]
+from = "/api/admin/crm/reactivation"
+to = "/.netlify/functions/admin-admin-crm-reactivation"
+status = 200
+
+[[redirects]]
+from = "/api/admin/crm/reactivation-unsubscribe"
+to = "/.netlify/functions/admin-reactivation-unsubscribe"
+status = 200
+
+[[redirects]]
+from = "/api/admin/crm/reactivation-events"
+to = "/.netlify/functions/admin-reactivation-events"
 status = 200
 
 [[redirects]]

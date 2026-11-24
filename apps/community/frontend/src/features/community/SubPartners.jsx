@@ -12,6 +12,8 @@ function SubPartners({ partners, loading, websiteStyle = false }) {
   const [discountPartner, setDiscountPartner] = useState(null);
   const [copyStatus, setCopyStatus] = useState('');
   const discountDialog = useRef(null);
+  const [unavailablePartner, setUnavailablePartner] = useState(null);
+  const unavailableDialog = useRef(null);
   const cats = ["all", ...Object.keys(PARTNER_CATEGORY_LABELS).filter(key => !websiteStyle || partners.some(partner => partner.category === key))];
   const filtered = cat === "all" ? partners : partners.filter((p) => p.category === cat);
   function openPartner(event, partner) {
@@ -21,6 +23,10 @@ function SubPartners({ partners, loading, websiteStyle = false }) {
   async function copyCode() {
     try { await navigator.clipboard.writeText('ROBIN'); setCopyStatus('Código copiado.'); }
     catch (_) { setCopyStatus('Selecciona el código ROBIN y cópialo.'); }
+  }
+  function showUnavailableLink(partner) {
+    setUnavailablePartner(partner);
+    unavailableDialog.current.showModal();
   }
 
   return (
@@ -45,11 +51,16 @@ function SubPartners({ partners, loading, websiteStyle = false }) {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((p) => {
-          const Logo = websiteStyle && p.contact_url ? 'a' : 'div';
+          const unavailable = websiteStyle && p.link_unavailable;
+          const description = websiteStyle && p.arrival_description ? t(p.arrival_description) : p.description;
+          const Logo = unavailable ? 'button' : websiteStyle && p.contact_url ? 'a' : 'div';
+          const logoProps = unavailable
+            ? { type: 'button', 'aria-haspopup': 'dialog', 'aria-label': t('Ver enlace de {0}', [p.name]), onClick: () => showUnavailableLink(p) }
+            : websiteStyle && p.contact_url ? { href: p.contact_url, target: '_blank', rel: 'noopener noreferrer', onClick: event => openPartner(event, p) } : {};
           return (
           <Card key={p.id}>
             <CardContent className="space-y-2.5">
-              <Logo {...(websiteStyle && p.contact_url ? { href: p.contact_url, target: '_blank', rel: 'noopener noreferrer', onClick: event => openPartner(event, p) } : {})} className="flex h-28 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-4">
+              <Logo {...logoProps} className="flex h-28 w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-4">
                 {p.logo_url ? <img src={p.logo_url} alt={t("Logo de {0}", [p.name])} loading="lazy" className="h-full w-full object-contain" /> : <ImageIcon className="h-8 w-8 text-slate-300" aria-hidden="true" />}
               </Logo>
               <div className="flex items-start justify-between gap-2">
@@ -57,18 +68,26 @@ function SubPartners({ partners, loading, websiteStyle = false }) {
                 {(!websiteStyle || p.category !== 'other') && <Badge tone="slate">{PARTNER_CATEGORY_LABELS[p.category] || p.category}</Badge>}
               </div>
               {p.city && <div className="text-xs text-slate-400 flex items-center gap-1"><MapPin className="h-3 w-3" /> {p.city}</div>}
-              {p.description && <div className="text-sm text-slate-600">{p.description}</div>}
+              {description && <div className="text-sm text-slate-600">{description}</div>}
               {p.benefits && <div className="text-xs text-slate-500"><span className="font-semibold">{t("Beneficios: ")}</span>{p.benefits}</div>}
               {p.discount && <div><Badge tone="gold"><Percent className="h-3 w-3 mr-1 inline" />{p.discount}</Badge></div>}
               {p.eligibility && <div className="text-[11px] text-slate-400">{t("Elegibilidad: ")}{p.eligibility}</div>}
               <div className="flex gap-2 pt-1">
-                {p.contact_url && <a href={p.contact_url} target="_blank" rel="noopener noreferrer" onClick={event => openPartner(event, p)}><Btn size="sm" variant="secondary"><ExternalLink className="h-3.5 w-3.5" /> {websiteStyle ? t('Ver partner') : t('Contactar')}</Btn></a>}
-                {p.booking_url && <a href={p.booking_url} target="_blank" rel="noreferrer"><Btn size="sm"><CalendarCheck className="h-3.5 w-3.5" />{t(" Reservar")}</Btn></a>}
+                {unavailable ? <button type="button" aria-haspopup="dialog" onClick={() => showUnavailableLink(p)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 transition-all hover:bg-slate-50"><ExternalLink className="h-3.5 w-3.5" />{t('Ver partner')}</button>
+                  : p.contact_url && <a href={p.contact_url} target="_blank" rel="noopener noreferrer" onClick={event => openPartner(event, p)}><Btn size="sm" variant="secondary"><ExternalLink className="h-3.5 w-3.5" /> {websiteStyle ? t('Ver partner') : t('Contactar')}</Btn></a>}
+                {!unavailable && p.booking_url && <a href={p.booking_url} target="_blank" rel="noreferrer"><Btn size="sm"><CalendarCheck className="h-3.5 w-3.5" />{t(" Reservar")}</Btn></a>}
               </div>
             </CardContent>
           </Card>
         ); })}
       </div>
+      {websiteStyle && <dialog ref={unavailableDialog} className="robin-info-dialog" aria-labelledby="partner-link-title" aria-describedby="partner-link-message" onClose={() => setUnavailablePartner(null)} onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
+        <div className="px-6 py-5 space-y-4">
+          <h2 id="partner-link-title" className="text-2xl font-semibold" style={{ fontFamily: 'var(--robin-font-display)' }}>{unavailablePartner?.name || t('Enlace del partner')}</h2>
+          <p id="partner-link-message" className="text-sm leading-relaxed">{t('El link único aún no está disponible.')}</p>
+          <Btn variant="secondary" onClick={() => unavailableDialog.current.close()}>{t('Cerrar')}</Btn>
+        </div>
+      </dialog>}
       <dialog ref={discountDialog} className="robin-info-dialog" aria-labelledby="partner-discount-title" onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
         <div className="px-6 py-5 space-y-4">
           <h2 id="partner-discount-title" className="text-2xl font-semibold" style={{ fontFamily: 'var(--robin-font-display)' }}>{t("Tu descuento en Swapfiets")}</h2>

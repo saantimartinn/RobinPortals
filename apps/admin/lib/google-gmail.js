@@ -47,7 +47,7 @@ async function getGmailStatus() {
   }
 }
 
-async function getGmailAccessToken() {
+async function getGmailAccessToken(required = [GMAIL_SEND_SCOPE]) {
     const accessToken = await requestAccessToken();
     const response = await fetch(`${TOKEN_INFO_ENDPOINT}?access_token=${encodeURIComponent(accessToken)}`);
     const tokenInfo = await response.json().catch(() => ({}));
@@ -57,12 +57,31 @@ async function getGmailAccessToken() {
       throw error;
     }
     const scopes = String(tokenInfo.scope || '').split(/\s+/);
-    if (!scopes.includes(GMAIL_SEND_SCOPE)) {
-      const error = new Error('La cuenta de Google debe reautorizarse con el permiso de envío de Gmail.');
-      error.code = 'gmail_scope_missing';
+    if (!required.some(scope => scopes.includes(scope))) {
+      const reading = !required.includes(GMAIL_SEND_SCOPE);
+      const error = new Error(reading ? 'Falta permiso de lectura de Gmail para detener correos al recibir una respuesta.' : 'La cuenta de Google debe reautorizarse con el permiso de envío de Gmail.');
+      error.code = reading ? 'gmail_read_scope_missing' : 'gmail_scope_missing';
       throw error;
     }
     return accessToken;
+}
+
+async function getGmailReadAccessToken() {
+  return getGmailAccessToken(['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.modify', 'https://mail.google.com/']);
+}
+
+async function hasLeadReply({ email, since, accessToken, includeOutbound = false }) {
+  const { validEmail, normalizeEmail } = require('./lead-reactivation-content');
+  if (!validEmail(email) || !Number.isFinite(Date.parse(since))) throw new Error('invalid_reply_lookup');
+  const address = normalizeEmail(email);
+  // Sequence messages go through Resend and are never in Gmail's Sent folder.
+  // Manual CRM/Gmail messages from the team must also stop reactivation.
+  const contact = includeOutbound ? `{from:(${address}) {in:sent to:(${address})}}` : `from:(${address})`;
+  const query = new URLSearchParams({ q: `${contact} after:${Math.floor(Date.parse(since) / 1000)} -in:trash`, maxResults: '1', includeSpamTrash: 'false' });
+  const response = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?${query}`, { headers: { authorization: `Bearer ${accessToken || await getGmailReadAccessToken()}` }, signal: AbortSignal.timeout(15000) });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(`gmail_reply_lookup_${response.status}`);
+  return Boolean(data.messages?.length);
 }
 
 function headerValue(value) {
@@ -120,4 +139,4 @@ async function sendMessage({ to, from, subject, body, accessToken }) {
   return { id: result.id, threadId: result.threadId };
 }
 
-module.exports = { GMAIL_SEND_SCOPE, encodeRawMessage, getGmailAccessToken, getGmailStatus, personalize, sendMessage };
+module.exports = { GMAIL_SEND_SCOPE, encodeRawMessage, getGmailAccessToken, getGmailReadAccessToken, hasLeadReply, getGmailStatus, personalize, sendMessage };

@@ -60,6 +60,8 @@ Robin Admin recibe leads desde varios orígenes. Los puntos de entrada important
 - Las reglas de landings viven en [`shared/lead-attribution.mjs`](../shared/lead-attribution.mjs) y se aplican al webhook, la ingestión y la lectura del cliente. `/webinar21-11/` y `/webianr21-11/` fuerzan Meta Ads / `Webinar 21-11`; `/veteaholanda/` fuerza Meta Ads / `Campaña continua Candela`, por encima de campañas heredadas. Un `ad_id` conservado en un registro con `page_url` no se usa para resolver campañas de formularios nativos de Meta.
 - [`scripts/repair-webinar-attribution.sql`](../scripts/repair-webinar-attribution.sql) prepara la corrección de datos existentes del webinar y del lead de Candela auditado. Ejecutar únicamente en el proyecto CRM `odcjxzxfaclwwoynfqui`, no en PortalAlumno; es una reparación de datos y no una migración de esquema.
 - La landing `/vaparaaholanda/` (también `/vaparaholanda/`) se atribuye a origen Meta Ads y campaña `PORTUGAL II` desde el 15/11/2026 incluido, usando la fecha de entrada enviada o la fecha actual si no se proporciona. Las entradas anteriores de `/vaparaaholanda/` conservan la campaña `Portugal`; la URL original permanece en `source_payload.page_url`.
+- Solo las nuevas entradas del formulario `reserva` de `/retarwebinar21-11/` guardan `source_payload.retargeting_reservation` y aparecen en Reservas → Retargeting. No se deduce esta marca al leer URLs antiguas ni se ejecuta una reclasificación histórica. Si existe el contacto por email/teléfono, se añade la reserva al mismo registro conservando su captación, fecha original, asesor y fase. Si se crea una ficha, lleva `exclude_from_acquisition: true`: se mantiene como reserva, excluida de las cohortes y métricas de leads nuevos. El contacto original ya contabilizado conserva su recuento.
+- La reserva pública se guarda directamente desde [`Web-robin/netlify/lib/crm-lead.mjs`](https://github.com/RobinManuV/Web-robin/blob/main/netlify/lib/crm-lead.mjs), invocado por su función `book.mjs`. Esa vía y `lib/crm-lead-ingest.js` deben emitir las mismas marcas. Para activar la funcionalidad deben publicarse el gestor y la web; no requiere migración de esquema ni cambios en el historial.
 - Meta: [`meta-lead-webhook.js`](../netlify/functions/meta-lead-webhook.js) recibe el evento externo y valida el flujo de ingestión.
 - Notion: [`notion-webhook.js`](../netlify/functions/notion-webhook.js) recibe cambios del sistema CRM externo.
 - Operación interna: rutas `/api/admin/crm/*` y conversión servidor-a-servidor `/api/internal/crm/convert`.
@@ -118,6 +120,8 @@ Dashboard/report UI → src/services/integrations.ts
 ```
 
 Los módulos `lib/finance-dashboard.js` y `lib/holded.js` conservan fachadas de compatibilidad sobre submódulos. Al cambiar un cálculo revisa período, timezone, filtros, monedas/unidades, datos faltantes y el tipo que consume React. Holded y la base local pueden aportar piezas diferentes: anota la fuente de cada campo antes de cambiar una suma.
+
+Las facturas nuevas de clientes LATAM conservan su referencia y añaden la observación literal de [`packages/billing/holded-invoice-notes.cjs`](../../../packages/billing/holded-invoice-notes.cjs), sin «sin impuestos» ni la observación anterior de IELTS. Se envía en `notes` (internas) y `body` (impresas). La regla usa `isLatamClient`, se aplica en Admin, Alumno, Robin Jr y suscripciones, y no modifica facturas ya emitidas ni el cálculo de impuestos.
 
 ## 5. Analítica e integraciones
 
