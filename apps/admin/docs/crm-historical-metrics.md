@@ -46,17 +46,9 @@ analíticas no lo ven hasta que se activa. Al activar, el lote anterior pasa a
 
 ## Aplicación paso a paso
 
-### Importación directa utilizada en producción
+### Datos privados de importación
 
-Tras crear las tablas con la migración `202610080001`, el lote validado también
-puede cargarse directamente desde
-`202610080002_seed_crm_historical_metrics.sql`. Este archivo no contiene nombres,
-emails ni teléfonos, valida los 1.168 leads y activa el lote en la misma
-transacción. Los 109 clientes se atribuyen a su cohorte de adquisición, sin
-inventar una fecha de firma cuando no existe una fecha contractual verificable.
-
-El importador descrito más abajo se conserva para regeneraciones futuras que
-necesiten volver a cruzar temporalmente el Portal y Meta.
+El repositorio contiene el esquema y el importador, pero no los registros reales de producción. Los datos originales, los lotes y los informes de importación se guardan fuera de Git, incluso cuando los identificadores estén seudonimizados. La antigua migración de datos se conserva como no-op; no altera los registros ya existentes.
 
 ### 1. Desplegar el código compatible
 
@@ -122,18 +114,7 @@ npm run crm-history:preview -- \
   --report /tmp/robin-crm-history-preview.json
 ```
 
-El ensayo debe confirmar exactamente:
-
-```text
-Leads:       1168
-Clientes:     109
-Orgánicos:    303
-Noel:         236
-María:        258
-Manuel:       229
-Varios:         3
-Sin gestor:   442
-```
+El ensayo debe contrastarse con los totales de control del lote privado. No publicar esos informes ni su desglose por gestor o campaña.
 
 También muestra las campañas Meta que no se hayan podido cruzar por nombre. El
 ensayo no contiene datos personales.
@@ -205,7 +186,7 @@ group by campaign_name, channel
 order by leads desc, campaign_name;
 ```
 
-El estado debe ser `staged` y los tres totales principales, 1168, 109 y 303.
+El estado debe ser `staged` y los totales deben coincidir con el informe privado validado.
 
 ### 8. Activar el lote
 

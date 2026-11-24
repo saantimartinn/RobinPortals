@@ -59,7 +59,8 @@ test('envía un enlace al correo del alumno y lo invalida después de usarlo', a
     const changed = await confirm({ httpMethod: 'POST', headers, body: payload });
     assert.equal(changed.statusCode, 200);
     assert.equal(verifyPassword('ClaveNueva2027!', user.password_hash), true);
-    assert.equal(user.password_hash, 'plain:v1:ClaveNueva2027!');
+    assert.match(user.password_hash, /^\$2[aby]\$12\$/);
+    assert.equal(user.password_hash.includes('ClaveNueva2027!'), false);
     const replay = await confirm({ httpMethod: 'POST', headers, body: payload });
     assert.equal(replay.statusCode, 400);
   } finally {

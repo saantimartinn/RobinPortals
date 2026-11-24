@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { parse: parseCookies, serialize: serializeCookie } = require('cookie');
 const { createCookieHelpers } = require('../../../../packages/auth/cookies.cjs');
-const { verifyStoredPlaintextPassword } = require('../../../../packages/auth/password-storage.cjs');
 const sharedCookies = createCookieHelpers({ parse: parseCookies, serialize: serializeCookie });
 
 const COOKIE_NAME = 'robin_subscription_session';
@@ -22,11 +21,14 @@ function getJwtSecret() {
 }
 
 function hashPassword(plain) {
+  if (typeof plain !== 'string' || !plain || Buffer.byteLength(plain, 'utf8') > 72) {
+    throw new TypeError('password must contain between 1 and 72 UTF-8 bytes');
+  }
   return bcrypt.hashSync(plain, 12);
 }
 function verifyPassword(plain, hash) {
-  const plainResult = verifyStoredPlaintextPassword(plain, hash);
-  if (plainResult !== null) return plainResult;
+  if (typeof plain !== 'string' || !plain || Buffer.byteLength(plain, 'utf8') > 72) return false;
+  if (typeof hash !== 'string' || !/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(hash)) return false;
   return bcrypt.compareSync(plain, hash);
 }
 

@@ -23,28 +23,13 @@ test/                  Pruebas sin acceso a producción
 docs/                  Arquitectura, operación y árbol navegable
 ```
 
-## Desarrollo
+## Producción
 
-Requisito: Node.js 22.13 o posterior; versión de referencia en `.nvmrc`.
+Acceso: [https://project-robin.com/therobinplan/](https://project-robin.com/therobinplan/), con una cuenta autorizada desde el [login común](https://project-robin.com/login).
 
-```bash
-npm ci
-# Copiar .env.example a .env y configurar los proveedores necesarios.
-npm run dev
-```
+El sitio unificado compila esta aplicación y empaqueta sus Functions con las otras tres. Consulta el [README principal](../../README.md) para los comandos de verificación y publicación. Los secretos de suscripción y las claves de servicio se configuran exclusivamente en el entorno privado de Netlify.
 
-`npm run dev` inicia Netlify Dev en `http://localhost:8888/therobinplan/` con API del
-mismo origen. `npm run dev:frontend` sirve únicamente la interfaz, sin backend.
-Las cookies son Secure: para probar sesiones usa localhost compatible o HTTPS local.
-
-```bash
-npm run verify        # arquitectura, tests, build y documentación
-npm run docs:generate # actualizar mapas al cambiar archivos o rutas
-```
-
-El build de raíz incorpora `dist/therobinplan/` al sitio unificado y empaqueta
-las Functions por separado. No subir compilados, dependencias, credenciales o
-exports de datos.
+Las pruebas de esta aplicación se ejecutan con `npm test`; `npm run docs:generate` actualiza los mapas de documentación. No subir compilados, dependencias, credenciales ni exports de clientes.
 
 ## Documentación
 

@@ -1,9 +1,7 @@
-# Contraseñas
+# Password storage policy
 
-El código heredado usa bcrypt con coste 12. Alta: mínimo 6 caracteres; cambio:
-mínimo 8. El script nuevo de administrador exige 16 caracteres y máximo 72 bytes
-UTF-8. Estas diferencias se documentan; no representan una política uniforme.
+Subscriber signup, password changes and recovery use bcrypt with an independent salt and cost 12. Login rejects recoverable plaintext storage. The server rejects values exceeding 72 UTF-8 bytes to prevent bcrypt truncation. Password changes and recovery require at least eight characters.
 
-No se incluye una contraseña predeterminada. Si existía el administrador del SQL
-original, rotarlo explícitamente. Endurecer validación y añadir revocación de sesiones
-como cambio coordinado con frontend, backend y usuarios existentes.
+Supabase stores only hashes for custom `subscribers` credentials. Supabase Auth, where used by another application, owns its hashing and must receive the original password over the server API rather than a browser-generated hash.
+
+The migration and deployment procedure is documented in [Portal password policy](../../portal/docs/PASSWORD_POLICY.md). Select `--app=community` to review and migrate `subscribers`; other apps use `users`. No production migration has been executed as part of preparing this source change.

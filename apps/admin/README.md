@@ -3,20 +3,13 @@
 Panel interno de Project Robin para CRM, operaciones, finanzas, analítica e
 integraciones. Forma parte del sitio Netlify unificado del monorepo. El navegador
 ejecuta React/Vite; las rutas de datos se sirven con Netlify Functions y servicios
-de dominio en `lib/`. Para probar todas las apps juntas, usa `npm run dev` desde
-la raíz.
+de dominio en `lib/`.
 
-## Inicio rápido
+## Producción
 
-Requisitos: Node.js compatible con la versión de Vite y npm.
+Acceso: [https://project-robin.com/admin/](https://project-robin.com/admin/), con una cuenta administrativa autorizada desde el [login común](https://project-robin.com/login).
 
-```bash
-npm ci
-cp .env.example .env
-npx netlify dev
-```
-
-Configura solo variables necesarias para el flujo local. Las claves de servicio pertenecen al backend y no deben usar el prefijo `VITE_`.
+La compilación y publicación se realizan desde la raíz del monorepo; consulta el [README principal](../../README.md). Las credenciales y los exports del CRM se gestionan fuera de Git. Las claves de servicio pertenecen a Functions y no deben usar el prefijo `VITE_`.
 
 ## Documentación
 

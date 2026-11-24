@@ -1,3 +1,4 @@
+const { Buffer } = require('node:buffer');
 /**
  * POST /api/subscriber/signup  Body: { name, email, password }
  * Crea una cuenta nueva para The Robin Plan (portal de suscriptores).
@@ -28,7 +29,7 @@ exports.handler = async (event) => {
 
   if (!name || !email || !password) return json({ error: 'missing_fields' }, { statusCode: 400 });
   if (!isValidEmail(email)) return json({ error: 'invalid_email' }, { statusCode: 400 });
-  if (password.length < 6) return json({ error: 'weak_password' }, { statusCode: 400 });
+  if (typeof password !== 'string' || password.length < 6 || Buffer.byteLength(password, 'utf8') > 72) return json({ error: 'weak_password' }, { statusCode: 400 });
 
   try {
     const sb = getSupabase();

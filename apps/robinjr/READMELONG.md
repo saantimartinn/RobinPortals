@@ -90,8 +90,8 @@ el backend verifica rol y ownership. Robin Admin es otra app del mismo sitio.
 ## Build, publicación y rutas
 
 - Root package: backend y tooling; `portal-source/package.json`: frontend Vite/React.
-- `netlify.toml` instala `portal-source`, construye y copia su `dist/` a `deploy/portal`, además declara funciones, redirects, headers, cron y Edge routes.
-- `infrastructure/cloudflare/project-robin-router.js` maneja subpaths globales y preserva WordPress como fallback.
+- El build de producción se ejecuta desde la raíz con `site/build.mjs`, incorpora el frontend al sitio unificado y empaqueta sus Functions. El `netlify.toml` de cada app aporta rutas, cabeceras y tareas al archivo generado de raíz.
+- El Worker vigente está en `infra/cloudflare/project-robin-router.js` de la raíz del monorepo y conserva la web comercial para las rutas ajenas a las apps.
 - Las guías existentes cubren operación en [OPERATIONS.md](docs/OPERATIONS.md), configuración en [ENVIRONMENT.md](docs/ENVIRONMENT.md), y flujos de host en [CLOUDFLARE_ROUTING.md](docs/CLOUDFLARE_ROUTING.md).
 
 ## Repositorios conectados

@@ -64,7 +64,7 @@ test('reset link always returns to The Robin Plan and contains the signed token'
   }
 });
 
-test('a valid reset request stores the new password without a hash', async () => {
+test('a valid reset request stores bcrypt and rejects reuse of the old password', async () => {
   const previous = process.env.JWT_SECRET;
   process.env.JWT_SECRET = 'test-only-password-reset-secret-with-enough-entropy';
   try {
@@ -88,7 +88,8 @@ test('a valid reset request stores the new password without a hash', async () =>
     const response = await service.applyPasswordReset(token, 'a-new-secure-password');
     assert.equal(response.ok, true);
     assert.equal(auth.verifyPassword('a-new-secure-password', savedHash), true);
-    assert.equal(savedHash, 'plain:v1:a-new-secure-password');
+    assert.match(savedHash, /^\$2[aby]\$12\$/);
+    assert.equal(auth.verifyPassword('initial-password', savedHash), false);
   } finally {
     if (previous === undefined) delete process.env.JWT_SECRET;
     else process.env.JWT_SECRET = previous;

@@ -1,41 +1,54 @@
 # Project Robin
 
-Monorepo del portal del alumno, Robin Jr, Robin Community y el admin. Las cuatro apps se publican como **un único sitio de Netlify**. La web pública es un proyecto aparte y no forma parte de este repositorio.
+Plataforma en producción para alumnos, Robin Jr, The Robin Plan y el equipo de Project Robin. Las cuatro aplicaciones se construyen y publican juntas en un único sitio Netlify, servido por Cloudflare bajo el dominio público. La web comercial es un proyecto independiente.
+
+## Aplicaciones en producción
+
+| Aplicación | Acceso |
+| --- | --- |
+| Login común | [project-robin.com/login](https://project-robin.com/login) |
+| Portal del Alumno | [project-robin.com/portal/](https://project-robin.com/portal/) |
+| Robin Jr | [project-robin.com/robinjr/](https://project-robin.com/robinjr/) |
+| The Robin Plan | [project-robin.com/therobinplan/](https://project-robin.com/therobinplan/) |
+| Administración | [project-robin.com/admin/](https://project-robin.com/admin/) |
+
+Los portales y el panel requieren una cuenta autorizada. El repositorio público no concede acceso a datos ni incluye credenciales de uso.
 
 ## Estructura
 
-- `apps/portal` — portal del alumno y login común (`/portal`, `/login`)
-- `apps/robinjr` — Robin Jr (`/robinjr`)
-- `apps/community` — Robin Community (`/therobinplan`)
-- `apps/admin` — admin (`/admin`, funciones en `/api/admin`, `/api/internal`, …)
-- `packages/auth` — cookies, HTTP y URL del sitio compartidos
-- `packages/portal-nav` — enlaces entre portales
-- `site/` — herramientas del sitio unificado (config, build, entorno, tests)
-- `dev/` — arranque local (ver `dev/README.md`)
+- `apps/portal`: expediente, onboarding, documentos, reservas y pagos del alumno.
+- `apps/robinjr`: programa Junior, progreso, mentorías y pagos.
+- `apps/community`: suscripción, comunidad y acceso del Pack Llegada.
+- `apps/admin`: CRM, operaciones, finanzas e integraciones internas.
+- `packages/`: autenticación, navegación, traducciones, marca y reglas compartidas.
+- `site/`: configuración, compilación y pruebas del sitio unificado.
+- `infra/cloudflare/`: enrutamiento del dominio público.
+- `dev/`: herramientas auxiliares de desarrollo; no es el entorno publicado.
+- `apps/ios/`: prototipo nativo, todavía no distribuido en App Store.
 
-La cuota y la conversión de clientes de Mentoría del Portal del Alumno están
-documentadas en [Mentoría y conversión](apps/portal/docs/MENTORIA_CONVERSION.md).
+## Publicación y verificación
 
-## Comandos
+Se requiere Node.js 22.13 o posterior. Desde la raíz del monorepo:
 
-| Comando | Qué hace |
-| --- | --- |
-| `npm run dev` | Arranca todo en local en http://localhost:8888 |
-| `npm test` | Tests de las cuatro apps |
-| `npm run site:config` | Regenera `netlify.toml` a partir de `apps/*/netlify.toml` |
-| `npm run site:build` | Compila el sitio en `site/.output` |
-| `npm run site:env` | Regenera `./.env` a partir de `apps/*/.env` |
-| `npm run site:pull-env` | Copia a `apps/*/.env` las variables de cada proyecto de Netlify (solo lectura) |
-| `npm run site:netlify-env -- --site-url https://<sitio>.netlify.app` | Prepara en `.netlify/production-env.json` las variables del sitio de producción (no envía nada) |
+```bash
+npm ci
+npm test
+npm run site:build
+```
 
-El ejecutor `site/test-all.mjs` reúne los archivos `*.test.js`, `*.test.cjs` y
-`*.test.mjs` de `test/` y `tests/` en cada app, y los ejecuta desde su propia carpeta.
+Netlify usa `node site/build.mjs --install`; la salida publicada se prepara en `site/.output/`. El archivo `netlify.toml` de raíz se genera a partir de los de cada aplicación con `npm run site:config`. Los cambios de código solo llegan a producción cuando el despliegue correspondiente queda publicado; el último commit de Git por sí solo no acredita qué versión está sirviendo Netlify.
 
-`netlify.toml` de la raíz es generado: cada app sigue definiendo sus rutas en su propio `netlify.toml`, y `site/generate-config.mjs` las monta bajo su ruta y renombra sus funciones con el prefijo de la app.
+[Cloudflare y rutas](infra/cloudflare/README.md) explica el salto al sitio unificado y las excepciones de webhooks heredados. Las variables privadas se configuran en Netlify, con los prefijos `PORTAL__`, `ROBINJR__`, `COMMUNITY__` y `ADMIN__`. Los archivos `.env.example` documentan nombres y valores ficticios. Los secretos, exports y credenciales pertenecen a almacenamiento privado fuera de Git.
 
-## Producción
+Las tareas programadas solo se ejecutan con `ROBIN_RUN_SCHEDULED=true`; la transición entre sitios requiere evitar envíos duplicados.
 
-- **Build:** `node site/build.mjs --install` (lo fija `netlify.toml`). Las funciones de las apps tienen el formato clásico (`exports.handler`), pero se publican como funciones modernas de Netlify mediante un adaptador (`serve` en `site/app-env.cjs`): las clásicas solo admiten 4 KB de variables y las cuatro apps necesitan unos 10 KB. En local (`npm run dev`) se generan como clásicas: `netlify dev` las ejecuta sin empaquetar.
-- **Variables:** cada app con su prefijo (`PORTAL__…`, `ROBINJR__…`, `COMMUNITY__…`, `ADMIN__…`) más `PUBLIC_BASE_URL`, `ROBIN_SITE_URL` y `ALLOWED_ORIGINS`. `npm run site:netlify-env -- --site-url …` genera el fichero para `netlify api createEnvVars`, con `JWT_SECRET` nuevos, y lista los secretos que hay que poner a mano porque Netlify no deja leer su valor de producción.
-- **Tareas programadas:** no hacen nada hasta que el sitio tenga `ROBIN_RUN_SCHEDULED=true` (`site/app-env.cjs`). Se activa el día del cambio, a la vez que se apagan los sitios antiguos, para no duplicar envíos como las felicitaciones de cumpleaños.
-- **Enrutado:** `infra/cloudflare/project-robin-router.js` (Worker de project-robin.com).
+## Documentación
+
+- [Portal del Alumno](apps/portal/README.md)
+- [Robin Jr](apps/robinjr/README.md)
+- [The Robin Plan](apps/community/README.md)
+- [Administración](apps/admin/README.md)
+- [Mentoría y conversión](apps/portal/docs/MENTORIA_CONVERSION.md)
+- [Primitivas de autenticación](packages/auth/README.md)
+
+Las guías técnicas explican contratos y operación. Sus ejemplos no son cuentas de acceso ni deben contener datos de clientes.

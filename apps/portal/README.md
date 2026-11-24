@@ -2,22 +2,15 @@
 
 Portal del Alumno dentro del sitio Netlify unificado de Project Robin. El frontend
 React/Vite se publica en `/portal/`; su API se ejecuta en Functions del mismo sitio
-y accede a los proveedores externos desde backend. Para arrancar las cuatro apps
-juntas en local, usa `npm run dev` desde la raíz del monorepo.
+y accede a los proveedores externos desde backend.
 
-## Desarrollo local
+## Producción
 
-Requisitos del sitio unificado: Node.js 22. Copiar `.env.example` a un archivo local que no se
-versione y completar solo las variables necesarias para el flujo que se vaya a probar.
+Acceso: [https://project-robin.com/portal/](https://project-robin.com/portal/), con una cuenta autorizada desde el [login común](https://project-robin.com/login).
 
-```bash
-npm ci
-npm --prefix portal-source ci --include=dev
-npm --prefix portal-source run dev
-```
+Esta aplicación se publica junto con las otras tres desde la raíz del monorepo. La compilación del sitio y sus Functions se describen en el [README principal](../../README.md). Las claves privadas se configuran en Netlify y nunca en variables de navegador `VITE_`.
 
-El conjunto completo de verificaciones se describe en [docs/TESTING.md](docs/TESTING.md). Nunca
-se deben guardar secretos, datos personales ni exports de producción en Git.
+Las pruebas se describen en [docs/TESTING.md](docs/TESTING.md). No subir secretos, datos personales ni exports de producción a Git.
 
 ## Documentación principal
 

@@ -69,7 +69,6 @@ Consulta la [guía por flujo](USERGUIDE.md) y el [inventario de rutas](docs/API_
 
 ```bash
 npm ci
-npx netlify dev          # Vite + Functions local
 npm run build            # bundle de producción
 npm test                 # pruebas del repo Admin
 npm run docs:generate    # actualizar árbol, mapa y API inventariada

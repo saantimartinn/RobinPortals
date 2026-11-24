@@ -1,10 +1,5 @@
-# Enrutador de project-robin.com
+# Enrutamiento de producción
 
-El Worker conserva WordPress como origen predeterminado y envía únicamente estas rutas a Netlify:
+Esta carpeta conserva el router histórico anterior al sitio unificado. La referencia vigente es [infra/cloudflare/README.md](../../../../infra/cloudflare/README.md) en la raíz del monorepo.
 
-- `/login` al selector de portales.
-- `/portal/*` al portal de aplicación.
-- `/therobinplan/*` a The Robin Plan.
-
-Las rutas públicas de API quedan aisladas bajo `/portal/api/*` y `/therobinplan/api/*`.
-El Worker elimina ese primer prefijo antes de llamar a las Functions existentes de cada proyecto.
+El Worker actual sirve las aplicaciones bajo [project-robin.com](https://project-robin.com), conserva sus prefijos y envía Portal, Robin Jr, The Robin Plan y Admin al sitio unificado. La guía vigente documenta también las excepciones de webhooks heredados.

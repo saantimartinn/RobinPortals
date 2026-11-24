@@ -13,21 +13,13 @@ de 500 €, 500 € y 499 €. Las carreras no contienen documentos: el admin cr
 con imagen, asignaturas y requisitos, y la asigna al alumno; los documentos y sus deadlines
 se gestionan aparte.
 
-## Desarrollo local
+## Producción
 
-Desde la raíz del monorepo, `npm run dev` arranca las cuatro apps juntas.
+Acceso: [https://project-robin.com/robinjr/](https://project-robin.com/robinjr/), con una cuenta autorizada desde el [login común](https://project-robin.com/login).
 
-Requisitos: Node.js 20 o posterior. Copiar `.env.example` a un archivo local que no se
-versione y completar solo las variables necesarias para el flujo que se vaya a probar.
+Esta aplicación se publica junto con las otras tres desde la raíz del monorepo. La compilación del sitio y sus Functions se describen en el [README principal](../../README.md). Las claves privadas se configuran en Netlify y nunca en variables de navegador `VITE_`.
 
-```bash
-npm ci
-npm --prefix portal-source ci --include=dev
-npm --prefix portal-source run dev
-```
-
-El conjunto completo de verificaciones se describe en [docs/TESTING.md](docs/TESTING.md). Nunca
-se deben guardar secretos, datos personales ni exports de producción en Git.
+Las pruebas se describen en [docs/TESTING.md](docs/TESTING.md). No subir secretos, datos personales ni exports de producción a Git.
 
 ## Documentación principal
 

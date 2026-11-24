@@ -1,39 +1,15 @@
-# Password policy
+# Password storage policy
 
-Initial passwords use bcrypt. Manually changed passwords are stored with the
-`plain:v1:` marker in the existing `password_hash` column, without a hash.
-Login accepts both formats during the transition.
+All account creation, password changes and password resets store bcrypt hashes with an independent salt and cost 12 in `password_hash`. Login accepts bcrypt hashes only. The former recoverable password format is not accepted by any authentication handler.
 
-## Canonical policy
+Passwords must fit within bcrypt's 72 UTF-8 byte limit; longer values are rejected rather than silently truncated. Password-change and recovery routes require at least eight characters. Existing bcrypt hashes are retained. A credential originally created from more than 72 UTF-8 bytes must be reset, because the old bcrypt implementation truncated it and hash-only authentication now rejects that oversized input.
 
-- minimum: 8 characters;
-- maximum: 72 UTF-8 bytes, retained for consistency with existing accounts;
-- no mandatory uppercase, digit, symbol or periodic rotation rules;
-- bcrypt work factor remains 12 in `lib/auth.js`.
+## Existing credentials and rollout
 
-`shared/password-policy.cjs` is consumed by password change and the Notion bootstrap
-gate. Invalid new credentials return
-`weak_password`; an invalid configured bootstrap returns
-`weak_bootstrap_password_configuration` and fails closed.
+Before deploying hash-only authentication, pause password changes/resets, privately review existing credentials, and migrate the legacy records with [`dev/migrate-legacy-passwords.cjs`](../../../dev/migrate-legacy-passwords.cjs) from the monorepo root. This script is not part of the public HTTP API.
 
-Login deliberately does not apply the new-credential policy. It must continue to
-verify existing hashes, including credentials created under the historical six-
-character rule or passwords whose suffix bcrypt previously ignored after 72 bytes.
-Users can move to the current policy when changing their password.
+The operation defaults to preview mode. Select the application and explicitly confirm its Supabase URL with `--app=portal` (or `robinjr`, `admin`, `community`) and `--expect-url=https://PROJECT.supabase.co`. Only `--apply` enables updates. Supply that application's server credentials through the private operator environment, never through command-line credential values or Git.
 
-## Lifecycle audit
+The migration preserves passwords, leaves existing bcrypt hashes untouched, paginates by ID, and conditionally updates each original credential to avoid overwriting concurrent changes. It prints counts only. Empty or oversized legacy values are reported as blocked and require an account reset; conflicts must be reviewed. Rerun preview and require zero remaining legacy records before publishing hash-only login. Reopen password writes only after the new deployment is live. Rollback must keep hashed storage.
 
-| Flow | State |
-|---|---|
-| Application bootstrap | password comes from required `NOTION_BOOTSTRAP_PASSWORD`; canonical policy enforced, no hard-coded fallback |
-| Password change | authenticated endpoint, current password required, canonical policy enforced; new value is stored without a hash |
-| Password recovery | no recovery/reset endpoint found in the repository |
-| Sessions | signed HTTP-only secure cookie, seven-day expiry |
-
-The shared Notion bootstrap credential is still a residual risk even though it is
-environment-only and validated. Replacing it requires an activation/reset delivery
-flow and user-communication decision; inventing that flow is outside cleanup.
-Login/change abuse protection is handled separately in Phase 30.
-
-No password values were read, logged or committed. No Supabase access or database
-change was performed.
+The script has been tested with synthetic data. Production migration and deployment require a separately reviewed operation; preparing this code does not change deployed accounts.

@@ -80,16 +80,15 @@ El catálogo de contratos está en [API_INVENTORY](docs/API_INVENTORY.md), funci
 
 ## Build y publicación
 
-- Requisito Node.js `>=22.13.0`; `.nvmrc` define la versión de referencia.
-- `npm run dev` ejecuta Netlify Dev (UI y Functions same-origin) en el puerto 8888; `/` redirige a `/therobinplan/`.
-- `npm run dev:frontend` sirve únicamente Vite, sin serverless backend.
-- `npm run build` construye workspace `frontend`, escribe SPA en `dist/therobinplan/` y `dist/_redirects` para la ruta DB.
-- Netlify publica solo `dist/` y empaqueta `backend/functions/` de acuerdo con `netlify.toml`.
-- `npm run verify` ejecuta checks, suite automatizada, build y documentación generada. `npm run docs:generate` reconstruye file/component/API trees.
+- Entrada pública: [The Robin Plan](https://project-robin.com/therobinplan/).
+- Node.js `>=22.13.0`; `.nvmrc` define la versión de referencia.
+- El build de raíz `site/build.mjs` incorpora el frontend y empaqueta las Functions en el sitio unificado.
+- `npm test` desde la raíz comprueba el sitio y las cuatro aplicaciones. `npm run docs:generate` desde esta app actualiza sus mapas.
+- Netlify publica la salida unificada; las rutas y cabeceras provienen de los `netlify.toml` de cada app.
 
 ## Repos relacionados
 
 - [Robin Platform cliente](../portal/README.md): identity provider / aplicación de origen; [READMELONG](../portal/READMELONG.md), [USERGUIDE](../portal/USERGUIDE.md), [Cloudflare paths](../portal/docs/CLOUDFLARE_ROUTING.md).
 - [Robin Admin](../admin/README.md): panel interno; [READMELONG](../admin/READMELONG.md), [USERGUIDE](../admin/USERGUIDE.md), [API mapping](../admin/docs/API_INVENTORY.md).
 
-Los proyectos se despliegan individualmente. Si cambia SSO, roles, rutas, scopes, producto/checkout o navegación, mantener contrato hacia atrás y coordinar los repos en cambios separados.
+Las cuatro aplicaciones se publican juntas. Los cambios de SSO, roles, rutas, scopes, producto/checkout o navegación requieren comprobar sus consumidores antes del despliegue unificado.
