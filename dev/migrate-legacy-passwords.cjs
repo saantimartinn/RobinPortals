@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-const { createClient } = require('@supabase/supabase-js');
-
 const APPS = {
   portal: { envFile: 'apps/portal/.env', table: 'users', hash: 'apps/portal/lib/auth.js' },
   admin: { envFile: 'apps/admin/.env', table: 'users', hash: 'apps/admin/lib/auth.js' },
@@ -71,6 +69,9 @@ async function main() {
   if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(options.expectUrl)) throw new Error('expected URL must be a Supabase project URL');
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
   if (!serviceKey) throw new Error('service role key is not configured');
+  const { createClient } = require(require.resolve('@supabase/supabase-js', {
+    paths: [path.resolve(__dirname, '../apps/admin')],
+  }));
   const hashPassword = require(path.resolve(__dirname, '..', app.hash)).hashPassword;
   const sb = createClient(options.expectUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const counts = await migratePasswords({ sb, table: app.table, hashPassword, apply: options.apply });
