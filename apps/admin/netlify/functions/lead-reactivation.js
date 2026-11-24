@@ -10,10 +10,9 @@ exports.handler = async event => {
   if (process.env.CONTEXT !== 'production') return json({ skipped: 'not_production' });
   try {
     const { getAdminSupabase } = require('../../lib/admin-supabase');
-    const { rows } = require('../../lib/lead-reactivation');
-    const { CAMPAIGN_ID } = require('../../lib/lead-reactivation-content');
-    const settings = await rows(getAdminSupabase().from('crm_reactivation_settings').select('enabled,activated_at').eq('campaign_id', CAMPAIGN_ID).single());
-    if (!settings.enabled || !settings.activated_at) return json({ enabled: false });
+    const { readSettings } = require('../../lib/lead-reactivation');
+    const settings = await readSettings(getAdminSupabase());
+    if (!settings || !settings.enabled || !settings.activated_at) return json({ enabled: false });
     // Scheduled functions have a 30-second limit. The authenticated background
     // worker has 15 minutes for calendar/Gmail checks and provider rate limits.
     const token = jwt.sign({ run_at: new Date().toISOString() }, getJwtSecret('crm-reactivation-worker'), { algorithm: 'HS256', audience: 'crm-reactivation-worker', expiresIn: '5m' });

@@ -4,7 +4,7 @@ const { readSessionFromEvent } = require('../../lib/auth');
 const { findAdminForSession } = require('../../lib/admin-auth');
 const { json, methodNotAllowed, parseJsonBody, serverError } = require('../../lib/http');
 const { sendEmail } = require('../../lib/email');
-const { rows } = require('../../lib/lead-reactivation');
+const { rows, readSettings } = require('../../lib/lead-reactivation');
 const { CAMPAIGN_ID, TEST_TO, templates, ineligibleReason, renderMessage, testIdempotencyKey } = require('../../lib/lead-reactivation-content');
 
 exports.handler = async event => {
@@ -29,7 +29,8 @@ exports.handler = async event => {
       if (!result.sent || !result.id) return json({ error: 'test_send_failed' }, { statusCode: 502 });
       return json({ sent: true, to: TEST_TO, id: result.id });
     }
-    const settings = await rows(db.from('crm_reactivation_settings').select('enabled,activated_at,confirmed_holanda_lead_ids,last_error').eq('campaign_id', CAMPAIGN_ID).single());
+    const settings = await readSettings(db);
+    if (!settings) return json({ enabled: false, setupPending: true, enrollment: null, count: 0, messages: [], templates: templates.map(({ number, day, subject }) => ({ number, day, subject })), testTo: TEST_TO });
     const enrollment = await rows(db.from('crm_lead_reactivations').select('id,status,stop_reason,enrolled_at').eq('lead_id', leadId).eq('campaign_id', CAMPAIGN_ID).maybeSingle());
     const messages = enrollment ? await rows(db.from('crm_lead_reactivation_messages').select('id,message_number,template,scheduled_at,sent_at,status,delivery_status,error').eq('enrollment_id', enrollment.id).order('message_number')) : [];
     return json({ enabled: settings.enabled, blocked: Boolean(settings.last_error), enrollment, exclusion: ineligibleReason(lead, new Date(), settings.confirmed_holanda_lead_ids || []), count: messages.filter(message => message.sent_at).length, messages, templates: templates.map(({ number, day, subject }) => ({ number, day, subject })), testTo: TEST_TO });

@@ -3,6 +3,14 @@ const assert = require('node:assert/strict');
 const { unsubscribeUrl } = require('../lib/lead-reactivation');
 const { TEST_TO } = require('../lib/lead-reactivation-content');
 
+test('an unpublished migration keeps reactivation disabled and does not call providers; connection errors remain visible', async () => {
+  const { runReactivation, readSettings } = require('../lib/lead-reactivation');
+  const db = error => ({ from() { return { select() { return this; }, eq() { return this; }, maybeSingle: async () => ({ data: null, error }) }; } });
+  const result = await runReactivation({ db: db({ code: 'PGRST205' }), calendar: async () => { throw new Error('must_not_call_calendar'); } });
+  assert.deepEqual(result, { enabled: false, sent: 0 });
+  await assert.rejects(readSettings(db({ code: '503', message: 'connection_failed' })), error => error.code === '503');
+});
+
 function handler(file, mocks) {
   const saved = [];
   for (const [name, exports] of Object.entries(mocks)) {

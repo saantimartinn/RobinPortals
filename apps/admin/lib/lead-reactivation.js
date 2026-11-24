@@ -27,6 +27,13 @@ async function rows(query) {
   return result.data;
 }
 
+async function readSettings(db) {
+  const result = await db.from('crm_reactivation_settings').select('*').eq('campaign_id', CAMPAIGN_ID).maybeSingle();
+  if (['42P01', 'PGRST205'].includes(result.error?.code)) return null;
+  if (result.error) throw result.error;
+  return result.data;
+}
+
 async function rpc(db, name, args) { return rows(db.rpc(name, args)); }
 
 async function allRows(db, table, columns = '*') {
@@ -53,8 +60,8 @@ function activeBooking(bookings, email, now) {
 
 // Called by the scheduled function only. All provider failures fail closed.
 async function runReactivation({ now = new Date(), db = getAdminSupabase(), calendar = listWebBookings, readToken = getGmailReadAccessToken, reply = hasLeadReply, mailer = sendEmail } = {}) {
-  const settings = await rows(db.from('crm_reactivation_settings').select('*').eq('campaign_id', CAMPAIGN_ID).single());
-  if (!settings.enabled || !settings.activated_at) return { enabled: false, sent: 0 };
+  const settings = await readSettings(db);
+  if (!settings || !settings.enabled || !settings.activated_at) return { enabled: false, sent: 0 };
   const exclusion = lead => ineligibleReason(lead, now, settings.confirmed_holanda_lead_ids || []);
   if (!process.env.RESEND_API_KEY) throw new Error('reactivation_email_provider_missing');
   const bookings = await calendar(new Date(now.getTime() - DAY).toISOString(), new Date(now.getTime() + 180 * DAY).toISOString());
@@ -137,4 +144,4 @@ async function runReactivation({ now = new Date(), db = getAdminSupabase(), cale
   return { enabled: true, enrolled, sent, failed, booked, stopped };
 }
 
-module.exports = { unsubscribeUrl, readUnsubscribeToken, rows, runReactivation };
+module.exports = { unsubscribeUrl, readUnsubscribeToken, rows, readSettings, runReactivation };

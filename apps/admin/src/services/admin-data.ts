@@ -9,7 +9,7 @@ const apiFetch = (input: RequestInfo | URL, init?: RequestInit) =>
 export type EditableMetricRecord = { id: string; label: string; value: string; detail: string; group?: string };
 export type CrmEmailDraft = { subject: string; body: string; recipientIds: string[]; campaignFilter: string };
 export type CrmEmailTemplate = { id: string; name: string; subject: string; body: string; updatedAt?: string };
-export type LeadReactivationStatus = { enabled: boolean; blocked?: boolean; enrollment: { status: string; stop_reason?: string; enrolled_at: string } | null; exclusion?: string; count: number; testTo: string; templates: Array<{ number: number; day: number; subject: string }>; messages: Array<{ id: string; message_number: number; status: string; scheduled_at: string; sent_at?: string; delivery_status?: string; error?: string }> };
+export type LeadReactivationStatus = { enabled: boolean; setupPending?: boolean; blocked?: boolean; enrollment: { status: string; stop_reason?: string; enrolled_at: string } | null; exclusion?: string; count: number; testTo: string; templates: Array<{ number: number; day: number; subject: string }>; messages: Array<{ id: string; message_number: number; status: string; scheduled_at: string; sent_at?: string; delivery_status?: string; error?: string }> };
 // Consultation booked on the website (hello@ calendar), matched to leads by email.
 export type WebBooking = { eventId: string; start: string; end?: string; emails: string[]; name?: string | null; meetUrl?: string | null };
 export type LeadTeamNote = { id: string; leadId: string; body: string; authorName: string; createdAt: string };

@@ -807,6 +807,11 @@ to = "/.netlify/functions/community-subscriber-profile-update"
 status = 200
 
 [[redirects]]
+from = "/therobinplan/api/subscriber/avatar"
+to = "/.netlify/functions/community-subscriber-avatar"
+status = 200
+
+[[redirects]]
 from = "/therobinplan/api/subscription/sync"
 to = "/.netlify/functions/community-subscription-sync"
 status = 200
@@ -895,6 +900,11 @@ status = 200
 [[redirects]]
 from = "/therobinplan/api/sub-admin/partner-logo"
 to = "/.netlify/functions/community-partner-logo-upload"
+status = 200
+
+[[redirects]]
+from = "/therobinplan/api/sub-admin/mentor-photo"
+to = "/.netlify/functions/community-sub-admin-mentor-photo"
 status = 200
 
 [[redirects]]
