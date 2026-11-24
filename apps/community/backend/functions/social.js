@@ -8,6 +8,7 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { isSubscriberRole, subscriberDisplayName } = require('../lib/principal');
+const { subscriberAvatarUrls } = require('../lib/subscriber-avatars');
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
@@ -70,7 +71,7 @@ exports.handler = async (event) => {
 
     // ---- GET: directorio + estados ----
     const { data: subs } = await sb.from('subscribers')
-      .select('id, nombre, apellidos, email, username, ciudad, avatar_url')
+      .select('id, nombre, apellidos, email, username, ciudad, avatar_url, avatar_path')
       .or('is_subscriber.eq.true,role.eq.subscriber')
       .neq('id', uid);
 
@@ -85,9 +86,17 @@ exports.handler = async (event) => {
     });
 
     const friends = [], incoming = [], outgoing = [], directory = [];
-    (subs || []).forEach((u) => {
-      const card = { id: u.id, name: subscriberDisplayName(u), ciudad: u.ciudad || null, avatar_url: u.avatar_url || null };
-      const r = relByOther[u.id];
+    const avatarUrls = await subscriberAvatarUrls(sb, subs || []);
+    const cards = (subs || []).map((u, index) => ({
+      id: u.id,
+      name: subscriberDisplayName(u),
+      ciudad: u.ciudad || null,
+      avatar_url: avatarUrls[index],
+      userId: u.id,
+    }));
+    cards.forEach((card) => {
+      const r = relByOther[card.userId];
+      delete card.userId;
       let status = 'none';
       if (r) {
         if (r.status === 'accepted') status = 'friends';

@@ -14,3 +14,4 @@ SQL estructural versionado, sin cuentas predeterminadas.
 - [006_crm_client_notes.sql](../../../../supabase/migrations/006_crm_client_notes.sql): Esquema de base de datos.
 - [007_arrival_pack_access.sql](../../../../supabase/migrations/007_arrival_pack_access.sql): Esquema de base de datos.
 - [008_website_partners.sql](../../../../supabase/migrations/008_website_partners.sql): Esquema de base de datos.
+- [009_community_private_images.sql](../../../../supabase/migrations/009_community_private_images.sql): Esquema de base de datos.

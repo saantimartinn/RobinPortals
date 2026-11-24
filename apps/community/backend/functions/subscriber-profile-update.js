@@ -1,14 +1,12 @@
 /**
- * POST /api/subscriber/profile  Body: { nombre?, apellidos?, email?, ciudad?, avatar_url? }
+ * POST /api/subscriber/profile  Body: { nombre?, apellidos?, email?, ciudad?, profile_extra? }
  * Edición mínima de perfil para suscriptores (Ajustes). Email duplicado → 409.
- *
- * avatar_url: foto de perfil (data URL base64 ya redimensionada en cliente). Se guarda
- * en users.avatar_url. Se actualiza por separado para que, si la columna aún no existe
- * (migración pendiente), no rompa el guardado del resto de campos.
+ * Las fotos se gestionan por /api/subscriber/avatar y nunca se guardan aquí como data URL.
  */
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
+const { subscriberAvatarUrl } = require('../lib/subscriber-avatars');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return methodNotAllowed(['POST']);
@@ -18,6 +16,9 @@ exports.handler = async (event) => {
 
   const body = parseJsonBody(event);
   if (!body) return json({ error: 'invalid_json' }, { statusCode: 400 });
+  if (Object.prototype.hasOwnProperty.call(body, 'avatar_url')) {
+    return json({ error: 'avatar_upload_endpoint_required' }, { statusCode: 400 });
+  }
 
   const update = {};
   if (typeof body.nombre === 'string') update.nombre = body.nombre.trim();
@@ -25,9 +26,8 @@ exports.handler = async (event) => {
   if (typeof body.email === 'string' && body.email.trim()) update.email = body.email.trim().toLowerCase();
   if (typeof body.ciudad === 'string') update.ciudad = body.ciudad.trim() || null;
 
-  const hasAvatar = typeof body.avatar_url === 'string';
   const hasExtra = body.profile_extra && typeof body.profile_extra === 'object' && !Array.isArray(body.profile_extra);
-  if (!Object.keys(update).length && !hasAvatar && !hasExtra) return json({ error: 'nothing_to_update' }, { statusCode: 400 });
+  if (!Object.keys(update).length && !hasExtra) return json({ error: 'nothing_to_update' }, { statusCode: 400 });
 
   try {
     const sb = getSupabase();
@@ -43,20 +43,6 @@ exports.handler = async (event) => {
       const res = await sb.from('subscribers').update(update).eq('id', session.uid).select('*').single();
       if (res.error) throw res.error;
       data = res.data;
-    }
-
-    // Avatar por separado (tolerante a columna inexistente)
-    let avatarSaved = false;
-    let avatarUrl = null;
-    if (hasAvatar) {
-      const val = body.avatar_url ? String(body.avatar_url) : null;
-      const res = await sb.from('subscribers').update({ avatar_url: val }).eq('id', session.uid).select('id, avatar_url').single();
-      if (res.error) {
-        console.error('subscriber-profile-update avatar error (¿falta migración avatar_url?)', res.error.message || res.error);
-      } else {
-        avatarSaved = true;
-        avatarUrl = res.data ? res.data.avatar_url : val;
-      }
     }
 
     // Campos extendidos de perfil (tolerante a columna inexistente)
@@ -75,9 +61,9 @@ exports.handler = async (event) => {
       if (!res.error) data = res.data;
     }
 
+    const avatarUrl = await subscriberAvatarUrl(sb, data);
     return json({
       ok: true,
-      avatar_saved: avatarSaved,
       extra_saved: extraSaved,
       user: {
         id: data && data.id,
@@ -85,7 +71,7 @@ exports.handler = async (event) => {
         apellidos: data && data.apellidos,
         email: data && data.email,
         ciudad: data && data.ciudad,
-        avatar_url: avatarUrl != null ? avatarUrl : (data && data.avatar_url) || null,
+        avatar_url: avatarUrl,
         profile_extra: (data && data.profile_extra) || (hasExtra ? body.profile_extra : null),
       },
     });

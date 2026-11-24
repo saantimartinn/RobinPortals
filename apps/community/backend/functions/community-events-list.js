@@ -5,6 +5,7 @@
 const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
+const { signedMentorPhotoPaths } = require('../lib/subscriber-avatars');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -28,7 +29,13 @@ exports.handler = async (event) => {
       (rsvps || []).forEach((r) => { rsvpMap[r.event_id] = r.status; });
     }
 
-    const out = (events || []).map((e) => ({ ...e, my_rsvp: rsvpMap[e.id] || null }));
+    const out = (events || []).map((e) => ({ ...e, meta: { ...(e.meta || {}) }, my_rsvp: rsvpMap[e.id] || null }));
+    const mentorPaths = out.map((row) => row.meta?.photo_path).filter(Boolean);
+    const mentorUrls = await signedMentorPhotoPaths(sb, mentorPaths);
+    out.forEach((row) => {
+      row.meta.photo = mentorUrls.get(row.meta.photo_path) || (String(row.meta.photo || '').startsWith('data:image/') ? row.meta.photo : '');
+      delete row.meta.photo_path;
+    });
     return json({ events: out });
   } catch (e) {
     console.error('community-events-list error', e);

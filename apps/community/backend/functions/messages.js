@@ -10,6 +10,7 @@ const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { getFriendIds, areFriends } = require('../lib/social');
 const { isSubscriberRole, subscriberDisplayName } = require('../lib/principal');
+const { subscriberAvatarUrls } = require('../lib/subscriber-avatars');
 
 exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
@@ -59,9 +60,12 @@ exports.handler = async (event) => {
     if (!friendIds.length) return json({ conversations: [], unread_total: 0 });
 
     const { data: fusers } = await sb.from('subscribers')
-      .select('id, nombre, apellidos, email, username, avatar_url')
+      .select('id, nombre, apellidos, email, username, avatar_url, avatar_path')
       .in('id', friendIds);
-    const nameById = {}; (fusers || []).forEach((u) => { nameById[u.id] = u; });
+    const avatarUrls = await subscriberAvatarUrls(sb, fusers || []);
+    const nameById = {}; (fusers || []).forEach((u, index) => {
+      nameById[u.id] = { ...u, avatar_url: avatarUrls[index] };
+    });
 
     const { data: allMsgs } = await sb.from('direct_messages')
       .select('id, sender_id, recipient_id, body, created_at, read_at')

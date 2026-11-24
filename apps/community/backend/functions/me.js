@@ -5,6 +5,7 @@ const { principalTable } = require('../lib/principal');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
 const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 const { readArrivalIdentity, arrivalUser } = require('../lib/arrival-access');
+const { subscriberAvatarUrl } = require('../lib/subscriber-avatars');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -55,7 +56,7 @@ exports.handler = async (event) => {
       nombre: u.nombre,
       apellidos: u.apellidos,
       ciudad: u.ciudad || null,
-      avatar_url: u.avatar_url || null,
+      avatar_url: await subscriberAvatarUrl(sb, u),
       profile_extra: u.profile_extra || null,
       robin_level_override: u.robin_level_override || null,
       bonus_days: u.bonus_days || 0,

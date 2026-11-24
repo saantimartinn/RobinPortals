@@ -5,7 +5,7 @@ import { CalendarCheck, CheckCircle2, GraduationCap, Loader2, Pencil, Plus, Tras
 import { NAVY, NAVY_DARK } from "../../shared/theme.js";
 import React, { useState } from "react";
 import { formatDate, resizeImageFile } from "../../shared/utils.js";
-import { subAdminMutate } from "../../api/index.js";
+import { subAdminMutate, subAdminMentorPhotoUpload } from "../../api/index.js";
 
 function AdminMentorManager({ events, onChanged }) {
   const mentors = events.filter((e) => e.type === "mentor");
@@ -21,7 +21,7 @@ function AdminMentorManager({ events, onChanged }) {
   function blank() { return { title: "", meta: { sector: "", job: "", linkedin: "", photo: "", description: "" }, active: true }; }
   function startEdit(m) { setErr(""); setEditing(m ? { ...m, meta: { sector: "", job: "", linkedin: "", photo: "", description: "", ...(m.meta || {}) } } : blank()); }
   function setMeta(k, v) { setEditing((p) => ({ ...p, meta: { ...(p.meta || {}), [k]: v } })); }
-  async function onPhoto(e) { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { const d = await resizeImageFile(f, 256); setMeta("photo", d); } catch (_) {} }
+  async function onPhoto(e) { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { const blob = await resizeImageFile(f, 256, { asBlob: true }); const result = await subAdminMentorPhotoUpload(blob); setEditing((p) => ({ ...p, meta: { ...(p.meta || {}), photo_path: result.path, photo: result.photo_url } })); } catch (error) { setErr(error.message || "No se pudo subir la foto."); } }
   async function saveMentor() {
     if (!editing.title.trim()) { setErr("El nombre es obligatorio."); return; }
     setSaving(true); setErr("");
@@ -55,7 +55,7 @@ function AdminMentorManager({ events, onChanged }) {
               </div>
               <label className="cursor-pointer">
                 <span className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white" style={{ background: NAVY }}><UploadCloud className="h-3.5 w-3.5" /> {editing.meta.photo ? "Cambiar foto" : "Subir foto"}</span>
-                <input type="file" accept="image/*" className="hidden" onChange={onPhoto} />
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onPhoto} />
               </label>
             </div>
             <Field label="Nombre" value={editing.title} onChange={(v) => setEditing((p) => ({ ...p, title: v }))} />

@@ -13,6 +13,7 @@ Generado desde Netlify y los handlers. Los controles por rol y ownership están 
 | `/api/subscriber/signup` | [subscriber-signup](../backend/functions/subscriber-signup.js) | POST | Público |
 | `/api/subscriber/cv-ai` | [subscriber-cv-ai](../backend/functions/subscriber-cv-ai.js) | POST | Sesión suscriptor/admin |
 | `/api/subscriber/profile` | [subscriber-profile-update](../backend/functions/subscriber-profile-update.js) | POST | Sesión suscriptor/admin |
+| `/api/subscriber/avatar` | [subscriber-avatar](../backend/functions/subscriber-avatar.js) | POST | Sesión suscriptor/admin |
 | `/api/subscription/sync` | [subscription-sync](../backend/functions/subscription-sync.js) | GET | Sesión suscriptor/admin |
 | `/api/subscription/cancel` | [subscription-cancel](../backend/functions/subscription-cancel.js) | POST | Sesión suscriptor/admin |
 | `/api/subscription/checkout` | [subscription-checkout](../backend/functions/subscription-checkout.js) | POST | Sesión suscriptor/admin |
@@ -31,6 +32,7 @@ Generado desde Netlify y los handlers. Los controles por rol y ownership están 
 | `/api/sub-admin/data` | [sub-admin-data](../backend/functions/sub-admin-data.js) | GET | Sesión suscriptor/admin |
 | `/api/sub-admin/mutate` | [sub-admin-mutate](../backend/functions/sub-admin-mutate.js) | POST | Sesión suscriptor/admin |
 | `/api/sub-admin/partner-logo` | [partner-logo-upload](../backend/functions/partner-logo-upload.js) | POST | Sesión suscriptor/admin |
+| `/api/sub-admin/mentor-photo` | [sub-admin-mentor-photo](../backend/functions/sub-admin-mentor-photo.js) | POST | Sesión suscriptor/admin |
 | `/api/notifications/ack` | [notifications-ack](../backend/functions/notifications-ack.js) | POST | Sesión suscriptor/admin |
 | `/api/notifications` | [notifications-list](../backend/functions/notifications-list.js) | GET | Sesión suscriptor/admin |
 | `/api/stripe/webhook` | [stripe-webhook](../backend/functions/stripe-webhook.js) | POST | Firma Stripe |

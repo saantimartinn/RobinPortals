@@ -32,7 +32,9 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [backend/functions/sub-admin-client-folders.js](../backend/functions/sub-admin-client-folders.js) | Handler HTTP: sub-admin-client-folders | handler |
 | [backend/functions/sub-admin-data.js](../backend/functions/sub-admin-data.js) | Handler HTTP: sub-admin-data | handler |
 | [backend/functions/sub-admin-database.js](../backend/functions/sub-admin-database.js) | Handler HTTP: sub-admin-database | handler, requireDeveloper |
+| [backend/functions/sub-admin-mentor-photo.js](../backend/functions/sub-admin-mentor-photo.js) | Handler HTTP: sub-admin-mentor-photo | handler |
 | [backend/functions/sub-admin-mutate.js](../backend/functions/sub-admin-mutate.js) | Handler HTTP: sub-admin-mutate | bumpDays, handler, normDuration, pick |
+| [backend/functions/subscriber-avatar.js](../backend/functions/subscriber-avatar.js) | Handler HTTP: subscriber-avatar | handler |
 | [backend/functions/subscriber-cv-ai.js](../backend/functions/subscriber-cv-ai.js) | Handler HTTP: subscriber-cv-ai | docxToText, handler, stripDataUrl |
 | [backend/functions/subscriber-profile-update.js](../backend/functions/subscriber-profile-update.js) | Handler HTTP: subscriber-profile-update | handler |
 | [backend/functions/subscriber-signup.js](../backend/functions/subscriber-signup.js) | Handler HTTP: subscriber-signup | handler, isValidEmail |
@@ -55,6 +57,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [backend/lib/revolut-subscriptions.js](../backend/lib/revolut-subscriptions.js) | Servicio servidor: revolut-subscriptions | cancelSubscription, configured, createCustomer, createSubscription, listCycles, planSpec, request, retrieveOrder, retrieveSubscription, variationFor |
 | [backend/lib/social.js](../backend/lib/social.js) | Servicio servidor: social | areFriends, getFriendIds |
 | [backend/lib/stripe.js](../backend/lib/stripe.js) | Servicio servidor: stripe | fulfillCheckout, getBaseUrl, getStripe, isConfigured, toCents |
+| [backend/lib/subscriber-avatars.js](../backend/lib/subscriber-avatars.js) | Servicio servidor: subscriber-avatars | BUCKET, MAX_AVATAR_BYTES, SIGNED_READ_TTL_SECONDS, avatarDescriptor, avatarPrefix, createSignedMentorUpload, createSignedUpload, hasImageSignature, invalid, mentorPhotoPrefix, pathInsidePrefix, removeAvatarObject, removeLinkedMentorPhoto, removeMentorPhotoObject, signedAvatarUrl, signedMentorPhotoPaths, signedMentorPhotoUrl, subscriberAvatarUrl, subscriberAvatarUrls, verifyImageObject, verifyUploadedAvatar, verifyUploadedMentorPhoto |
 | [backend/lib/subscription-billing.js](../backend/lib/subscription-billing.js) | Servicio servidor: subscription-billing | candidateValues, contractClient, createHoldedInvoice, ensureHoldedContact, findPortalMatch, fullName, getPortalSupabase, holdedFetch, intersects, norm, normEmail, normPhone, normTaxId, processRevolutOrder, processStripeInvoice, profileValues, scoreCandidate |
 | [backend/lib/subscription.js](../backend/lib/subscription.js) | Servicio servidor: subscription | PLANS, fulfillSubscriptionCheckout, isConfigured, listAvailablePlans, mapStripeStatus, planAmount, planInterval, planPriceId, syncSubscriptionFromStripeObject |
 | [backend/lib/supabase.js](../backend/lib/supabase.js) | Servicio servidor: supabase | getSupabase |
@@ -82,7 +85,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [frontend/public/recursos/tranquilidad-para-los-padres.pdf](../frontend/public/recursos/tranquilidad-para-los-padres.pdf) | Recurso público | — |
 | [frontend/src/admin-permissions.js](../frontend/src/admin-permissions.js) | Módulo frontend: admin-permissions | canAdminSee, firstAllowedAdminUrl, isDeveloperAdminEmail |
 | [frontend/src/api/arrival.js](../frontend/src/api/arrival.js) | Módulo frontend: arrival | arrivalCheckout, arrivalPayments |
-| [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, changePassword, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMutate, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCancel, subscriptionCheckout, subscriptionPlans, subscriptionPortal, subscriptionSync |
+| [frontend/src/api/index.js](../frontend/src/api/index.js) | Módulo frontend: index | adminFaqMutate, api, challengeSubmit, challengesList, changePassword, communityEventsList, communityRsvp, discountValidate, exchangeApplicationSession, faqsList, login, logout, me, messageSend, messagesConversations, messagesThread, notificationAck, notificationsPending, partnerLogoUpload, partnersList, request, requestPasswordReset, resetPassword, serviceRequestCreate, serviceRequestsList, socialAction, socialData, subAdminData, subAdminDatabase, subAdminDatabaseExecuteSql, subAdminDatabaseUpdate, subAdminMentorPhotoUpload, subAdminMutate, subscriberAvatarDelete, subscriberAvatarUpload, subscriberCvAi, subscriberProfileUpdate, subscriberSignup, subscriptionCancel, subscriptionCheckout, subscriptionPlans, subscriptionPortal, subscriptionSync |
 | [frontend/src/app.jsx](../frontend/src/app.jsx) | Módulo frontend: app | PortalRobin, handleLogout, onFocus, refresh, refreshUser |
 | [frontend/src/application/CrossPortalNav.jsx](../frontend/src/application/CrossPortalNav.jsx) | Módulo frontend: CrossPortalNav | CrossPortalNav, closeEscape, closeOutside, openRobinJr |
 | [frontend/src/application/SubscriberPortal.jsx](../frontend/src/application/SubscriberPortal.jsx) | Módulo frontend: SubscriberPortal | SubscriberPortal |
@@ -180,6 +183,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [scripts/check-architecture.cjs](../scripts/check-architecture.cjs) | Configuración, herramienta o prueba | cycle, markReachable, walk |
 | [scripts/create-admin.cjs](../scripts/create-admin.cjs) | Configuración, herramienta o prueba | main |
 | [scripts/generate-docs.cjs](../scripts/generate-docs.cjs) | Configuración, herramienta o prueba | functionSymbols, link, purpose, walk |
+| [scripts/migrate-subscriber-avatars.mjs](../scripts/migrate-subscriber-avatars.mjs) | Configuración, herramienta o prueba | hasImageSignature, main, parseLegacyDataUrl, verifyStoredImage |
 | [shared/product-access.cjs](../shared/product-access.cjs) | Configuración, herramienta o prueba | canOpenTab, isArrivalOnly, specific, visibleFaqs |
 | [supabase/migrations/001_robin_plan_schema.sql](../supabase/migrations/001_robin_plan_schema.sql) | Esquema de base de datos | — |
 | [supabase/migrations/002_subscription_faqs.sql](../supabase/migrations/002_subscription_faqs.sql) | Esquema de base de datos | — |
@@ -189,6 +193,7 @@ Generado con `npm run docs:generate`. El mapa técnico mantenido está en `docs/
 | [supabase/migrations/006_crm_client_notes.sql](../supabase/migrations/006_crm_client_notes.sql) | Esquema de base de datos | — |
 | [supabase/migrations/007_arrival_pack_access.sql](../supabase/migrations/007_arrival_pack_access.sql) | Esquema de base de datos | — |
 | [supabase/migrations/008_website_partners.sql](../supabase/migrations/008_website_partners.sql) | Esquema de base de datos | — |
+| [supabase/migrations/009_community_private_images.sql](../supabase/migrations/009_community_private_images.sql) | Esquema de base de datos | — |
 | [supabase/seeds/demo.sql](../supabase/seeds/demo.sql) | Datos demo opcionales | — |
 | [test/application-permissions.test.cjs](../test/application-permissions.test.cjs) | Configuración, herramienta o prueba | — |
 | [test/arrival-access.test.cjs](../test/arrival-access.test.cjs) | Configuración, herramienta o prueba | load |

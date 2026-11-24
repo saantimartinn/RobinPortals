@@ -11,6 +11,7 @@ const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = require('../lib/http');
 const { parseImageDataUrl, uploadPartnerLogo } = require('../lib/partner-logo');
 const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
+const avatarStorage = require('../lib/subscriber-avatars');
 
 // Campos permitidos por entidad (whitelist)
 const EVENT_FIELDS   = ['title', 'type', 'description', 'location', 'city', 'starts_at', 'ends_at', 'capacity', 'expires_at', 'meta', 'image_url', 'active', 'sort_order'];
@@ -124,15 +125,36 @@ exports.handler = async (event) => {
 
     if (action === 'delete') {
       if (!payload.id) return json({ error: 'missing_id' }, { statusCode: 400 });
+      let oldMentorPath = null;
+      if (entity === 'event') {
+        const { data: oldEvent } = await sb.from('community_events').select('type, meta').eq('id', payload.id).maybeSingle();
+        if (oldEvent?.type === 'mentor') oldMentorPath = oldEvent.meta?.photo_path || null;
+      }
       if (entity === 'notification') {
         await sb.from('notification_recipients').delete().eq('notification_id', payload.id);
       }
       const { error } = await sb.from(table).delete().eq('id', payload.id);
       if (error) throw error;
+      if (oldMentorPath) {
+        try { await avatarStorage.removeLinkedMentorPhoto(sb, oldMentorPath); } catch (_) { /* Keep database changes successful if Storage cleanup is temporarily unavailable. */ }
+      }
       return json({ ok: true });
     }
 
     const data = pick(payload, fields);
+    let previousMentorPath = null;
+    if (entity === 'event' && data.type === 'mentor' && data.meta) {
+      const meta = { ...data.meta };
+      if (String(meta.photo || '').startsWith('data:image/')) return json({ error: 'mentor_photo_upload_required' }, { statusCode: 400 });
+      delete meta.photo;
+      const photoPath = meta.photo_path || null;
+      if (photoPath && !/^mentors\/[0-9a-f-]{36}\/[^/]+\.(jpg|png|webp)$/i.test(photoPath)) return json({ error: 'invalid_mentor_photo_path' }, { statusCode: 400 });
+      if (action === 'update' && payload.id) {
+        const { data: oldEvent } = await sb.from('community_events').select('meta').eq('id', payload.id).maybeSingle();
+        previousMentorPath = oldEvent?.meta?.photo_path || null;
+      }
+      data.meta = meta;
+    }
     if (entity === 'partner' && data.products !== undefined && (!Array.isArray(data.products) || !data.products.length || data.products.some(product => !['community', 'pack_llegada'].includes(product)))) return json({ error: 'invalid_products' }, { statusCode: 400 });
     if (entity === 'partner' && payload.logo_data_url) {
       const image = parseImageDataUrl(payload.logo_data_url);
@@ -165,6 +187,7 @@ exports.handler = async (event) => {
       }
       const { data: row, error } = await sb.from(table).insert(data).select('*').single();
       if (error) throw error;
+      if (entity === 'event' && row.type === 'mentor') row.meta = { ...(row.meta || {}), photo: null };
       return json({ ok: true, item: row });
     }
 
@@ -180,6 +203,13 @@ exports.handler = async (event) => {
     }
     const { data: row, error } = await sb.from(table).update(data).eq('id', payload.id).select('*').single();
     if (error) throw error;
+    if (entity === 'event' && row.type === 'mentor') {
+      row.meta = { ...(row.meta || {}), photo: null };
+      const nextPath = row.meta.photo_path;
+      if (previousMentorPath && previousMentorPath !== nextPath) {
+        try { await avatarStorage.removeLinkedMentorPhoto(sb, previousMentorPath); } catch (_) { /* Keep database changes successful if Storage cleanup is temporarily unavailable. */ }
+      }
+    }
     return json({ ok: true, item: row });
   } catch (e) {
     console.error('sub-admin-mutate error', e);

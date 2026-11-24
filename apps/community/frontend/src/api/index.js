@@ -90,6 +90,39 @@ export async function subscriberProfileUpdate(payload) {
   return api.post("/api/subscriber/profile", payload);
 }
 
+export async function subscriberAvatarUpload(file) {
+  if (!file || !Number.isSafeInteger(file.size) || file.size <= 0) throw new Error("invalid_file_size");
+  const uploadTicket = await api.post("/api/subscriber/avatar", {
+    action: "upload_ticket",
+    file_mime: file.type,
+    file_size: file.size,
+  });
+  const upload = uploadTicket && uploadTicket.upload;
+  if (!upload?.signed_url || !upload?.path) throw new Error("avatar_upload_ticket_missing");
+  try {
+    const response = await fetch(upload.signed_url, {
+      method: "PUT",
+      headers: { "Content-Type": file.type, "cache-control": "no-store", "x-upsert": "false" },
+      body: file,
+    });
+    if (!response.ok) throw new Error("avatar_upload_failed");
+    return await api.post("/api/subscriber/avatar", {
+      action: "commit",
+      file_path: upload.path,
+      file_mime: file.type,
+      file_size: file.size,
+    });
+  } catch (error) {
+    try { await api.post("/api/subscriber/avatar", { action: "cancel", file_path: upload.path }); }
+    catch (_) {}
+    throw error;
+  }
+}
+
+export async function subscriberAvatarDelete() {
+  return api.post("/api/subscriber/avatar", { action: "delete" });
+}
+
 export async function subscriptionCheckout(plan, billing) {
   return api.post("/api/subscription/checkout", { plan, billing });
 }
@@ -152,6 +185,21 @@ export async function subAdminMutate(entity, action, payload) {
 
 export async function partnerLogoUpload(dataUrl, partnerId) {
   return api.post("/api/sub-admin/partner-logo", { data_url: dataUrl, partner_id: partnerId || null });
+}
+
+export async function subAdminMentorPhotoUpload(file) {
+  if (!file || !Number.isSafeInteger(file.size) || file.size <= 0) throw new Error("invalid_file_size");
+  const ticket = await api.post("/api/sub-admin/mentor-photo", { action: "upload_ticket", file_mime: file.type, file_size: file.size });
+  const upload = ticket && ticket.upload;
+  if (!upload?.signed_url || !upload?.path) throw new Error("mentor_photo_upload_ticket_missing");
+  try {
+    const response = await fetch(upload.signed_url, { method: "PUT", headers: { "Content-Type": file.type, "cache-control": "no-store", "x-upsert": "false" }, body: file });
+    if (!response.ok) throw new Error("mentor_photo_upload_failed");
+    return await api.post("/api/sub-admin/mentor-photo", { action: "commit", file_path: upload.path, file_mime: file.type, file_size: file.size });
+  } catch (error) {
+    try { await api.post("/api/sub-admin/mentor-photo", { action: "cancel", file_path: upload.path }); } catch (_) {}
+    throw error;
+  }
 }
 
 export async function notificationsPending() {

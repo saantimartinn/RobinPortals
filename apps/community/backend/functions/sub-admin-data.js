@@ -11,6 +11,7 @@ const { getSupabase } = require('../lib/supabase');
 const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
 const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
+const { signedMentorPhotoPaths } = require('../lib/subscriber-avatars');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -107,9 +108,16 @@ exports.handler = async (event) => {
       submissionsOut = (subms || []).map((sm) => ({ ...sm, challenge_title: chTitle[sm.challenge_id] || '—', user_name: nameById[sm.user_id] || null }));
     } catch (_) { challengesOut = []; submissionsOut = []; }
 
+    const eventsOut = (eRes.data || []).map((row) => ({ ...row, meta: { ...(row.meta || {}) } }));
+    const mentorPaths = eventsOut.map((row) => row.meta?.photo_path).filter(Boolean);
+    const mentorUrls = await signedMentorPhotoPaths(sb, mentorPaths);
+    eventsOut.forEach((row) => {
+      row.meta.photo = mentorUrls.get(row.meta.photo_path) || (String(row.meta.photo || '').startsWith('data:image/') ? row.meta.photo : '');
+    });
+
     return json({
       users: usersOut,
-      events: eRes.data || [],
+      events: eventsOut,
       partners: pRes.data || [],
       requests: requestsOut,
       discount_codes,

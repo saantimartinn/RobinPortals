@@ -50,7 +50,7 @@ function isSubscriberUser(u) {
 
 export { isSubscriberUser };
 
-function resizeImageFile(file, max = 256) {
+function resizeImageFile(file, max = 256, options = {}) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("read_error"));
@@ -65,6 +65,10 @@ function resizeImageFile(file, max = 256) {
         canvas.width = max; canvas.height = max;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, sx, sy, side, side, 0, 0, max, max);
+        if (options.asBlob) {
+          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("encode_error")), "image/jpeg", 0.85);
+          return;
+        }
         resolve(canvas.toDataURL("image/jpeg", 0.85));
       };
       img.src = reader.result;

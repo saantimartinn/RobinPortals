@@ -34,4 +34,5 @@ Documentación mantenida y mapas generados.
 - [PARTNERS.md](../../PARTNERS.md): Documentación.
 - [PASSWORD_POLICY.md](../../PASSWORD_POLICY.md): Documentación.
 - [PRIVACY_DATA_MAP.md](../../PRIVACY_DATA_MAP.md): Documentación.
+- [PRIVATE_AVATARS.md](../../PRIVATE_AVATARS.md): Documentación.
 - [TESTING.md](../../TESTING.md): Documentación.

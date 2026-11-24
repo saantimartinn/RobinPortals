@@ -29,7 +29,9 @@ Entradas HTTP de Netlify. Conservan los contratos /api existentes.
 - [sub-admin-client-folders.js](../../../../backend/functions/sub-admin-client-folders.js): Handler HTTP: sub-admin-client-folders.
 - [sub-admin-data.js](../../../../backend/functions/sub-admin-data.js): Handler HTTP: sub-admin-data.
 - [sub-admin-database.js](../../../../backend/functions/sub-admin-database.js): Handler HTTP: sub-admin-database.
+- [sub-admin-mentor-photo.js](../../../../backend/functions/sub-admin-mentor-photo.js): Handler HTTP: sub-admin-mentor-photo.
 - [sub-admin-mutate.js](../../../../backend/functions/sub-admin-mutate.js): Handler HTTP: sub-admin-mutate.
+- [subscriber-avatar.js](../../../../backend/functions/subscriber-avatar.js): Handler HTTP: subscriber-avatar.
 - [subscriber-cv-ai.js](../../../../backend/functions/subscriber-cv-ai.js): Handler HTTP: subscriber-cv-ai.
 - [subscriber-profile-update.js](../../../../backend/functions/subscriber-profile-update.js): Handler HTTP: subscriber-profile-update.
 - [subscriber-signup.js](../../../../backend/functions/subscriber-signup.js): Handler HTTP: subscriber-signup.

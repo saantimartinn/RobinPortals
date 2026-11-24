@@ -74,6 +74,11 @@
   to = "/.netlify/functions/subscriber-profile-update"
   status = 200
 
+[[redirects]]
+  from = "/api/subscriber/avatar"
+  to = "/.netlify/functions/subscriber-avatar"
+  status = 200
+
 # ---------- Suscripciones (Revolut para altas nuevas; Stripe para las vigentes) ----------
 [[redirects]]
   from = "/api/subscription/sync"
@@ -151,6 +156,10 @@
 [[redirects]]
   from = "/api/sub-admin/partner-logo"
   to = "/.netlify/functions/partner-logo-upload"
+  status = 200
+[[redirects]]
+  from = "/api/sub-admin/mentor-photo"
+  to = "/.netlify/functions/sub-admin-mentor-photo"
   status = 200
 
 # ---------- Notificaciones ----------

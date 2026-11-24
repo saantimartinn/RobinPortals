@@ -20,6 +20,7 @@ Servicios y utilidades del servidor compartidos por handlers.
 - [revolut-subscriptions.js](../../../../backend/lib/revolut-subscriptions.js): Servicio servidor: revolut-subscriptions.
 - [social.js](../../../../backend/lib/social.js): Servicio servidor: social.
 - [stripe.js](../../../../backend/lib/stripe.js): Servicio servidor: stripe.
+- [subscriber-avatars.js](../../../../backend/lib/subscriber-avatars.js): Servicio servidor: subscriber-avatars.
 - [subscription-billing.js](../../../../backend/lib/subscription-billing.js): Servicio servidor: subscription-billing.
 - [subscription.js](../../../../backend/lib/subscription.js): Servicio servidor: subscription.
 - [supabase.js](../../../../backend/lib/supabase.js): Servicio servidor: supabase.

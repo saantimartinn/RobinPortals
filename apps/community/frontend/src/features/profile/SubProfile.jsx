@@ -6,7 +6,7 @@ import { NAVY, NAVY_DARK } from "../../shared/theme.js";
 import { ROBIN_CITIES } from "../../shared/constants.js";
 import React, { useState } from "react";
 import { getRobinLevel, resizeImageFile, robinLevelDef } from "../../shared/utils.js";
-import { subscriberProfileUpdate } from "../../api/index.js";
+import { subscriberAvatarDelete, subscriberAvatarUpload, subscriberProfileUpdate } from "../../api/index.js";
 
 function SubProfile({ user, onUserRefresh, setActive }) {
   useLocale();
@@ -47,25 +47,34 @@ function SubProfile({ user, onUserRefresh, setActive }) {
     e.target.value = "";
     if (!file) return;
     setError(""); setMsg(""); setAvatarBusy(true);
+    const previousAvatar = avatar;
+    let previewUrl = "";
+    let uploadComplete = false;
     try {
-      const dataUrl = await resizeImageFile(file, 256);
-      setAvatar(dataUrl);
-      const res = await subscriberProfileUpdate({ avatar_url: dataUrl });
-      if (res && res.avatar_saved === false) setError("Foto mostrada, pero falta aplicar la migración avatar_url en la base de datos para que persista.");
-      else setMsg("Foto de perfil actualizada.");
+      const resized = await resizeImageFile(file, 256, { asBlob: true });
+      previewUrl = URL.createObjectURL(resized);
+      setAvatar(previewUrl);
+      const res = await subscriberAvatarUpload(resized);
+      uploadComplete = true;
+      setAvatar(res.avatar_url || "");
+      setMsg("Foto de perfil actualizada.");
+      URL.revokeObjectURL(previewUrl);
+      previewUrl = "";
       await onUserRefresh();
     } catch (_) {
+      if (!uploadComplete) setAvatar(previousAvatar);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
       setError("No hemos podido actualizar la foto.");
     } finally { setAvatarBusy(false); }
   }
   async function removeAvatar() {
     setError(""); setMsg(""); setAvatarBusy(true);
     try {
+      await subscriberAvatarDelete();
       setAvatar("");
-      await subscriberProfileUpdate({ avatar_url: "" });
       await onUserRefresh();
       setMsg("Foto eliminada.");
-    } catch (_) {} finally { setAvatarBusy(false); }
+    } catch (_) { setError("No hemos podido eliminar la foto."); } finally { setAvatarBusy(false); }
   }
 
   async function save() {
@@ -104,11 +113,11 @@ function SubProfile({ user, onUserRefresh, setActive }) {
                   <span className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white" style={{ background: NAVY }}>
                     {avatarBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />} {avatar ? t("Cambiar foto") : t("Subir foto")}
                   </span>
-                  <input type="file" accept="image/*" className="hidden" onChange={onPickAvatar} disabled={avatarBusy} />
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onPickAvatar} disabled={avatarBusy} />
                 </label>
                 {avatar && <Btn size="sm" variant="ghost" onClick={removeAvatar} disabled={avatarBusy}>{t("Quitar")}</Btn>}
               </div>
-              <div className="text-[11px] text-slate-400">{t("JPG o PNG. Se recorta a un cuadrado.")}</div>
+              <div className="text-[11px] text-slate-400">{t("JPG, PNG o WEBP. Se recorta a un cuadrado.")}</div>
             </div>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
