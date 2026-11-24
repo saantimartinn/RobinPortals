@@ -14,7 +14,6 @@ Maintained files in this directory and links to their responsibilities.
 | [`202610050001_create_sales_simulation.sql`](../../../../supabase/admin-migrations/202610050001_create_sales_simulation.sql) | Database migration, seed, or schema support file. |
 | [`202610060001_create_crm_email_workspace.sql`](../../../../supabase/admin-migrations/202610060001_create_crm_email_workspace.sql) | Database migration, seed, or schema support file. |
 | [`202610080001_create_crm_historical_metrics.sql`](../../../../supabase/admin-migrations/202610080001_create_crm_historical_metrics.sql) | Database migration, seed, or schema support file. |
-| [`202610080002_seed_crm_historical_metrics.sql`](../../../../supabase/admin-migrations/202610080002_seed_crm_historical_metrics.sql) | Database migration, seed, or schema support file. |
 | [`202610130001_create_crm_call_history.sql`](../../../../supabase/admin-migrations/202610130001_create_crm_call_history.sql) | Database migration, seed, or schema support file. |
 | [`202610130002_create_crm_future_leads.sql`](../../../../supabase/admin-migrations/202610130002_create_crm_future_leads.sql) | Database migration, seed, or schema support file. |
 | [`202610190003_add_crm_leads_display_id.sql`](../../../../supabase/admin-migrations/202610190003_add_crm_leads_display_id.sql) | Database migration, seed, or schema support file. |

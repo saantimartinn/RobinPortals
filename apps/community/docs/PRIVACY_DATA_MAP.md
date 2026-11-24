@@ -6,6 +6,8 @@ Stripe recibe datos de pago en su propia interfaz, no campos de tarjeta en React
 CV con IA envía al proveedor Anthropic el contenido necesario del documento/perfil.
 Resend procesa destinatarios y contenido de correo transaccional.
 
-No se incluyen datos reales ni exports en Git. Establecer retención y borrado de
-mensajes, CV y logs antes de producción. El fallback de email registra solo etiqueta,
-pero otros logs heredados requieren revisión específica.
+No se incluyen exports de suscriptores ni datos reales propios de Community en Git.
+El monorepo sí contiene un seed histórico seudonimizado del CRM de Admin; está
+documentado en [métricas históricas](../../admin/docs/crm-historical-metrics.md).
+Establecer retención y borrado de mensajes, CV y logs antes de producción. El
+fallback de email registra solo etiqueta, pero otros logs heredados requieren revisión específica.

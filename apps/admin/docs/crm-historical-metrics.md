@@ -11,27 +11,20 @@ Las analíticas existentes combinan automáticamente dos tramos:
 - Histórico validado de Notion: fechas anteriores al 23/09/2026, hora de Madrid.
 - CRM nativo: desde el 23/09/2026, hora de Madrid.
 
-El histórico solo conserva un HMAC seudónimo, fecha de adquisición, campaña,
-canal, gestor y condición de cliente. No conserva nombre, email ni teléfono.
-El email se utiliza una sola vez durante la importación para buscar una posible
-firma contractual en el Portal. Si se encuentra una coincidencia única se
-guardan el identificador interno del usuario y la fecha contractual; si no, el
-registro cuenta como cliente de su cohorte, pero no se le inventa una fecha de
-alta.
+Las tablas de producción pueden conservar hechos históricos seudonimizados
+para alimentar métricas agregadas. El email se utiliza durante la importación
+para buscar una posible firma contractual en el Portal; los archivos originales
+y los informes resultantes deben mantenerse fuera de Git. La seudonimización no
+convierte esos registros en anónimos.
 
 ## Criterios incorporados
 
-- `IN` y `25-26` cuentan como cliente.
-- Sin campaña cuenta como `Orgánico`.
-- Delft/Deflt y el resto de campañas con nombre cuentan como Meta, salvo los
-  colegios indicados.
-- Voramar, Kings College y The Ark cuentan como Colegios.
-- Noel, María y Manuel aparecen por separado.
-- Varios cuenta en el equipo, pero no se atribuye a una persona.
-- Sin gestor cuenta en el total general, pero no en el rendimiento individual.
-- Duplicados y registros de prueba ya depurados no se almacenan como incidencias
-  ni se muestran en las métricas.
-- Meta aporta el gasto. CRM + histórico aportan el número de leads y clientes.
+- Las reglas de clasificación distinguen clientes, campañas orgánicas, campañas
+  publicitarias y centros educativos.
+- Los leads sin gestor identificable no se atribuyen al rendimiento individual.
+- Duplicados y registros de prueba depurados no se almacenan como incidencias ni
+  se muestran en las métricas.
+- Meta aporta el gasto. CRM e histórico aportan los recuentos comerciales.
 
 ## Tablas nuevas
 
@@ -48,7 +41,7 @@ analíticas no lo ven hasta que se activa. Al activar, el lote anterior pasa a
 
 ### Datos privados de importación
 
-El repositorio contiene el esquema y el importador, pero no los registros reales de producción. Los datos originales, los lotes y los informes de importación se guardan fuera de Git, incluso cuando los identificadores estén seudonimizados. La antigua migración de datos se conserva como no-op; no altera los registros ya existentes.
+El repositorio contiene el esquema y el importador, pero no contiene filas históricas del CRM ni un seed con registros reales. Los datos originales, los lotes y los informes de importación deben guardarse fuera de Git, incluso cuando los identificadores estén seudonimizados. La reescritura del historial público no elimina filas ya cargadas en Supabase.
 
 ### 1. Desplegar el código compatible
 
@@ -114,7 +107,7 @@ npm run crm-history:preview -- \
   --report /tmp/robin-crm-history-preview.json
 ```
 
-El ensayo debe contrastarse con los totales de control del lote privado. No publicar esos informes ni su desglose por gestor o campaña.
+El informe debe contrastarse con los controles internos autorizados. No publicar los informes ni sus desgloses por gestor o campaña.
 
 También muestra las campañas Meta que no se hayan podido cruzar por nombre. El
 ensayo no contiene datos personales.
@@ -126,7 +119,7 @@ alguna campaña pendiente, crear fuera del repositorio un JSON como este:
 
 ```json
 {
-  "Delft Septiembre": {
+  "Campaña de ejemplo": {
     "id": "ID_REAL_DE_META",
     "name": "NOMBRE_REAL_EN_META"
   }
@@ -205,13 +198,13 @@ y los clientes vivos continúan leyendo exclusivamente los datos operativos.
 
 Comprobar en el portal:
 
-1. Rango `Todo`: aparecen datos desde mayo de 2025.
-2. Un rango anterior al 23/09/2026: muestra histórico sin duplicar CRM.
-3. Un rango posterior al corte: coincide con el CRM nativo.
+1. El rango completo incluye el tramo histórico configurado.
+2. Un rango anterior a la fecha de corte muestra histórico sin duplicar el CRM.
+3. Un rango posterior al corte coincide con el CRM nativo.
 4. Campañas: conserva el nombre original y muestra gasto cuando existe cruce
    Meta.
-5. Gestores: Noel, María y Manuel tienen sus cohortes; el total de equipo es
-   mayor o igual que la suma individual por Varios y Sin gestor.
+5. Gestores: las métricas individuales concuerdan con las reglas internas de
+   asignación; el total de equipo incluye los registros sin atribución individual.
 6. Bandeja de leads y cartera: no aparece ningún registro histórico nuevo.
 
 ## Rollback

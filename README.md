@@ -44,6 +44,7 @@ Las tareas programadas solo se ejecutan con `ROBIN_RUN_SCHEDULED=true`; la trans
 
 ## Documentación
 
+- [Guía del repositorio público, privacidad y licencias](docs/PUBLIC_REPOSITORY.md)
 - [Portal del Alumno](apps/portal/README.md)
 - [Robin Jr](apps/robinjr/README.md)
 - [The Robin Plan](apps/community/README.md)
@@ -52,3 +53,9 @@ Las tareas programadas solo se ejecutan con `ROBIN_RUN_SCHEDULED=true`; la trans
 - [Primitivas de autenticación](packages/auth/README.md)
 
 Las guías técnicas explican contratos y operación. Sus ejemplos no son cuentas de acceso ni deben contener datos de clientes.
+
+## Licencia y reutilización
+
+Este repositorio es público, pero **no está publicado bajo una licencia de código abierto**. Consulta [`LICENSE`](LICENSE) y la [guía de derechos y reutilización](docs/PUBLIC_REPOSITORY.md#derechos-de-autor-y-reutilización). GitHub permite a sus usuarios ver y bifurcar repositorios públicos; eso no concede una licencia general para reutilizar el código fuera de la plataforma. El código, las fotografías, las marcas y otros recursos pueden tener titulares y condiciones distintos.
+
+Para reportar un problema de seguridad, consulta [`SECURITY.md`](SECURITY.md). No publiques secretos, datos de clientes ni detalles de vulnerabilidades sin corregir en incidencias públicas.

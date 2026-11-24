@@ -104,3 +104,7 @@ el backend verifica rol y ownership. Robin Admin es otra app del mismo sitio.
 Las cuatro apps comparten el build del sitio y algunos paquetes de la raíz,
 pero conservan reglas y Functions propias. Los cambios de roles, API o rutas
 requieren revisar consumidores en todo el monorepo.
+
+## Repositorio público y licencia
+
+Este monorepo no se distribuye bajo una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [`LICENSE`](../../LICENSE); los permisos de fotografías, marcas y otros recursos pueden ser distintos.

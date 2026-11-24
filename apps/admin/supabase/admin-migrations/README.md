@@ -18,7 +18,7 @@ navegador.
 - `202610080001_create_crm_historical_metrics.sql`: cohortes históricas
   pseudonimizadas para alimentar las métricas anteriores al 23/09/2026 sin
   añadir registros a la bandeja, clientes ni eventos operativos.
-- `202610080002_seed_crm_historical_metrics.sql`: identificador histórico conservado como no-op. Los datos reales se importan desde almacenamiento privado.
+- Las filas históricas del CRM no se distribuyen en Git. Para su carga, usa el importador autorizado con el archivo fuente custodiado fuera del repositorio y sigue la [nota sobre métricas](../../docs/crm-historical-metrics.md).
 - `202610190003_add_crm_leads_display_id.sql`: añade IDs legibles `ID-N` a
   los leads; conserva sus UUID internos como claves y referencias.
 - `202611040001_add_crm_lead_messages.sql`: permite registrar mensajes sin

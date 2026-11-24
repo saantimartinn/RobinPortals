@@ -95,3 +95,7 @@ El usuario administrativo se resuelve en `portal-source/src/app.jsx` y entra a `
 Las cuatro apps comparten el build del sitio, pero conservan Functions, variables
 de entorno y reglas de dominio propias. Los cambios de identidad, API o rutas
 requieren comprobar todos los consumidores y regenerar `netlify.toml` de raíz.
+
+## Repositorio público y licencia
+
+Este monorepo no se distribuye bajo una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [`LICENSE`](../../LICENSE); los permisos de fotografías, marcas y otros recursos pueden ser distintos.

@@ -101,3 +101,5 @@ Para un fallo de UI vacía, examina respuesta de documento, bundle JS/CSS, base 
 - [Robin Subscriptions USERGUIDE](../community/USERGUIDE.md).
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)
+
+Consulta también la [guía del repositorio público](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [licencia](../../LICENSE). La documentación no concede acceso a cuentas ni datos de producción.

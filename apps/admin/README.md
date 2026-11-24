@@ -29,3 +29,7 @@ La compilación y publicación se realizan desde la raíz del monorepo; consulta
 - [Robin Jr](../robinjr/README.md): programa Junior.
 
 El árbol y los contratos de los otros repos se enlazan desde [USERGUIDE](USERGUIDE.md).
+
+## Repositorio público y licencia
+
+El código es público, pero no tiene una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md), [`LICENSE`](../../LICENSE) y [`SECURITY.md`](../../SECURITY.md). No publiques credenciales, datos del CRM ni exports.

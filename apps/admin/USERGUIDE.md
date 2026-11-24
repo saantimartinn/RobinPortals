@@ -118,3 +118,5 @@ Al reproducir un bug, anota URL completa, pathname y query, host, identidad/rol 
 - [Robin Subscriptions USERGUIDE](../community/USERGUIDE.md) · cuenta, billing y comunidad de The Robin Plan.
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)
+
+Consulta también la [guía del repositorio público](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [licencia](../../LICENSE). La documentación no concede acceso al CRM ni a datos de producción.

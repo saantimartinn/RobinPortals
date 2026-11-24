@@ -87,3 +87,7 @@ Los dos últimos comandos se añaden con esta documentación. El mapa generado e
 La referencia del Worker vigente es
 [`infra/cloudflare/README.md`](../../infra/cloudflare/README.md); las rutas del
 sitio se combinan desde los `netlify.toml` de las cuatro apps.
+
+## Repositorio público y licencia
+
+Este monorepo no se distribuye bajo una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [`LICENSE`](../../LICENSE); los permisos de fotografías, marcas y otros recursos pueden ser distintos.

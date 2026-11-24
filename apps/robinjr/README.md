@@ -44,3 +44,7 @@ Las pruebas se describen en [docs/TESTING.md](docs/TESTING.md). No subir secreto
 
 Las descripciones principales están en `README.md`, `READMELONG.md` y `USERGUIDE.md`;
 las guías técnicas y los mapas navegables viven bajo `docs/`.
+
+## Repositorio público y licencia
+
+El código es público, pero no tiene una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md), [`LICENSE`](../../LICENSE) y [`SECURITY.md`](../../SECURITY.md). No publiques credenciales, datos personales ni exports.

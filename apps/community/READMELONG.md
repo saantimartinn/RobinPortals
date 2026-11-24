@@ -92,3 +92,7 @@ El catálogo de contratos está en [API_INVENTORY](docs/API_INVENTORY.md), funci
 - [Robin Admin](../admin/README.md): panel interno; [READMELONG](../admin/READMELONG.md), [USERGUIDE](../admin/USERGUIDE.md), [API mapping](../admin/docs/API_INVENTORY.md).
 
 Las cuatro aplicaciones se publican juntas. Los cambios de SSO, roles, rutas, scopes, producto/checkout o navegación requieren comprobar sus consumidores antes del despliegue unificado.
+
+## Repositorio público y licencia
+
+Este monorepo no se distribuye bajo una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [`LICENSE`](../../LICENSE); los permisos de fotografías, marcas y otros recursos pueden ser distintos.

@@ -96,3 +96,5 @@ Para pantalla vacía, inspecciona consola, JS/CSS, base `/therobinplan/`, salida
 - [Robin Admin USERGUIDE](../admin/USERGUIDE.md) · panel interno y APIs administrativas.
 
 **Volver al inicio:** [USERGUIDE](USERGUIDE.md) · [README largo](READMELONG.md)
+
+Consulta también la [guía del repositorio público](../../docs/PUBLIC_REPOSITORY.md) y el aviso de [licencia](../../LICENSE). La documentación no concede acceso a cuentas ni datos de producción.

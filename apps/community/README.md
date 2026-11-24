@@ -51,3 +51,7 @@ Las pruebas de esta aplicación se ejecutan con `npm test`; `npm run docs:genera
 
 Las tres entradas principales son `README.md`, `READMELONG.md` y `USERGUIDE.md`;
 las guías técnicas y los mapas navegables se mantienen bajo `docs/`.
+
+## Repositorio público y licencia
+
+El código es público, pero no tiene una licencia de código abierto. Consulta la [guía de publicación](../../docs/PUBLIC_REPOSITORY.md), [`LICENSE`](../../LICENSE) y [`SECURITY.md`](../../SECURITY.md). No publiques credenciales, datos personales ni exports.
