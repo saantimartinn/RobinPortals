@@ -4,7 +4,7 @@ import WebKit
 import LocalAuthentication
 import Security
 
-private enum RobinAddress {
+enum RobinAddress {
     static let start: URL = {
         #if DEBUG && targetEnvironment(simulator)
         URL(string: "http://localhost:8888/portal/")!
@@ -42,7 +42,7 @@ struct ContentView: View {
         ZStack {
             RobinWebView(
                 startURL: RobinAddress.start,
-                onLoaded: { error = nil },
+                onLoaded: { error = nil; if let view = webViewBox.value { PushRegistration.active?.attach(view) } },
                 onError: { error = $0.localizedDescription },
                 onCreated: { webViewBox.value = $0 },
                 onAuthMessage: handleAuthMessage
@@ -148,6 +148,7 @@ struct ContentView: View {
                         throw RobinCredentialStore.Failure.serviceUnavailable
                     }
                     webView.load(URLRequest(url: RobinAddress.start))
+                    PushRegistration.active?.attach(webView)
                 } catch {
                     if case RobinCredentialStore.Failure.keychain(errSecItemNotFound) = error {
                         UserDefaults.standard.removeObject(forKey: RobinCredentialStore.savedUsernameKey)
