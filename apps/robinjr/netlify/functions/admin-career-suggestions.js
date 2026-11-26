@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * /api/admin/career-suggestions
  *
@@ -55,6 +56,7 @@ exports.handler = async (event) => {
       if (body.action === 'feedback') feedbackInput = { programCode: body.program_code, decision: body.decision };
     }
     if (!userId) return json({ error: 'missing_user_id' }, { statusCode: 400 });
+    if (!await canManageClient(sb, admin, userId)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     const { data: user, error: e1 } = await sb
       .from('users')

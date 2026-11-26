@@ -1,3 +1,4 @@
+const { scopeClients } = require('./client-access');
 // Server-side admin dashboard helpers used by request handlers; provider calls and domain rules stay behind this boundary.
 const { ADMIN_EMAILS } = require('./admins');
 const { hasApplicationAdminRole } = require('./authorization');
@@ -17,11 +18,8 @@ async function loadAdminDashboard(sb, admin, adminEmail) {
   const baseSelect =
     'id, display_id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, pago_completed, nombre, apellidos, questionnaire, intereses, assigned_to, application_phase, phase_changed_at, tipo, num_carreras, created_at, updated_at';
 
-  const { data: clientRows, error: clientsError } = await sb
-    .from('users')
-    .select(baseSelect)
-    .eq('assigned_to', adminEmail)
-    .order('created_at', { ascending: false });
+  const { query: clientQuery } = await scopeClients(sb.from('users').select(baseSelect), admin);
+  const { data: clientRows, error: clientsError } = await clientQuery.order('created_at', { ascending: false });
   if (clientsError) throw clientsError;
   let clients = clientRows || [];
 

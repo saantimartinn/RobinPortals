@@ -16,6 +16,18 @@
 
 # ---------- API de administración e integraciones -> Netlify Functions ----------
 [[redirects]]
+  from = "/api/admin/collaboration"
+  to = "/.netlify/functions/admin-collaboration"
+  status = 200
+[[redirects]]
+  from = "/api/admin/tutorial"
+  to = "/.netlify/functions/admin-tutorial"
+  status = 200
+[[redirects]]
+  from = "/api/admin/client-history"
+  to = "/.netlify/functions/admin-client-history"
+  status = 200
+[[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/auth-login"
   status = 200

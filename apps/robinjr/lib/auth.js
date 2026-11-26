@@ -37,7 +37,7 @@ function signSession(user) {
   if (user.auth_source === 'application_admin') {
     payload.auth_source = 'application_admin';
     payload.is_application_admin = true;
-    payload.is_pro_admin = true;
+    payload.is_pro_admin = user.is_pro_admin === true;
     payload.visible_tabs = Array.isArray(user.visible_tabs) ? user.visible_tabs : [];
     payload.email = user.email || null;
     payload.nombre = user.nombre || null;

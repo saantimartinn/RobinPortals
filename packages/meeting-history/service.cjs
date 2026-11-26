@@ -26,7 +26,7 @@ async function summarizeMeeting({ text, title, meetingAt }, chatCompletion) {
   return result.text.trim();
 }
 
-function createTranscriptService({ repo, google, summarize }) {
+function createTranscriptService({ repo, google, summarize, onCompleted }) {
   async function discover(advisors, lookbackHours = 168) {
     const since = new Date(Date.now() - Math.max(1, Math.min(2160, lookbackHours)) * 3600000).toISOString();
     const results = [];
@@ -56,7 +56,11 @@ function createTranscriptService({ repo, google, summarize }) {
     // Document creation can lag the call. Never infer its booking/date from a
     // nearby appointment; only provider-supplied meeting timestamps are factual.
     const summary = await summarize({ text, title:item.title, meetingAt:item.meeting_at_source === 'document' ? null : item.meeting_at });
-    return repo.complete(item, { userId: user.id, bookingId:item.booking_id || null, text, title:item.title, meetingAt:item.meeting_at, summary });
+    const history = await repo.complete(item, { userId: user.id, bookingId:item.booking_id || null, text, title:item.title, meetingAt:item.meeting_at, summary });
+    // History is committed before notification; mail failures remain retryable
+    // in the durable outbox and must never rewrite or lose a completed meeting.
+    if (onCompleted) try { await onCompleted(); } catch (_) { console.warn('[meeting_mail_retry_pending]'); }
+    return history;
   }
 
   async function processBatch(limit = 5) {

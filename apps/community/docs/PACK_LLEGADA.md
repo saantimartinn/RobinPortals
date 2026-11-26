@@ -88,6 +88,10 @@ existing profile flags or answers are not overwritten to bypass the form.
   existing payment receipt. Reading with `product=llegada` does **not** run
   `ensurePayments`, insert rows or reprice existing installments. Missing rows
   are shown as unregistered, with the contractual amount separately identified.
+  The first installment also recognizes Portal's authoritative `pago_completed`
+  and recorded payment date, even if its ledger row is missing or still locked/
+  unlocked. This confirmation does not create a billing row or receipt; existing
+  paid rows and their amounts remain unchanged.
 - A pending first payment links to the existing onboarding payment flow.
   Later unlocked, existing payments open the existing checkout and return to
   Community. Webhook and return verification remain authoritative/idempotent.

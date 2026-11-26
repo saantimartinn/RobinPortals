@@ -1,3 +1,4 @@
+const { scopeClients } = require('../../lib/client-access');
 /**
  * POST /api/admin/assistant
  * Body: { messages: [{role: 'user'|'assistant', content: string}], focus_user_id?: uuid }
@@ -57,10 +58,10 @@ exports.handler = async (event) => {
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
 
     // 1) Clientes del admin
-    const { data: clients, error: ec } = await sb
+    const { query: clientQuery } = await scopeClients(sb
       .from('users')
-      .select('id, lead_id, email, nombre, apellidos, application_phase, phase_changed_at, tipo, num_carreras, pago_completed, created_at, updated_at, historial, intereses, academic_system, academic_subjects, questionnaire')
-      .eq('assigned_to', adminEmail)
+      .select('id, lead_id, email, nombre, apellidos, application_phase, phase_changed_at, tipo, num_carreras, pago_completed, created_at, updated_at, historial, intereses, academic_system, academic_subjects, questionnaire'), admin);
+    const { data: clients, error: ec } = await clientQuery
       .order('created_at', { ascending: false });
     if (ec) throw ec;
     if (focusUserId && !(clients || []).some(client => client.id === focusUserId)) {

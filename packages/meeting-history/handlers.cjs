@@ -1,9 +1,12 @@
 const { createMeetingRepository } = require('./repository.cjs');
 const { createTranscriptService, summarizeMeeting } = require('./service.cjs');
+const { deliverMeetingNotes } = require('../admin-collaboration/meeting-mail.cjs');
 
 function createTranscriptHandlers({ appId, getSupabase, google, chatCompletion, advisors, http }) {
   const service = () => createTranscriptService({ repo: createMeetingRepository(getSupabase()), google,
-    summarize: meeting => summarizeMeeting(meeting, chatCompletion) });
+    summarize: meeting => summarizeMeeting(meeting, chatCompletion),
+    onCompleted: () => deliverMeetingNotes(appId === 'admin' ? 'portal' : appId, {source:getSupabase()}),
+  });
   async function kick() {
     const base = process.env.URL || process.env.DEPLOY_PRIME_URL;
     const secret = process.env.MEET_WEBHOOK_SECRET;
@@ -32,6 +35,7 @@ function createTranscriptHandlers({ appId, getSupabase, google, chatCompletion, 
     const processor = service();
     const discovery = await processor.discover(advisors, Number(process.env.MEET_POLL_LOOKBACK_HOURS) || 168);
     const result = { discovery, ...await processor.processBatch(5) };
+    result.meeting_mail = await deliverMeetingNotes(appId === 'admin' ? 'portal' : appId, {source:getSupabase()});
     console.log('meet-transcript-worker', JSON.stringify(result));
     return http.json(result);
   }

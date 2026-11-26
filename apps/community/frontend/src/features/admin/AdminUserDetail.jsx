@@ -29,11 +29,24 @@ function AdminUserDetail({ u, requests, onChanged, onClose }) {
   }
   async function setReqStatus(r, s) { try { await subAdminMutate("request", "update", { id: r.id, status: s }); await onChanged(); } catch (_) {} }
 
+  async function claim() {
+    setSaving(true); setMsg("");
+    try { await subAdminMutate("user", "claim", { id: u.id }); setMsg("Cliente asignado a tu perfil."); await onChanged(); }
+    catch (e) { setMsg(e.status === 409 ? "Otro administrador ya ha tomado este cliente. La ficha se ha actualizado." : "No se pudo asignar el cliente. Vuelve a intentarlo."); await onChanged(); }
+    finally { setSaving(false); }
+  }
+
+  const readOnly = u.can_manage === false;
   return (
     <Card>
       <CardHeader title={u.name} subtitle={u.email} icon={User}
         right={<Btn size="sm" variant="ghost" onClick={onClose}><XCircle className="h-3.5 w-3.5" /> Cerrar</Btn>} />
       <CardContent className="space-y-4">
+        <p className="text-sm text-slate-500">{u.assigned_to ? `Responsable: ${u.assigned_to}` : "Este cliente no tiene responsable. Si te lo asignas, será un cliente propio de tu perfil."}</p>
+        {!u.assigned_to && <Btn disabled={saving} onClick={claim}>{saving ? "Asignando…" : "Asignarme este cliente"}</Btn>}
+        {readOnly && u.assigned_to && <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">Solo consulta. Para gestionar este cliente, su PRO debe compartirlo contigo.</p>}
+        {msg && <div role="status" className="text-sm rounded-xl px-3 py-2 bg-slate-50 text-slate-700">{msg}</div>}
+        <fieldset disabled={readOnly} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-3">
           <Field label="Nombre" value={nombre} onChange={setNombre} />
           <Field label="Apellidos" value={apellidos} onChange={setApellidos} />
@@ -41,7 +54,6 @@ function AdminUserDetail({ u, requests, onChanged, onClose }) {
           <SelectField label="Estado de suscripción" allowEmpty={false} value={status} onChange={setStatus}
             options={Object.keys(SUB_STATUS_LABELS).map((k) => ({ value: k, label: SUB_STATUS_LABELS[k].label }))} />
         </div>
-        {msg && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">{msg}</div>}
         <Btn disabled={saving} onClick={saveUser}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Guardar cambios</Btn>
 
         <Divider />
@@ -82,6 +94,7 @@ function AdminUserDetail({ u, requests, onChanged, onClose }) {
             </select>
           </div>
         ))}
+        </fieldset>
       </CardContent>
     </Card>
   );

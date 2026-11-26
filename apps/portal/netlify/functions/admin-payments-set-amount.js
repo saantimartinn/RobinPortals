@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/payments/set-amount
  * Body: { user_id, installment (2 ó 3), amount }
@@ -42,6 +43,7 @@ exports.handler = async (event) => {
     const adminEmail = normalizeEmail(admin);
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!await canManageClient(sb, admin, user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     const { data: u } = await sb
       .from('users')

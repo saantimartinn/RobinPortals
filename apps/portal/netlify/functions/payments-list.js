@@ -51,6 +51,7 @@ exports.handler = async (event) => {
         tipo: u.tipo || 'general', num_carreras: u.num_carreras || 1,
         origin: u.origin || null, pais: u.pais || null,
         has_eu_id: u.has_eu_id == null ? null : !!u.has_eu_id,
+        ...(arrival ? { pago_completed: !!u.pago_completed, pago_completed_at: u.pago_completed_at || null } : {}),
       },
       payments,
       ...(arrival ? { contract_plan: applicationPlanForUser(u), arrival_pack: arrivalPackForUser(u) } : {}),

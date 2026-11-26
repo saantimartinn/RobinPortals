@@ -61,6 +61,7 @@ function FolderedClients({ clients, totalCount, onSelect }) {
             <div className="text-sm font-semibold text-slate-900 truncate">{c.nombre} {c.apellidos}</div>
             <div className="text-xs text-slate-400 truncate">{c.email && `${c.email} · `}ID: {c.lead_id || c.id}</div>
           </div>
+          {c.shared_by && <span className="text-xs rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">Compartido por {c.shared_by}</span>}
           <ClientPhaseBadge client={c} />
           <ChevronRight className="h-4 w-4 text-slate-300 flex-shrink-0" />
         </button>
@@ -111,7 +112,7 @@ export function AdminClientesList({ clients, totalCount, searchQ, onSearch, onSe
   );
 }
 
-export function AssignClientModal({ adminEmail, list, loading, error, busyId, onAssign, onClose }) {
+export function AssignClientModal({ canReassign = false, adminEmail, list, loading, error, busyId, onAssign, onClose }) {
   const [q, setQ] = useState("");
   const dq = useDebounced(q, 200);
   const visibles = useMemo(() => {
@@ -168,8 +169,8 @@ export function AssignClientModal({ adminEmail, list, loading, error, busyId, on
                     <Badge tone="green">Tuyo</Badge>
                   ) : (
                     <Btn size="sm" variant={other ? "secondary" : "primary"}
-                      onClick={() => onAssign(c.id)} disabled={busyId === c.id}>
-                      {busyId === c.id ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> …</> : (other ? "Reasignar a mí" : "Asignar")}
+                      onClick={() => onAssign(c.id)} disabled={busyId === c.id || (other && !canReassign)}>
+                      {busyId === c.id ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> …</> : (other ? canReassign ? "Reasignar a mí" : "Solo consulta" : "Asignar")}
                     </Btn>
                   )}
                 </div>

@@ -1,3 +1,4 @@
+import { AdminTutorial } from '../../../../../packages/admin-tutorial/AdminTutorial.jsx';
 // Portal view or navigation module for admin portal; the application shell owns session state.
 import React, { useMemo, useState, useEffect, useRef, useReducer } from "react";
 import { AdminWorkspace } from "./AdminWorkspace.jsx";
@@ -200,6 +201,8 @@ export function AdminPortal({ user }) {
     }
   }
 
+  useEffect(() => { const timer = setInterval(reloadAssigned, 30000); window.addEventListener('focus', reloadAssigned); return () => { clearInterval(timer); window.removeEventListener('focus', reloadAssigned); }; }, [adminId]);
+
   // Filter (debounce)
   const visibleClients = useMemo(() => {
     const q = (debouncedQ || "").trim().toLowerCase();
@@ -211,8 +214,22 @@ export function AdminPortal({ user }) {
     });
   }, [data.clients, debouncedQ]);
 
+  function tutorialNavigate(section) {
+    if (!section) return;
+    const globalSections = ['inicio','clientes','notificaciones','faqs'];
+    if (!globalSections.includes(section) && !selectedClientId) {
+      const first = data.clients?.[0];
+      if (!first) { navigate('clientes'); return; }
+      dispatchNavigation({type:'open',clientId:first.id});
+      dispatchNavigation({type:'navigate',section,client:first});
+      return;
+    }
+    navigate(section);
+  }
+
   return (
     <>
+      <AdminTutorial portal="robinjr" user={user} onNavigate={tutorialNavigate}/>
       <AdminWorkspace user={user} active={active} client={selectedClient} clients={data.clients || []} isDeveloper={isDeveloper}
         loading={loadingClients} error={loadError} onNavigate={navigate} onSwitchClient={switchClient}>
 
@@ -280,6 +297,7 @@ export function AdminPortal({ user }) {
       {assignOpen && (
         <AssignClientModal
           adminEmail={adminId}
+          canReassign={user.is_pro_admin === true}
           list={assignList}
           loading={assignLoading}
           error={assignError}

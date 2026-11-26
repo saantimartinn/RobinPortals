@@ -61,7 +61,7 @@ exports.handler = async (event) => {
     sessionUser.auth_source = identity.is_application_admin ? 'application_admin' : 'application_sso';
     if (identity.is_application_admin) {
       sessionUser.is_application_admin = true;
-      sessionUser.is_pro_admin = true;
+      sessionUser.is_pro_admin = identity.is_pro_admin === true;
       sessionUser.visible_tabs = identity.visible_tabs || [];
       sessionUser.application_identity = identity;
     }

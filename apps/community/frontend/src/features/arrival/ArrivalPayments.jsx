@@ -37,18 +37,21 @@ export function ArrivalPayments() {
     {error && <p role="alert" className="text-sm text-rose-700">{t(error)}</p>}
     {!loading && <Btn variant="secondary" onClick={load}>{t("Actualizar estado")}</Btn>}
     {!loading && data && [...installments, ...extras].map(({ expected, payment }) => {
-      const overdue = payment?.status === 'unlocked' && payment.due_date && Date.parse(payment.due_date) < Date.now();
-      const state = !payment ? 'Pendiente de registrar' : payment.status === 'paid' ? 'Pagado' : overdue ? 'Vencido' : payment.status === 'locked' ? 'Pendiente de desbloqueo' : payment.status === 'unlocked' ? 'Pendiente' : payment.status;
-      return <Card key={expected.installment}><CardHeader title={payment?.concept || (expected.installment === 1 ? t('Primer pago') : expected.installment === 2 ? t('Segundo pago') : t('Pago adicional'))} icon={CreditCard} right={<Badge tone={payment?.status === 'paid' ? 'green' : 'amber'}>{t(state)}</Badge>} /><CardContent className="space-y-3">
+      // Onboarding can confirm the first payment before its ledger row is created or synchronized.
+      const paid = payment?.status === 'paid' || (expected.installment === 1 && data.user?.pago_completed && (!payment || ['locked', 'unlocked'].includes(payment.status)));
+      const paidAt = paid ? payment?.paid_at || (expected.installment === 1 ? data.user?.pago_completed_at : null) : null;
+      const overdue = !paid && payment?.status === 'unlocked' && payment.due_date && Date.parse(payment.due_date) < Date.now();
+      const state = paid ? 'Pagado' : !payment ? 'Pendiente de registrar' : overdue ? 'Vencido' : payment.status === 'locked' ? 'Pendiente de desbloqueo' : payment.status === 'unlocked' ? 'Pendiente' : payment.status;
+      return <Card key={expected.installment}><CardHeader title={payment?.concept || (expected.installment === 1 ? t('Primer pago') : expected.installment === 2 ? t('Segundo pago') : t('Pago adicional'))} icon={CreditCard} right={<Badge tone={paid ? 'green' : 'amber'}>{t(state)}</Badge>} /><CardContent className="space-y-3">
         <Row label={payment ? t('Importe') : t('Importe contractual')} value={formatMoney(payment ? Number(payment.amount) : expected.amount, payment?.currency || 'EUR')} />
         {expected.installment <= 2 && <p className="text-sm text-slate-500">{expected.installment === 1 ? t('Al aceptar el servicio. Es necesario para iniciar la prestación.') : t('Al firmar o confirmar el contrato de alojamiento. El saldo puede incluir los extras aceptados.')}</p>}
         {payment?.due_date && <Row label={t("Vencimiento")} value={formatDate(payment.due_date)} />}
-        {payment?.unlocked_at && !payment.due_date && payment.status !== 'paid' && <p className="text-sm text-slate-500">{t("Plazo contractual: 7 días hábiles desde el desbloqueo del pago.")}</p>}
-        {payment?.paid_at && <Row label={t("Fecha de pago")} value={formatDate(payment.paid_at)} />}
-        {!payment && <p className="text-sm text-slate-500">{t("Todavía no hay un registro de facturación para esta cuota. Consulta con tu asesor.")}</p>}
+        {payment?.unlocked_at && !payment.due_date && !paid && <p className="text-sm text-slate-500">{t("Plazo contractual: 7 días hábiles desde el desbloqueo del pago.")}</p>}
+        {paidAt && <Row label={t("Fecha de pago")} value={formatDate(paidAt)} />}
+        {!payment && !paid && <p className="text-sm text-slate-500">{t("Todavía no hay un registro de facturación para esta cuota. Consulta con tu asesor.")}</p>}
         {payment?.status === 'paid' && <Btn variant="secondary" onClick={() => setReceipt(payment)}>{t("Ver justificante")}</Btn>}
         {payment?.status === 'unlocked' && payment.installment >= 2 && <Btn disabled={busy !== null} onClick={() => pay(payment)}>{busy === payment.id ? t('Abriendo pago…') : t('Completar pago')}</Btn>}
-        {expected.installment === 1 && payment?.status !== 'paid' && <a className="inline-block font-semibold underline text-sm" href="/portal/">{t("Completar primer pago en el Portal del Alumno")}</a>}
+        {expected.installment === 1 && !paid && <a className="inline-block font-semibold underline text-sm" href="/portal/">{t("Completar primer pago en el Portal del Alumno")}</a>}
       </CardContent></Card>;
     })}
     <Factura open={!!receipt} onClose={() => setReceipt(null)} user={data?.user} payment={receipt} />

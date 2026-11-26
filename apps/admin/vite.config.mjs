@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/admin/",
   plugins: [react()],
   html: { cspNonce: "robin-vite" },
-  resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
+  resolve: { dedupe: ['react', 'react-dom'], alias: { "@": path.resolve(import.meta.dirname, "./src") } },
   build: {
     rollupOptions: {
       output: {

@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 // Netlify handler for /api/admin/documents/delete; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
 const storage = require('../../lib/storage');
@@ -19,6 +20,8 @@ exports.handler = async (event) => {
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    const { data: documentOwner } = await sb.from('documents').select('user_id').eq('id', id).maybeSingle();
+    if (!documentOwner || !await canManageClient(sb, admin, documentOwner.user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
     // Recuperamos las rutas para limpiar Storage tras borrar la fila.
     const { data: cur } = await sb.from('documents').select('file_path, template_path').eq('id', id).single();
     const { error } = await sb.from('documents').delete().eq('id', id);

@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/documents/add
  * Body: { user_id, name, required, template_path?, template_filename?, template_mime?, template_size? }
@@ -25,6 +26,7 @@ exports.handler = async (event) => {
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!await canManageClient(sb, admin, user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
     const { data: target } = await sb.from('users').select('id').eq('id', user_id).single();
     if (!target) return json({ error: 'user_not_found' }, { statusCode: 404 });
 

@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/historial/add
  * Body: { user_id, raw_notes, meeting_date?, meeting_title? }
@@ -47,7 +48,7 @@ exports.handler = async (event) => {
     if (eu || !u) return json({ error: 'user_not_found' }, { statusCode: 404 });
 
     // Seguridad: solo el advisor asignado o un admin/supervisor puede tocar el historial.
-    if ((u.assigned_to || '').toLowerCase() !== adminEmail && !hasApplicationAdminRole(admin)) {
+    if (!await canManageClient(sb, admin, userId)) {
       return json({ error: 'forbidden_not_assigned' }, { statusCode: 403 });
     }
 

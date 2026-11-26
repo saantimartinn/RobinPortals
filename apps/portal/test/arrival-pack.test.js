@@ -18,6 +18,7 @@ test('admin client lists return actual contract and onboarding flags instead of 
   for (const endpoint of ['admin-clients-list', 'admin-clients-all']) {
     const filters = [];
     const handler = load(endpoint, {
+      '../../lib/client-access': { scopeClients: async (query, actor) => ({ query: query.eq('assigned_to', actor.email) }) },
       '../../lib/auth': { readSessionFromEvent: () => ({ uid: 'admin' }) },
       '../../lib/student-phone': { attachStudentPhones: async (_sb, rows) => rows },
       '../../lib/supabase': { getSupabase: () => ({ from(table) {
@@ -43,6 +44,7 @@ test('administration cannot assign an admission phase to Llegada, while other pr
   for (const client of [{ tipo: 'llegada', application_phase: 3 }, { tipo: 'general', application_phase: 3 }, null]) {
     const writes = [];
     const handler = load('admin-phase-set', {
+      '../../lib/client-access': { canManageClient: async () => true },
       '../../lib/auth': { readSessionFromEvent: () => ({ uid: 'admin' }) },
       '../../lib/http': { ...require('../lib/http'), verifyOrigin: () => true },
       '../../lib/supabase': { getSupabase: () => ({ from() { let id; return {
@@ -71,18 +73,32 @@ test('current contractual installments are 850 + 850; a real mentorship credit a
   assert.deepEqual(applicationPlanForUser({ ...user, contract_data: { ...user.contract_data, mentoria_upgrade: { target_type: 'llegada', credit_eur: 666.33 } } }).map(row => row.amount), [183.67, 850]);
 });
 
-test('Arrival billing reads actual owned rows without inserting, repricing or manufacturing paid rows', async () => {
-  for (const payments of [[], [{ id: 'p1', installment: 1, amount: 183.67, status: 'paid', paid_at: '2026-11-01' }, { id: 'p2', installment: 2, amount: 999, status: 'unlocked' }, { id: 'extra', installment: 4, amount: 450, status: 'paid' }]]) {
+test('Arrival billing includes the confirmed first payment without inserting, repricing or manufacturing ledger rows', async () => {
+  const paidUser = { ...user, pago_completed_at: '2026-11-18T10:00:00Z' };
+  const existing = [{ id: 'p1', installment: 1, amount: 183.67, status: 'paid', paid_at: '2026-11-01' }, { id: 'p2', installment: 2, amount: 999, status: 'unlocked' }, { id: 'extra', installment: 4, amount: 450, status: 'paid' }];
+  const cases = [
+    [paidUser, []],
+    [paidUser, existing],
+    [paidUser, [{ ...existing[0], status: 'locked', paid_at: null }]],
+    [paidUser, [{ ...existing[0], status: 'unlocked', paid_at: null }]],
+    [{ ...user, pago_completed: false }, []],
+    [user, []],
+  ];
+  for (const [actualUser, payments] of cases) {
     const filters = [];
     const handler = load('payments-list', {
       '../../lib/auth': { readSessionFromEvent: () => ({ uid: user.id }) },
       '../../lib/payments': { ensurePayments: () => assert.fail('must not create/reprice payments'), invoiceNumber: () => 'existing' },
-      '../../lib/supabase': { getSupabase: () => ({ from(table) { return { select() { return this; }, eq(key, value) { filters.push([table, key, value]); return this; }, single: async () => ({ data: user }), order: async () => ({ data: payments }) }; } }) },
+      '../../lib/supabase': { getSupabase: () => ({ from(table) { return { select() { return this; }, eq(key, value) { filters.push([table, key, value]); return this; }, single: async () => ({ data: actualUser }), order: async () => ({ data: payments }) }; } }) },
     });
     const response = await handler({ httpMethod: 'GET', headers: {}, queryStringParameters: { product: 'llegada', user_id: 'victim' } });
     assert.equal(response.statusCode, 200);
     const data = JSON.parse(response.body);
+    assert.equal(data.user.pago_completed, actualUser.pago_completed);
+    assert.equal(data.user.pago_completed_at, actualUser.pago_completed_at || null);
     assert.deepEqual(data.payments.map(row => row.amount), payments.map(row => row.amount));
+    assert.deepEqual(data.payments.map(row => row.status), payments.map(row => row.status));
+    assert.deepEqual(data.payments.map(row => row.paid_at), payments.map(row => row.paid_at));
     assert.deepEqual(data.contract_plan.map(row => row.amount), [850, 850]);
     assert.ok(filters.every(([, , id]) => id === user.id));
   }

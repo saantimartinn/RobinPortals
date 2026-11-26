@@ -98,9 +98,10 @@ exports.handler = async (event) => {
     if (!name || !email || !email.includes('@') || !/^[a-z0-9._-]{3,50}$/.test(username)) return json({ error: 'invalid_fields' }, { statusCode: 400 });
     if (!passwordPolicy(password).ok) return json({ error: 'weak_password' }, { statusCode: 400 });
     if (await identityExists(sb, [email, username])) return json({ error: 'user_already_exists' }, { statusCode: 409 });
-    const { data: inserted, error } = await sb.from('users').insert({ nombre: name, email, username, role: 'admin', password_hash: hashPassword(password), requires_onboarding: false }).select('id').single();
+    if (body.attach_to_me !== undefined && typeof body.attach_to_me !== 'boolean') return json({ error: 'invalid_fields' }, { statusCode: 400 });
+    const { data: insertedId, error } = await sb.rpc('create_admin_profile', { p_actor: actor.id, p_name: name, p_email: email, p_username: username, p_password_hash: hashPassword(password), p_attach: body.attach_to_me === true });
     if (error) throw error;
-    const created = await getAdminUser(sb, inserted.id);
+    const created = await getAdminUser(sb, insertedId);
     return json({ user: (await serializeUsers(sb, [created]))[0] }, { statusCode: 201 });
   } catch (error) {
     if (error?.code === '23505') return json({ error: 'user_already_exists' }, { statusCode: 409 });

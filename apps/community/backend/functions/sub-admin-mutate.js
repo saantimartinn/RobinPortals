@@ -2,7 +2,7 @@
  * POST /api/sub-admin/mutate · Crear / editar / borrar contenido del portal de
  * suscriptores. Body: { entity, action, payload }
  *   entity : 'event' (community_events: eventos/grupos/ofertas/viajes) | 'partner' | 'user' | 'request'
- *   action : 'create' | 'update' | 'delete'
+ *   action : 'create' | 'update' | 'delete' | 'claim' (user sin responsable)
  *   payload: campos del registro (incluye id para update/delete)
  * Gate: sólo sesión con role='subscriber_admin'.
  */
@@ -12,6 +12,8 @@ const { json, methodNotAllowed, parseJsonBody, serverError, verifyOrigin } = req
 const { parseImageDataUrl, uploadPartnerLogo } = require('../lib/partner-logo');
 const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 const avatarStorage = require('../lib/subscriber-avatars');
+const { canManageClient } = require('../../../../packages/admin-collaboration/access.cjs');
+const { claimSubscriber } = require('../lib/subscriber-advisor');
 
 // Campos permitidos por entidad (whitelist)
 const EVENT_FIELDS   = ['title', 'type', 'description', 'location', 'city', 'starts_at', 'ends_at', 'capacity', 'expires_at', 'meta', 'image_url', 'active', 'sort_order'];
@@ -45,8 +47,10 @@ exports.handler = async (event) => {
   const session = readSessionFromEvent(event);
   if (!session) return json({ error: 'unauthorized' }, { statusCode: 401 });
   if (session.role !== 'subscriber_admin') return json({ error: 'forbidden' }, { statusCode: 403 });
+  let applicationIdentity;
   try {
-    if (!canUseRobinPlan(await readApplicationIdentity(event))) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
+    applicationIdentity = await readApplicationIdentity(event);
+    if (!canUseRobinPlan(applicationIdentity)) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
   } catch (error) { return serverError(error, 'sub-admin.permissions'); }
 
   const body = parseJsonBody(event);
@@ -56,15 +60,21 @@ exports.handler = async (event) => {
   const table = TABLES[entity];
   const fields = FIELDS[entity];
   if (!table || !fields) return json({ error: 'bad_entity' }, { statusCode: 400 });
-  if (!['create', 'update', 'delete'].includes(action)) return json({ error: 'bad_action' }, { statusCode: 400 });
+  if (!['create', 'update', 'delete'].includes(action) && !(entity === 'user' && action === 'claim')) return json({ error: 'bad_action' }, { statusCode: 400 });
 
   // Reglas de seguridad: usuarios sólo se actualizan (no crear/borrar desde aquí)
-  if (entity === 'user' && action !== 'update') return json({ error: 'user_update_only' }, { statusCode: 400 });
+  if (entity === 'user' && !['update', 'claim'].includes(action)) return json({ error: 'user_update_only' }, { statusCode: 400 });
   if (entity === 'request' && action === 'create') return json({ error: 'request_no_create' }, { statusCode: 400 });
   if (entity === 'submission' && action !== 'update') return json({ error: 'submission_update_only' }, { statusCode: 400 });
 
   try {
     const sb = getSupabase();
+    if (entity === 'user' && action === 'claim') return json({ ok: true, item: await claimSubscriber(sb, applicationIdentity, payload.id) });
+    if (entity === 'user' && !await canManageClient(sb, applicationIdentity, payload.id, 'community')) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
+    if (['request','submission'].includes(entity) && payload.id) {
+      const { data: owned } = await sb.from(table).select('user_id').eq('id',payload.id).maybeSingle();
+      if (!owned || !await canManageClient(sb,applicationIdentity,owned.user_id,'community')) return json({error:'client_not_assigned'},{statusCode:403});
+    }
 
     // --- Validación de entregas de retos (aplica/retira días) ---
     if (entity === 'submission' && action === 'update') {
@@ -212,6 +222,7 @@ exports.handler = async (event) => {
     }
     return json({ ok: true, item: row });
   } catch (e) {
+    if (e.statusCode) return json({ error: e.message }, { statusCode: e.statusCode });
     console.error('sub-admin-mutate error', e);
     return serverError(e);
   }

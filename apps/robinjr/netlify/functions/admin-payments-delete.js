@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/payments/delete
  * Body: { user_id, payment_id }
@@ -29,6 +30,7 @@ exports.handler = async (event) => {
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!await canManageClient(sb, admin, user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     // Verificar que el pago pertenece al cliente y es un extra (installment >= 4).
     const { data: p, error: e1 } = await sb

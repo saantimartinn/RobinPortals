@@ -7,6 +7,8 @@ import { portalClient } from "@/services/portal";
 import { PortalAccessUser } from "@/services/portal";
 import { adminTabPermissions, allAdminTabPermissions } from "@/lib/admin-permissions";
 import { FeatureModuleProps, Title } from './feature-shared';
+import { AdminCollaboration } from './admin-collaboration';
+import './admin-collaboration.css';
 
 export function Configuration({ onAddAdmin, onRemoveAdmin, currentUser, portalAdmin, notify, isProAdmin, isDeveloperAdmin }: FeatureModuleProps) {
   const [adding, setAdding] = useState(false);
@@ -14,6 +16,7 @@ export function Configuration({ onAddAdmin, onRemoveAdmin, currentUser, portalAd
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [attachToMe, setAttachToMe] = useState(false);
   const [users, setUsers] = useState<PortalAccessUser[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState("");
@@ -42,7 +45,7 @@ export function Configuration({ onAddAdmin, onRemoveAdmin, currentUser, portalAd
   useEffect(() => { void refreshAdminUsers(); }, []);
   async function createUser(event: React.FormEvent) {
     event.preventDefault(); setBusy(true);
-    try { const result = await portalClient.createAdmin({ name, email, username, password }); setUsers((items) => [...items, result.user]); onAddAdmin(name); setName(""); setEmail(""); setUsername(""); setPassword(""); setAdding(false); notify("Usuario administrador creado"); }
+    try { const result = await portalClient.createAdmin({ name, email, username, password, attach_to_me: attachToMe }); setUsers((items) => [...items, result.user]); onAddAdmin(name); setName(""); setEmail(""); setUsername(""); setPassword(""); setAttachToMe(false); setAdding(false); notify("Usuario administrador creado"); }
     catch (error) { notify(error instanceof Error ? error.message : "No se pudo crear el usuario"); }
     finally { setBusy(false); }
   }
@@ -90,6 +93,7 @@ export function Configuration({ onAddAdmin, onRemoveAdmin, currentUser, portalAd
           <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email" required />
           <input value={username} onChange={(event) => setUsername(event.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))} placeholder="Usuario para iniciar sesión" minLength={3} maxLength={50} pattern="[a-z0-9._-]{3,50}" autoComplete="username" required />
           <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Contraseña inicial" minLength={10} autoComplete="new-password" required />
+          <label className="attach-admin-choice"><input type="checkbox" checked={attachToMe} onChange={event=>setAttachToMe(event.target.checked)}/><span>Vincular este administrador a mí<small>Podrás compartirle clientes sin dejar de ser su responsable. Tendrá un tutorial obligatorio en su primer acceso.</small></span></label>
           <Button type="submit" disabled={busy}>{busy ? "Creando…" : "Añadir"}</Button><Button type="button" variant="outline" onClick={() => setAdding(false)}>Cancelar</Button>
         </form>
       )}
@@ -106,6 +110,7 @@ export function Configuration({ onAddAdmin, onRemoveAdmin, currentUser, portalAd
         {users.map((user) => { const label = user.nombre || user.email || user.username || "Administrador"; const current = user.id === portalAdmin.id; return <article className="panel" key={user.id}><i className={user.avatar_url ? "has-photo" : ""}>{user.avatar_url ? <img src={user.avatar_url} alt="" /> : label.slice(0, 2).toUpperCase()}</i><div><h3>{label}</h3><p>{user.email || "Administrador"} · {user.username || "sin usuario"}{user.display_id ? ` · ${user.display_id}` : ""}{current ? " · Usuario actual" : ""}</p></div><Badge variant="outline">{user.is_pro ? "Pro" : "Activo"}</Badge>{isProAdmin && !user.is_pro && <button type="button" className="ui-button outline" aria-label={`Configurar pestañas de ${label}`} title="Configurar pestañas" onClick={() => { setEditingPermissions(user); setSelectedTabs(user.visible_tabs || [...allAdminTabPermissions]); }}><Settings /></button>}{isProAdmin && !user.is_pro && !current ? <button type="button" className="remove-admin" aria-label={`Eliminar ${label}`} onClick={() => void removeUser(user)}><Trash2 /></button> : <span />}</article>; })}
               </div>}
       </section>
+      <AdminCollaboration users={users} actor={{...portalAdmin,is_pro_admin:isProAdmin}} notify={notify}/>
       {isDeveloperAdmin && <section className="panel developer-database-console">
         <div className="panel-heading"><div><h2><Database /> Consola de base de datos</h2><p>Acceso de desarrollador a los tres proyectos Supabase. Cada envío ejecuta una sola instrucción.</p></div><a className="ui-button outline" href={`${window.location.pathname.startsWith("/admin") ? "/admin" : ""}/base-datos`}>Abrir tablas de leads y clientes</a></div>
         <form onSubmit={(event) => void runDeveloperSql(event)}>

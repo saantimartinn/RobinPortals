@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 // Netlify handler for /api/admin/payments/unlock; it owns the HTTP boundary and hands reusable work to server modules.
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
@@ -29,6 +30,7 @@ exports.handler = async (event) => {
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!await canManageClient(sb, admin, user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     const { data: u } = await sb
       .from('users')

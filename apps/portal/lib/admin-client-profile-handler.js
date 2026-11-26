@@ -1,3 +1,5 @@
+const { canUseStudentPortal }=require('./authorization');
+const { canManageClient }=require('./client-access');
 // Administrative edits to a student's profile and the private commercial notes copy.
 const { getSupabase }=require('./supabase');
 const { readSessionFromEvent }=require('./auth');
@@ -15,7 +17,7 @@ exports.handler=async(event)=>{
   if(actorError)throw actorError;
   const {data:client,error:clientError}=await sb.from('users').select('id,role,email,username,assigned_to,lead_id,updated_at').eq('id',userId).maybeSingle();
   if(clientError)throw clientError;
-  if(!actor||!client||!canEditClient(actor,client))return json({error:'forbidden'},{statusCode:403});
+  if(!actor||!client||!canUseStudentPortal(actor)||!(canEditClient(actor,client)||await canManageClient(sb,actor,userId)))return json({error:'forbidden'},{statusCode:403});
   if(body.action==='notes') {
    const {data:stored,error:readError}=await sb.from('crm_client_notes').select('notes,synced_at').eq('user_id',userId).maybeSingle();
    if(readError)throw readError;

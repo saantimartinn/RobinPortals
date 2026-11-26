@@ -1,3 +1,4 @@
+const { canManageClient }=require('../../lib/client-access');
 /**
  * POST /api/admin/clients/convert-mentoria
  * Requiere un pago real de Mentoría de 666,33 € y destino General, Delft o
@@ -31,8 +32,7 @@ exports.handler = async (event) => {
     const { data: client, error: clientError } = await sb.from('users')
       .select('id,email,username,role,assigned_to,tipo,pago_completed').eq('id', body.user_id).single();
     if (clientError || !client) return json({ error: 'not_found' }, { statusCode: 404 });
-    if (isApplicationAdmin(client) || (!isDeveloperAdmin(admin)
-        && String(client.assigned_to || '').toLowerCase() !== normalizeEmail(admin))) {
+    if (isApplicationAdmin(client) || !await canManageClient(sb,admin,client.id)) {
       return json({ error: 'forbidden' }, { statusCode: 403 });
     }
     if (String(client.tipo || '').toLowerCase() !== 'mentoria') {

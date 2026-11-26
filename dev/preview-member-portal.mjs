@@ -101,7 +101,7 @@ const server = createHttpServer(async (request, response) => {
         if (url.pathname.endsWith('/cancel')) { const input = await body(request); const booking = state.bookings.find(row => row.id === (input.id || input.booking_id)); if (booking) booking.cancellation_requested_at = new Date().toISOString(); return json(response, { ok: true, booking }); }
         return json(response, { error: state.user.arrival_pack.first_payment_completed ? 'booking_pending' : 'arrival_payment_required' }, 409);
       }
-      if (url.pathname === '/portal/api/payments/list') {
+      if (url.pathname === '/portal/api/payments') {
         if (!state.user.arrival_pack) return json(response, { error: 'arrival_pack_required' }, 403);
         return json(response, { user: { ...state.user, role: 'client', tipo: 'llegada' }, payments: state.payments, contract_plan: [{ installment: 1, amount: 850 }, { installment: 2, amount: 850 }] });
       }

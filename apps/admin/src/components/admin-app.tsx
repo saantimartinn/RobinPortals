@@ -1,3 +1,4 @@
+import { AdminTutorial } from '../../../../packages/admin-tutorial/AdminTutorial.jsx';
 // Admin interface component for admin app; composed by the shell or a feature module.
 "use client";
 
@@ -154,7 +155,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   const [admins, setAdmins] = useState(() => ["Noel", "Manuel", "María", ...(isDeveloperAdminEmail(authUser.email) ? ["Santi"] : [])]);
   const isProAdmin = isProAdminEmail(permissionProfile.email) || permissionProfile.is_pro_admin === true;
   const isDeveloperAdmin = isDeveloperAdminEmail(permissionProfile.email);
-  const visibleTabs = allAdminTabPermissions;
+  const visibleTabs = isProAdmin ? allAdminTabPermissions : (permissionProfile.visible_tabs || allAdminTabPermissions);
   const canSee = (key: string) => key === "developer.database" ? isDeveloperAdmin : key.startsWith("developer.") || visibleTabs.includes(key);
   const routePermission = path === "/" || path.startsWith("/informes/inicio") ? "home.summary"
     : path === "/bandeja-leads" ? "home.leads"
@@ -463,6 +464,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
             />
           )}
         </main>
+        <AdminTutorial portal="admin" user={permissionProfile}/>
       </div>
 
       {notice && <div className="toast"><ShieldCheck /><span>{notice}</span><button onClick={() => setNotice("")}><X /></button></div>}

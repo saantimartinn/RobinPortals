@@ -17,9 +17,10 @@ function fixture(app) {
         async single() {
           if (table === 'users') return { data: this.id === 'admin'
             ? { id: 'admin', role: 'admin', email: 'advisor@example.com' }
-            : { id: 'student', nombre: 'Alumno', apellidos: 'Prueba' } };
+            : { id: 'student', role: 'client', assigned_to: 'advisor@example.com', nombre: 'Alumno', apellidos: 'Prueba' } };
           return { data: { id: 'payment', ...this.row } };
         },
+        async maybeSingle() { return this.single(); },
         then(fulfilled, rejected) { return Promise.resolve({ data: [] }).then(fulfilled, rejected); },
       };
     },

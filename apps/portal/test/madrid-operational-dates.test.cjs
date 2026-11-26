@@ -63,6 +63,7 @@ for (const app of ['portal', 'robinjr', 'admin']) {
       order: async () => ({ data: [] }) }) };
     const handler = load(app, 'netlify/functions/admin-assistant.js', {
       date: frozenDate('2026-12-31T23:30:00Z'), overrides: {
+        '../../lib/client-access': { scopeClients: async (query, actor) => ({ query: query.eq('assigned_to', actor.email) }) },
         '../../lib/supabase': { getSupabase: () => sb },
         '../../lib/auth': { readSessionFromEvent: () => ({ uid: 'admin' }) },
         '../../lib/authorization': { isApplicationAdmin: () => true, normalizeEmail: (admin) => admin.email },

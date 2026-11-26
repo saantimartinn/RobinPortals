@@ -1,3 +1,4 @@
+const { scopeClients } = require('../../lib/client-access');
 /**
  * GET /api/admin/clients
  * Devuelve los clientes asignados al admin de la sesión.
@@ -44,7 +45,7 @@ exports.handler = async (event) => {
       .select(
         'id, lead_id, username, email, role, requires_onboarding, dni_completed, contract_signed, contract_signed_at, contract_data, profile_completed, pago_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, academic_system, academic_subjects, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, application_phase, created_at, updated_at'
       );
-    if (!isDeveloperAdmin(admin)) clientsQuery = clientsQuery.eq('assigned_to', adminEmail);
+    if (!isDeveloperAdmin(admin)) ({ query: clientsQuery } = await scopeClients(clientsQuery, admin));
     const { data: clients, error: e2 } = await clientsQuery.order('created_at', { ascending: false });
     if (e2) throw e2;
 
@@ -66,7 +67,7 @@ exports.handler = async (event) => {
         nombre: admin.nombre,
         apellidos: admin.apellidos,
       },
-      clients: list.map((client) => ({ ...client, crm_notes: notesByUser.get(client.id)?.notes || [], crm_notes_updated_at: notesByUser.get(client.id)?.synced_at || null })),
+      clients: list.map((client) => ({ ...client, shared_by: client.assigned_to?.toLowerCase() !== adminEmail ? client.assigned_to : null, crm_notes: notesByUser.get(client.id)?.notes || [], crm_notes_updated_at: notesByUser.get(client.id)?.synced_at || null })),
     });
   } catch (e) {
     console.error('admin-clients-list error', e);

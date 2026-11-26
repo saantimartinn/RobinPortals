@@ -1,3 +1,4 @@
+import { MeetingHistory } from '../../../../../../packages/admin-collaboration/MeetingHistory.jsx';
 // Admin workspace module for profile; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { User, FileText, CheckCircle2, BookOpen, Loader2, AlertCircle, Sparkles, RefreshCw, ExternalLink, GraduationCap, ChevronDown, PartyPopper, XCircle } from "lucide-react";
@@ -93,6 +94,7 @@ export function AdminPerfil({ client, onRefresh }) {
 
   return (
     <div className="space-y-5">
+      <MeetingHistory clientId={client.id} portal="robinjr"/>
       <Card>
         <CardHeader title="Cumpleaños" icon={PartyPopper}
           subtitle="Fecha recuperada del DNI durante el onboarding" />

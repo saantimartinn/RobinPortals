@@ -12,6 +12,7 @@ const { readSessionFromEvent } = require('../lib/auth');
 const { json, methodNotAllowed, serverError } = require('../lib/http');
 const { readApplicationIdentity, canUseRobinPlan } = require('../lib/application-permissions');
 const { signedMentorPhotoPaths } = require('../lib/subscriber-avatars');
+const { hasClientManagement, sharedGrants } = require('../../../../packages/admin-collaboration/access.cjs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'GET') return methodNotAllowed(['GET']);
@@ -20,12 +21,13 @@ exports.handler = async (event) => {
   if (session.role !== 'subscriber_admin') return json({ error: 'forbidden' }, { statusCode: 403 });
 
   try {
-    if (!canUseRobinPlan(await readApplicationIdentity(event))) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
+    const applicationIdentity = await readApplicationIdentity(event);
+    if (!canUseRobinPlan(applicationIdentity)) return json({ error: 'robin_plan_access_denied' }, { statusCode: 403 });
     const sb = getSupabase();
 
     const [uRes, eRes, pRes, rRes, rsvpRes, dcRes] = await Promise.all([
       sb.from('subscribers')
-        .select('id, role, lead_id, nombre, apellidos, email, username, ciudad, subscription_status, subscription_plan, current_period_end, created_at, subscription_started_at, robin_level_override')
+        .select('id, role, lead_id, nombre, apellidos, email, username, ciudad, subscription_status, subscription_plan, current_period_end, created_at, subscription_started_at, robin_level_override, assigned_to')
         .or('is_subscriber.eq.true,role.eq.subscriber')
         .order('created_at', { ascending: false }),
       sb.from('community_events').select('*').order('sort_order', { ascending: true }).order('starts_at', { ascending: true }),
@@ -72,6 +74,8 @@ exports.handler = async (event) => {
         rsvps_count: rsvpByUser[u.id] || 0,
       };
     });
+    const grants = await sharedGrants(applicationIdentity,'community');
+    usersOut.forEach(user => { user.can_manage = hasClientManagement(applicationIdentity,user,grants); });
 
     const requestsOut = requests.map((r) => ({ ...r, user_name: nameById[r.user_id] || r.requester_name || null }));
 

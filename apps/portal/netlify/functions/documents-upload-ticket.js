@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/documents/upload-ticket
  * Crea una URL firmada de uso temporal para subir directamente al bucket privado.
@@ -32,10 +33,12 @@ exports.handler = async (event) => {
       if (!isAdmin && !ownsRecord(caller, document)) {
         return json({ error: 'forbidden' }, { statusCode: 403 });
       }
+      if (isAdmin && !await canManageClient(sb, caller, document.user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
       keyPrefix = `${document.user_id}/${document.id}`;
     } else if (body.purpose === 'document_template') {
       if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
       if (!body.user_id) return json({ error: 'missing_user_id' }, { statusCode: 400 });
+      if (!await canManageClient(sb, caller, body.user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
       const { data: target } = await sb.from('users').select('id').eq('id', body.user_id).single();
       if (!target) return json({ error: 'user_not_found' }, { statusCode: 404 });
       keyPrefix = `${target.id}/templates/${caller.id}`;

@@ -33,7 +33,7 @@ exports.handler = async (event) => {
         nombre: session.nombre || null,
         apellidos: session.apellidos || null,
         is_application_admin: true,
-        is_pro_admin: true,
+        is_pro_admin: session.is_pro_admin === true,
         visible_tabs: session.visible_tabs || [],
       });
     }

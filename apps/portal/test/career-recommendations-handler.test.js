@@ -5,11 +5,11 @@ const {ENGINE_VERSION}=require('../lib/career-suggestions');
 
 async function invoke(app,{current=false,origin='espana'}={}){
  const writes=[];
- const client={id:'11111111-1111-4111-8111-111111111111',origin,intereses:['ingenierias'],questionnaire:{blocks:[{title:'General',items:[{q:'Perfil',a:'Respuesta'}]}],signals:{}},career_suggestions:{...(current?{engine_version:ENGINE_VERSION}:{}),items:[{program_code:'legacy-cached'}]}};
+ const client={id:'11111111-1111-4111-8111-111111111111',role:'client',assigned_to:'advisor@example.com',origin,intereses:['ingenierias'],questionnaire:{blocks:[{title:'General',items:[{q:'Perfil',a:'Respuesta'}]}],signals:{}},career_suggestions:{...(current?{engine_version:ENGINE_VERSION}:{}),items:[{program_code:'legacy-cached'}]}};
  const actor={id:'admin',role:'admin',email:'advisor@example.com'};
  const sb={from(table){return {filters:{},select(){return this;},eq(key,value){this.filters[key]=value;return this;},neq(){this.history=true;return this;},order(){return this;},limit(){return this;},update(value){this.patch=value;return this;},async single(){return {data:this.filters.id==='admin'?actor:client,error:null};},then(resolve,reject){if(this.patch)writes.push(this.patch);return Promise.resolve({data:this.patch?null:this.history?[{program_code:'tud-aerospace-engineering',decision:'approved',student:{id:'previous',intereses:['ingenierias'],questionnaire:{signals:{rasgos:['analitico']}}}}]:[],error:null}).then(resolve,reject);}};}};
  const filename=require.resolve(`../../${app}/netlify/functions/admin-career-suggestions`);
- const mocks={'../../lib/supabase':{getSupabase:()=>sb},'../../lib/auth':{readSessionFromEvent:()=>({uid:'admin'})},'../../lib/session-user':{getSessionUser:async()=>({data:actor})}};
+ const mocks={'../../lib/client-access':{canManageClient:async()=>client.assigned_to===actor.email},'../../lib/supabase':{getSupabase:()=>sb},'../../lib/auth':{readSessionFromEvent:()=>({uid:'admin'})},'../../lib/session-user':{getSessionUser:async()=>({data:actor})}};
  if(app==='portal')delete mocks['../../lib/session-user'];
  const cache=new Map();for(const [name,exports] of Object.entries(mocks)){const key=require.resolve(name,{paths:[path.dirname(filename)]});cache.set(key,require.cache[key]);require.cache[key]={id:key,filename:key,loaded:true,exports};}
  const apiKey=process.env.ANTHROPIC_API_KEY,remoteUrl=process.env.RBMT_SUPABASE_URL;

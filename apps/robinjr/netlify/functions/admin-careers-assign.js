@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/careers/assign     { user_id, career_template_id }   asigna una carrera al alumno
  * POST /api/admin/careers/unassign   { user_id, career_template_id }   quita la asignación
@@ -28,6 +29,7 @@ exports.handler = async (event) => {
     const adminEmail = normalizeEmail(admin);
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!await canManageClient(sb, admin, user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     if (action === 'unassign') {
       const { error: unassignError } = await sb.from('client_careers').delete().eq('user_id', user_id).eq('career_template_id', ctid);

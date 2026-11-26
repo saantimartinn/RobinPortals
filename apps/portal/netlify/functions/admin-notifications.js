@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * /api/admin/notifications
  *   GET  -> lista notificaciones (con destinatarios y su estado) — para el panel de seguimiento
@@ -88,6 +89,7 @@ exports.handler = async (event) => {
       if (!title) return json({ error: 'missing_title' }, { statusCode: 400 });
       if (!content) return json({ error: 'missing_content' }, { statusCode: 400 });
       if (!userIds.length) return json({ error: 'no_recipients' }, { statusCode: 400 });
+      for (const userId of userIds) if (!await canManageClient(sb, admin, userId)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
       const { data: notif, error: e1 } = await sb
         .from('notifications')

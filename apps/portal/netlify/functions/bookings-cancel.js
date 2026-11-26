@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /** Request, approve, reject or directly cancel a future Google Meet booking. */
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
@@ -35,7 +36,7 @@ function createBookingCancelHandler(deps = {}) {
 
     const admin = isApplicationAdmin(actor);
     const studentOwner = !admin && String(booking.user_id) === String(actor.id);
-    const assignedAdmin = admin && (isDeveloperAdmin(actor) || normalizeEmail(actor) === normalizeEmail(booking.admin_email));
+    const assignedAdmin = admin && (isDeveloperAdmin(actor) || normalizeEmail(actor) === normalizeEmail(booking.admin_email) || await canManageClient(sb, actor, booking.user_id));
     if (action === 'request' ? !studentOwner : !assignedAdmin) {
       return json({ error: 'forbidden' }, { statusCode: 403 });
     }

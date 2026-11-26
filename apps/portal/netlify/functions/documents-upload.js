@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/documents/upload
  * Confirma un binario previamente subido con /api/documents/upload-ticket.
@@ -38,6 +39,7 @@ exports.handler = async (event) => {
     const { data: doc, error: documentError } = await sb.from('documents').select('*').eq('id', id).single();
     if (documentError || !doc) return json({ error: 'not_found' }, { statusCode: 404 });
     if (!isAdmin && !ownsRecord(caller, doc)) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (isAdmin && !await canManageClient(sb, caller, doc.user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
     if (doc.file_path === file_path && doc.status === 'pending_review') {
       return json({ ok: true, document_id: doc.id, already_confirmed: true });
     }

@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/payments/add
  * Body: { user_id, preset?, concept?, amount?, tax_rate?, ielts_mode?, ielts_hours?, units?, due_date? }
@@ -54,6 +55,7 @@ exports.handler = async (event) => {
     if (!admin) return json({ error: 'unauthorized' }, { statusCode: 401 });
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    if (!await canManageClient(sb, admin, user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     // Comprobar que el cliente existe
     const { data: client, error: ce } = await sb

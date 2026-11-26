@@ -1,3 +1,4 @@
+import { MeetingHistory } from '../../../../../../packages/admin-collaboration/MeetingHistory.jsx';
 // Admin workspace module for profile; AdminPortal composes these views.
 import { useState, useEffect } from "react";
 import { User, FileText, CheckCircle2, BookOpen, Loader2, AlertCircle, Sparkles, RefreshCw, ExternalLink, GraduationCap, PartyPopper, XCircle } from "lucide-react";
@@ -107,6 +108,7 @@ export function AdminPerfil({ client, onRefresh }) {
 
       <AdminProfileEditor client={client} onRefresh={onRefresh} personalOnly />
       <CommercialNotesEditor client={client} onRefresh={onRefresh} />
+      <MeetingHistory clientId={client.id} portal="portal"/>
 
       {!arrival && <>
       <Card>

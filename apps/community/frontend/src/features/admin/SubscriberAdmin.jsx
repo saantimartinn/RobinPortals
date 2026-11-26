@@ -1,3 +1,4 @@
+import { AdminTutorial } from '../../../../../../packages/admin-tutorial/AdminTutorial.jsx';
 // Admin feature UI for subscriber admin; the application shell selects this view.
 import { AdminChallengeManager } from "./AdminChallengeManager.jsx";
 import { AdminDiscountManager } from "./AdminDiscountManager.jsx";
@@ -60,6 +61,7 @@ function SubscriberAdmin({ applicationIdentity }) {
 
   return (
     <div className="student-portal subscription-admin">
+      <AdminTutorial portal="community" user={applicationIdentity} onNavigate={key=>{if(key)setSection(key);}}/>
       <a className="student-skip" href="#subscription-admin-content">Saltar al contenido</a>
       <div className="student-layout">
         <nav className="student-sidebar" aria-label="Navegación de administración">

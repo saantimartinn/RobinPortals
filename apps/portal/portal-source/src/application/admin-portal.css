@@ -134,3 +134,5 @@
   .admin-questionnaire > .ui-card-header { flex-direction: column; align-items: stretch; }
   .admin-questionnaire > .ui-card-header > :last-child { align-self: flex-start; }
 }
+
+.admin-client-responsibility { margin: 0 0 14px; color: #536079; font-size: 13px; line-height: 1.5; }

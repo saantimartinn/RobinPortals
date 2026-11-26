@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * /api/admin/chat  ·  El ASESOR ve e interviene en el chat alumno⇄IA.
  *
@@ -31,7 +32,7 @@ async function getAdmin(sb, session) {
   const isSuper = isListedAdvisor(admin);
   const isAdmin = isApplicationAdmin(admin);
   if (!isAdmin) return null;
-  return { id: admin.id, email, isSuper };
+  return { ...admin, id: admin.id, email, isSuper };
 }
 
 /** Comprueba que el admin puede ver a ese alumno. Devuelve el cliente o null. */
@@ -42,7 +43,7 @@ async function loadClientForAdmin(sb, admin, userId) {
     .eq('id', userId)
     .single();
   if (!client) return null;
-  if (!admin.isSuper && (client.assigned_to || '').toLowerCase() !== admin.email) return null;
+  if (!await canManageClient(sb, admin, userId)) return null;
   return client;
 }
 

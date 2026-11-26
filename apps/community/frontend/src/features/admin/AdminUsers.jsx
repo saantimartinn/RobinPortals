@@ -51,7 +51,7 @@ function AdminUsers({ users, requests, onChanged }) {
         <div className="client-folder-tiles">{folders.filter((folder) => folder.parent_id === selectedId).sort((a, b) => a.name.localeCompare(b.name, 'es')).map((folder) => <div className="client-folder-tile" key={folder.id} {...dropProps(folder.id)}><button type="button" className="client-folder-open" onClick={() => openFolder(folder.id)}><Folder /><span>{folder.name}</span><small>{items.filter((item) => item.folder_id === folder.id).length} clientes</small></button><button type="button" title="Renombrar" aria-label={`Renombrar ${folder.name}`} onClick={() => { const name = window.prompt('Nombre de la carpeta', folder.name); if (name?.trim()) void change({ action: 'rename', folderId: folder.id, name: name.trim() }); }}><Pencil /></button><button type="button" title="Eliminar carpeta vacía" aria-label={`Eliminar ${folder.name}`} onClick={() => { if (window.confirm(`¿Eliminar la carpeta vacía «${folder.name}»?`)) void change({ action: 'delete', folderId: folder.id }); }}><Trash2 /></button></div>)}</div>
       </div>
 
-      {open && <AdminUserDetail u={open} requests={requests} onChanged={onChanged} onClose={() => setOpenId(null)} />}
+      {open && <AdminUserDetail key={open.id} u={open} requests={requests} onChanged={onChanged} onClose={() => setOpenId(null)} />}
 
       <Card>
         <CardContent className="p-0 overflow-x-auto">
@@ -70,6 +70,7 @@ function AdminUsers({ users, requests, onChanged }) {
                     <td className="px-4 py-3">
                       <div className="font-medium text-slate-800">{u.name}</div>
                       <div className="text-xs text-slate-400">{u.email}</div>{(u.crm_notes || []).length > 0 && <div className="text-xs text-slate-600 truncate max-w-xs">Notas comerciales ({u.crm_notes.length}): {u.crm_notes.at(-1)?.body}</div>}
+                      <div className="text-xs text-slate-500">{u.assigned_to ? `Responsable: ${u.assigned_to}` : 'Sin responsable · Disponible para asignar'}</div>
                     </td>
                     <td className="px-4 py-3">{u.ciudad || <span className="text-slate-300">—</span>}</td>
                     <td className="px-4 py-3"><Badge tone={st.tone}>{st.label}</Badge></td>
@@ -77,7 +78,7 @@ function AdminUsers({ users, requests, onChanged }) {
                     <td className="px-4 py-3">{u.rsvps_count}</td>
                     <td className="px-4 py-3 text-right">
                       <Btn size="sm" variant="secondary" onClick={() => setOpenId(u.id === openId ? null : u.id)}>
-                        {u.id === openId ? "Cerrar" : "Gestionar"} <ChevronRight className="h-3.5 w-3.5" />
+                        {u.id === openId ? "Cerrar" : !u.assigned_to ? "Ver y asignarme" : u.can_manage === false ? "Consultar" : "Gestionar"} <ChevronRight className="h-3.5 w-3.5" />
                       </Btn>
                     </td>
                   </tr>

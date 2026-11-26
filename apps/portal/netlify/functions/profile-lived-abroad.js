@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/profile/lived-abroad
  * Guarda si el alumno ha vivido fuera de España en alguno de los 3 últimos años.
@@ -31,6 +32,7 @@ exports.handler = async (event) => {
     const isAdmin = isApplicationAdmin(caller);
 
     const target_uid = (isAdmin && body.user_id) ? body.user_id : caller.id;
+    if (isAdmin && !await canManageClient(sb, caller, target_uid)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
     if (!isAdmin && body.user_id && body.user_id !== caller.id) {
       return json({ error: 'forbidden' }, { statusCode: 403 });
     }

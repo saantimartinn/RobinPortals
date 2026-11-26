@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * POST /api/admin/documents/review
  * Body: { id, decision: 'validate'|'reject', rejection_reason? }
@@ -27,6 +28,8 @@ exports.handler = async (event) => {
     const adminEmail = normalizeEmail(admin);
     const isAdmin = isApplicationAdmin(admin);
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
+    const { data: documentOwner } = await sb.from('documents').select('user_id').eq('id', id).maybeSingle();
+    if (!documentOwner || !await canManageClient(sb, admin, documentOwner.user_id)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
 
     if (decision === 'validate') {
       const nowIso = new Date().toISOString();

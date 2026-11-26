@@ -1,3 +1,4 @@
+const { isProAdmin } = require('../../../admin/lib/admin-profiles');
 /**
  * POST /api/admin/clients/assign  body: { user_id: string }
  * Asigna ese cliente al admin de la sesión (assigned_to = email_admin).
@@ -35,13 +36,14 @@ exports.handler = async (event) => {
     // No permitir asignar a un admin a sí mismo
     const { data: target, error: e2 } = await sb
       .from('users')
-      .select('id, role, email, username')
+      .select('id, role, email, username, assigned_to')
       .eq('id', userId)
       .single();
     if (e2 || !target) return json({ error: 'not_found' }, { statusCode: 404 });
 
     const targetIsAdmin = isApplicationAdmin(target);
     if (targetIsAdmin) return json({ error: 'cannot_assign_admin' }, { statusCode: 400 });
+    if (target.assigned_to && target.assigned_to.toLowerCase() !== adminEmail && !isProAdmin(admin)) return json({ error: 'only_pro_can_reassign' }, { statusCode: 403 });
 
     const { error: e3 } = await sb
       .from('users')

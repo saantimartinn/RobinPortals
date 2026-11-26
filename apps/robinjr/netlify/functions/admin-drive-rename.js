@@ -1,3 +1,4 @@
+const { canManageClient } = require('../../lib/client-access');
 /**
  * /api/admin/drive-rename
  * Renombra las carpetas de Google Drive de clientes que YA completaron el DNI
@@ -67,6 +68,7 @@ exports.handler = async (event) => {
 
     const processed = [];
     for (const u of targets) {
+      if (!await canManageClient(sb, admin, u.id)) continue;
       if (!u.dni_completed) {
         processed.push({ lead_id: u.lead_id, ok: false, skipped: true, reason: 'dni_not_completed' });
         continue;

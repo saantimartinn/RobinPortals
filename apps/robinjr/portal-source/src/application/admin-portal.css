@@ -109,3 +109,5 @@
 }
 @media (prefers-reduced-motion: reduce) { .admin-workspace *, .admin-workspace *::before, .admin-workspace *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 @media (max-height: 600px) { .admin-client-context { position: static; } }
+
+.admin-client-responsibility { margin: 0 0 14px; color: #536079; font-size: 13px; line-height: 1.5; }

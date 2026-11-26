@@ -1,3 +1,4 @@
+const { scopeClients } = require('../../lib/client-access');
 /**
  * GET /api/admin/clients
  * Devuelve los clientes asignados al admin de la sesión.
@@ -36,13 +37,13 @@ exports.handler = async (event) => {
     if (!isAdmin) return json({ error: 'forbidden' }, { statusCode: 403 });
 
     // Buscar clientes asignados a este admin
-    const { data: clients, error: e2 } = await sb
+    const { query: clientQuery } = await scopeClients(sb
       .from('users')
       .select(
         'id, display_id, lead_id, username, email, role, requires_onboarding, dni_completed, profile_completed, nombre, apellidos, dni_numero, direccion, fecha_nacimiento, questionnaire, intereses, lived_abroad, lived_abroad_country, lived_abroad_other, lived_abroad_set, tipo, origin, application_level, has_eu_id, assigned_to, application_phase, created_at, updated_at'
       )
-      .eq('assigned_to', adminEmail)
-      .order('created_at', { ascending: false });
+      , admin);
+    const { data: clients, error: e2 } = await clientQuery.order('created_at', { ascending: false });
     if (e2) throw e2;
 
     // Por seguridad, nunca devolver otro admin/supervisor como cliente.
@@ -60,7 +61,7 @@ exports.handler = async (event) => {
         nombre: admin.nombre,
         apellidos: admin.apellidos,
       },
-      clients: list,
+      clients: list.map(client => ({...client,shared_by:client.assigned_to?.toLowerCase()!==adminEmail?client.assigned_to:null})),
     });
   } catch (e) {
     console.error('admin-clients-list error', e);

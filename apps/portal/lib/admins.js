@@ -40,8 +40,12 @@ function adminName(email) {
 function refreshTokenFor(email) {
   const canon = canonicalAdvisorEmail(email);
   const a = ADVISORS.find((x) => x.email.toLowerCase() === canon);
-  if (!a) return null;
-  return process.env[a.refreshEnv] ? String(process.env[a.refreshEnv]).trim() : null;
+  if (a) return process.env[a.refreshEnv] ? String(process.env[a.refreshEnv]).trim() : null;
+  // Additional advisors use the same OAuth app, without becoming PRO admins.
+  try {
+    const tokens = JSON.parse(process.env.GOOGLE_ADVISOR_REFRESH_TOKENS || '{}');
+    return typeof tokens[canon] === 'string' ? tokens[canon].trim() || null : null;
+  } catch { return null; }
 }
 
 function canonicalAdvisorEmail(email) {
