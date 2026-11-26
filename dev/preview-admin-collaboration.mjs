@@ -85,6 +85,15 @@ async function api(req,res,url,actor){
       target.assigned_to=actor.email;return json(res,{ok:true});
     }
     if(id&&!await canManage(actor,portal,id))return json(res,{error:'client_not_assigned'},403);
+    if(path==='/api/admin/careers/assign'){
+      const template=state.templates.find(t=>t.id===data.career_template_id);
+      if(!client||!template)return json(res,{error:'invalid_career'},400);
+      const assignments=source.tables.client_careers||=[];
+      const match=row=>row.user_id===client.id&&row.career_template_id===template.id;
+      if(data.action==='unassign')source.tables.client_careers=assignments.filter(row=>!match(row));
+      else if(!assignments.some(match))assignments.push({user_id:client.id,career_template_id:template.id});
+      return json(res,{ok:true});
+    }
     if(path==='/api/admin/phase'&&client){client.application_phase=data.phase;return json(res,{ok:true});}
     if(path==='/api/admin/clients'&&client){Object.assign(client,data.data,{updated_at:new Date().toISOString()});return json(res,{ok:true,updated_at:client.updated_at});}
     if(path==='/api/admin/payments/unlock'){state.payments.find(p=>p.user_id===userId&&p.installment===data.installment).status='unlocked';return json(res,{ok:true});}
@@ -94,7 +103,10 @@ async function api(req,res,url,actor){
   }
   if(path==='/api/admin/payments')return json(res,{user:client,payments:state.payments.filter(p=>p.user_id===userId)});
   if(path==='/api/admin/documents')return json(res,{documents:state.documents.filter(d=>d.user_id===userId)});
-  if(path==='/api/careers')return json(res,{templates:state.templates,assigned_template_ids:[state.templates[0].id],careers:[state.templates[0]]});
+  if(path==='/api/careers'){
+    const assigned=(source.tables.client_careers||[]).filter(row=>row.user_id===userId).map(row=>row.career_template_id);
+    return json(res,{templates:state.templates,assigned_template_ids:assigned,careers:state.templates.filter(template=>assigned.includes(template.id))});
+  }
   if(path==='/api/admin/career-suggestions')return json(res,{has_questionnaire:true,suggestions:{items:[],generated_at:new Date().toISOString()},feedback:[]});
   if(path==='/api/bookings')return json(res,{bookings:state.bookings.filter(b=>b.user_id===userId)});
   if(path==='/api/admin/chat')return json(res,{messages:[],ai_paused:false});

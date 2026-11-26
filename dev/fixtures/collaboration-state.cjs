@@ -19,7 +19,18 @@ function previewState(){
   const meetings=rows=>rows.map((c,i)=>({id:uid(100+Number(c.lead_id)),user_id:c.id,advisor_email:c.assigned_to,title:'Orientación inicial · ejemplo',meeting_at:ago(8),completed_at:ago(8),summary:'Temas: opciones académicas.\nDecisión: revisar requisitos.\nAcción: preparar la documentación para la próxima reunión.',status:'completed'}));
   const db=memoryDatabase({users:[...actors,...clients],admin_links:links,admin_client_shares:[grant(0,2,'portal',10),grant(1,2,'portal',12),grant(0,2,'robinjr',20),grant(0,2,'community',30)],admin_tutorials:['admin','portal','robinjr','community'].map(portal=>({admin_id:actors[3].id,portal,revision:1,completed_revision:0,step:0})),admin_meeting_mail:[],meeting_transcripts:meetings(clients)});
   const sources={portal:db,robinjr:memoryDatabase({users:juniors,meeting_transcripts:meetings(juniors)}),community:memoryDatabase({subscribers})};
-  const templates=[{id:uid(70),name:'International Business',university:'Universidad de ejemplo',city:'Maastricht',required_docs:[{id:'req-demo',type:'document',name:'Certificado académico',required:true,deadline:'2027-01-15'}]},{id:uid(71),name:'Economics',university:'Universidad de ejemplo',city:'Ámsterdam',required_docs:[]}];
+  const templates=[
+    {id:uid(70),name:'International Business',university:'Maastricht University',city:'Maastricht',required_docs:[{id:'req-demo',type:'document',name:'Certificado académico',required:true,deadline:'2027-01-15'}]},
+    {id:uid(71),name:'Economics',university:'Maastricht University',city:'Maastricht',required_docs:[]},
+    {id:uid(72),name:'Psychology',university:'Tilburg University',city:'Tilburg',required_docs:[]},
+    {id:uid(73),name:'Computer Science',university:'University of Groningen',city:'Groningen',required_docs:[]},
+    {id:uid(74),name:'Law',university:'Tilburg University',city:'Tilburg',required_docs:[]},
+    {id:uid(75),name:'Artificial Intelligence',university:'University of Groningen',city:'Groningen',required_docs:[]},
+    {id:uid(76),name:'Business Analytics',university:'Maastricht University',city:'Maastricht',required_docs:[]},
+    {id:uid(77),name:'Programa pendiente de universidad',university:'',city:'',required_docs:[]},
+  ];
+  db.tables.client_careers=[{user_id:uid(10),career_template_id:uid(70)},{user_id:uid(10),career_template_id:uid(74)},{user_id:uid(11),career_template_id:uid(72)},{user_id:uid(13),career_template_id:uid(73)}];
+  sources.robinjr.tables.client_careers=[{user_id:uid(20),career_template_id:uid(71)}];
   const payments=[],documents=[],bookings=[];
   for(const c of [...clients,...juniors]){
     payments.push({id:uid(200+Number(c.lead_id)),user_id:c.id,installment:1,amount:799.67,currency:'EUR',status:'paid',paid_at:ago(10),payment_data:{}},{id:uid(300+Number(c.lead_id)),user_id:c.id,installment:2,amount:799.67,currency:'EUR',status:'locked'},{id:uid(400+Number(c.lead_id)),user_id:c.id,installment:3,amount:799.66,currency:'EUR',status:'locked'});
