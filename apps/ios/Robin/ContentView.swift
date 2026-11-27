@@ -53,26 +53,40 @@ struct ContentView: View {
         Group {
             if let url = selectedProductURL {
                 VStack(spacing: 0) {
-                    HStack {
-                        Button { closeProduct() } label: {
-                            Label("Inicio", systemImage: "chevron.left")
-                                .font(.custom(RobinStyle.textSemibold, size: 14))
-                                .frame(minHeight: 44)
-                        }
-                        .tint(RobinStyle.navy)
-                        Spacer()
-                        Image("RobinWordmark").resizable().scaledToFit().frame(width: 70, height: 32).accessibilityLabel("Robin")
-                        Spacer()
-                        Button { reloadNumber += 1 } label: { Image(systemName: "arrow.clockwise").font(.system(size: 16, weight: .medium)) }
+                    ZStack {
+                        HStack {
+                            Button { closeProduct() } label: {
+                                Label("Inicio", systemImage: "chevron.left")
+                                    .font(.custom(RobinStyle.textSemibold, size: 14))
+                                    .frame(minHeight: 44)
+                            }
+                            .tint(RobinStyle.navy)
+                            Spacer()
+                            Button { reloadNumber += 1 } label: {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .frame(width: 44, height: 44)
+                            }
                             .tint(RobinStyle.navy)
                             .accessibilityLabel("Recargar")
+                        }
+
+                        VStack(spacing: 0) {
+                            Image("RobinWordmark")
+                                .resizable().scaledToFit().frame(width: 70, height: 30)
+                                .accessibilityLabel("Robin")
+                            if let activeProduct {
+                                Text(activeProduct.title)
+                                    .font(.custom(RobinStyle.subtitle, size: 15))
+                                    .foregroundStyle(RobinStyle.navy)
+                                    .lineLimit(1).minimumScaleFactor(0.8)
+                                    .accessibilityAddTraits(.isHeader)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .allowsHitTesting(false)
                     }
-                    .padding(.horizontal, 18).padding(.top, 8).padding(.bottom, 5)
-                    if let activeProduct {
-                        Text(activeProduct.title)
-                            .font(.custom(RobinStyle.subtitle, size: 16))
-                            .foregroundStyle(RobinStyle.navy).padding(.bottom, 8)
-                    }
+                    .padding(.horizontal, 16).padding(.vertical, 5)
                     Rectangle().fill(RobinStyle.border).frame(height: 1)
                     RobinWebView(
                         startURL: url,
