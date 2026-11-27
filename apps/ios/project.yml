@@ -22,6 +22,8 @@ targets:
           NSAllowsLocalNetworking: true
     entitlements:
       path: Robin/Robin.entitlements
+      properties:
+        aps-environment: $(APS_ENVIRONMENT)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.projectrobin.ios
