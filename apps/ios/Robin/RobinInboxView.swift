@@ -13,7 +13,7 @@ struct RobinInboxView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 23) {
+            VStack(alignment: .leading, spacing: 21) {
                 RobinBrandHeader()
                 RobinPageHeading(
                     eyebrow: "Tu bandeja",
@@ -21,29 +21,30 @@ struct RobinInboxView: View {
                     subtitle: "Mensajes importantes de los productos que usas."
                 )
 
-                HStack(spacing: 12) {
-                    Image(systemName: pendingCount > 0 ? "bell.badge.fill" : "checkmark.circle.fill")
-                        .font(.system(size: 20, weight: .semibold)).foregroundStyle(RobinStyle.gold)
-                        .frame(width: 46, height: 46).background(.white.opacity(0.11), in: Circle())
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(pendingCount == 0 ? "Estás al día" : "\(pendingCount) pendientes")
-                            .font(.system(size: 17, weight: .semibold, design: .serif)).foregroundStyle(.white)
-                        Text(pendingCount == 0 ? "No tienes avisos nuevos." : "Entra para leer el mensaje completo.")
-                            .font(.system(size: 12)).foregroundStyle(.white.opacity(0.75))
+                HStack(alignment: .center, spacing: 13) {
+                    Text("\(pendingCount)")
+                        .font(.custom(RobinStyle.display, size: 43)).foregroundStyle(RobinStyle.navy)
+                        .frame(minWidth: 46, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(pendingCount == 0 ? "Estás al día" : "por leer")
+                            .font(.custom(RobinStyle.subtitle, size: 20)).foregroundStyle(RobinStyle.navy)
+                        Text(pendingCount == 0 ? "No tienes avisos nuevos." : "Avisos importantes de Robin")
+                            .font(.custom(RobinStyle.text, size: 12)).foregroundStyle(RobinStyle.muted)
                     }
                     Spacer(minLength: 0)
+                    Image(systemName: pendingCount == 0 ? "checkmark.seal" : "bell.badge")
+                        .font(.system(size: 20, weight: .regular)).foregroundStyle(RobinStyle.navy)
                 }
-                .padding(16)
-                .background(RobinStyle.navy, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .padding(.horizontal, 15).padding(.vertical, 12)
+                .background(RobinStyle.gold.opacity(0.28))
+                .overlay(alignment: .leading) { Rectangle().fill(RobinStyle.gold).frame(width: 4) }
 
                 HStack(spacing: 6) {
                     filterButton("Pendientes", selected: pendingOnly) { pendingOnly = true }
                     filterButton("Todos", selected: !pendingOnly) { pendingOnly = false }
                     Spacer()
-                    Text("\(visibleNotices.count)")
-                        .font(.system(size: 11, weight: .semibold)).foregroundStyle(RobinStyle.navy)
-                        .padding(.horizontal, 10).padding(.vertical, 6)
-                        .background(RobinStyle.gold.opacity(0.25), in: Capsule())
+                    Text("\(visibleNotices.count) avisos")
+                        .font(.custom(RobinStyle.text, size: 11)).foregroundStyle(RobinStyle.muted)
                 }
 
                 if !snapshot.noticeErrors.isEmpty {
@@ -64,7 +65,7 @@ struct RobinInboxView: View {
                             HStack(spacing: 8) {
                                 RobinProductLogo(product: product, size: 34)
                                 Text(product.title.uppercased())
-                                    .font(.system(size: 10, weight: .bold, design: .rounded)).tracking(0.85)
+                                    .font(.custom(RobinStyle.displayBold, size: 11)).tracking(0.75)
                                     .foregroundStyle(RobinStyle.muted)
                                 Spacer()
                                 Text("\(visibleNotices.filter { $0.product == product }.count)")
@@ -85,12 +86,12 @@ struct RobinInboxView: View {
 
     private func filterButton(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title).font(.system(size: 12, weight: .semibold))
+            Text(title).font(.custom(RobinStyle.textSemibold, size: 12))
                 .foregroundStyle(selected ? RobinStyle.navy : RobinStyle.muted)
                 .padding(.horizontal, 13).padding(.vertical, 9)
                 .background(selected ? RobinStyle.gold.opacity(0.31) : RobinStyle.paper,
-                            in: Capsule())
-                .overlay(Capsule().stroke(selected ? RobinStyle.gold.opacity(0.65) : RobinStyle.border, lineWidth: 1))
+                            in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(selected ? RobinStyle.gold.opacity(0.65) : RobinStyle.border, lineWidth: 1))
         }
         .buttonStyle(.plain)
     }
@@ -103,7 +104,7 @@ struct RobinInboxView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .top, spacing: 8) {
                         Text(notice.title)
-                            .font(.system(size: 14, weight: notice.isPending ? .semibold : .medium))
+                            .font(.custom(notice.isPending ? RobinStyle.textSemibold : RobinStyle.text, size: 14))
                             .foregroundStyle(RobinStyle.navy).multilineTextAlignment(.leading)
                         Spacer(minLength: 0)
                         Image(systemName: "arrow.up.right")
@@ -125,10 +126,9 @@ struct RobinInboxView: View {
                     .font(.system(size: 10, weight: .medium)).foregroundStyle(RobinStyle.muted)
                 }
             }
-            .padding(13).frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
-            .background(RobinStyle.paper, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 17, style: .continuous).stroke(RobinStyle.border, lineWidth: 1))
-            .contentShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+            .padding(.vertical, 12).frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
+            .contentShape(Rectangle())
+            .overlay(alignment: .bottom) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
         }
         .buttonStyle(.plain)
         .accessibilityHint("Abre el aviso en su producto")
@@ -136,15 +136,14 @@ struct RobinInboxView: View {
 
     private var emptyState: some View {
         VStack(spacing: 11) {
-            Image(systemName: pendingOnly ? "checkmark.seal" : "bell.slash")
-                .font(.system(size: 28, weight: .light)).foregroundStyle(RobinStyle.navy)
+            Image("RobinMascot").resizable().scaledToFit().frame(width: 138, height: 112)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous)).accessibilityHidden(true)
             Text(pendingOnly ? "No tienes avisos pendientes" : "Todavía no hay avisos")
-                .font(.system(size: 17, weight: .semibold, design: .serif)).foregroundStyle(RobinStyle.navy)
+                .font(.custom(RobinStyle.subtitle, size: 20)).foregroundStyle(RobinStyle.navy)
             Text(pendingOnly ? "Cuando llegue algo nuevo, aparecerá aquí." : "Los avisos de tus productos aparecerán en esta bandeja.")
-                .font(.system(size: 12)).foregroundStyle(RobinStyle.muted).multilineTextAlignment(.center)
+                .font(.custom(RobinStyle.text, size: 12)).foregroundStyle(RobinStyle.muted).multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity).padding(.vertical, 30).padding(.horizontal, 20)
-        .background(RobinStyle.paper, in: RoundedRectangle(cornerRadius: 21, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 21, style: .continuous).stroke(RobinStyle.border, lineWidth: 1))
+        .background(RobinStyle.paper)
     }
 }

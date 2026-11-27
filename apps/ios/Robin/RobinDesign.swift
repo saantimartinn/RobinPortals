@@ -8,6 +8,11 @@ enum RobinStyle {
     static let soft = Color(red: 246.0 / 255, green: 243.0 / 255, blue: 224.0 / 255)
     static let border = Color(red: 237.0 / 255, green: 236.0 / 255, blue: 219.0 / 255)
     static let muted = Color(red: 104.0 / 255, green: 112.0 / 255, blue: 136.0 / 255)
+    static let display = "RobinDisplay-Medium"
+    static let displayBold = "RobinDisplay-Bold"
+    static let subtitle = "RobinSubtitle-Regular"
+    static let text = "RobinText-Regular"
+    static let textSemibold = "RobinText-Semibold"
 
     static func initials(for name: String?) -> String {
         let parts = (name ?? "R").split(whereSeparator: \.isWhitespace)
@@ -62,16 +67,16 @@ struct RobinPageHeading: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
             Text(eyebrow.uppercased())
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .font(.custom(RobinStyle.displayBold, size: 11))
                 .tracking(1.25)
                 .foregroundStyle(RobinStyle.muted)
             Text(title)
-                .font(.system(size: 31, weight: .semibold, design: .serif))
+                .font(.custom(RobinStyle.display, size: 34))
                 .tracking(-0.6)
                 .foregroundStyle(RobinStyle.navy)
                 .fixedSize(horizontal: false, vertical: true)
             Text(subtitle)
-                .font(.system(size: 14, weight: .regular))
+                .font(.custom(RobinStyle.text, size: 14))
                 .lineSpacing(3)
                 .foregroundStyle(RobinStyle.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -86,7 +91,7 @@ struct RobinSectionHeading: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(title).font(.system(size: 18, weight: .semibold, design: .serif)).foregroundStyle(RobinStyle.navy)
+            Text(title).font(.custom(RobinStyle.subtitle, size: 19)).foregroundStyle(RobinStyle.navy)
             Spacer()
             if let trailing { Text(trailing).font(.system(size: 12, weight: .medium)).foregroundStyle(RobinStyle.muted) }
         }
@@ -102,6 +107,7 @@ struct RobinProductLogo: View {
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.24, style: .continuous))
             .padding(size * 0.1)
             .background(RobinStyle.soft, in: RoundedRectangle(cornerRadius: size * 0.32, style: .continuous))
             .accessibilityHidden(true)
@@ -125,22 +131,22 @@ struct RobinTabBar: View {
                                 Circle().fill(RobinStyle.gold).frame(width: 8, height: 8).offset(x: -2, y: -1)
                             }
                         }
-                        Text(tab.rawValue).font(.system(size: 11, weight: selection == tab ? .semibold : .medium))
+                        Text(tab.rawValue).font(.custom(selection == tab ? RobinStyle.textSemibold : RobinStyle.text, size: 11))
                     }
                     .foregroundStyle(selection == tab ? RobinStyle.navy : RobinStyle.muted)
                     .frame(maxWidth: .infinity).frame(height: 58)
-                    .background(selection == tab ? RobinStyle.gold.opacity(0.23) : .clear,
-                                in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .overlay(alignment: .bottom) {
+                        Rectangle().fill(selection == tab ? RobinStyle.gold : .clear).frame(height: 3)
+                    }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(selection == tab ? .isSelected : [])
             }
         }
-        .padding(7)
-        .background(RobinStyle.paper, in: RoundedRectangle(cornerRadius: 25, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 25, style: .continuous).stroke(RobinStyle.border, lineWidth: 1))
-        .shadow(color: RobinStyle.navy.opacity(0.08), radius: 20, x: 0, y: 6)
+        .padding(.horizontal, 9).padding(.top, 6)
+        .background(RobinStyle.paper)
+        .overlay(alignment: .top) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
     }
 
     private func selectedSymbol(_ tab: RobinTab) -> String {

@@ -8,15 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		0C8674A89A89B44AE3F79ADC /* RobinNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A872265EA8B18A7CB7B7CF9 /* RobinNavigation.swift */; };
+		12B6296D7B0272A8C98ADA98 /* OFL-bodonimoda.txt in Resources */ = {isa = PBXBuildFile; fileRef = DA7FAA0FD3037CFF8BE94D13 /* OFL-bodonimoda.txt */; };
+		131D174D2D5F5D42ACBA46CC /* RobinSubtitle-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 200A7C7702AEBE0A644701B1 /* RobinSubtitle-Regular.ttf */; };
 		17DF13814077D905AE503488 /* RobinNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5630D7A2CA3E0E8E6C1E7867 /* RobinNavigationTests.swift */; };
 		1D9BA179485A8B8DFC4A6C2C /* RobinAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432E2A92C3BF6F2502BDAB8F /* RobinAccountView.swift */; };
+		3F0C93C9F1574F96DAB63C06 /* RobinDisplay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0370D8FEB3429E6E4571616C /* RobinDisplay-Bold.ttf */; };
 		5AEA871B0B5391D42FB53441 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16669C47865736CA9B5F3216 /* Assets.xcassets */; };
 		790378B7157F9A5AF6CD33B3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0C6AED334E6EEFC622A09488 /* PrivacyInfo.xcprivacy */; };
 		7D8AC12D668310BD318F2291 /* RobinInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7B65620C66AA9D44BE92D8 /* RobinInboxView.swift */; };
+		8992DB9FCB77A98F69D5AEEB /* RobinText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 32F81AFE890385FB6428F461 /* RobinText-Regular.ttf */; };
+		B06371871EDF96A897418A54 /* OFL-oswald.txt in Resources */ = {isa = PBXBuildFile; fileRef = FAEFF3CD0CA0972E65975B5A /* OFL-oswald.txt */; };
 		BD02FB582B8ABE23C4D8CCDE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299681F53C660F0F2079A50A /* ContentView.swift */; };
 		C74C897DA5A17AB5AC4A007A /* RobinDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDE5D93A22B1698947DEF32 /* RobinDesign.swift */; };
+		C9CD264EADB22CD38E63E4C6 /* OFL-archivo.txt in Resources */ = {isa = PBXBuildFile; fileRef = 661A2068CEDE6C47ABB7072A /* OFL-archivo.txt */; };
 		CA1A2F319ABFD0DE8CDF750F /* RobinHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECF1DD1BA00FB1DFF1A230B /* RobinHomeView.swift */; };
 		D4DD5D53F0AA8F8780988A45 /* PushRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70C43A8CA7340425565402F4 /* PushRegistration.swift */; };
+		D98B145A7BF24574CFB57203 /* RobinText-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D4AD445A14E9DAFD7C01748 /* RobinText-Semibold.ttf */; };
+		D9FA74D7A82D92FE1356BAA5 /* RobinDisplay-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04C44DD4ECD98339CE72D2DD /* RobinDisplay-Medium.ttf */; };
 		DBA8BC5FE8ACD108076940CE /* RobinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457041A2E8F752AEA6236C4D /* RobinApp.swift */; };
 		E1A1338CDD0139E080FFAFB8 /* RobinService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66802AAB352D2F75A8795354 /* RobinService.swift */; };
 /* End PBXBuildFile section */
@@ -32,25 +40,48 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0370D8FEB3429E6E4571616C /* RobinDisplay-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobinDisplay-Bold.ttf"; sourceTree = "<group>"; };
+		04C44DD4ECD98339CE72D2DD /* RobinDisplay-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobinDisplay-Medium.ttf"; sourceTree = "<group>"; };
 		0C6AED334E6EEFC622A09488 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		16669C47865736CA9B5F3216 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1A872265EA8B18A7CB7B7CF9 /* RobinNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinNavigation.swift; sourceTree = "<group>"; };
+		200A7C7702AEBE0A644701B1 /* RobinSubtitle-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobinSubtitle-Regular.ttf"; sourceTree = "<group>"; };
 		299681F53C660F0F2079A50A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		32F81AFE890385FB6428F461 /* RobinText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobinText-Regular.ttf"; sourceTree = "<group>"; };
+		3D4AD445A14E9DAFD7C01748 /* RobinText-Semibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RobinText-Semibold.ttf"; sourceTree = "<group>"; };
 		3E5BE963991491A5D4440BD0 /* RobinTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RobinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		432E2A92C3BF6F2502BDAB8F /* RobinAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinAccountView.swift; sourceTree = "<group>"; };
 		457041A2E8F752AEA6236C4D /* RobinApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinApp.swift; sourceTree = "<group>"; };
 		4A7B65620C66AA9D44BE92D8 /* RobinInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinInboxView.swift; sourceTree = "<group>"; };
 		4BDE5D93A22B1698947DEF32 /* RobinDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinDesign.swift; sourceTree = "<group>"; };
 		5630D7A2CA3E0E8E6C1E7867 /* RobinNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinNavigationTests.swift; sourceTree = "<group>"; };
+		661A2068CEDE6C47ABB7072A /* OFL-archivo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "OFL-archivo.txt"; sourceTree = "<group>"; };
 		66802AAB352D2F75A8795354 /* RobinService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinService.swift; sourceTree = "<group>"; };
 		70C43A8CA7340425565402F4 /* PushRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistration.swift; sourceTree = "<group>"; };
 		C5EC5E40723A5184B83DE4CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DA7FAA0FD3037CFF8BE94D13 /* OFL-bodonimoda.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "OFL-bodonimoda.txt"; sourceTree = "<group>"; };
 		EECF1DD1BA00FB1DFF1A230B /* RobinHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinHomeView.swift; sourceTree = "<group>"; };
 		F3E22E8D646E250837757F79 /* Robin.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Robin.entitlements; sourceTree = "<group>"; };
+		FAEFF3CD0CA0972E65975B5A /* OFL-oswald.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "OFL-oswald.txt"; sourceTree = "<group>"; };
 		FB76E59A7154998AEA2DEA8E /* Robin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Robin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		80DB0A5745551BAB0374B91A /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				661A2068CEDE6C47ABB7072A /* OFL-archivo.txt */,
+				DA7FAA0FD3037CFF8BE94D13 /* OFL-bodonimoda.txt */,
+				FAEFF3CD0CA0972E65975B5A /* OFL-oswald.txt */,
+				0370D8FEB3429E6E4571616C /* RobinDisplay-Bold.ttf */,
+				04C44DD4ECD98339CE72D2DD /* RobinDisplay-Medium.ttf */,
+				200A7C7702AEBE0A644701B1 /* RobinSubtitle-Regular.ttf */,
+				32F81AFE890385FB6428F461 /* RobinText-Regular.ttf */,
+				3D4AD445A14E9DAFD7C01748 /* RobinText-Semibold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		8DA11A03717261E542F8917B /* Robin */ = {
 			isa = PBXGroup;
 			children = (
@@ -67,6 +98,7 @@
 				4A7B65620C66AA9D44BE92D8 /* RobinInboxView.swift */,
 				1A872265EA8B18A7CB7B7CF9 /* RobinNavigation.swift */,
 				66802AAB352D2F75A8795354 /* RobinService.swift */,
+				80DB0A5745551BAB0374B91A /* Fonts */,
 			);
 			path = Robin;
 			sourceTree = "<group>";
@@ -176,7 +208,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEA871B0B5391D42FB53441 /* Assets.xcassets in Resources */,
+				C9CD264EADB22CD38E63E4C6 /* OFL-archivo.txt in Resources */,
+				12B6296D7B0272A8C98ADA98 /* OFL-bodonimoda.txt in Resources */,
+				B06371871EDF96A897418A54 /* OFL-oswald.txt in Resources */,
 				790378B7157F9A5AF6CD33B3 /* PrivacyInfo.xcprivacy in Resources */,
+				3F0C93C9F1574F96DAB63C06 /* RobinDisplay-Bold.ttf in Resources */,
+				D9FA74D7A82D92FE1356BAA5 /* RobinDisplay-Medium.ttf in Resources */,
+				131D174D2D5F5D42ACBA46CC /* RobinSubtitle-Regular.ttf in Resources */,
+				8992DB9FCB77A98F69D5AEEB /* RobinText-Regular.ttf in Resources */,
+				D98B145A7BF24574CFB57203 /* RobinText-Semibold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
