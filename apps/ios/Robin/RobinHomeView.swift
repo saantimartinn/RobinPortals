@@ -7,7 +7,6 @@ struct RobinHomeView: View {
     let onRefresh: () -> Void
     let onOpenProduct: (RobinProduct) -> Void
     let onOpenInbox: () -> Void
-    let onOpenAccount: () -> Void
     let onReportProblem: () -> Void
 
     private var pendingCount: Int { snapshot.notices.filter(\.isPending).count }
@@ -16,8 +15,7 @@ struct RobinHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 23) {
-                RobinBrandHeader(personName: snapshot.profile?.name, personAction: onOpenAccount,
-                                 trailingSymbol: "bell", trailingAction: onOpenInbox)
+                RobinBrandHeader()
 
                 VStack(alignment: .leading, spacing: 7) {
                     Text(greetingName.isEmpty ? "Hola" : "Hola, \(greetingName)")

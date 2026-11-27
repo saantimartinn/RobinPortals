@@ -106,7 +106,6 @@ struct ContentView: View {
                                   onRefresh: { Task { await refreshSession() } },
                                   onOpenProduct: { product in Task { await openProduct(product) } },
                                   onOpenInbox: { activeTab = .inbox },
-                                  onOpenAccount: { activeTab = .account },
                                   onReportProblem: openReportProblem)
                     case .inbox:
                         RobinInboxView(snapshot: service.snapshot, isLoading: service.isLoading,
@@ -376,9 +375,15 @@ struct ContentView: View {
     private func handleAuthMessage(_ message: WKScriptMessage, _ webView: WKWebView) {
         guard message.frameInfo.isMainFrame,
               let url = message.frameInfo.request.url,
-              RobinAddress.isTrustedPortal(url),
+              RobinAddress.isInternalSite(url),
               let body = message.body as? [String: Any],
               let action = body["action"] as? String else { return }
+
+        if action == "adminShellDetected" {
+            isAdminWebView = true
+            return
+        }
+        guard RobinAddress.isTrustedPortal(url) else { return }
 
         switch action {
         case "status":
@@ -587,7 +592,16 @@ private struct RobinWebView: UIViewRepresentable {
                     if (sectionNav && window.matchMedia('(max-width: 1023px)').matches) {
                       sectionNav.style.setProperty('top', '0px', 'important');
                     }
-                    return !!nav && (!isPortalPath || !!sectionNav || !!document.querySelector('.admin-workspace'));
+                    const adminNav = document.querySelector('.mobile-admin-nav');
+                    if (adminNav) {
+                      const adminTopBar = document.querySelector('.shell > .work > .top');
+                      if (adminTopBar) adminTopBar.style.setProperty('display', 'none', 'important');
+                      if (!document.documentElement.dataset.robinAdminShell) {
+                        document.documentElement.dataset.robinAdminShell = 'true';
+                        window.webkit.messageHandlers.robinAuth.postMessage({ action: 'adminShellDetected' });
+                      }
+                    }
+                    return !!adminNav || (!!nav && (!isPortalPath || !!sectionNav));
                   };
                   const observer = new MutationObserver(() => {
                     if (applyNativeNavigation()) observer.disconnect();
@@ -608,6 +622,7 @@ private struct RobinWebView: UIViewRepresentable {
         webView.isOpaque = false
         webView.backgroundColor = RobinStyle.paperUIColor
         webView.scrollView.backgroundColor = webView.backgroundColor
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.load(URLRequest(url: startURL))
         onCreated(webView)
         return webView

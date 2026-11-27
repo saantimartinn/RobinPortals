@@ -71,6 +71,7 @@
   html.robin-native-app .admin-home-mobile-brand{display:flex;align-items:center;gap:8px;margin:0 0 24px}
   html.robin-native-app .admin-home-mobile-brand img{display:block;width:76px;height:38px;object-fit:contain;object-position:left center}
   html.robin-native-app .admin-home-mobile-brand span{padding-left:12px;border-left:var(--robin-line);color:var(--robin-ink-600);font:400 1rem/1.2 var(--robin-font-subtitle)}
+  html.robin-native-app .admin-home-mobile-brand{display:none}
   html.robin-native-app .admin-home-mobile>h1{margin:0;color:var(--robin-navy);font:500 clamp(2rem,9vw,2.6rem)/1.05 var(--robin-font-display);text-wrap:balance}
   html.robin-native-app .admin-home-mobile>p{margin:8px 0 16px;color:var(--robin-ink-600);font:400 1rem/1.4 var(--robin-font-subtitle)}
   html.robin-native-app .admin-home-mobile-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:142px;margin:0 0 24px;padding:20px;border-radius:16px;background:var(--robin-navy);color:var(--robin-on-navy);text-decoration:none}

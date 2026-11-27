@@ -149,6 +149,8 @@ struct RobinTabBar: View {
                     }
                     .foregroundStyle(selection == tab ? RobinStyle.navy : RobinStyle.muted)
                     .frame(maxWidth: .infinity).frame(height: 58)
+                    .background(selection == tab ? RobinStyle.soft : .clear,
+                                in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)

@@ -94,7 +94,13 @@
   .admin-global-nav { display: flex; gap: 8px; overflow: auto; } .admin-global-nav button { flex-shrink: 0; padding: 11px 14px; }
 }
 @media (max-width: 600px) {
-  .admin-sidebar { padding: 9px 12px; } .admin-global-nav button { font-size: 12px; padding: 11px 12px; } .admin-global-nav small { display: none; }
+  .admin-sidebar { padding: 9px 12px; }
+  .admin-global-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 4px; overflow: visible; }
+  .admin-global-nav button { min-width: 0; min-height: 58px; flex-direction: column; justify-content: center; gap: 4px; padding: 7px 3px; font-size: 11px; line-height: 1.15; text-align: center; white-space: normal; }
+  .admin-global-nav button svg { width: 18px; height: 18px; }
+  .admin-global-nav button span { overflow-wrap: anywhere; }
+  .admin-global-nav button[aria-current] { background: #F6F3E0; color: #2D3A64; }
+  .admin-global-nav small { display: none; }
   .admin-workarea { padding: 24px 14px 110px; } .admin-page-heading { margin-bottom: 22px; }
   .admin-client-context { padding-top: 10px; margin-top: -10px; } .admin-breadcrumb { margin-bottom: 12px; }
   .admin-client-heading { flex-wrap: wrap; gap: 10px; } .admin-client-avatar { width: 40px; height: 45px; font-size: 15px; border-radius: 12px; }
