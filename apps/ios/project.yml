@@ -38,3 +38,14 @@ targets:
           APS_ENVIRONMENT: development
         Release:
           APS_ENVIRONMENT: production
+  RobinTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - RobinTests
+    dependencies:
+      - target: Robin
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.projectrobin.ios.tests
+        SWIFT_VERSION: "5.0"

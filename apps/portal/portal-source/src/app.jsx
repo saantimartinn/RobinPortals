@@ -68,6 +68,12 @@ export default function PortalRobin() {
   const landingHandled = useRef(false);
 
   useEffect(() => {
+    if (!authState.user || new URLSearchParams(window.location.search).get("nativeAction") !== "report-problem") return;
+    setReportOpen(true);
+    window.history.replaceState({}, "", window.location.pathname + window.location.hash);
+  }, [authState.user?.id]);
+
+  useEffect(() => {
     if (!resetToken) return;
     window.history.replaceState({}, "", window.location.pathname + window.location.search);
   }, [resetToken]);
@@ -178,6 +184,10 @@ export default function PortalRobin() {
 
   useEffect(() => {
     if (resetToken || !authState.user || checkingSubscriptionAccess || !subscriptionAccessResolved || landingHandled.current) return;
+    if (new URLSearchParams(window.location.search).get("nativeAction") === "report-problem") {
+      landingHandled.current = true;
+      return;
+    }
     const admin = isAdminUser(authState.user);
     const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
     const next = new URLSearchParams(window.location.search).get("next");

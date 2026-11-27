@@ -14,11 +14,15 @@ exports.handler = async (event) => {
 
   try {
     const sb = getSupabase();
-    const { data: recs, error } = await sb
+    const nativeSummary = event.queryStringParameters?.native === '1';
+    let recipientQuery = sb
       .from('notification_recipients')
       .select('notification_id, status')
-      .eq('user_id', session.uid)
-      .eq('status', 'pending');
+      .eq('user_id', session.uid);
+    recipientQuery = nativeSummary
+      ? recipientQuery.in('status', ['pending', 'seen', 'accepted'])
+      : recipientQuery.eq('status', 'pending');
+    const { data: recs, error } = await recipientQuery;
     if (error) {
       // Tabla aún no creada → sin notificaciones
       return json({ notifications: [] });
@@ -26,14 +30,22 @@ exports.handler = async (event) => {
     const ids = (recs || []).map((r) => r.notification_id);
     if (!ids.length) return json({ notifications: [] });
 
-    const { data: notifs, error: e2 } = await sb
+    const fields = nativeSummary ? 'id, title, type, created_at' : 'id, title, content, type, created_at';
+    let notifsQuery = sb
       .from('notifications')
-      .select('id, title, content, type, created_at')
+      .select(fields)
       .in('id', ids)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: !nativeSummary });
+    if (nativeSummary) notifsQuery = notifsQuery.limit(100);
+    const { data: notifs, error: e2 } = await notifsQuery;
     if (e2) return json({ notifications: [] });
 
-    return json({ notifications: notifs || [] });
+    if (!nativeSummary) return json({ notifications: notifs || [] });
+    const statusById = new Map((recs || []).map((row) => [row.notification_id, row.status]));
+    return json({ notifications: (notifs || []).map((notification) => ({
+      ...notification,
+      status: statusById.get(notification.id) || 'pending',
+    })) });
   } catch (e) {
     console.error('notifications-list error', e);
     return serverError(e);

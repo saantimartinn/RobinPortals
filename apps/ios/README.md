@@ -1,12 +1,16 @@
-# Robin iOS · prototipo nativo
+# Robin iOS · experiencia nativa
 
-Proyecto nativo SwiftUI con `WKWebView`. Abre el login existente de Robin y conserva sus rutas y cookies bajo un mismo origen. No está preparado para App Store.
+Aplicación SwiftUI con una pantalla nativa de inicio, una bandeja común de avisos y una sección de cuenta. Los flujos completos de Portal, Robin Jr y The Robin Plan siguen dentro de `WKWebView`, con sus sesiones y controles de acceso actuales. Esta implementación no implica que la app ya esté aprobada o lista para publicar en App Store.
+
+Las pantallas nativas reutilizan el wordmark y los tres emblemas de producto de la web, junto a su paleta navy, dorado y crema. El selector superior de producto de la web se oculta dentro de la app: Inicio y el selector nativo son el punto para cambiar de producto. Dentro del Portal, «Mi camino», «Mis carreras» y el resto de secciones quedan fijadas en la parte superior de la vista web al desplazarse.
 
 ## Portal de producción y estado del prototipo
 
 El iPhone físico y la compilación Release abren [Portal del Alumno](https://project-robin.com/portal/). La compilación Debug para simulador conserva una configuración de desarrollo y no representa un despliegue público. El prototipo requiere Xcode y no debe presentarse como una app publicada.
 
-El proyecto se genera desde `project.yml` con `xcodegen generate`. La app conserva las páginas de Portal, Robin Jr y Community en la misma ventana. Los enlaces externos, como pasarelas de pago, se abren fuera de la app y requieren una revisión completa antes de distribuirla.
+El proyecto se genera desde `project.yml` con `xcodegen generate`. Inicio solo muestra productos cuya sesión y acceso se confirman en su servidor. Se conserva el último producto abierto si sigue autorizado. Los enlaces externos, como pasarelas de pago, se abren fuera de la app y requieren una revisión completa antes de distribuirla.
+
+La bandeja consulta cada producto por separado. Los endpoints `GET /api/notifications?native=1` devuelven como máximo 100 resúmenes sin el cuerpo del aviso. Abrir un aviso deja que su popup aplique el flujo actual; leerlo desde la bandeja no lo marca como visto ni acepta términos.
 
 ## Contraseña y Face ID
 
@@ -28,3 +32,7 @@ Para activar el envío en producción:
 4. Publicar el sitio y la app firmada. Las funciones programadas despachan cada cinco minutos; un aviso programado puede salir hasta cinco minutos después de la hora elegida.
 
 La clave APNs queda solo en Netlify. El panel muestra cuántos dispositivos están registrados y el resultado aceptado/rechazado por APNs; la aceptación de APNs no confirma que iOS haya mostrado el aviso.
+
+## Desarrollo
+
+Desde `apps/ios`, ejecuta `xcodegen generate` para regenerar el proyecto. Las pruebas de navegación están en `RobinTests`.

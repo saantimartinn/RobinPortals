@@ -14,6 +14,7 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
     private weak var webView: WKWebView?
     private var requestingPermission = false
     private var pendingNotificationURL: URL?
+    var onOpenNotification: ((URL) -> Void)?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
@@ -28,7 +29,7 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
             guard let value = try? await view.callAsyncJavaScript("const response = await fetch('/portal/api/me', {credentials:'same-origin'}); const user = response.ok ? await response.json() : null; return !!user && !user.is_application_admin;", arguments: [:], in: nil, contentWorld: .page),
                   view.url == pageURL, let signedIn = value as? Bool else { return }
             if signedIn {
-                self?.requestPermission()
+                self?.sessionValidated(isSignedIn: true)
                 if let target = self?.pendingNotificationURL {
                     self?.pendingNotificationURL = nil
                     if view.url != target { view.load(URLRequest(url: target)) }
@@ -37,6 +38,18 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
                 self?.unregisterForProducts()
             }
         }
+    }
+
+    func sessionValidated(isSignedIn: Bool) {
+        if isSignedIn { requestPermission() }
+        else { unregisterForProducts() }
+    }
+
+    func logout(completion: @escaping () -> Void) {
+        unregisterForProducts(completion: completion)
+        UserDefaults.standard.removeObject(forKey: "robin.apns.token")
+        token = nil
+        webView = nil
     }
 
     private func requestPermission() {
@@ -65,16 +78,22 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
 
     private func registerForProducts() { sendDeviceRequest(method: "POST") }
 
-    private func unregisterForProducts() { sendDeviceRequest(method: "DELETE") }
+    private func unregisterForProducts(completion: (() -> Void)? = nil) {
+        sendDeviceRequest(method: "DELETE", completion: completion)
+    }
 
-    private func sendDeviceRequest(method: String) {
-        guard let token else { return }
+    private func sendDeviceRequest(method: String, completion: (() -> Void)? = nil) {
+        guard let token else { completion?(); return }
         WKWebsiteDataStore.default().httpCookieStore.getAllCookies { cookies in
-            let hostCookies = cookies.filter { $0.domain == "project-robin.com" || $0.domain.hasSuffix(".project-robin.com") }
+            guard let host = RobinAddress.origin.host?.lowercased() else { completion?(); return }
+            let hostCookies = cookies.filter {
+                let domain = $0.domain.trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
+                return host == domain || host.hasSuffix("." + domain)
+            }
             let cookieHeader = hostCookies.map { "\($0.name)=\($0.value)" }.joined(separator: "; ")
-            guard method == "DELETE" || !cookieHeader.isEmpty else { return }
+            guard method == "DELETE" || !cookieHeader.isEmpty else { completion?(); return }
             for path in ["/portal/api/mobile/push", "/robinjr/api/mobile/push", "/therobinplan/api/mobile/push"] {
-                guard let url = URL(string: "https://project-robin.com\(path)") else { continue }
+                let url = RobinAddress.origin.appending(path: String(path.dropFirst()))
                 var request = URLRequest(url: url)
                 request.httpMethod = method
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -83,6 +102,7 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
                 request.httpBody = try? JSONSerialization.data(withJSONObject: ["token": token])
                 URLSession.shared.dataTask(with: request).resume()
             }
+            completion?()
         }
     }
 
@@ -94,11 +114,12 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
         defer { completionHandler() }
         guard let product = response.notification.request.content.userInfo["product"] as? String,
               let id = response.notification.request.content.userInfo["notificationId"] as? String,
-              ["portal", "robinjr", "community"].contains(product) else { return }
-        let path = product == "community" ? "/therobinplan/" : "/\(product)/"
-        guard let url = URL(string: "https://project-robin.com\(path)?notification=\(id.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")") else { return }
+              let productValue = RobinProduct(rawValue: product),
+              UUID(uuidString: id) != nil,
+              let url = productValue.noticeURL(id: id, origin: RobinAddress.origin) else { return }
         DispatchQueue.main.async {
             self.pendingNotificationURL = url
+            self.onOpenNotification?(url)
             self.webView?.load(URLRequest(url: url))
         }
     }

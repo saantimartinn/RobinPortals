@@ -1,16 +1,21 @@
 import SwiftUI
 import UIKit
 import WebKit
+import UserNotifications
 import LocalAuthentication
 import Security
 
 enum RobinAddress {
-    static let start: URL = {
+    static var origin: URL {
         #if DEBUG && targetEnvironment(simulator)
-        URL(string: "http://localhost:8888/portal/")!
+        URL(string: "http://localhost:8888")!
         #else
-        URL(string: "https://project-robin.com/portal/")!
+        URL(string: "https://project-robin.com")!
         #endif
+    }
+
+    static let start: URL = {
+        origin.appending(path: "/portal/")
     }()
 
     static func isInternalSite(_ url: URL) -> Bool {
@@ -30,6 +35,12 @@ enum RobinAddress {
 }
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var service = RobinService()
+    @State private var activeTab: RobinTab = .home
+    @State private var selectedProductURL: URL?
+    @State private var activeProduct: RobinProduct?
+    @State private var pendingNotificationURL: URL?
     @State private var error: String?
     @State private var reloadNumber = 0
     @State private var pendingCredential: RobinCredential?
@@ -39,37 +50,105 @@ struct ContentView: View {
     @State private var webViewBox = WeakWebViewBox()
 
     var body: some View {
-        ZStack {
-            RobinWebView(
-                startURL: RobinAddress.start,
-                onLoaded: { error = nil; if let view = webViewBox.value { PushRegistration.active?.attach(view) } },
-                onError: { error = $0.localizedDescription },
-                onCreated: { webViewBox.value = $0 },
-                onAuthMessage: handleAuthMessage
-            )
-            .padding(.top, -24)
-            .id(reloadNumber)
-
-            if let error {
-                VStack(spacing: 16) {
-                    Text("No se puede abrir Robin")
-                        .font(.title2.weight(.semibold))
-                    Text(error)
-                        .font(.footnote)
-                        .multilineTextAlignment(.center)
-                    Button("Reintentar") {
-                        self.error = nil
-                        reloadNumber += 1
+        Group {
+            if let url = selectedProductURL {
+                VStack(spacing: 0) {
+                    HStack {
+                        Button { selectedProductURL = nil; activeProduct = service.lastProduct; activeTab = .home } label: {
+                            Label("Inicio", systemImage: "chevron.left").font(.system(size: 13, weight: .semibold))
+                        }
+                        Spacer()
+                        Image("RobinWordmark").resizable().scaledToFit().frame(width: 70, height: 32).accessibilityLabel("Robin")
+                        Spacer()
+                        Button { reloadNumber += 1 } label: { Image(systemName: "arrow.clockwise") }
+                            .accessibilityLabel("Recargar")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color(red: 45 / 255, green: 58 / 255, blue: 100 / 255))
+                    .padding(.horizontal, 18).padding(.top, 8)
+                    if let activeProduct {
+                        Text(activeProduct.title.uppercased())
+                            .font(.system(size: 9, weight: .bold, design: .rounded)).tracking(1)
+                            .foregroundStyle(RobinStyle.muted).padding(.top, 1).padding(.bottom, 7)
+                    }
+                    Rectangle().fill(RobinStyle.border).frame(height: 1)
+                    RobinWebView(
+                        startURL: url,
+                        onLoaded: handleWebViewLoaded,
+                        onError: { error = $0.localizedDescription },
+                        onCreated: { webViewBox.value = $0 },
+                        onAuthMessage: handleAuthMessage
+                    )
+                    .id(reloadNumber)
                 }
-                .padding(28)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255))
+            } else if let profile = service.snapshot.profile {
+                Group {
+                    switch activeTab {
+                    case .home:
+                    RobinHomeView(snapshot: service.snapshot, isLoading: service.isLoading, lastProduct: service.lastProduct,
+                                  onRefresh: { Task { await refreshSession() } },
+                                  onOpenProduct: { product in Task { await openProduct(product) } },
+                                  onOpenInbox: { activeTab = .inbox },
+                                  onReportProblem: openReportProblem)
+                    case .inbox:
+                        RobinInboxView(snapshot: service.snapshot,
+                                   onRefresh: { await refreshSession() },
+                                   onOpenNotice: { notice in Task { await openNotice(notice) } })
+                    case .account:
+                        RobinAccountView(profile: profile, activeProduct: activeProduct,
+                                     onReportProblem: openReportProblem,
+                                     onRefresh: { Task { await refreshSession() } },
+                                     onLogout: logout)
+                    }
+                }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    RobinTabBar(selection: $activeTab, pendingCount: service.snapshot.notices.filter(\.isPending).count)
+                        .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 5)
+                        .background(LinearGradient(colors: [RobinStyle.canvas.opacity(0), RobinStyle.canvas], startPoint: .top, endPoint: .bottom))
+                }
+                .background(RobinStyle.canvas)
+            } else {
+                ZStack {
+                    RobinWebView(
+                        startURL: RobinAddress.start,
+                        onLoaded: handleWebViewLoaded,
+                        onError: { error = $0.localizedDescription },
+                        onCreated: { webViewBox.value = $0 },
+                        onAuthMessage: handleAuthMessage
+                    )
+                    .id(reloadNumber)
+                    if let error {
+                        VStack(spacing: 16) {
+                            Text("No se puede abrir Robin").font(.title2.weight(.semibold))
+                            Text(error).font(.footnote).multilineTextAlignment(.center)
+                            Button("Reintentar") { self.error = nil; reloadNumber += 1 }
+                                .buttonStyle(.borderedProminent)
+                                .tint(Color(red: 45 / 255, green: 58 / 255, blue: 100 / 255))
+                        }
+                        .padding(28).frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255))
+                    }
+                }
             }
         }
         .background(Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255).ignoresSafeArea())
+        .overlay {
+            if scenePhase != .active {
+                Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255).ignoresSafeArea()
+                    .overlay(Text("Robin").font(.title2.bold()).foregroundStyle(Color(red: 45 / 255, green: 58 / 255, blue: 100 / 255)))
+            }
+        }
+        .onAppear {
+            PushRegistration.active?.onOpenNotification = { url in
+                DispatchQueue.main.async {
+                    guard validateNoticeURL(url) != nil else { return }
+                    if service.snapshot.profile == nil { pendingNotificationURL = url }
+                    else { Task { await openURL(url) } }
+                }
+            }
+            Task { await refreshSession() }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await refreshSession() } }
+        }
         .alert("Guardar contraseña en este iPhone", isPresented: $showsSavePrompt) {
             Button("Ahora no", role: .cancel) { pendingCredential = nil }
             Button("Guardar") { savePendingCredential() }
@@ -84,6 +163,82 @@ struct ContentView: View {
         } message: {
             Text(authenticationError ?? "Vuelve a entrar con tu contraseña.")
         }
+    }
+
+    @MainActor private func refreshSession() async {
+        await service.refresh()
+        PushRegistration.active?.sessionValidated(isSignedIn: service.snapshot.profile != nil)
+        if service.snapshot.profile != nil, activeProduct == nil { activeProduct = service.lastProduct }
+        if service.snapshot.profile != nil, let pendingNotificationURL {
+            self.pendingNotificationURL = nil
+            await openURL(pendingNotificationURL)
+        } else if service.snapshot.profile == nil {
+            selectedProductURL = nil
+            activeProduct = nil
+        }
+    }
+
+    private func handleWebViewLoaded() {
+        error = nil
+        if let view = webViewBox.value { PushRegistration.active?.attach(view) }
+        Task { await refreshSession() }
+    }
+
+    @MainActor private func openProduct(_ product: RobinProduct) async {
+        await refreshSession()
+        guard service.snapshot.products.contains(product) else { return }
+        service.lastProduct = product
+        activeProduct = product
+        selectedProductURL = RobinAddress.origin.appending(path: String(product.path.dropFirst()))
+    }
+
+    @MainActor private func openNotice(_ notice: RobinNotice) async {
+        await refreshSession()
+        guard service.snapshot.products.contains(notice.product),
+              let url = notice.product.noticeURL(id: notice.id, origin: RobinAddress.origin) else { return }
+        service.lastProduct = notice.product
+        activeProduct = notice.product
+        selectedProductURL = url
+    }
+
+    @MainActor private func openURL(_ url: URL) async {
+        await refreshSession()
+        guard let product = validateNoticeURL(url), service.snapshot.products.contains(product) else { return }
+        activeProduct = product
+        service.lastProduct = product
+        selectedProductURL = url
+    }
+
+    private func validateNoticeURL(_ url: URL) -> RobinProduct? {
+        guard RobinAddress.isInternalSite(url),
+              URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "notification" }).flatMap({ $0.value }).flatMap(UUID.init(uuidString:)) != nil else { return nil }
+        return RobinProduct.allCases.first { url.path.hasPrefix($0.path) }
+    }
+
+    private func openReportProblem() {
+        guard service.snapshot.products.contains(.portal) else {
+            if let url = URL(string: "mailto:hello@project-robin.com") { UIApplication.shared.open(url) }
+            return
+        }
+        var components = URLComponents(url: RobinAddress.origin.appending(path: "/portal/"), resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "nativeAction", value: "report-problem")]
+        activeProduct = .portal
+        selectedProductURL = components.url
+    }
+
+    private func logout() {
+        let clearSession = {
+            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: .distantPast) {
+                Task { @MainActor in
+                    service.reset()
+                    selectedProductURL = nil
+                    activeProduct = nil
+                    error = nil
+                }
+            }
+        }
+        if let push = PushRegistration.active { push.logout(completion: clearSession) }
+        else { clearSession() }
     }
 
     private func handleAuthMessage(_ message: WKScriptMessage, _ webView: WKWebView) {
@@ -288,6 +443,30 @@ private struct RobinWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
+        configuration.userContentController.addUserScript(WKUserScript(
+            source: """
+                (() => {
+                  const isPortalPath = /^\\/portal(?:\\/|$)/.test(window.location.pathname);
+                  const applyNativeNavigation = () => {
+                    document.documentElement.classList.add('robin-native-app');
+                    const nav = document.querySelector('.robin-cross-nav');
+                    if (nav) nav.style.setProperty('display', 'none', 'important');
+                    const sectionNav = document.querySelector('.student-sidebar');
+                    if (sectionNav && window.matchMedia('(max-width: 1023px)').matches) {
+                      sectionNav.style.setProperty('top', '0px', 'important');
+                    }
+                    return !!nav && (!isPortalPath || !!sectionNav || !!document.querySelector('.admin-workspace'));
+                  };
+                  const observer = new MutationObserver(() => {
+                    if (applyNativeNavigation()) observer.disconnect();
+                  });
+                  observer.observe(document.documentElement, { childList: true, subtree: true });
+                  if (applyNativeNavigation()) observer.disconnect();
+                })();
+                """,
+            injectionTime: .atDocumentEnd,
+            forMainFrameOnly: true
+        ))
         configuration.userContentController.add(context.coordinator, name: "robinAuth")
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator

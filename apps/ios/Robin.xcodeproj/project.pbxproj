@@ -7,20 +7,45 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C8674A89A89B44AE3F79ADC /* RobinNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A872265EA8B18A7CB7B7CF9 /* RobinNavigation.swift */; };
+		17DF13814077D905AE503488 /* RobinNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5630D7A2CA3E0E8E6C1E7867 /* RobinNavigationTests.swift */; };
+		1D9BA179485A8B8DFC4A6C2C /* RobinAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432E2A92C3BF6F2502BDAB8F /* RobinAccountView.swift */; };
 		5AEA871B0B5391D42FB53441 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16669C47865736CA9B5F3216 /* Assets.xcassets */; };
 		790378B7157F9A5AF6CD33B3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0C6AED334E6EEFC622A09488 /* PrivacyInfo.xcprivacy */; };
+		7D8AC12D668310BD318F2291 /* RobinInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7B65620C66AA9D44BE92D8 /* RobinInboxView.swift */; };
 		BD02FB582B8ABE23C4D8CCDE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299681F53C660F0F2079A50A /* ContentView.swift */; };
+		C74C897DA5A17AB5AC4A007A /* RobinDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDE5D93A22B1698947DEF32 /* RobinDesign.swift */; };
+		CA1A2F319ABFD0DE8CDF750F /* RobinHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EECF1DD1BA00FB1DFF1A230B /* RobinHomeView.swift */; };
 		D4DD5D53F0AA8F8780988A45 /* PushRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70C43A8CA7340425565402F4 /* PushRegistration.swift */; };
 		DBA8BC5FE8ACD108076940CE /* RobinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457041A2E8F752AEA6236C4D /* RobinApp.swift */; };
+		E1A1338CDD0139E080FFAFB8 /* RobinService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66802AAB352D2F75A8795354 /* RobinService.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		73E0ED0B305873D9B59441DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9D49DC2246EB8DA063159E0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A023C6DC2491932DC3A5C221;
+			remoteInfo = Robin;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0C6AED334E6EEFC622A09488 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		16669C47865736CA9B5F3216 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1A872265EA8B18A7CB7B7CF9 /* RobinNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinNavigation.swift; sourceTree = "<group>"; };
 		299681F53C660F0F2079A50A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3E5BE963991491A5D4440BD0 /* RobinTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RobinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		432E2A92C3BF6F2502BDAB8F /* RobinAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinAccountView.swift; sourceTree = "<group>"; };
 		457041A2E8F752AEA6236C4D /* RobinApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinApp.swift; sourceTree = "<group>"; };
+		4A7B65620C66AA9D44BE92D8 /* RobinInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinInboxView.swift; sourceTree = "<group>"; };
+		4BDE5D93A22B1698947DEF32 /* RobinDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinDesign.swift; sourceTree = "<group>"; };
+		5630D7A2CA3E0E8E6C1E7867 /* RobinNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinNavigationTests.swift; sourceTree = "<group>"; };
+		66802AAB352D2F75A8795354 /* RobinService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinService.swift; sourceTree = "<group>"; };
 		70C43A8CA7340425565402F4 /* PushRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistration.swift; sourceTree = "<group>"; };
 		C5EC5E40723A5184B83DE4CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		EECF1DD1BA00FB1DFF1A230B /* RobinHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RobinHomeView.swift; sourceTree = "<group>"; };
 		F3E22E8D646E250837757F79 /* Robin.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Robin.entitlements; sourceTree = "<group>"; };
 		FB76E59A7154998AEA2DEA8E /* Robin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Robin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -35,15 +60,30 @@
 				0C6AED334E6EEFC622A09488 /* PrivacyInfo.xcprivacy */,
 				70C43A8CA7340425565402F4 /* PushRegistration.swift */,
 				F3E22E8D646E250837757F79 /* Robin.entitlements */,
+				432E2A92C3BF6F2502BDAB8F /* RobinAccountView.swift */,
 				457041A2E8F752AEA6236C4D /* RobinApp.swift */,
+				4BDE5D93A22B1698947DEF32 /* RobinDesign.swift */,
+				EECF1DD1BA00FB1DFF1A230B /* RobinHomeView.swift */,
+				4A7B65620C66AA9D44BE92D8 /* RobinInboxView.swift */,
+				1A872265EA8B18A7CB7B7CF9 /* RobinNavigation.swift */,
+				66802AAB352D2F75A8795354 /* RobinService.swift */,
 			);
 			path = Robin;
+			sourceTree = "<group>";
+		};
+		B033A68B6AC98BC7C97F6C7F /* RobinTests */ = {
+			isa = PBXGroup;
+			children = (
+				5630D7A2CA3E0E8E6C1E7867 /* RobinNavigationTests.swift */,
+			);
+			path = RobinTests;
 			sourceTree = "<group>";
 		};
 		E164A9ECD7D2CA39117BE5DC = {
 			isa = PBXGroup;
 			children = (
 				8DA11A03717261E542F8917B /* Robin */,
+				B033A68B6AC98BC7C97F6C7F /* RobinTests */,
 				E59FBBEEAC608726FA10551F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				FB76E59A7154998AEA2DEA8E /* Robin.app */,
+				3E5BE963991491A5D4440BD0 /* RobinTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,6 +100,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		51590CA02F668B0175FEEB1C /* RobinTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36570D0FE058AE93B730F59A /* Build configuration list for PBXNativeTarget "RobinTests" */;
+			buildPhases = (
+				B6BFCA7B9063152CB8346E3A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FD26FEE6819BD5663FA2FC02 /* PBXTargetDependency */,
+			);
+			name = RobinTests;
+			packageProductDependencies = (
+			);
+			productName = RobinTests;
+			productReference = 3E5BE963991491A5D4440BD0 /* RobinTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A023C6DC2491932DC3A5C221 /* Robin */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8E9B58911D66A560C0BDB92B /* Build configuration list for PBXNativeTarget "Robin" */;
@@ -106,6 +165,7 @@
 			projectRoot = "";
 			targets = (
 				A023C6DC2491932DC3A5C221 /* Robin */,
+				51590CA02F668B0175FEEB1C /* RobinTests */,
 			);
 		};
 /* End PBXProject section */
@@ -123,19 +183,58 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B6BFCA7B9063152CB8346E3A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				17DF13814077D905AE503488 /* RobinNavigationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CD44A99EC7819957F56E3000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				BD02FB582B8ABE23C4D8CCDE /* ContentView.swift in Sources */,
 				D4DD5D53F0AA8F8780988A45 /* PushRegistration.swift in Sources */,
+				1D9BA179485A8B8DFC4A6C2C /* RobinAccountView.swift in Sources */,
 				DBA8BC5FE8ACD108076940CE /* RobinApp.swift in Sources */,
+				C74C897DA5A17AB5AC4A007A /* RobinDesign.swift in Sources */,
+				CA1A2F319ABFD0DE8CDF750F /* RobinHomeView.swift in Sources */,
+				7D8AC12D668310BD318F2291 /* RobinInboxView.swift in Sources */,
+				0C8674A89A89B44AE3F79ADC /* RobinNavigation.swift in Sources */,
+				E1A1338CDD0139E080FFAFB8 /* RobinService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		FD26FEE6819BD5663FA2FC02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A023C6DC2491932DC3A5C221 /* Robin */;
+			targetProxy = 73E0ED0B305873D9B59441DC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		106716DE31DEBACD6602C55C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.projectrobin.ios.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Robin.app/Robin";
+			};
+			name = Debug;
+		};
 		3630D22D18061DBD5D07ACA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -177,6 +276,23 @@
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		876E371F11635CCF9D78ABBE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.projectrobin.ios.tests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Robin.app/Robin";
 			};
 			name = Release;
 		};
@@ -302,6 +418,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		36570D0FE058AE93B730F59A /* Build configuration list for PBXNativeTarget "RobinTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				106716DE31DEBACD6602C55C /* Debug */,
+				876E371F11635CCF9D78ABBE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		636FE875653DB363969A3D5C /* Build configuration list for PBXProject "Robin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
