@@ -24,8 +24,9 @@ final class PushRegistration: NSObject, UIApplicationDelegate, UNUserNotificatio
         webView = view
         guard let url = view.url, RobinAddress.isInternalSite(url) else { return }
         let pageURL = view.url
-        view.evaluateJavaScript("fetch('/portal/api/me', {credentials:'same-origin'}).then(r => r.ok ? r.json() : null).then(u => !!u && !u.is_application_admin)") { [weak self] value, error in
-            guard error == nil, view.url == pageURL, let signedIn = value as? Bool else { return }
+        Task { @MainActor [weak self] in
+            guard let value = try? await view.callAsyncJavaScript("const response = await fetch('/portal/api/me', {credentials:'same-origin'}); const user = response.ok ? await response.json() : null; return !!user && !user.is_application_admin;", arguments: [:], in: nil, contentWorld: .page),
+                  view.url == pageURL, let signedIn = value as? Bool else { return }
             if signedIn {
                 self?.requestPermission()
                 if let target = self?.pendingNotificationURL {
