@@ -20,9 +20,9 @@ struct RobinHomeView: View {
                 VStack(alignment: .leading, spacing: 7) {
                     Text(greetingName.isEmpty ? "Hola" : "Hola, \(greetingName)")
                         .font(.custom(RobinStyle.display, size: 34))
-                        .tracking(-0.35).foregroundStyle(RobinStyle.navy)
-                    Text("Tu camino sigue aquí.")
-                        .font(.custom(RobinStyle.subtitle, size: 17)).italic().foregroundStyle(RobinStyle.muted)
+                        .foregroundStyle(RobinStyle.navy)
+                    Text("Tus productos y avisos, en un mismo lugar.")
+                        .font(.custom(RobinStyle.subtitle, size: 17)).foregroundStyle(RobinStyle.muted)
                 }
                 .padding(.top, 6)
 
@@ -30,17 +30,17 @@ struct RobinHomeView: View {
                     Button { onOpenProduct(lastProduct) } label: {
                         HStack(spacing: 0) {
                             VStack(alignment: .leading, spacing: 12) {
-                                Text("RETOMAR TU CAMINO")
-                                    .font(.custom(RobinStyle.displayBold, size: 12)).tracking(0.8)
-                                    .foregroundStyle(RobinStyle.gold)
+                                Text("Continuar en")
+                                    .font(.custom(RobinStyle.text, size: 14))
+                                    .foregroundStyle(RobinStyle.canvas.opacity(0.82))
                                 Text(lastProduct.title)
                                     .font(.custom(RobinStyle.subtitle, size: 23))
                                     .multilineTextAlignment(.leading).foregroundStyle(RobinStyle.canvas)
-                                Label("Entrar", systemImage: "arrow.right")
-                                    .font(.custom(RobinStyle.textSemibold, size: 12))
+                                Text("Abrir")
+                                    .font(.custom(RobinStyle.textSemibold, size: 14))
                                     .foregroundStyle(RobinStyle.navy)
                                     .padding(.horizontal, 13).padding(.vertical, 8)
-                                    .background(RobinStyle.gold)
+                                    .background(RobinStyle.gold, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 20).padding(.vertical, 18)
@@ -64,41 +64,47 @@ struct RobinHomeView: View {
                     if snapshot.products.isEmpty && !isLoading {
                         emptyProducts
                     }
-                    if isLoading { ProgressView().tint(RobinStyle.navy).frame(maxWidth: .infinity).padding(14) }
+                    if isLoading {
+                        HStack(spacing: 10) {
+                            ProgressView().tint(RobinStyle.navy)
+                            Text("Buscando tus accesos")
+                                .font(.custom(RobinStyle.text, size: 14)).foregroundStyle(RobinStyle.muted)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 14)
+                    }
                 }
 
                 HStack(spacing: 12) {
                     Image(systemName: pendingCount > 0 ? "bell.badge.fill" : "bell")
-                        .font(.system(size: 19, weight: .semibold)).foregroundStyle(RobinStyle.navy)
-                        .frame(width: 44, height: 44).background(RobinStyle.gold.opacity(0.25), in: Circle())
+                        .font(.system(size: 21, weight: .regular)).foregroundStyle(RobinStyle.navy)
+                        .frame(width: 28, height: 28)
                     VStack(alignment: .leading, spacing: 3) {
                         Text(pendingCount == 0 ? "Todo al día" : "Tienes \(pendingCount) avisos")
-                            .font(.custom(RobinStyle.textSemibold, size: 14)).foregroundStyle(RobinStyle.navy)
+                            .font(.custom(RobinStyle.textSemibold, size: 15)).foregroundStyle(RobinStyle.navy)
                         Text(pendingCount == 0 ? "Aquí aparecerán las novedades importantes." : "Revisa lo que tu equipo quiere contarte.")
-                            .font(.custom(RobinStyle.text, size: 12)).foregroundStyle(RobinStyle.muted)
+                            .font(.custom(RobinStyle.text, size: 14)).foregroundStyle(RobinStyle.muted)
                     }
                     Spacer(minLength: 2)
                     Button(action: onOpenInbox) {
-                        Image(systemName: "arrow.right").font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(RobinStyle.navy).frame(width: 34, height: 34)
-                            .background(RobinStyle.soft, in: Circle())
+                        Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(RobinStyle.navy).frame(width: 38, height: 38)
                     }
                     .accessibilityLabel("Ver avisos")
                 }
                 .padding(.vertical, 10)
+                .background(pendingCount > 0 ? RobinStyle.gold.opacity(0.14) : RobinStyle.paper)
                 .overlay(alignment: .bottom) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
 
                 Button(action: onReportProblem) {
                     HStack(spacing: 9) {
                         Image(systemName: "questionmark.circle")
-                        Text("¿Necesitas ayuda?").font(.custom(RobinStyle.textSemibold, size: 13))
+                        Text("¿Necesitas ayuda?").font(.custom(RobinStyle.textSemibold, size: 15))
                         Spacer()
-                        Text("Contactar").font(.system(size: 12, weight: .semibold))
-                        Image(systemName: "arrow.up.right").font(.system(size: 10, weight: .bold))
+                        Text("Contactar").font(.custom(RobinStyle.textSemibold, size: 14))
                     }
-                    .font(.custom(RobinStyle.text, size: 13)).foregroundStyle(RobinStyle.navy)
+                    .font(.custom(RobinStyle.text, size: 15)).foregroundStyle(RobinStyle.navy)
                     .padding(.horizontal, 14).padding(.vertical, 16)
-                    .background(RobinStyle.soft.opacity(0.65))
+                    .background(RobinStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .padding(.bottom, 12)
@@ -117,10 +123,9 @@ struct RobinHomeView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(product.title).font(.custom(RobinStyle.textSemibold, size: 15)).foregroundStyle(RobinStyle.navy)
                     Text(product == lastProduct ? "Último producto abierto" : subtitle(for: product))
-                        .font(.custom(RobinStyle.text, size: 12)).foregroundStyle(RobinStyle.muted)
+                        .font(.custom(RobinStyle.text, size: 14)).foregroundStyle(RobinStyle.muted)
                 }
                 Spacer(minLength: 3)
-                Image(systemName: "chevron.right").font(.system(size: 12, weight: .bold)).foregroundStyle(RobinStyle.navy.opacity(0.65))
             }
             .padding(.vertical, 9)
             .contentShape(Rectangle())
@@ -131,14 +136,12 @@ struct RobinHomeView: View {
 
     private var emptyProducts: some View {
         VStack(spacing: 9) {
-            Image(systemName: "rectangle.slash").font(.system(size: 25)).foregroundStyle(RobinStyle.navy)
             Image("RobinMascot").resizable().scaledToFit().frame(width: 116, height: 96).accessibilityHidden(true)
             Text("No hay productos disponibles").font(.custom(RobinStyle.subtitle, size: 19)).foregroundStyle(RobinStyle.navy)
-            Text("Actualiza la sesión o contacta con soporte.").font(.custom(RobinStyle.text, size: 12)).foregroundStyle(RobinStyle.muted)
-            Button("Actualizar") { onRefresh() }.font(.system(size: 13, weight: .semibold)).tint(RobinStyle.navy)
+            Text("Actualiza la sesión para comprobar tus accesos.").font(.custom(RobinStyle.text, size: 14)).foregroundStyle(RobinStyle.muted)
+            Button("Actualizar") { onRefresh() }.font(.custom(RobinStyle.textSemibold, size: 14)).tint(RobinStyle.navy)
         }
-        .frame(maxWidth: .infinity).padding(22)
-        .background(RobinStyle.paper, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .frame(maxWidth: .infinity).padding(.vertical, 22)
     }
 
     private func subtitle(for product: RobinProduct) -> String {

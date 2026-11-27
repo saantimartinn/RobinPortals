@@ -55,19 +55,22 @@ struct ContentView: View {
                 VStack(spacing: 0) {
                     HStack {
                         Button { selectedProductURL = nil; activeProduct = service.lastProduct; activeTab = .home } label: {
-                            Label("Inicio", systemImage: "chevron.left").font(.system(size: 13, weight: .semibold))
+                            Label("Inicio", systemImage: "chevron.left")
+                                .font(.custom(RobinStyle.textSemibold, size: 14))
                         }
+                        .tint(RobinStyle.navy)
                         Spacer()
                         Image("RobinWordmark").resizable().scaledToFit().frame(width: 70, height: 32).accessibilityLabel("Robin")
                         Spacer()
-                        Button { reloadNumber += 1 } label: { Image(systemName: "arrow.clockwise") }
+                        Button { reloadNumber += 1 } label: { Image(systemName: "arrow.clockwise").font(.system(size: 16, weight: .medium)) }
+                            .tint(RobinStyle.navy)
                             .accessibilityLabel("Recargar")
                     }
-                    .padding(.horizontal, 18).padding(.top, 8)
+                    .padding(.horizontal, 18).padding(.top, 8).padding(.bottom, 5)
                     if let activeProduct {
-                        Text(activeProduct.title.uppercased())
-                            .font(.system(size: 9, weight: .bold, design: .rounded)).tracking(1)
-                            .foregroundStyle(RobinStyle.muted).padding(.top, 1).padding(.bottom, 7)
+                        Text(activeProduct.title)
+                            .font(.custom(RobinStyle.subtitle, size: 16))
+                            .foregroundStyle(RobinStyle.navy).padding(.bottom, 8)
                     }
                     Rectangle().fill(RobinStyle.border).frame(height: 1)
                     RobinWebView(
@@ -89,7 +92,7 @@ struct ContentView: View {
                                   onOpenInbox: { activeTab = .inbox },
                                   onReportProblem: openReportProblem)
                     case .inbox:
-                        RobinInboxView(snapshot: service.snapshot,
+                        RobinInboxView(snapshot: service.snapshot, isLoading: service.isLoading,
                                    onRefresh: { await refreshSession() },
                                    onOpenNotice: { notice in Task { await openNotice(notice) } })
                     case .account:
@@ -102,7 +105,7 @@ struct ContentView: View {
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     RobinTabBar(selection: $activeTab, pendingCount: service.snapshot.notices.filter(\.isPending).count)
                         .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 5)
-                        .background(LinearGradient(colors: [RobinStyle.canvas.opacity(0), RobinStyle.canvas], startPoint: .top, endPoint: .bottom))
+                        .background(RobinStyle.canvas)
                 }
                 .background(RobinStyle.canvas)
             } else {
@@ -117,23 +120,34 @@ struct ContentView: View {
                     .id(reloadNumber)
                     if let error {
                         VStack(spacing: 16) {
-                            Text("No se puede abrir Robin").font(.title2.weight(.semibold))
-                            Text(error).font(.footnote).multilineTextAlignment(.center)
+                            Image("RobinMascot").resizable().scaledToFit().frame(width: 140, height: 120)
+                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                .accessibilityHidden(true)
+                            Text("No se ha podido abrir Robin")
+                                .font(.custom(RobinStyle.display, size: 28)).foregroundStyle(RobinStyle.navy)
+                                .multilineTextAlignment(.center)
+                            Text(error).font(.custom(RobinStyle.text, size: 15))
+                                .foregroundStyle(RobinStyle.muted).multilineTextAlignment(.center)
                             Button("Reintentar") { self.error = nil; reloadNumber += 1 }
-                                .buttonStyle(.borderedProminent)
-                                .tint(Color(red: 45 / 255, green: 58 / 255, blue: 100 / 255))
+                                .font(.custom(RobinStyle.textSemibold, size: 15))
+                                .foregroundStyle(RobinStyle.canvas)
+                                .padding(.horizontal, 22).padding(.vertical, 12)
+                                .background(RobinStyle.navy, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                         }
                         .padding(28).frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(red: 254 / 255, green: 251 / 255, blue: 229 / 255))
+                        .background(RobinStyle.canvas)
                     }
                 }
             }
         }
-        .background(Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255).ignoresSafeArea())
+        .background(RobinStyle.paper.ignoresSafeArea())
         .overlay {
             if scenePhase != .active {
-                Color(red: 255 / 255, green: 253 / 255, blue: 245 / 255).ignoresSafeArea()
-                    .overlay(Text("Robin").font(.title2.bold()).foregroundStyle(Color(red: 45 / 255, green: 58 / 255, blue: 100 / 255)))
+                RobinStyle.paper.ignoresSafeArea()
+                    .overlay {
+                        Image("RobinWordmark").resizable().scaledToFit().frame(width: 100, height: 48)
+                            .accessibilityLabel("Robin")
+                    }
             }
         }
         .onAppear {

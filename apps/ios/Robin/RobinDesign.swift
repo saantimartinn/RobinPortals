@@ -8,6 +8,7 @@ enum RobinStyle {
     static let soft = Color(red: 246.0 / 255, green: 243.0 / 255, blue: 224.0 / 255)
     static let border = Color(red: 237.0 / 255, green: 236.0 / 255, blue: 219.0 / 255)
     static let muted = Color(red: 104.0 / 255, green: 112.0 / 255, blue: 136.0 / 255)
+    static let danger = Color(red: 180.0 / 255, green: 66.0 / 255, blue: 79.0 / 255)
     static let display = "RobinDisplay-Medium"
     static let displayBold = "RobinDisplay-Bold"
     static let subtitle = "RobinSubtitle-Regular"
@@ -47,11 +48,10 @@ struct RobinBrandHeader: View {
             }
             if let personName {
                 Text(RobinStyle.initials(for: personName))
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.custom(RobinStyle.displayBold, size: 14))
                     .foregroundStyle(RobinStyle.navy)
                     .frame(width: 42, height: 42)
                     .background(RobinStyle.gold.opacity(0.28), in: Circle())
-                    .overlay(Circle().stroke(RobinStyle.gold.opacity(0.75), lineWidth: 1))
                     .accessibilityLabel("Cuenta de \(personName)")
             }
         }
@@ -60,23 +60,17 @@ struct RobinBrandHeader: View {
 }
 
 struct RobinPageHeading: View {
-    let eyebrow: String
     let title: String
     let subtitle: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(eyebrow.uppercased())
-                .font(.custom(RobinStyle.displayBold, size: 11))
-                .tracking(1.25)
-                .foregroundStyle(RobinStyle.muted)
             Text(title)
                 .font(.custom(RobinStyle.display, size: 34))
-                .tracking(-0.6)
                 .foregroundStyle(RobinStyle.navy)
                 .fixedSize(horizontal: false, vertical: true)
             Text(subtitle)
-                .font(.custom(RobinStyle.text, size: 14))
+                .font(.custom(RobinStyle.text, size: 15))
                 .lineSpacing(3)
                 .foregroundStyle(RobinStyle.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -93,7 +87,7 @@ struct RobinSectionHeading: View {
         HStack(alignment: .firstTextBaseline) {
             Text(title).font(.custom(RobinStyle.subtitle, size: 19)).foregroundStyle(RobinStyle.navy)
             Spacer()
-            if let trailing { Text(trailing).font(.system(size: 12, weight: .medium)).foregroundStyle(RobinStyle.muted) }
+            if let trailing { Text(trailing).font(.custom(RobinStyle.text, size: 13)).foregroundStyle(RobinStyle.muted) }
         }
     }
 }
@@ -128,10 +122,15 @@ struct RobinTabBar: View {
                                 .font(.system(size: 18, weight: selection == tab ? .semibold : .regular))
                                 .frame(width: 34, height: 22)
                             if tab == .inbox && pendingCount > 0 {
-                                Circle().fill(RobinStyle.gold).frame(width: 8, height: 8).offset(x: -2, y: -1)
+                                Text("\(min(pendingCount, 99))")
+                                    .font(.custom(RobinStyle.textSemibold, size: 9))
+                                    .foregroundStyle(RobinStyle.navy)
+                                    .frame(minWidth: 16, minHeight: 16)
+                                    .background(RobinStyle.gold, in: Circle())
+                                    .offset(x: 3, y: -5)
                             }
                         }
-                        Text(tab.rawValue).font(.custom(selection == tab ? RobinStyle.textSemibold : RobinStyle.text, size: 11))
+                        Text(tab.rawValue).font(.custom(selection == tab ? RobinStyle.textSemibold : RobinStyle.text, size: 12))
                     }
                     .foregroundStyle(selection == tab ? RobinStyle.navy : RobinStyle.muted)
                     .frame(maxWidth: .infinity).frame(height: 58)
