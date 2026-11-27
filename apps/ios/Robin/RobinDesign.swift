@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum RobinStyle {
     static let navy = Color(red: 45.0 / 255, green: 58.0 / 255, blue: 100.0 / 255)
@@ -9,6 +10,7 @@ enum RobinStyle {
     static let border = Color(red: 237.0 / 255, green: 236.0 / 255, blue: 219.0 / 255)
     static let muted = Color(red: 104.0 / 255, green: 112.0 / 255, blue: 136.0 / 255)
     static let danger = Color(red: 180.0 / 255, green: 66.0 / 255, blue: 79.0 / 255)
+    static let paperUIColor = UIColor(red: 255.0 / 255, green: 253.0 / 255, blue: 245.0 / 255, alpha: 1)
     static let display = "RobinDisplay-Medium"
     static let displayBold = "RobinDisplay-Bold"
     static let subtitle = "RobinSubtitle-Regular"
@@ -24,6 +26,7 @@ enum RobinStyle {
 
 struct RobinBrandHeader: View {
     var personName: String? = nil
+    var personAction: (() -> Void)? = nil
     var trailingSymbol: String? = nil
     var trailingAction: (() -> Void)? = nil
 
@@ -40,22 +43,34 @@ struct RobinBrandHeader: View {
                     Image(systemName: trailingSymbol)
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(RobinStyle.navy)
-                        .frame(width: 42, height: 42)
+                        .frame(width: 44, height: 44)
                         .background(RobinStyle.paper, in: Circle())
                         .overlay(Circle().stroke(RobinStyle.border, lineWidth: 1))
                 }
                 .accessibilityLabel(trailingSymbol == "bell" ? "Abrir avisos" : "Abrir cuenta")
             }
             if let personName {
-                Text(RobinStyle.initials(for: personName))
-                    .font(.custom(RobinStyle.displayBold, size: 14))
-                    .foregroundStyle(RobinStyle.navy)
-                    .frame(width: 42, height: 42)
-                    .background(RobinStyle.gold.opacity(0.28), in: Circle())
-                    .accessibilityLabel("Cuenta de \(personName)")
+                if let personAction {
+                    Button(action: personAction) {
+                        accountAvatar(for: personName)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Abrir cuenta de \(personName)")
+                } else {
+                    accountAvatar(for: personName)
+                        .accessibilityLabel("Cuenta de \(personName)")
+                }
             }
         }
         .frame(height: 44)
+    }
+
+    private func accountAvatar(for name: String) -> some View {
+        Text(RobinStyle.initials(for: name))
+            .font(.custom(RobinStyle.displayBold, size: 14))
+            .foregroundStyle(RobinStyle.navy)
+            .frame(width: 44, height: 44)
+            .background(RobinStyle.soft, in: Circle())
     }
 }
 
@@ -137,6 +152,8 @@ struct RobinTabBar: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(tab.rawValue)
+                .accessibilityValue(tab == .inbox && pendingCount > 0 ? "\(pendingCount) avisos pendientes" : "")
                 .accessibilityAddTraits(selection == tab ? .isSelected : [])
             }
         }

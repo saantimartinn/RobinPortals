@@ -1,0 +1,23 @@
+{
+  "project": "Robin iOS",
+  "scope": "native SwiftUI shell: Inicio, Avisos, Cuenta and shared navigation",
+  "preserve": [
+    "DESIGN.md and the Robin palette, fonts, wordmark, mascot and product logos",
+    "existing product routes, authentication, push registration and notification deep links",
+    "the current three-tab app structure"
+  ],
+  "source_of_truth": [
+    "../../DESIGN.md",
+    "../../packages/brand/brand.css",
+    "Robin/RobinDesign.swift"
+  ],
+  "introduced": [
+    "Hallmark static checks adapted for SwiftUI source",
+    "search and product filters in the native notification inbox",
+    "refresh of native notification state when returning from a product"
+  ],
+  "limits": [
+    "Hallmark sloplint does not parse Swift or SwiftUI",
+    "static checks cannot verify rendered contrast, dynamic type, touch geometry or visual hierarchy"
+  ]
+}

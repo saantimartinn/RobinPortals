@@ -7,6 +7,7 @@ struct RobinHomeView: View {
     let onRefresh: () -> Void
     let onOpenProduct: (RobinProduct) -> Void
     let onOpenInbox: () -> Void
+    let onOpenAccount: () -> Void
     let onReportProblem: () -> Void
 
     private var pendingCount: Int { snapshot.notices.filter(\.isPending).count }
@@ -15,7 +16,8 @@ struct RobinHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 23) {
-                RobinBrandHeader(personName: snapshot.profile?.name, trailingSymbol: "bell", trailingAction: onOpenInbox)
+                RobinBrandHeader(personName: snapshot.profile?.name, personAction: onOpenAccount,
+                                 trailingSymbol: "bell", trailingAction: onOpenInbox)
 
                 VStack(alignment: .leading, spacing: 7) {
                     Text(greetingName.isEmpty ? "Hola" : "Hola, \(greetingName)")
@@ -87,7 +89,7 @@ struct RobinHomeView: View {
                     Spacer(minLength: 2)
                     Button(action: onOpenInbox) {
                         Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(RobinStyle.navy).frame(width: 38, height: 38)
+                            .foregroundStyle(RobinStyle.navy).frame(width: 44, height: 44)
                     }
                     .accessibilityLabel("Ver avisos")
                 }
@@ -139,7 +141,9 @@ struct RobinHomeView: View {
             Image("RobinMascot").resizable().scaledToFit().frame(width: 116, height: 96).accessibilityHidden(true)
             Text("No hay productos disponibles").font(.custom(RobinStyle.subtitle, size: 19)).foregroundStyle(RobinStyle.navy)
             Text("Actualiza la sesión para comprobar tus accesos.").font(.custom(RobinStyle.text, size: 14)).foregroundStyle(RobinStyle.muted)
-            Button("Actualizar") { onRefresh() }.font(.custom(RobinStyle.textSemibold, size: 14)).tint(RobinStyle.navy)
+            Button("Actualizar") { onRefresh() }
+                .font(.custom(RobinStyle.textSemibold, size: 14)).tint(RobinStyle.navy)
+                .frame(minHeight: 44)
         }
         .frame(maxWidth: .infinity).padding(.vertical, 22)
     }

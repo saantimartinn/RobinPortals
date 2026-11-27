@@ -78,6 +78,7 @@ struct RobinAccountView: View {
                     .overlay(alignment: .bottom) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
                 }
                 .buttonStyle(.plain)
+                .frame(minHeight: 52)
                 .padding(.top, 2).padding(.bottom, 15)
             }
             .padding(.horizontal, 20).padding(.top, 12)
@@ -93,7 +94,8 @@ struct RobinAccountView: View {
         HStack(spacing: 14) {
             Text(RobinStyle.initials(for: profile?.name))
                 .font(.custom(RobinStyle.display, size: 22)).foregroundStyle(RobinStyle.navy)
-                .frame(width: 58, height: 58).background(RobinStyle.soft)
+                .frame(width: 58, height: 58)
+                .background(RobinStyle.soft, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
             VStack(alignment: .leading, spacing: 4) {
                 Text(displayName)
                     .font(.custom(RobinStyle.subtitle, size: 21)).foregroundStyle(RobinStyle.navy)
@@ -132,6 +134,7 @@ struct RobinAccountView: View {
             Image(systemName: accessory).font(.system(size: 11, weight: .semibold)).foregroundStyle(RobinStyle.muted)
         }
         .padding(.vertical, 9)
+        .frame(minHeight: 48)
         .contentShape(Rectangle())
         .overlay(alignment: .bottom) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
     }

@@ -54,9 +54,10 @@ struct ContentView: View {
             if let url = selectedProductURL {
                 VStack(spacing: 0) {
                     HStack {
-                        Button { selectedProductURL = nil; activeProduct = service.lastProduct; activeTab = .home } label: {
+                        Button { closeProduct() } label: {
                             Label("Inicio", systemImage: "chevron.left")
                                 .font(.custom(RobinStyle.textSemibold, size: 14))
+                                .frame(minHeight: 44)
                         }
                         .tint(RobinStyle.navy)
                         Spacer()
@@ -90,6 +91,7 @@ struct ContentView: View {
                                   onRefresh: { Task { await refreshSession() } },
                                   onOpenProduct: { product in Task { await openProduct(product) } },
                                   onOpenInbox: { activeTab = .inbox },
+                                  onOpenAccount: { activeTab = .account },
                                   onReportProblem: openReportProblem)
                     case .inbox:
                         RobinInboxView(snapshot: service.snapshot, isLoading: service.isLoading,
@@ -190,6 +192,13 @@ struct ContentView: View {
             selectedProductURL = nil
             activeProduct = nil
         }
+    }
+
+    @MainActor private func closeProduct() {
+        selectedProductURL = nil
+        activeProduct = service.lastProduct
+        activeTab = .home
+        Task { await refreshSession() }
     }
 
     private func handleWebViewLoaded() {
@@ -488,7 +497,7 @@ private struct RobinWebView: UIViewRepresentable {
         context.coordinator.webView = webView
         webView.allowsBackForwardNavigationGestures = true
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(red: 255 / 255, green: 253 / 255, blue: 245 / 255, alpha: 1)
+        webView.backgroundColor = RobinStyle.paperUIColor
         webView.scrollView.backgroundColor = webView.backgroundColor
         webView.load(URLRequest(url: startURL))
         onCreated(webView)
