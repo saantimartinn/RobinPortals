@@ -102,14 +102,24 @@
 .student-portal .student-sidebar:has(.student-nav-items>:nth-child(12)) .student-nav-item{height:2.3rem}
 @media (max-height:820px){.student-portal .student-support,.admin-workspace .admin-sidebar-note{display:none}}
 
-/* Narrow screens: the sidebar becomes a navy strip of links under the top bar. */
+/* Narrow screens: product navigation sits directly below the browser or native bar. */
 @media(max-width:800px){.student-portal,.admin-workspace{min-height:calc(100vh - 4rem)}}
 @media(max-width:1023px){
   .student-portal .student-layout,.admin-workspace .admin-layout{display:block}
-  .student-portal .student-sidebar,.admin-workspace .admin-sidebar{top:4rem;z-index:20;height:auto;padding:.5rem .75rem}
+  .student-portal:not(.is-onboarding) .student-sidebar,.admin-workspace .admin-sidebar{top:4rem;z-index:20;height:auto;overflow:visible;padding:.5rem .75rem;border-bottom:var(--robin-line);background:var(--robin-cream);color:var(--robin-navy)}
+  html.robin-native-app .student-portal:not(.is-onboarding) .student-sidebar,html.robin-native-app .admin-workspace .admin-sidebar{top:0}
   .student-portal :is(.student-identity,.student-nav-caption,.student-support),.admin-workspace :is(.admin-team,.admin-nav-caption,.admin-sidebar-note){display:none}
-  .student-portal .student-nav-items,.admin-workspace .admin-global-nav{display:flex;gap:.25rem;overflow-x:auto;padding:0}
-  .student-portal .student-nav-item,.admin-workspace .admin-global-nav button{width:auto;flex-shrink:0;height:2.5rem;padding:0 .8rem;font-size:.875rem}
+  .student-portal:not(.subscription-admin) .student-nav-items,.admin-workspace .admin-global-nav{display:flex;gap:.25rem;overflow-x:auto;padding:0}
+  .student-portal.subscription-admin .student-nav-items{display:none}
+  .student-portal:not(.is-onboarding) .student-nav-item,.admin-workspace .admin-global-nav button{width:auto;flex-shrink:0;min-height:2.75rem;height:auto;padding:0 .8rem;color:var(--robin-ink-600);font-size:.75rem}
+  .student-portal:not(.is-onboarding) .student-nav-item.is-active,.admin-workspace .admin-global-nav button[aria-current]{background:var(--robin-ink-50);color:var(--robin-navy);font-weight:700}
   .student-portal .student-main,.admin-workspace .admin-workarea{padding:1.25rem 1.25rem 6rem}
   .student-page-heading h1:not(.student-page-title),.admin-page-heading h1:not(.admin-page-title){font-size:2rem}
+}
+@media(max-width:600px){
+  .student-portal .student-main,.admin-workspace .admin-workarea{padding:1.25rem 1rem 6rem}
+  .admin-workspace .admin-global-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:.25rem;overflow:visible}
+  .admin-workspace .admin-global-nav button{width:100%;min-width:0;min-height:3.6rem;flex-direction:column;justify-content:center;gap:.2rem;padding:.4rem .15rem;text-align:center;white-space:normal}
+  .admin-workspace .admin-global-nav button span{overflow-wrap:anywhere}
+  .student-page-heading .student-page-title,.admin-page-heading .admin-page-title{font:600 1.5rem/1.2 var(--robin-font-display);color:var(--robin-navy)}
 }
