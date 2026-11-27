@@ -2,19 +2,35 @@
 import { Bell, Loader2, Search, Send, Trash2 } from "lucide-react";
 import { Btn, Card, CardContent, CardHeader, Field, TextareaField } from "../../shared/ui.jsx";
 import { NAVY } from "../../shared/theme.js";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatDate } from "../../shared/utils.js";
 import { subAdminMutate } from "../../api/index.js";
 
-function AdminSubNotifications({ notifications = [], users = [], onChanged }) {
+function AdminSubNotifications({ notifications = [], scheduled = [], users = [], onChanged }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [scope, setScope] = useState("all"); // all | select
   const [selected, setSelected] = useState(new Set());
+  const [delivery, setDelivery] = useState("now");
+  const [scheduledLocal, setScheduledLocal] = useState("");
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
+  const [audiencePreview, setAudiencePreview] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setAudiencePreview(null);
+    const timer = setTimeout(async () => {
+      try {
+        const payload = { preview_audience: true, ...(scope === "all" ? { all: true } : scope === "installed" ? { installed: true } : { user_ids: Array.from(selected) }) };
+        const result = await subAdminMutate("notification", "update", payload);
+        if (!cancelled) setAudiencePreview(result);
+      } catch (_) { if (!cancelled) setAudiencePreview({ error: true }); }
+    }, 350);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [scope, selected]);
 
   const filtered = users.filter((u) => {
     const t = q.trim().toLowerCase();
@@ -28,18 +44,18 @@ function AdminSubNotifications({ notifications = [], users = [], onChanged }) {
     if (!title.trim()) { setErr("Añade un título."); return; }
     if (!content.trim()) { setErr("Añade un contenido."); return; }
     if (scope === "select" && selected.size === 0) { setErr("Selecciona al menos un suscriptor."); return; }
+    if (delivery === "later" && !scheduledLocal) { setErr("Elige fecha y hora de Madrid."); return; }
     setBusy(true);
     try {
-      const payload = scope === "all"
-        ? { title: title.trim(), content: content.trim(), all: true }
-        : { title: title.trim(), content: content.trim(), user_ids: Array.from(selected) };
+      const payload = { title: title.trim(), content: content.trim(), ...(scope === "all" ? { all: true } : scope === "installed" ? { installed: true } : { user_ids: Array.from(selected) }), ...(delivery === "later" ? { scheduled_local: scheduledLocal } : {}) };
       const r = await subAdminMutate("notification", "create", payload);
-      setMsg(`Notificación enviada a ${r.recipients} suscriptor(es). Aparecerá al iniciar sesión.`);
-      setTitle(""); setContent(""); setSelected(new Set()); setScope("all");
+      setMsg(`${delivery === "later" ? "Notificación programada" : "Notificación enviada"} para ${r.recipients} suscriptor(es).`);
+      setTitle(""); setContent(""); setSelected(new Set()); setScope("all"); setDelivery("now"); setScheduledLocal("");
       await onChanged();
     } catch (e) { setErr(e.message || "No se pudo enviar la notificación."); }
     finally { setBusy(false); }
   }
+  async function cancelScheduled(id) { try { await subAdminMutate('notification', 'update', { cancel_scheduled_id: id }); await onChanged(); } catch (_) { setErr('No se pudo cancelar.'); } }
   async function remove(n) { if (!window.confirm(`¿Eliminar la notificación "${n.title}"?`)) return; try { await subAdminMutate("notification", "delete", { id: n.id }); await onChanged(); } catch (_) {} }
 
   return (
@@ -57,9 +73,10 @@ function AdminSubNotifications({ notifications = [], users = [], onChanged }) {
                   style={scope === "all" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Todos</button>
                 <button type="button" onClick={() => setScope("select")} className="px-3 py-1 rounded-md text-xs font-medium transition"
                   style={scope === "select" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Seleccionar</button>
+                <button type="button" onClick={() => setScope("installed")} className="px-3 py-1 rounded-md text-xs font-medium transition" style={scope === "installed" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Con app instalada</button>
               </div>
             </div>
-            {scope === "all" ? (
+            {scope === "installed" ? (<div className="text-xs text-slate-500">Se enviará a suscriptores con la app y avisos activados.</div>) : scope === "all" ? (
               <div className="text-xs text-slate-500">Se enviará a todos los suscriptores ({users.length}).</div>
             ) : (
               <div className="rounded-xl border border-slate-100 p-2">
@@ -82,12 +99,18 @@ function AdminSubNotifications({ notifications = [], users = [], onChanged }) {
               </div>
             )}
           </div>
+          <div className="space-y-2 text-sm"><label className="block font-semibold">Momento del envío</label><div className="flex gap-3"><label><input type="radio" checked={delivery === "now"} onChange={() => setDelivery("now")} /> Ahora</label><label><input type="radio" checked={delivery === "later"} onChange={() => setDelivery("later")} /> Programar</label></div>{delivery === "later" && <label className="block">Fecha y hora de Madrid <input className="block border rounded-lg p-2" type="datetime-local" value={scheduledLocal} onChange={event => setScheduledLocal(event.target.value)} /></label>}</div>
+          <div className="text-xs text-slate-600">{audiencePreview && !audiencePreview.error ? `${audiencePreview.recipients} suscriptor(es) · ${audiencePreview.devices} dispositivo(s) con avisos` : "Calculando destinatarios…"}</div>
           {err && <div className="text-sm text-rose-600 bg-rose-50 rounded-xl px-3 py-2">{err}</div>}
           {msg && <div className="text-sm text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">{msg}</div>}
-          <Btn disabled={busy} onClick={submit}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Enviar notificación</Btn>
+          <Btn disabled={busy || !audiencePreview?.recipients} onClick={submit}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {delivery === "later" ? "Programar notificación" : "Enviar notificación"}</Btn>
         </CardContent>
       </Card>
 
+      <Card><CardHeader title="Programación y entrega móvil" subtitle="Hora de Madrid" icon={Bell} /><CardContent className="space-y-2">
+        {scheduled.map(item => <div key={item.id} className="flex items-center justify-between gap-3 border rounded-lg p-3"><div><strong>{item.title}</strong><p className="text-xs text-slate-500">{new Date(item.scheduled_at).toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })} · {item.status === 'pending' ? 'Programada' : item.status === 'processing' ? 'En proceso' : item.status === 'cancelled' ? 'Cancelada' : item.status === 'failed' ? 'Fallida' : `APNs: ${item.push_accepted || 0} aceptada(s), ${item.push_rejected || 0} rechazada(s), ${item.push_review || 0} en revisión`}</p></div>{item.status === 'pending' && <Btn variant="secondary" onClick={() => cancelScheduled(item.id)}>Cancelar</Btn>}</div>)}
+        {!scheduled.length && <p className="text-sm text-slate-500">No hay avisos.</p>}
+      </CardContent></Card>
       <Card>
         <CardHeader title="Notificaciones enviadas" subtitle="Vistas por los suscriptores" icon={Bell} />
         <CardContent className="space-y-2">

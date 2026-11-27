@@ -6,7 +6,7 @@ const base64url = value => Buffer.from(value).toString('base64url');
 
 function buildApnsRequest(message, config = {}) {
   const { token, title, body, product, notificationId } = message;
-  if (!/^[a-f0-9]{64,}$/i.test(String(token || '')) || !PRODUCTS.has(product) || !notificationId) throw new Error('invalid_push_target');
+  if (!/^[a-f0-9]{32,512}$/i.test(String(token || '')) || String(token).length % 2 || !PRODUCTS.has(product) || !notificationId) throw new Error('invalid_push_target');
   const { teamId, keyId, privateKey, bundleId, environment = 'production', now = Math.floor(Date.now() / 1000) } = config;
   if (!teamId || !keyId || !privateKey || !bundleId) throw new Error('apns_not_configured');
   const header = base64url(JSON.stringify({ alg: 'ES256', kid: keyId }));

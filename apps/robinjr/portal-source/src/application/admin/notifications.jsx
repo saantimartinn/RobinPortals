@@ -13,12 +13,16 @@ export function AdminNotificaciones({ adminId, clients }) {
   const [type, setType] = useState("info"); // 'info' | 'terms'
   const [scope, setScope] = useState("assigned"); // 'assigned' | 'all'
   const [selected, setSelected] = useState(() => new Set());
+  const [delivery, setDelivery] = useState("now");
+  const [scheduledLocal, setScheduledLocal] = useState("");
   const [allClients, setAllClients] = useState(null);
   const [loadingAll, setLoadingAll] = useState(false);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   const [sent, setSent] = useState([]);
+  const [scheduled, setScheduled] = useState([]);
+  const [audiencePreview, setAudiencePreview] = useState(null);
   const [loadingSent, setLoadingSent] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [q, setQ] = useState("");
@@ -31,10 +35,21 @@ export function AdminNotificaciones({ adminId, clients }) {
   }, [pool, q]);
 
   useEffect(() => { reloadSent(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    setAudiencePreview(null);
+    const timer = setTimeout(async () => {
+      try {
+        const result = await adminNotificationCreate({ action: "preview", user_ids: Array.from(selected), ...(["installed", "everyone"].includes(scope) ? { audience: scope === "everyone" ? "all" : "installed" } : {}) });
+        if (!cancelled) setAudiencePreview(result);
+      } catch (_) { if (!cancelled) setAudiencePreview({ error: true }); }
+    }, 350);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [scope, selected]);
   async function reloadSent() {
     setLoadingSent(true);
-    try { const r = await adminNotificationsList(); setSent(r.notifications || []); }
-    catch (_) { setSent([]); }
+    try { const r = await adminNotificationsList(); setSent(r.notifications || []); setScheduled(r.scheduled || []); }
+    catch (_) { setSent([]); setScheduled([]); }
     finally { setLoadingSent(false); }
   }
 
@@ -65,16 +80,22 @@ export function AdminNotificaciones({ adminId, clients }) {
     setError(""); setFeedback("");
     if (!title.trim()) { setError("Añade un título."); return; }
     if (!content.trim()) { setError("Añade un contenido."); return; }
-    if (!selected.size) { setError("Selecciona al menos un cliente."); return; }
+    if (!["installed", "everyone"].includes(scope) && !selected.size) { setError("Selecciona al menos un cliente."); return; }
+    if (delivery === "later" && !scheduledLocal) { setError("Elige fecha y hora de Madrid."); return; }
     setBusy(true);
     try {
-      const r = await adminNotificationCreate({ title: title.trim(), content: content.trim(), type, user_ids: Array.from(selected) });
-      setFeedback(`Notificación enviada a ${r.recipients} cliente(s).`);
-      setTitle(""); setContent(""); setSelected(new Set());
+      const r = await adminNotificationCreate({ title: title.trim(), content: content.trim(), type, user_ids: Array.from(selected), ...(["installed", "everyone"].includes(scope) ? { audience: scope === "everyone" ? "all" : "installed" } : {}), ...(delivery === "later" ? { scheduled_local: scheduledLocal } : {}) });
+      setFeedback(`${delivery === "later" ? "Notificación programada" : "Notificación enviada"} para ${r.recipients} cliente(s).`);
+      setTitle(""); setContent(""); setSelected(new Set()); setScheduledLocal(""); setDelivery("now");
       await reloadSent();
     } catch (e) {
       setError(e.message || "No se pudo crear la notificación.");
     } finally { setBusy(false); }
+  }
+
+  async function cancelScheduled(id) {
+    try { await adminNotificationCreate({ action: 'cancel', id }); await reloadSent(); }
+    catch (error) { setError(error.message || 'No se pudo cancelar.'); }
   }
 
   function statusLabel(rec, ntype) {
@@ -122,16 +143,18 @@ export function AdminNotificaciones({ adminId, clients }) {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-semibold text-slate-600 ">Destinatarios ({selected.size} seleccionado(s))</div>
-              <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-0.5">
+              <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-100 p-0.5">
                 <button type="button" onClick={() => switchScope("assigned")}
                   className="px-3 py-1 rounded-md text-xs font-medium transition"
                   style={scope === "assigned" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Mis clientes</button>
                 <button type="button" onClick={() => switchScope("all")}
                   className="px-3 py-1 rounded-md text-xs font-medium transition"
-                  style={scope === "all" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Todos</button>
+                  style={scope === "all" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Buscar en todos</button>
+                <button type="button" onClick={() => switchScope("everyone")} className="px-3 py-1 rounded-md text-xs font-medium transition" style={scope === "everyone" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Todos los clientes</button>
+                <button type="button" onClick={() => switchScope("installed")} className="px-3 py-1 rounded-md text-xs font-medium transition" style={scope === "installed" ? { background: NAVY, color: "#FEFBE5" } : { color: "#4E5979" }}>Con app instalada</button>
               </div>
             </div>
-            <div className="flex items-center gap-2 mb-2">
+            {!["everyone", "installed"].includes(scope) && <div className="flex items-center gap-2 mb-2">
               <div className="relative flex-1">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar cliente…"
@@ -140,9 +163,9 @@ export function AdminNotificaciones({ adminId, clients }) {
               <button type="button" onClick={toggleAllVisible} className="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50" style={{ color: NAVY }}>
                 Seleccionar visibles
               </button>
-            </div>
+            </div>}
             <div className="max-h-64 overflow-y-auto rounded-xl border border-slate-200 divide-y divide-slate-100">
-              {loadingAll && scope === "all" ? (
+              {scope === "installed" ? (<div className="px-4 py-6 text-center text-sm text-slate-500">Se enviará a los clientes de este producto con la app y avisos activados.</div>) : scope === "everyone" ? (<div className="px-4 py-6 text-center text-sm text-slate-500">Se enviará a todos los clientes de este producto. Quienes tengan la app recibirán además el aviso del iPhone.</div>) : loadingAll && scope === "all" ? (
                 <div className="px-4 py-6 text-center text-sm text-slate-400"><Loader2 className="h-4 w-4 animate-spin inline mr-2" />Cargando clientes…</div>
               ) : filtered.length === 0 ? (
                 <div className="px-4 py-6 text-center text-sm text-slate-400">No hay clientes.</div>
@@ -165,17 +188,23 @@ export function AdminNotificaciones({ adminId, clients }) {
             </div>
           </div>
 
+          <div className="space-y-2 text-sm"><label className="block font-semibold">Momento del envío</label><div className="flex gap-3"><label><input type="radio" checked={delivery === "now"} onChange={() => setDelivery("now")} /> Ahora</label><label><input type="radio" checked={delivery === "later"} onChange={() => setDelivery("later")} /> Programar</label></div>{delivery === "later" && <label className="block">Fecha y hora de Madrid <input className="block border rounded-lg p-2" type="datetime-local" value={scheduledLocal} onChange={event => setScheduledLocal(event.target.value)} /></label>}</div>
+          <div className="text-xs text-slate-600">{audiencePreview && !audiencePreview.error ? `${audiencePreview.recipients} cliente(s) · ${audiencePreview.devices} dispositivo(s) con avisos` : "Calculando destinatarios…"}</div>
           {error && <div className="text-sm text-rose-600 flex items-center gap-2"><AlertCircle className="h-4 w-4" />{error}</div>}
           {feedback && <div className="text-sm text-emerald-600 flex items-center gap-2"><CheckCircle2 className="h-4 w-4" />{feedback}</div>}
 
           <div className="flex justify-end">
-            <Btn variant="primary" onClick={submit} disabled={busy}>
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} Enviar notificación
+            <Btn variant="primary" onClick={submit} disabled={busy || !audiencePreview?.recipients}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {delivery === "later" ? "Programar notificación" : "Enviar notificación"}
             </Btn>
           </div>
         </CardContent>
       </Card>
 
+      <Card><CardHeader title="Programación y entrega móvil" subtitle="Hora de Madrid" icon={Clock} /><CardContent className="space-y-2">
+        {scheduled.map(item => <div key={item.id} className="flex items-center justify-between gap-3 border rounded-lg p-3"><div><strong>{item.title}</strong><p className="text-xs text-slate-500">{new Date(item.scheduled_at).toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })} · {item.status === 'pending' ? 'Programada' : item.status === 'processing' ? 'En proceso' : item.status === 'cancelled' ? 'Cancelada' : item.status === 'failed' ? 'Fallida' : `APNs: ${item.push_accepted || 0} aceptada(s), ${item.push_rejected || 0} rechazada(s), ${item.push_review || 0} en revisión`}</p></div>{item.status === 'pending' && <Btn variant="secondary" onClick={() => cancelScheduled(item.id)}>Cancelar</Btn>}</div>)}
+        {!scheduled.length && <p className="text-sm text-slate-500">No hay avisos.</p>}
+      </CardContent></Card>
       {/* Notificaciones enviadas + seguimiento */}
       <Card>
         <CardHeader title="Notificaciones enviadas" subtitle="Estado de lectura y aceptación por cliente" icon={Clock}

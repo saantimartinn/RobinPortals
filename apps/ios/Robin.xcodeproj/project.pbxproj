@@ -87,7 +87,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					A023C6DC2491932DC3A5C221 = {
-						DevelopmentTeam = GWRMHMM34D;
+						DevelopmentTeam = 3S84TW36UJ;
 					};
 				};
 			};
@@ -139,11 +139,12 @@
 		3630D22D18061DBD5D07ACA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APS_ENVIRONMENT = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Robin/Robin.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GWRMHMM34D;
+				DEVELOPMENT_TEAM = 3S84TW36UJ;
 				INFOPLIST_FILE = Robin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -160,11 +161,12 @@
 		731B0BAB0BC7B7B2C2F3969E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APS_ENVIRONMENT = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Robin/Robin.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GWRMHMM34D;
+				DEVELOPMENT_TEAM = 3S84TW36UJ;
 				INFOPLIST_FILE = Robin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

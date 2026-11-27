@@ -68,7 +68,12 @@ export function NotificationPopup() {
   useEffect(() => {
     let cancel = false;
     (async () => {
-      try { const result = await notificationsPending(); if (!cancel) setQueue(result.notifications || []); }
+      try {
+        const result = await notificationsPending();
+        const target = new URLSearchParams(window.location.search).get("notification");
+        const notifications = result.notifications || [];
+        if (!cancel) setQueue(target ? [...notifications.filter(item => item.id === target), ...notifications.filter(item => item.id !== target)] : notifications);
+      }
       catch (_) { if (!cancel) setQueue([]); }
       finally { if (!cancel) setLoaded(true); }
     })();
