@@ -610,7 +610,7 @@ private struct RobinWebView: UIViewRepresentable {
                   if (applyNativeNavigation()) observer.disconnect();
                 })();
                 """,
-            injectionTime: .atDocumentEnd,
+            injectionTime: .atDocumentStart,
             forMainFrameOnly: true
         ))
         configuration.userContentController.add(context.coordinator, name: "robinAuth")

@@ -5,6 +5,7 @@
 .admin-home-mobile{display:none}
 
 @media(max-width:800px){
+  html.robin-native-app .shell>.work>.top{display:none!important}
   html.robin-native-app,html.robin-native-app body,html.robin-native-app #root{min-height:100%;width:100%;overflow-x:clip}
   html.robin-native-app .shell{min-height:100dvh}
 

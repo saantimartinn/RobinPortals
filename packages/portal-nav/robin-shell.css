@@ -8,6 +8,7 @@
 
 /* Page and type. The shell fills exactly the window below the top bar, so short
    pages do not scroll and the sticky sidebar never slides away. */
+html.robin-native-app .robin-cross-nav{display:none!important}
 .student-portal,.admin-workspace{min-height:calc(100vh - 4.75rem);background:var(--robin-cream);color:var(--robin-navy);font-family:var(--robin-font-text);font-size:15px}
 .student-main :is(h1,h2,h3),.admin-workarea :is(h1,h2,h3){font-family:var(--robin-font-display);font-weight:600;letter-spacing:.005em;color:var(--robin-navy)}
 .student-main .student-progress-card :is(h1,h2,h3),.student-main [class*="text-white"] :is(h1,h2,h3),.student-main :is(h1,h2,h3)[class*="text-white"]{color:var(--robin-on-navy)}
