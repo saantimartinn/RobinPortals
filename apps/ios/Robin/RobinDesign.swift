@@ -172,3 +172,94 @@ struct RobinTabBar: View {
         }
     }
 }
+
+struct RobinAdminTabBar: View {
+    @Binding var selection: RobinAdminTab
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(RobinAdminTab.allCases) { tab in
+                Button { selection = tab } label: {
+                    VStack(spacing: 5) {
+                        Image(systemName: selection == tab ? selectedSymbol(tab) : tab.symbol)
+                            .font(.system(size: 18, weight: selection == tab ? .semibold : .regular))
+                            .frame(height: 22)
+                        Text(tab.rawValue)
+                            .font(.custom(selection == tab ? RobinStyle.textSemibold : RobinStyle.text, size: 12))
+                    }
+                    .foregroundStyle(selection == tab ? RobinStyle.navy : RobinStyle.muted)
+                    .frame(maxWidth: .infinity).frame(height: 58)
+                    .background(selection == tab ? RobinStyle.soft : .clear,
+                                in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(tab.rawValue)
+            }
+        }
+        .padding(.horizontal, 9).padding(.top, 6)
+        .background(RobinStyle.paper)
+        .overlay(alignment: .top) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
+    }
+
+    private func selectedSymbol(_ tab: RobinAdminTab) -> String {
+        switch tab {
+        case .home: "house.fill"
+        case .calendar: "calendar"
+        case .account: "person.crop.circle.fill"
+        }
+    }
+}
+
+struct RobinProductTabBar: View {
+    let sections: [RobinNativeSection]
+    let activeKey: String
+    let onSelect: (String) -> Void
+
+    private var primary: [RobinNativeSection] { Array(sections.prefix(3)) }
+    private var remaining: [RobinNativeSection] { Array(sections.dropFirst(3)) }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(primary) { section in
+                Button { onSelect(section.key) } label: {
+                    tabLabel(section.label, symbol: section.symbol, isActive: activeKey == section.key)
+                }
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(activeKey == section.key ? .isSelected : [])
+            }
+            if !remaining.isEmpty {
+                Menu {
+                    ForEach(remaining) { section in
+                        Button(section.label, systemImage: section.symbol) { onSelect(section.key) }
+                    }
+                } label: {
+                    tabLabel("Más", symbol: "ellipsis.circle", isActive: remaining.contains(where: { $0.key == activeKey }))
+                }
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Más secciones")
+                .accessibilityValue(remaining.first(where: { $0.key == activeKey })?.label ?? "")
+            }
+        }
+        .padding(.horizontal, 9).padding(.top, 6)
+        .background(RobinStyle.paper)
+        .overlay(alignment: .top) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
+    }
+
+    private func tabLabel(_ title: String, symbol: String, isActive: Bool) -> some View {
+        VStack(spacing: 5) {
+            Image(systemName: symbol)
+                .font(.system(size: 18, weight: isActive ? .semibold : .regular))
+                .frame(height: 22)
+            Text(title)
+                .font(.custom(isActive ? RobinStyle.textSemibold : RobinStyle.text, size: 11))
+                .lineLimit(1).minimumScaleFactor(0.75)
+        }
+        .foregroundStyle(isActive ? RobinStyle.navy : RobinStyle.muted)
+        .frame(maxWidth: .infinity).frame(height: 58)
+        .background(isActive ? RobinStyle.soft : .clear,
+                    in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .contentShape(Rectangle())
+    }
+}

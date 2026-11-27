@@ -6,6 +6,7 @@ struct RobinAccountView: View {
     @Environment(\.scenePhase) private var scenePhase
     let profile: RobinProfile?
     let activeProduct: RobinProduct?
+    let isAdmin: Bool
     let onReportProblem: () -> Void
     let onRefresh: () -> Void
     let onLogout: () -> Void
@@ -21,7 +22,7 @@ struct RobinAccountView: View {
             VStack(alignment: .leading, spacing: 23) {
                 RobinBrandHeader()
                 RobinPageHeading(
-                    title: "Tu cuenta",
+                    title: isAdmin ? "Cuenta de administración" : "Tu cuenta",
                     subtitle: "Gestiona tu sesión y encuentra ayuda cuando la necesites."
                 )
 
@@ -29,13 +30,15 @@ struct RobinAccountView: View {
 
                 VStack(alignment: .leading, spacing: 11) {
                     RobinSectionHeading(title: "Preferencias")
-                    settingCard(
-                        symbol: permissionEnabled ? "bell.badge.fill" : "bell.slash",
-                        title: "Notificaciones",
-                        detail: permissionText,
-                        action: openNotificationSettings,
-                        accessory: permissionEnabled ? "checkmark" : "arrow.up.right"
-                    )
+                    if !isAdmin {
+                        settingCard(
+                            symbol: permissionEnabled ? "bell.badge.fill" : "bell.slash",
+                            title: "Notificaciones",
+                            detail: permissionText,
+                            action: openNotificationSettings,
+                            accessory: permissionEnabled ? "checkmark" : "arrow.up.right"
+                        )
+                    }
                     settingCard(
                         symbol: "arrow.clockwise",
                         title: "Actualizar sesión",
@@ -84,9 +87,9 @@ struct RobinAccountView: View {
             .padding(.horizontal, 20).padding(.top, 12)
         }
         .background(RobinStyle.canvas.ignoresSafeArea())
-        .onAppear { Task { await refreshPermission() } }
+        .onAppear { if !isAdmin { Task { await refreshPermission() } } }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await refreshPermission() } }
+            if phase == .active && !isAdmin { Task { await refreshPermission() } }
         }
     }
 

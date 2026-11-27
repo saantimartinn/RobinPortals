@@ -329,7 +329,7 @@ export default function PortalRobin() {
       <div className="min-h-screen grid place-items-center" style={{ background: CANVAS }}>
         <div className="flex items-center gap-3 text-slate-500 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" />{t(" Cargando portal…")}</div>
-      </div>, true
+      </div>, false
     );
   }
 

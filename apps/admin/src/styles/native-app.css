@@ -22,6 +22,7 @@
   html.robin-native-app .top-actions .authenticated-user{display:none!important}
   html.robin-native-app .top-actions button{display:grid;place-items:center;width:44px;height:44px;padding:0}
   html.robin-native-app .work{width:100%;min-height:100dvh;margin:0;padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  html.robin-native-app .work{padding-bottom:0}
   html.robin-native-app .work main{width:100%;min-width:0}
   html.robin-native-app .page{width:100%;max-width:none;margin:0;padding:16px 16px 28px;overflow-x:clip}
   html.robin-native-app .title{align-items:flex-start;flex-direction:column;gap:12px;margin-bottom:16px}
@@ -55,6 +56,7 @@
     min-height:64px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
     border-top:var(--robin-line);background:var(--robin-paper)
   }
+  html.robin-native-app .mobile-admin-nav{display:none!important}
   html.robin-native-app .mobile-admin-nav a,html.robin-native-app .mobile-admin-nav button{
     display:flex;min-width:0;min-height:48px;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     padding:4px;border:0;border-radius:10px;background:transparent;color:var(--robin-ink-600);

@@ -11,6 +11,7 @@ import { AdminUsers } from "./AdminUsers.jsx";
 import { AdminFaqManager } from "./AdminFaqManager.jsx";
 import { Bell, Briefcase, Building2, CalendarCheck, Database, GraduationCap, Handshake, HelpCircle, LayoutDashboard, Loader2, Percent, Plane, Sparkles, Tag, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { connectNativeSections } from "../../../../../../packages/portal-nav/native-sections.js";
 import { subAdminData } from "../../api/index.js";
 import { isDeveloperAdminEmail } from "../../admin-permissions.js";
 import { RobinPlanDeveloperDatabase } from "./RobinPlanDeveloperDatabase.jsx";
@@ -58,6 +59,7 @@ function SubscriberAdmin({ applicationIdentity }) {
     { key: "faqs", label: "FAQs", icon: HelpCircle },
     ...(isDeveloper ? [{ key: "database", label: "Base de datos", icon: Database }] : []),
   ];
+  useEffect(() => connectNativeSections({ items: nav, active: section, onSelect: setSection }), [section, isDeveloper]);
 
   return (
     <div className="student-portal subscription-admin">

@@ -38,8 +38,12 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var service = RobinService()
     @State private var activeTab: RobinTab = .home
+    @State private var activeAdminTab: RobinAdminTab = .home
     @State private var selectedProductURL: URL?
     @State private var activeProduct: RobinProduct?
+    @State private var activeAdminDestination: RobinAdminDestination?
+    @State private var nativeSections: [RobinNativeSection] = []
+    @State private var activeNativeSection = ""
     @State private var pendingNotificationURL: URL?
     @State private var error: String?
     @State private var reloadNumber = 0
@@ -47,6 +51,7 @@ struct ContentView: View {
     @State private var pendingCredential: RobinCredential?
     @State private var showsSavePrompt = false
     @State private var authenticationError: String?
+    @State private var destinationError: String?
     @State private var authenticating = false
     @State private var webViewBox = WeakWebViewBox()
 
@@ -76,8 +81,8 @@ struct ContentView: View {
                             Image("RobinWordmark")
                                 .resizable().scaledToFit().frame(width: 70, height: 30)
                                 .accessibilityLabel("Robin")
-                            if let activeProduct {
-                                Text(activeProduct.title)
+                            if let title = activeAdminDestination?.title ?? activeProduct?.title {
+                                Text(title)
                                     .font(.custom(RobinStyle.subtitle, size: 15))
                                     .foregroundStyle(RobinStyle.navy)
                                     .lineLimit(1).minimumScaleFactor(0.8)
@@ -98,6 +103,44 @@ struct ContentView: View {
                     )
                     .id(reloadNumber)
                 }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    if !nativeSections.isEmpty {
+                        RobinProductTabBar(sections: nativeSections, activeKey: activeNativeSection,
+                                           onSelect: selectNativeSection)
+                            .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 5)
+                            .background(RobinStyle.canvas)
+                    }
+                }
+            } else if service.snapshot.isApplicationAdmin {
+                Group {
+                    switch activeAdminTab {
+                    case .home:
+                        RobinAdminHomeView(
+                            profile: service.snapshot.profile,
+                            bookings: service.adminBookings,
+                            isLoading: service.isLoading,
+                            onOpen: { destination in Task { await openAdminDestination(destination) } },
+                            onOpenCalendar: { activeAdminTab = .calendar },
+                            onRefresh: { Task { await refreshSession() } }
+                        )
+                    case .calendar:
+                        RobinAdminCalendarView(bookings: service.adminBookings,
+                                               isLoading: service.isLoading,
+                                               hasError: service.adminCalendarError,
+                                               onRefresh: { Task { await refreshSession() } })
+                    case .account:
+                        RobinAccountView(profile: service.snapshot.profile, activeProduct: nil, isAdmin: true,
+                                         onReportProblem: openReportProblem,
+                                         onRefresh: { Task { await refreshSession() } },
+                                         onLogout: logout)
+                    }
+                }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    RobinAdminTabBar(selection: $activeAdminTab)
+                        .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 5)
+                        .background(RobinStyle.canvas)
+                }
+                .background(RobinStyle.canvas)
             } else if let profile = service.snapshot.profile {
                 Group {
                     switch activeTab {
@@ -112,7 +155,7 @@ struct ContentView: View {
                                    onRefresh: { await refreshSession() },
                                    onOpenNotice: { notice in Task { await openNotice(notice) } })
                     case .account:
-                        RobinAccountView(profile: profile, activeProduct: activeProduct,
+                        RobinAccountView(profile: profile, activeProduct: activeProduct, isAdmin: false,
                                      onReportProblem: openReportProblem,
                                      onRefresh: { Task { await refreshSession() } },
                                      onLogout: logout)
@@ -196,16 +239,24 @@ struct ContentView: View {
         } message: {
             Text(authenticationError ?? "Vuelve a entrar con tu contraseña.")
         }
+        .alert("No se pudo abrir el producto", isPresented: Binding(
+            get: { destinationError != nil },
+            set: { if !$0 { destinationError = nil } }
+        )) {
+            Button("Aceptar", role: .cancel) { destinationError = nil }
+        } message: {
+            Text(destinationError ?? "Vuelve a intentarlo.")
+        }
     }
 
     @MainActor private func refreshSession() async {
         await service.refresh()
-        PushRegistration.active?.sessionValidated(isSignedIn: service.snapshot.profile != nil)
-        if service.snapshot.profile != nil, activeProduct == nil { activeProduct = service.lastProduct }
-        if service.snapshot.profile != nil, let pendingNotificationURL {
+        PushRegistration.active?.sessionValidated(isSignedIn: service.snapshot.profile != nil && !service.snapshot.isApplicationAdmin)
+        if !service.snapshot.isApplicationAdmin, service.snapshot.profile != nil, activeProduct == nil { activeProduct = service.lastProduct }
+        if !service.snapshot.isApplicationAdmin, service.snapshot.profile != nil, let pendingNotificationURL {
             self.pendingNotificationURL = nil
             await openURL(pendingNotificationURL)
-        } else if service.snapshot.profile == nil {
+        } else if service.snapshot.profile == nil && !service.snapshot.isApplicationAdmin {
             selectedProductURL = nil
             activeProduct = nil
         }
@@ -213,9 +264,50 @@ struct ContentView: View {
 
     @MainActor private func closeProduct() {
         selectedProductURL = nil
-        activeProduct = service.lastProduct
-        activeTab = .home
+        nativeSections = []
+        activeNativeSection = ""
+        if service.snapshot.isApplicationAdmin {
+            activeAdminDestination = nil
+            activeAdminTab = .home
+        } else {
+            activeProduct = service.lastProduct
+            activeTab = .home
+        }
         Task { await refreshSession() }
+    }
+
+    @MainActor private func openAdminDestination(_ destination: RobinAdminDestination) async {
+        guard service.snapshot.isApplicationAdmin else { return }
+        var url = RobinAddress.origin.appending(path: String(destination.path.dropFirst()))
+        if destination == .robinjr {
+            guard let ticket = await service.issueRobinJrTicket(),
+                  var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                destinationError = "No se ha podido validar el acceso a Robin Jr."
+                return
+            }
+            components.queryItems = [URLQueryItem(name: "sso_ticket", value: ticket)]
+            guard let ticketURL = components.url else { return }
+            url = ticketURL
+        }
+        activeAdminDestination = destination
+        activeProduct = nil
+        nativeSections = []
+        activeNativeSection = ""
+        selectedProductURL = url
+    }
+
+    private func selectNativeSection(_ key: String) {
+        guard nativeSections.contains(where: { $0.key == key }), let webView = webViewBox.value else { return }
+        activeNativeSection = key
+        Task { @MainActor in
+            do {
+                _ = try await webView.callAsyncJavaScript(
+                    "window.dispatchEvent(new CustomEvent('robin-native-select-section', { detail: { key } })); return true;",
+                    arguments: ["key": key], in: nil, contentWorld: .page)
+            } catch {
+                destinationError = "No se ha podido abrir esta sección. Vuelve a intentarlo."
+            }
+        }
     }
 
     private func handleWebViewLoaded() {
@@ -226,7 +318,9 @@ struct ContentView: View {
                 isAdminWebView = true
             }
         }
-        Task { await refreshSession() }
+        if selectedProductURL == nil || !service.snapshot.isApplicationAdmin {
+            Task { await refreshSession() }
+        }
     }
 
     private var adminWebToolbar: some View {
@@ -318,6 +412,8 @@ struct ContentView: View {
         guard service.snapshot.products.contains(product) else { return }
         service.lastProduct = product
         activeProduct = product
+        nativeSections = []
+        activeNativeSection = ""
         selectedProductURL = RobinAddress.origin.appending(path: String(product.path.dropFirst()))
     }
 
@@ -327,6 +423,8 @@ struct ContentView: View {
               let url = notice.product.noticeURL(id: notice.id, origin: RobinAddress.origin) else { return }
         service.lastProduct = notice.product
         activeProduct = notice.product
+        nativeSections = []
+        activeNativeSection = ""
         selectedProductURL = url
     }
 
@@ -335,6 +433,8 @@ struct ContentView: View {
         guard let product = validateNoticeURL(url), service.snapshot.products.contains(product) else { return }
         activeProduct = product
         service.lastProduct = product
+        nativeSections = []
+        activeNativeSection = ""
         selectedProductURL = url
     }
 
@@ -345,13 +445,16 @@ struct ContentView: View {
     }
 
     private func openReportProblem() {
-        guard service.snapshot.products.contains(.portal) else {
+        guard service.snapshot.isApplicationAdmin || service.snapshot.products.contains(.portal) else {
             if let url = URL(string: "mailto:hello@project-robin.com") { UIApplication.shared.open(url) }
             return
         }
         var components = URLComponents(url: RobinAddress.origin.appending(path: "/portal/"), resolvingAgainstBaseURL: false)!
         components.queryItems = [URLQueryItem(name: "nativeAction", value: "report-problem")]
-        activeProduct = .portal
+        if service.snapshot.isApplicationAdmin { activeAdminDestination = .portal }
+        else { activeProduct = .portal }
+        nativeSections = []
+        activeNativeSection = ""
         selectedProductURL = components.url
     }
 
@@ -362,6 +465,10 @@ struct ContentView: View {
                     service.reset()
                     selectedProductURL = nil
                     activeProduct = nil
+                    activeAdminDestination = nil
+                    activeAdminTab = .home
+                    nativeSections = []
+                    activeNativeSection = ""
                     error = nil
                     isAdminWebView = false
                     reloadNumber += 1
@@ -381,6 +488,20 @@ struct ContentView: View {
 
         if action == "adminShellDetected" {
             isAdminWebView = true
+            return
+        }
+        if action == "nativeSections" {
+            guard let rows = body["items"] as? [[String: Any]], rows.count <= 30 else { return }
+            let sections = rows.compactMap { row -> RobinNativeSection? in
+                guard let key = row["key"] as? String,
+                      key.count <= 64, !key.isEmpty,
+                      key.allSatisfy({ $0.isASCII && ($0.isLowercase || $0.isNumber || $0 == "-" || $0 == "_") }),
+                      let label = row["label"] as? String,
+                      !label.isEmpty, label.count <= 80 else { return nil }
+                return RobinNativeSection(key: key, label: label)
+            }
+            nativeSections = sections
+            activeNativeSection = body["active"] as? String ?? ""
             return
         }
         guard RobinAddress.isTrustedPortal(url) else { return }

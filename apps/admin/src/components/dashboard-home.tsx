@@ -1,10 +1,9 @@
 // Admin interface component for dashboard home; composed by the shell or a feature module.
 import { useEffect, useState } from "react";
 import {
-  ArrowRight, CalendarDays, ChevronDown, CircleDollarSign, ExternalLink, GraduationCap,
+  CalendarDays, ChevronDown, CircleDollarSign, ExternalLink, GraduationCap,
   Sparkles, TrendingUp, Users,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import {
   Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer,
   Tooltip, XAxis, YAxis,
@@ -29,9 +28,7 @@ function dashboardReportUrl(type: "altas" | "embudo" | "facturacion", period: st
 }
 
 
-type MobileQuickLink = { href: string; label: string; Icon: LucideIcon };
-
-export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded, isDeveloperAdmin, canOpenCRM, mobileQuickLinks }: { snapshot: PortalSnapshot | null; contacts: Contact[]; leadStages: Record<string, CrmStage>; currentUser: string; holded: HoldedSnapshot | null; isDeveloperAdmin: boolean; canOpenCRM: boolean; mobileQuickLinks: MobileQuickLink[] }) {
+export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded, isDeveloperAdmin }: { snapshot: PortalSnapshot | null; contacts: Contact[]; leadStages: Record<string, CrmStage>; currentUser: string; holded: HoldedSnapshot | null; isDeveloperAdmin: boolean }) {
   const [period, setPeriod] = useState<"7" | "15" | "30" | "all">("all");
   const [acquisition, setAcquisition] = useState<SalesDashboard["acquisition"] | null>(null);
   // The charts and counts wait for the acquisition data instead of drawing a local
@@ -73,8 +70,6 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
   const chartHasValues = chartData.some((point) => point.leads > 0 || point.clients > 0);
   const hotLeads = contacts.filter((lead) => (isDeveloperAdmin || lead.owner === currentUser) && (lead.heat || 0) >= 80 && !["Cliente", "Lost"].includes(leadStages[lead.id] || lead.stage || "Por contactar"));
   const firstName = currentUser.trim().split(/\s+/)[0] || "equipo";
-  const primaryLink = canOpenCRM ? { href: adminPath("/crm"), label: "CRM", Icon: Users } : mobileQuickLinks[0];
-  const PrimaryIcon = primaryLink?.Icon || Users;
   const funnelStages: Array<[string, CrmStage]> = [["Por contactar", "Por contactar"], ["Contactados", "Contactado"], ["Llamadas", "Llamada programada"], ["Propuestas", "Propuesta enviada"], ["Clientes", "Cliente"]];
   const funnel = funnelStages.map(([label, stage]) => [label, contacts.filter((lead) => (leadStages[lead.id] || lead.stage || "Por contactar") === stage).length] as const);
   const funnelBase = Math.max(1, contacts.length);
@@ -88,20 +83,6 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
         </div>
         <h1 id="admin-home-title">Hola, {firstName}</h1>
         <p>Tu equipo y los productos Robin, en un mismo lugar.</p>
-        {primaryLink && <a className={`admin-home-mobile-hero ${interactiveState}`} href={primaryLink.href}>
-          <div>
-            <span>Continuar en</span>
-            <strong>{primaryLink.label}</strong>
-            <b>Abrir <ArrowRight aria-hidden="true" /></b>
-          </div>
-          <i><PrimaryIcon aria-hidden="true" /></i>
-        </a>}
-        {mobileQuickLinks.filter((link) => link.href !== primaryLink?.href).length > 0 && <div className="admin-home-mobile-links">
-          <h2>Accesos rápidos</h2>
-          {mobileQuickLinks.filter((link) => link.href !== primaryLink?.href).map(({ href, label, Icon }) => <a className={interactiveState} href={href} key={href}>
-            <Icon aria-hidden="true" /><span>{label}</span><ArrowRight aria-hidden="true" />
-          </a>)}
-        </div>}
       </section>
 
       <div className="title dashboard-page-heading">

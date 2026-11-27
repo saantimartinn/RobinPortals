@@ -67,6 +67,7 @@ import { DashboardLoader } from "@/components/dashboard-loader";
 import { EmptyChartBar } from "@/components/empty-chart-bar";
 import { allAdminTabPermissions, isDeveloperAdminEmail, isProAdminEmail } from "@/lib/admin-permissions";
 import { ROBIN_LINKS } from "../../../../packages/portal-nav/links.js";
+import { connectNativeSections } from "../../../../packages/portal-nav/native-sections.js";
 
 type NavItem = [string, string, typeof LayoutDashboard, string];
 
@@ -173,11 +174,6 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   const isDeveloperAdmin = isDeveloperAdminEmail(permissionProfile.email);
   const visibleTabs = isProAdmin ? allAdminTabPermissions : (permissionProfile.visible_tabs || allAdminTabPermissions);
   const canSee = (key: string) => key === "developer.database" ? isDeveloperAdmin : key.startsWith("developer.") || visibleTabs.includes(key);
-  const homeMobileTabs = sideMenus.home.filter(([, , , permission]) => canSee(permission)).slice(0, 3);
-  const mobileHomeLinks = sideMenus.home
-    .filter(([href, , , permission]) => href !== "/" && canSee(permission) && !homeMobileTabs.some(([tabHref]) => tabHref === href))
-    .slice(0, 3)
-    .map(([href, label, Icon]) => ({ href: adminPath(href), label, Icon }));
   const routePermission = path === "/" || path.startsWith("/informes/inicio") ? "home.summary"
     : path === "/bandeja-leads" ? "home.leads"
       : path === "/alumnos-global" || path.startsWith("/alumnos-global/") ? "home.students"
@@ -370,8 +366,22 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
     (!crmLoaded && (path === "/" || path === "/bandeja-leads" || path.startsWith("/crm"))) ||
     (portalLoading && (["/", "/alumnos-global", "/analitica-global"].includes(path) || path.startsWith("/informes/inicio"))) ||
     (!crmLoaded && path.startsWith("/informes/inicio"));
-  const mobileNavItems = sideMenus[area].filter(([, , , permission]) => canSee(permission)).slice(0, 3);
+  const visibleSideItems = sideMenus[area].filter(([, , , permission]) => canSee(permission));
+  const mobileNavItems = visibleSideItems.slice(0, 3);
   const isMobileMenuActive = !mobileNavItems.some(([href]) => isSideItemActive(path, href));
+  useEffect(() => {
+    const items = visibleSideItems.map(([, label], index) => ({ key: `section-${index}`, label }));
+    const activeItem = visibleSideItems.findIndex(([href]) => isSideItemActive(path, href));
+    return connectNativeSections({
+      items,
+      active: activeItem < 0 ? items[0]?.key : items[activeItem].key,
+      onSelect: key => {
+        const index = Number(key.slice("section-".length));
+        const href = visibleSideItems[index]?.[0];
+        if (href) window.location.assign(adminPath(href));
+      },
+    });
+  }, [area, path, permissionProfile]);
 
   return (
     <div className="shell">
@@ -383,7 +393,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
         </div>
         <div className="context-title"><i className={authUser.avatar_url ? "has-photo" : ""}>{authUser.avatar_url ? <img src={authUser.avatar_url} alt="" /> : initials}</i><div><strong>{currentUser}</strong><small>Administración</small></div></div>
         <nav>
-          {sideMenus[area].filter(([, , , permission]) => canSee(permission)).map(([href, label, Icon]) => (
+          {visibleSideItems.map(([href, label, Icon]) => (
             <a href={adminPath(href)} key={href} className={isSideItemActive(path, href) ? "active" : ""} onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
@@ -449,7 +459,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
         </header>
 
         <main>
-          {accessDenied ? <div className="page"><div className="empty"><ShieldCheck /><h2>Sección no disponible</h2><p>Tu perfil no tiene acceso a esta sección. Pide a un administrador Pro que ajuste sus pestañas.</p>{firstAllowedHref && <a className="portal-link-button" href={adminPath(firstAllowedHref)}>Ir a una sección disponible</a>}</div></div> : dashboardLoading || ((path === "/" || path.startsWith("/informes/inicio")) && holdedLoading) ? <div className="page"><DashboardLoader /></div> : path === "/" ? <Dashboard snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} currentUser={currentUser} holded={holdedSnapshot} isDeveloperAdmin={isDeveloperAdmin} canOpenCRM={canSee("crm.to_contact")} mobileQuickLinks={mobileHomeLinks} /> : path.startsWith("/informes/inicio") ? <DashboardReport snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} holded={holdedSnapshot} /> : (
+          {accessDenied ? <div className="page"><div className="empty"><ShieldCheck /><h2>Sección no disponible</h2><p>Tu perfil no tiene acceso a esta sección. Pide a un administrador Pro que ajuste sus pestañas.</p>{firstAllowedHref && <a className="portal-link-button" href={adminPath(firstAllowedHref)}>Ir a una sección disponible</a>}</div></div> : dashboardLoading || ((path === "/" || path.startsWith("/informes/inicio")) && holdedLoading) ? <div className="page"><DashboardLoader /></div> : path === "/" ? <Dashboard snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} currentUser={currentUser} holded={holdedSnapshot} isDeveloperAdmin={isDeveloperAdmin} /> : path.startsWith("/informes/inicio") ? <DashboardReport snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} holded={holdedSnapshot} /> : (
             <FeatureModule
               path={path}
               notify={setNotice}

@@ -1,4 +1,5 @@
 import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
+import { connectNativeSections } from "../../../../../packages/portal-nav/native-sections.js";
 // One member layout; product-specific services retain their own access rules.
 import { AnimatePresence, motion } from "framer-motion";
 import "./subscription-portal.css";
@@ -42,6 +43,10 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
   });
   const active = canOpenTab(user, activeTab) ? activeTab : 'home';
   const setActive = tab => setActiveTab(canOpenTab(user, tab) ? tab : 'home');
+  useEffect(() => connectNativeSections({
+    items: NAV_ITEMS, active,
+    onSelect: key => key === 'habitacion' ? roomDialogRef.current?.showModal() : setActive(key),
+  }), [active, user.id]);
   useEffect(() => {
     if (!window.matchMedia('(max-width: 1023px)').matches) return;
     navigationRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });

@@ -1,4 +1,5 @@
 import { t, useLocale } from "../../../../../packages/i18n/react.jsx";
+import { connectNativeSections } from "../../../../../packages/portal-nav/native-sections.js";
 // Portal view or navigation module for application portals; the application shell owns session state.
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import "./student-portal.css";
@@ -85,6 +86,7 @@ export function PortalShell({ user, clientName, onLogout, active, setActive, onU
     { key: "faqs", label: "FAQs", icon: HelpCircle },
     { key: "perfil", label: "Mi perfil", icon: User },
   ];
+  useEffect(() => connectNativeSections({ items: navigation, active, onSelect: setActive }), [active, setActive]);
 
   function openFaqCitation(number) {
     const hash = `#faq-${number}`;

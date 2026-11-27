@@ -1,5 +1,6 @@
 // Portal view or navigation module for admin workspace; the application shell owns session state.
 import React, { useEffect, useRef, useState } from "react";
+import { connectNativeSections } from "../../../../../packages/portal-nav/native-sections.js";
 import { LayoutDashboard, Users, Bell, Search, X, ArrowLeft, ArrowLeftRight, ChevronRight, User, BookOpen, FileText, CreditCard, Sparkles, Calendar, Compass, HelpCircle, GraduationCap, Database } from "lucide-react";
 import { APP_STEPS } from "../application-steps.js";
 import "./admin-portal.css";
@@ -41,6 +42,10 @@ export function AdminWorkspace({ user, active, client, clients, loading, error, 
   }, [active, client?.id]);
   const page = globalTabs.find(t => t.key === active);
   const clientPage = CLIENT_TABS.some(t => t.key === active);
+  useEffect(() => connectNativeSections({
+    items: clientPage && client ? [{ key: "clientes", label: "Mis clientes" }, ...CLIENT_TABS] : globalTabs,
+    active, onSelect: onNavigate,
+  }), [active, client?.id, isDeveloper, onNavigate]);
   return <div className="admin-workspace">
     <a className="admin-skip" href="#admin-content">Saltar al contenido</a>
     <div className="admin-layout">
