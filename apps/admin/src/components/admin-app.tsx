@@ -173,8 +173,9 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   const isDeveloperAdmin = isDeveloperAdminEmail(permissionProfile.email);
   const visibleTabs = isProAdmin ? allAdminTabPermissions : (permissionProfile.visible_tabs || allAdminTabPermissions);
   const canSee = (key: string) => key === "developer.database" ? isDeveloperAdmin : key.startsWith("developer.") || visibleTabs.includes(key);
+  const homeMobileTabs = sideMenus.home.filter(([, , , permission]) => canSee(permission)).slice(0, 3);
   const mobileHomeLinks = sideMenus.home
-    .filter(([href, , , permission]) => href !== "/" && canSee(permission))
+    .filter(([href, , , permission]) => href !== "/" && canSee(permission) && !homeMobileTabs.some(([tabHref]) => tabHref === href))
     .slice(0, 3)
     .map(([href, label, Icon]) => ({ href: adminPath(href), label, Icon }));
   const routePermission = path === "/" || path.startsWith("/informes/inicio") ? "home.summary"
