@@ -62,7 +62,7 @@ export function CrossPortalNav({ current = "application", user = null, onLogout,
         <img src={robinWordmark} alt="ROBIN" />
         <span>{isAdmin ? "Admin" : t("Portal del alumno")}</span>
       </a>
-      <div className="robin-cross-menu" ref={menuRef}>
+      <div className={`robin-cross-menu${isAdmin ? "" : " is-client"}`} ref={menuRef}>
         <button className="robin-cross-menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="robin-cross-links" onClick={() => setMenuOpen((value) => !value)}>
           <span>{t(links.find(([, , key]) => key === current)?.[1] || "Portales")}</span><ChevronDown aria-hidden="true" />
         </button>
