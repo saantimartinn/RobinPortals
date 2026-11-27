@@ -43,6 +43,7 @@ struct ContentView: View {
     @State private var pendingNotificationURL: URL?
     @State private var error: String?
     @State private var reloadNumber = 0
+    @State private var isAdminWebView = false
     @State private var pendingCredential: RobinCredential?
     @State private var showsSavePrompt = false
     @State private var authenticationError: String?
@@ -125,33 +126,36 @@ struct ContentView: View {
                 }
                 .background(RobinStyle.canvas)
             } else {
-                ZStack {
-                    RobinWebView(
-                        startURL: RobinAddress.start,
-                        onLoaded: handleWebViewLoaded,
-                        onError: { error = $0.localizedDescription },
-                        onCreated: { webViewBox.value = $0 },
-                        onAuthMessage: handleAuthMessage
-                    )
-                    .id(reloadNumber)
-                    if let error {
-                        VStack(spacing: 16) {
-                            Image("RobinMascot").resizable().scaledToFit().frame(width: 140, height: 120)
-                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                                .accessibilityHidden(true)
-                            Text("No se ha podido abrir Robin")
-                                .font(.custom(RobinStyle.display, size: 28)).foregroundStyle(RobinStyle.navy)
-                                .multilineTextAlignment(.center)
-                            Text(error).font(.custom(RobinStyle.text, size: 15))
-                                .foregroundStyle(RobinStyle.muted).multilineTextAlignment(.center)
-                            Button("Reintentar") { self.error = nil; reloadNumber += 1 }
-                                .font(.custom(RobinStyle.textSemibold, size: 15))
-                                .foregroundStyle(RobinStyle.canvas)
-                                .padding(.horizontal, 22).padding(.vertical, 12)
-                                .background(RobinStyle.navy, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                VStack(spacing: 0) {
+                    if isAdminWebView { adminWebToolbar }
+                    ZStack {
+                        RobinWebView(
+                            startURL: RobinAddress.start,
+                            onLoaded: handleWebViewLoaded,
+                            onError: { error = $0.localizedDescription },
+                            onCreated: { webViewBox.value = $0 },
+                            onAuthMessage: handleAuthMessage
+                        )
+                        .id(reloadNumber)
+                        if let error {
+                            VStack(spacing: 16) {
+                                Image("RobinMascot").resizable().scaledToFit().frame(width: 140, height: 120)
+                                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                    .accessibilityHidden(true)
+                                Text("No se ha podido abrir Robin")
+                                    .font(.custom(RobinStyle.display, size: 28)).foregroundStyle(RobinStyle.navy)
+                                    .multilineTextAlignment(.center)
+                                Text(error).font(.custom(RobinStyle.text, size: 15))
+                                    .foregroundStyle(RobinStyle.muted).multilineTextAlignment(.center)
+                                Button("Reintentar") { self.error = nil; reloadNumber += 1 }
+                                    .font(.custom(RobinStyle.textSemibold, size: 15))
+                                    .foregroundStyle(RobinStyle.canvas)
+                                    .padding(.horizontal, 22).padding(.vertical, 12)
+                                    .background(RobinStyle.navy, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            }
+                            .padding(28).frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(RobinStyle.canvas)
                         }
-                        .padding(28).frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(RobinStyle.canvas)
                     }
                 }
             }
@@ -217,8 +221,97 @@ struct ContentView: View {
 
     private func handleWebViewLoaded() {
         error = nil
-        if let view = webViewBox.value { PushRegistration.active?.attach(view) }
+        if let view = webViewBox.value {
+            PushRegistration.active?.attach(view)
+            if let path = view.url?.path, path == "/admin" || path.hasPrefix("/admin/") {
+                isAdminWebView = true
+            }
+        }
         Task { await refreshSession() }
+    }
+
+    private var adminWebToolbar: some View {
+        ZStack {
+            HStack {
+                Button {
+                    if let webView = webViewBox.value, webView.canGoBack { webView.goBack() }
+                    else { loadAdminPage("/") }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 17, weight: .semibold))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .tint(RobinStyle.navy)
+                .accessibilityLabel("Volver")
+
+                Spacer()
+
+                Button { webViewBox.value?.reload() } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 16, weight: .medium))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .tint(RobinStyle.navy)
+                .accessibilityLabel("Recargar")
+            }
+
+            Menu {
+                Button("Inicio de admin", systemImage: "house") { loadAdminPage("/") }
+                Button("CRM", systemImage: "person.2") { loadAdminPage("/crm") }
+                Divider()
+                Button("Portal del Alumno", systemImage: "graduationcap") { loadSitePage("/portal/") }
+                Button("Robin Jr", systemImage: "sparkles") { openRobinJr() }
+                Button("The Robin Plan", systemImage: "person.3") { loadSitePage("/therobinplan/") }
+                Divider()
+                Button("Cerrar sesión", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) { logout() }
+            } label: {
+                HStack(spacing: 7) {
+                    Image("RobinWordmark").resizable().scaledToFit().frame(width: 66, height: 28)
+                    Text("Admin").font(.custom(RobinStyle.textSemibold, size: 14))
+                    Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
+                }
+                .foregroundStyle(RobinStyle.navy)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .accessibilityLabel("Cambiar de portal o cerrar sesión")
+        }
+        .padding(.horizontal, 10)
+        .background(RobinStyle.paper)
+        .overlay(alignment: .bottom) { Rectangle().fill(RobinStyle.border).frame(height: 1) }
+    }
+
+    private func loadAdminPage(_ path: String) {
+        loadSitePage("/admin" + path)
+    }
+
+    private func loadSitePage(_ path: String) {
+        guard let webView = webViewBox.value else { return }
+        let url = RobinAddress.origin.appending(path: String(path.dropFirst()))
+        webView.load(URLRequest(url: url))
+    }
+
+    private func openRobinJr() {
+        guard let webView = webViewBox.value else { return }
+        Task { @MainActor in
+            do {
+                _ = try await webView.callAsyncJavaScript("""
+                    const response = await fetch('/portal/api/auth/sso-ticket', {
+                        method: 'POST', credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ target: 'robinjr' }), cache: 'no-store'
+                    });
+                    const result = await response.json().catch(() => ({}));
+                    if (!response.ok || !result.ticket) throw new Error('No se ha podido validar el acceso a Robin Jr.');
+                    window.location.assign('/robinjr/?sso_ticket=' + encodeURIComponent(result.ticket));
+                    return true;
+                    """, arguments: [:], in: nil, contentWorld: .page)
+            } catch {
+                self.error = "No se ha podido abrir Robin Jr. Vuelve a intentarlo."
+            }
+        }
     }
 
     @MainActor private func openProduct(_ product: RobinProduct) async {
@@ -271,6 +364,8 @@ struct ContentView: View {
                     selectedProductURL = nil
                     activeProduct = nil
                     error = nil
+                    isAdminWebView = false
+                    reloadNumber += 1
                 }
             }
         }
