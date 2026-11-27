@@ -4,6 +4,8 @@ const { canManageClient } = require('../../lib/client-access');
  *   GET  -> lista notificaciones (con destinatarios y su estado) — para el panel de seguimiento
  *   POST -> { title, content, type: 'info'|'terms', user_ids: [uuid...] }  crea la notificación
  */
+const { parseMadridDateTime } = require('../../../../packages/notifications/schedule.cjs');
+const { enqueue, preview, resolveIds } = require('../../../../packages/notifications/push-jobs.cjs');
 const { getSupabase } = require('../../lib/supabase');
 const { readSessionFromEvent } = require('../../lib/auth');
 const { isApplicationAdmin, normalizeEmail } = require('../../lib/authorization');
@@ -75,21 +77,39 @@ exports.handler = async (event) => {
         const done = recs.filter((r) => r.status === (n.type === 'terms' ? 'accepted' : 'seen') || r.status === 'accepted').length;
         return { ...n, recipients: recs, total, done };
       });
-      return json({ notifications: out });
+      const { data: scheduled, error: scheduledError } = await sb.from('scheduled_notifications').select('id,title,content,scheduled_at,status,created_at,push_accepted,push_rejected,push_review').order('created_at', { ascending: false }).limit(100);
+      if (scheduledError) throw scheduledError;
+      return json({ notifications: out, scheduled: scheduled || [] });
     }
 
     // ---------- POST: crear notificación ----------
     if (event.httpMethod === 'POST') {
       if (!verifyOrigin(event)) return json({ error: 'bad_origin' }, { statusCode: 403 });
       const body = parseJsonBody(event) || {};
+      if (body.action === 'cancel' && /^[a-f0-9-]{36}$/i.test(body.id || '')) {
+        const { data, error } = await sb.from('scheduled_notifications').update({ status: 'cancelled' }).eq('id', body.id).eq('status', 'pending').select('id').maybeSingle();
+        if (error) throw error;
+        return data ? json({ cancelled: true }) : json({ error: 'not_pending' }, { statusCode: 409 });
+      }
       const title = (body.title || '').trim();
       const content = (body.content || '').trim();
       const type = body.type === 'terms' ? 'terms' : 'info';
-      const userIds = Array.isArray(body.user_ids) ? body.user_ids.filter(Boolean) : [];
+      const audience = ['installed', 'all'].includes(body.audience) ? { mode: body.audience } : { mode: 'selected', user_ids: Array.isArray(body.user_ids) ? body.user_ids.filter(Boolean) : [] };
+      if (body.action === 'preview') {
+        if (audience.mode === 'selected' && !audience.user_ids.length) return json({ recipients: 0, devices: 0 });
+        return json(await preview(sb, audience, 'users', user => !isApplicationAdmin(user)));
+      }
+      const userIds = await resolveIds(sb, audience, 'users', user => !isApplicationAdmin(user));
       if (!title) return json({ error: 'missing_title' }, { statusCode: 400 });
       if (!content) return json({ error: 'missing_content' }, { statusCode: 400 });
       if (!userIds.length) return json({ error: 'no_recipients' }, { statusCode: 400 });
       for (const userId of userIds) if (!await canManageClient(sb, admin, userId)) return json({ error: 'client_not_assigned' }, { statusCode: 403 });
+      if (body.scheduled_local) {
+        const scheduledAt = parseMadridDateTime(body.scheduled_local);
+        if (scheduledAt.getTime() <= Date.now()) return json({ error: 'schedule_in_past' }, { statusCode: 400 });
+        const scheduled = await enqueue(sb, { title, content, type, audience, scheduledAt, createdBy: admin.email });
+        return json({ scheduled, recipients: userIds.length });
+      }
 
       const { data: notif, error: e1 } = await sb
         .from('notifications')
@@ -106,6 +126,7 @@ exports.handler = async (event) => {
       const { error: e2 } = await sb.from('notification_recipients').insert(rows);
       if (e2) return json({ error: 'recipients_failed', detail: e2.message }, { statusCode: 500 });
 
+      await enqueue(sb, { title, content, type, audience: { mode: 'selected', user_ids: userIds }, createdBy: admin.email, notificationId: notif.id });
       return json({ notification: notif, recipients: userIds.length });
     }
 

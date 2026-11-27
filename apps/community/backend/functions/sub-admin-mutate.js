@@ -1,3 +1,5 @@
+const { parseMadridDateTime } = require('../../../../packages/notifications/schedule.cjs');
+const { enqueue, preview, resolveIds } = require('../../../../packages/notifications/push-jobs.cjs');
 /**
  * POST /api/sub-admin/mutate · Crear / editar / borrar contenido del portal de
  * suscriptores. Body: { entity, action, payload }
@@ -109,6 +111,18 @@ exports.handler = async (event) => {
       return json({ ok: true, status: newStatus });
     }
 
+    if (entity === 'notification' && action === 'update' && payload.cancel_scheduled_id) {
+      const { data, error } = await sb.from('scheduled_notifications').update({ status: 'cancelled' }).eq('id', payload.cancel_scheduled_id).eq('status', 'pending').select('id').maybeSingle();
+      if (error) throw error;
+      return data ? json({ cancelled: true }) : json({ error: 'not_pending' }, { statusCode: 409 });
+    }
+
+    if (entity === 'notification' && action === 'update' && payload.preview_audience) {
+      const audience = payload.installed ? { mode: 'installed' } : payload.all ? { mode: 'all' } : { mode: 'selected', user_ids: payload.user_ids || [] };
+      if (audience.mode === 'selected' && !audience.user_ids.length) return json({ recipients: 0, devices: 0 });
+      return json(await preview(sb, audience, 'subscribers', user => user.role === 'subscriber' && ['active', 'trialing'].includes(user.subscription_status)));
+    }
+
     // --- Notificaciones (solo informativas) para suscriptores ---
     if (entity === 'notification' && action === 'create') {
       const title = (payload.title || '').trim();
@@ -116,13 +130,15 @@ exports.handler = async (event) => {
       if (!title) return json({ error: 'missing_title' }, { statusCode: 400 });
       if (!content) return json({ error: 'missing_content' }, { statusCode: 400 });
       // Destinatarios: lista explicita o TODOS los suscriptores
-      let userIds = Array.isArray(payload.user_ids) ? payload.user_ids.filter(Boolean) : [];
-      if (payload.all || !userIds.length) {
-        const { data: subs, error: eSubs } = await sb.from('subscribers').select('id').or('is_subscriber.eq.true,role.eq.subscriber');
-        if (eSubs) throw eSubs;
-        userIds = (subs || []).map((u) => u.id);
-      }
+      const audience = payload.installed ? { mode: 'installed' } : payload.all ? { mode: 'all' } : { mode: 'selected', user_ids: payload.user_ids || [] };
+      const userIds = await resolveIds(sb, audience, 'subscribers', user => user.role === 'subscriber' && ['active', 'trialing'].includes(user.subscription_status));
       if (!userIds.length) return json({ error: 'no_recipients' }, { statusCode: 400 });
+      if (payload.scheduled_local) {
+        const scheduledAt = parseMadridDateTime(payload.scheduled_local);
+        if (scheduledAt.getTime() <= Date.now()) return json({ error: 'schedule_in_past' }, { statusCode: 400 });
+        const scheduled = await enqueue(sb, { title, content, audience, scheduledAt, createdBy: session.username || 'subscriber_admin' });
+        return json({ ok: true, scheduled, recipients: userIds.length });
+      }
       const { data: notif, error: e1 } = await sb.from('notifications')
         .insert({ title, content, type: 'info', created_by: session.username || 'subscriber_admin' })
         .select('*').single();
@@ -130,6 +146,7 @@ exports.handler = async (event) => {
       const rows = userIds.map((uid) => ({ notification_id: notif.id, user_id: uid, status: 'pending' }));
       const { error: e2 } = await sb.from('notification_recipients').insert(rows);
       if (e2) throw e2;
+      await enqueue(sb, { title, content, audience: { mode: 'selected', user_ids: userIds }, createdBy: session.username || 'subscriber_admin', notificationId: notif.id });
       return json({ ok: true, item: notif, recipients: userIds.length });
     }
 

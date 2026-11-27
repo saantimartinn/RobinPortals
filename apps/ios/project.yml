@@ -20,12 +20,19 @@ targets:
         NSFaceIDUsageDescription: Robin usa Face ID para acceder de forma segura a la contraseña guardada en este iPhone.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+    entitlements:
+      path: Robin/Robin.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.projectrobin.ios
-        DEVELOPMENT_TEAM: GWRMHMM34D
+        DEVELOPMENT_TEAM: 3S84TW36UJ
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Debug:
+          APS_ENVIRONMENT: development
+        Release:
+          APS_ENVIRONMENT: production

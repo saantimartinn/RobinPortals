@@ -119,6 +119,7 @@ exports.handler = async (event) => {
       row.meta.photo = mentorUrls.get(row.meta.photo_path) || (String(row.meta.photo || '').startsWith('data:image/') ? row.meta.photo : '');
     });
 
+    const { data: scheduledNotifications } = await sb.from('scheduled_notifications').select('id,title,content,scheduled_at,status,created_at,push_accepted,push_rejected,push_review').order('created_at', { ascending: false }).limit(100);
     return json({
       users: usersOut,
       events: eventsOut,
@@ -126,6 +127,7 @@ exports.handler = async (event) => {
       requests: requestsOut,
       discount_codes,
       notifications: notificationsOut,
+      scheduled_notifications: scheduledNotifications || [],
       challenges: challengesOut,
       submissions: submissionsOut,
       counts: { users: usersOut.length, events: (eRes.data || []).length, partners: (pRes.data || []).length, requests: requests.length },

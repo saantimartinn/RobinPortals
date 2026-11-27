@@ -21,7 +21,7 @@ function SubscriberAdmin({ applicationIdentity }) {
   const adminKey = String(applicationIdentity?.email || applicationIdentity?.username || "").split("@")[0];
   const adminName = applicationIdentity?.nombre || (adminKey ? adminKey.charAt(0).toUpperCase() + adminKey.slice(1) : "Administrador");
   const [section, setSection] = useState("panel");
-  const [data, setData] = useState({ users: [], events: [], partners: [], requests: [], discount_codes: [], notifications: [], challenges: [], submissions: [] });
+  const [data, setData] = useState({ users: [], events: [], partners: [], requests: [], discount_codes: [], notifications: [], scheduled_notifications: [], challenges: [], submissions: [] });
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
@@ -29,7 +29,7 @@ function SubscriberAdmin({ applicationIdentity }) {
     setErr("");
     try {
       const d = await subAdminData();
-      setData({ users: d.users || [], events: d.events || [], partners: d.partners || [], requests: d.requests || [], discount_codes: d.discount_codes || [], notifications: d.notifications || [], challenges: d.challenges || [], submissions: d.submissions || [] });
+      setData({ users: d.users || [], events: d.events || [], partners: d.partners || [], requests: d.requests || [], discount_codes: d.discount_codes || [], notifications: d.notifications || [], scheduled_notifications: d.scheduled_notifications || [], challenges: d.challenges || [], submissions: d.submissions || [] });
     } catch (e) { setErr(e.message || "No se pudieron cargar los datos."); }
     finally { setLoading(false); }
   }
@@ -98,7 +98,7 @@ function SubscriberAdmin({ applicationIdentity }) {
               {section === "mentores" && <AdminMentorManager events={data.events} onChanged={load} />}
               {section === "partners" && <AdminPartnerManager partners={data.partners} onChanged={load} />}
               {section === "codigos" && <AdminDiscountManager codes={data.discount_codes} onChanged={load} />}
-              {section === "notificaciones" && <AdminSubNotifications notifications={data.notifications} users={data.users} onChanged={load} />}
+              {section === "notificaciones" && <AdminSubNotifications notifications={data.notifications} scheduled={data.scheduled_notifications} users={data.users} onChanged={load} />}
               {section === "retos" && <AdminChallengeManager challenges={data.challenges} submissions={data.submissions} onChanged={load} />}
               {section === "faqs" && <AdminFaqManager />}
               {section === "database" && isDeveloper && <RobinPlanDeveloperDatabase />}

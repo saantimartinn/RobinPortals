@@ -372,3 +372,11 @@
 # ---------- Felicitaciones de cumpleaños y aviso al asesor ----------
 [functions."birthday-notifications"]
   schedule = "0 6 * * *"
+
+[[redirects]]
+  from = "/api/mobile/push"
+  to = "/.netlify/functions/mobile-push"
+  status = 200
+
+[functions."mobile-push-dispatch"]
+  schedule = "*/5 * * * *"

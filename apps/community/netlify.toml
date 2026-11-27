@@ -201,3 +201,11 @@
   for = "/.netlify/functions/*"
   [headers.values]
     Cache-Control = "no-store"
+
+[[redirects]]
+  from = "/api/mobile/push"
+  to = "/.netlify/functions/mobile-push"
+  status = 200
+
+[functions.mobile-push-dispatch]
+  schedule = "*/5 * * * *"
