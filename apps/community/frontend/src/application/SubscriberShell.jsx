@@ -32,6 +32,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
   useLocale();
   const arrival = isArrivalOnly(user);
   const roomDialogRef = useRef(null);
+  const navigationRef = useRef(null);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window === 'undefined') return 'home';
     const params = new URLSearchParams(window.location.search);
@@ -41,6 +42,10 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
   });
   const active = canOpenTab(user, activeTab) ? activeTab : 'home';
   const setActive = tab => setActiveTab(canOpenTab(user, tab) ? tab : 'home');
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 1023px)').matches) return;
+    navigationRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [active]);
   const [requests, setRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [requestError, setRequestError] = useState('');
@@ -65,7 +70,7 @@ function SubscriberShell({ user, onLogout, onUserRefresh }) {
           <div><strong>{user.nombre?.trim() || clientName.split(' ')[0]}</strong><span>{t(productName)}</span></div>
         </button>
         <p className="student-nav-caption">{user.arrival_pack ? t('Tu Pack Llegada') : t('Tu espacio')}</p>
-        <div className="student-nav-items">
+        <div ref={navigationRef} className="student-nav-items">
           {NAV_ITEMS.map(({ key, label, icon: Icon }) => <button key={key}
             onClick={() => key === 'habitacion' ? roomDialogRef.current?.showModal() : setActive(key)}
             aria-haspopup={key === 'habitacion' ? 'dialog' : undefined} aria-current={active === key ? 'page' : undefined}

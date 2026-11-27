@@ -78,6 +78,11 @@ function SubscriberAdmin({ applicationIdentity }) {
               </button>;
             })}
           </div>
+          <label className="admin-section-picker">Sección de administración
+            <select value={section} onChange={event => setSection(event.target.value)}>
+              {nav.map(({ key, label }) => <option key={key} value={key}>{label}</option>)}
+            </select>
+          </label>
           <div className="student-support"><span className="student-eyebrow">Control Robin</span><h3>Todo el plan, bien organizado.</h3><p>Usuarios, comunidad, partners y contenido desde un mismo espacio.</p></div>
         </nav>
 

@@ -41,6 +41,7 @@
 .student-nav-item { display: flex; align-items: center; gap: 12px; min-height: 49px; padding: 13px 16px; width: 100%; border-radius: 12px; border: 0; background: transparent; text-align: left; color: #687088; font-size: 13px; font-weight: 600; }
 .student-nav-item:hover { background: #F6F3E0; color: var(--student-navy); }
 .student-nav-item.is-active { background: var(--student-navy); color: #FEFBE5; }
+.admin-section-picker { display: none; }
 .student-nav-item svg { flex-shrink: 0; stroke-width: 1.8; }
 .student-support { margin-top: 18px; border: 1px solid #EDECDB; border-radius: 14px; padding: 16px; background: #FFFDF5; }
 .student-eyebrow { display: block; font-size: 10px; font-weight: 750; letter-spacing:0; line-height: 1.6; }
@@ -126,6 +127,10 @@
   .student-identity, .student-nav-caption, .student-support { display: none; }
   .student-nav-items { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: thin; padding: 2px 1px 5px; }
   .student-nav-item { width: auto; flex-shrink: 0; min-height: 44px; padding: 10px 15px; font-size: 12px; gap: 8px; }
+  .student-nav-item.is-active { background: #F6F3E0; color: var(--student-navy); font-weight: 700; }
+  .subscription-admin .student-nav-items { display: none; }
+  .subscription-admin .admin-section-picker { display: grid; gap: 6px; width: 100%; color: #687088; font-size: 12px; font-weight: 650; }
+  .subscription-admin .admin-section-picker select { width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid #DFDED2; border-radius: 10px; background: #FFFDF5; color: #2D3A64; font-size: 16px; }
   .student-page-heading h1 { font-size: 28px; }
   .student-chat-launcher { right: 22px; bottom: 22px; }
 }

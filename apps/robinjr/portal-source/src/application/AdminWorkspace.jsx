@@ -63,8 +63,13 @@ export function AdminWorkspace({ user, active, client, clients, loading, error, 
           <div className="admin-client-phase"><span className={client.requires_onboarding ? "is-onboarding" : ""}>{client.requires_onboarding ? "Registro pendiente" : "Expediente activo"}</span><p>Paso {client.application_phase || 1} · {APP_STEPS.find(s => s.key === (client.application_phase || 1))?.label || "Proceso de admisión"}</p></div>
           <p className="admin-client-responsibility">{client.shared_by ? `Compartido por ${client.shared_by} · Las reservas usan su calendario.` : "Cliente propio · Las reservas usan tu calendario."}</p>
           <nav ref={tabRef} className="admin-client-tabs" aria-label="Expediente del alumno">{CLIENT_TABS.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => onNavigate(key)} aria-current={active === key ? "page" : undefined}><Icon size={16} />{label}</button>)}</nav>
+          <label className="admin-client-section-picker">Sección del expediente
+            <select value={active} onChange={event => onNavigate(event.target.value)}>
+              {CLIENT_TABS.map(({ key, label }) => <option key={key} value={key}>{label}</option>)}
+            </select>
+          </label>
         </div> : <div className="admin-empty-context" role="status"><h1>{loading ? "Cargando expediente…" : "Este expediente no está disponible"}</h1><p>{error || "Vuelve a tus clientes y selecciona un alumno asignado."}</p><button onClick={() => onNavigate("clientes")}>Ir a mis clientes</button></div>
-        : <div className="admin-page-heading"><h1 className="admin-eyebrow admin-page-title">{page?.label}</h1></div>}
+        : active !== "clientes" && <div className="admin-page-heading"><h1 className="admin-page-title">{page?.label}</h1></div>}
         {children}
       </div>
     </div>
