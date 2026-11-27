@@ -127,7 +127,7 @@ struct ContentView: View {
                 .background(RobinStyle.canvas)
             } else {
                 VStack(spacing: 0) {
-                    if isAdminWebView { adminWebToolbar }
+                    if isAdminWebView || service.snapshot.isApplicationAdmin { adminWebToolbar }
                     ZStack {
                         RobinWebView(
                             startURL: RobinAddress.start,

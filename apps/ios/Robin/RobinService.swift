@@ -14,11 +14,12 @@ struct RobinSnapshot {
     let notices: [RobinNotice]
     let noticeErrors: Set<RobinProduct>
     let sessionExpired: Bool
+    let isApplicationAdmin: Bool
 }
 
 @MainActor
 final class RobinService: ObservableObject {
-    @Published private(set) var snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: false)
+    @Published private(set) var snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: false, isApplicationAdmin: false)
     @Published private(set) var isLoading = true
     @Published var lastProduct: RobinProduct? {
         didSet {
@@ -41,7 +42,7 @@ final class RobinService: ObservableObject {
             cookieStore.getAllCookies { continuation.resume(returning: $0) }
         }
         guard let host = RobinAddress.origin.host else {
-            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true)
+            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true, isApplicationAdmin: false)
             return
         }
         let hostCookies = cookies.filter { cookie in
@@ -50,14 +51,21 @@ final class RobinService: ObservableObject {
             return host == domain || host.hasSuffix("." + domain)
         }
         guard !hostCookies.isEmpty else {
-            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true)
+            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true, isApplicationAdmin: false)
             return
         }
 
         guard let portalData = await get("/portal/api/me", cookies: hostCookies),
-              let portal = try? JSONSerialization.jsonObject(with: portalData) as? [String: Any],
-              let profile = profile(from: portal), portal["is_application_admin"] as? Bool != true else {
-            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true)
+              let portal = try? JSONSerialization.jsonObject(with: portalData) as? [String: Any] else {
+            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true, isApplicationAdmin: false)
+            return
+        }
+        if portal["is_application_admin"] as? Bool == true {
+            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: false, isApplicationAdmin: true)
+            return
+        }
+        guard let profile = profile(from: portal) else {
+            snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true, isApplicationAdmin: false)
             return
         }
 
@@ -102,11 +110,11 @@ final class RobinService: ObservableObject {
             notices += RobinNotice.summaries(from: data, product: product)
         }
         notices.sort { $0.createdAt > $1.createdAt }
-        snapshot = RobinSnapshot(profile: profile, products: products, notices: notices, noticeErrors: errors, sessionExpired: false)
+        snapshot = RobinSnapshot(profile: profile, products: products, notices: notices, noticeErrors: errors, sessionExpired: false, isApplicationAdmin: false)
     }
 
     func reset() {
-        snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true)
+        snapshot = RobinSnapshot(profile: nil, products: [], notices: [], noticeErrors: [], sessionExpired: true, isApplicationAdmin: false)
     }
 
     private func profile(from value: [String: Any]) -> RobinProfile? {
