@@ -288,7 +288,7 @@ export function AdminPortal({ user }) {
             {active === "faqs" && <AdminFaqManager />}
             {active === "base-datos" && isDeveloper && <DeveloperClientsTable />}
 
-            <div className="text-center text-xs text-slate-400 py-2">
+            <div className="admin-footer text-center text-xs text-slate-400 py-2">
               Project Robin · Panel de administración
             </div>
           </main>
