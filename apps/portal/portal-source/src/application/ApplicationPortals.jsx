@@ -57,7 +57,12 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
   const [chatOpen, setChatOpen] = useState(false);
   const [mascot] = useState(() => [robinKeys, robinGraduate, robinSkate, robinBike][Math.floor(Math.random() * 4)]);
   const [summary, setSummary] = useState({ documents: null, bookings: null });
+  const navigationRef = useRef(null);
   useEffect(() => { setProfilePhoto(user.avatar_url || null); }, [user.avatar_url]);
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 1023px)').matches) return;
+    navigationRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [active]);
   useEffect(() => {
     if (active !== "estado") return;
     let cancelled = false;
@@ -120,7 +125,7 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
             <div><strong>{user?.nombre?.trim() || clientName.split(" ")[0]}</strong><span>{t("Estudiante Robin")}</span></div>
           </div>
           <p className="student-nav-caption">{t("Tu espacio")}</p>
-          <div className="student-nav-items">
+          <div ref={navigationRef} className="student-nav-items">
             {navigation.map(({ key, label, icon: Icon }) => <button key={key} onClick={() => setActive(key)} aria-current={active === key ? "page" : undefined} className={`student-nav-item ${active === key ? "is-active" : ""}`}><Icon size={19} /><span>{t(label)}</span></button>)}
           </div>
           <div className="student-support"><span className="student-eyebrow">{t("Vamos contigo")}</span><h3>{t("Un equipo detrás de cada paso.")}</h3><p>{t("Habla con tu asesor y prepara lo que viene.")}</p><button type="button" className="robin-sidebar-report" onClick={onReportProblem}><AlertCircle size={16} />{t("Reportar problema")}</button></div>
