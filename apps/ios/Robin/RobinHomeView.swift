@@ -29,7 +29,6 @@ struct RobinHomeView: View {
                 if let lastProduct, snapshot.products.contains(lastProduct) {
                     Button { onOpenProduct(lastProduct) } label: {
                         HStack(spacing: 0) {
-                            Rectangle().fill(RobinStyle.gold).frame(width: 5)
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("RETOMAR TU CAMINO")
                                     .font(.custom(RobinStyle.displayBold, size: 12)).tracking(0.8)
@@ -44,7 +43,7 @@ struct RobinHomeView: View {
                                     .background(RobinStyle.gold)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 17).padding(.vertical, 18)
+                            .padding(.leading, 20).padding(.vertical, 18)
                             RobinProductLogo(product: lastProduct, size: 56)
                                 .background(RobinStyle.paper)
                                 .padding(.trailing, 16)

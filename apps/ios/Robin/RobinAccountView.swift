@@ -115,7 +115,6 @@ struct RobinAccountView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RobinStyle.paper)
-        .overlay(alignment: .leading) { Rectangle().fill(RobinStyle.gold).frame(width: 4) }
     }
 
     private func settingCard(symbol: String, title: String, detail: String, accent: Color,

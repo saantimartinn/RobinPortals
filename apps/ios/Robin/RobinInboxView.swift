@@ -37,7 +37,6 @@ struct RobinInboxView: View {
                 }
                 .padding(.horizontal, 15).padding(.vertical, 12)
                 .background(RobinStyle.gold.opacity(0.28))
-                .overlay(alignment: .leading) { Rectangle().fill(RobinStyle.gold).frame(width: 4) }
 
                 HStack(spacing: 6) {
                     filterButton("Pendientes", selected: pendingOnly) { pendingOnly = true }
@@ -99,8 +98,6 @@ struct RobinInboxView: View {
     private func noticeCard(_ notice: RobinNotice) -> some View {
         Button { onOpenNotice(notice) } label: {
             HStack(alignment: .top, spacing: 11) {
-                RoundedRectangle(cornerRadius: 2).fill(notice.isPending ? RobinStyle.gold : RobinStyle.border)
-                    .frame(width: 3).frame(maxHeight: .infinity)
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .top, spacing: 8) {
                         Text(notice.title)
