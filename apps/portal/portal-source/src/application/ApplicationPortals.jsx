@@ -130,7 +130,7 @@ export function PortalShell({ user, clientName, active, setActive, onUserRefresh
           <motion.main key={active}
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }} className="student-main" id="student-content" tabIndex={-1}>
-            {active !== "estado" && <div className="student-page-heading"><h1 className="student-eyebrow student-page-title">{navigation.find(item => item.key === active)?.label || t("Mi camino")}</h1></div>}
+            {active !== "estado" && !["carreras", "documentos", "pagos"].includes(active) && <div className="student-page-heading"><h1 className="student-page-title">{t(navigation.find(item => item.key === active)?.label || "Mi camino")}</h1></div>}
 
             {active === "estado" && (
               <Estado step={user.application_phase || 1} onNavigate={setActive} docsPendingCount={summary.documents} bookingsCount={summary.bookings} />
