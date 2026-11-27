@@ -60,7 +60,7 @@
     font:500 .75rem/1.15 var(--robin-font-text);text-decoration:none
   }
   html.robin-native-app .mobile-admin-nav svg{width:19px;height:19px;flex:none}
-  html.robin-native-app .mobile-admin-nav a.active{background:var(--robin-ink-50);color:var(--robin-navy);font-weight:700}
+  html.robin-native-app .mobile-admin-nav :is(a,button).active{background:var(--robin-ink-50);color:var(--robin-navy);font-weight:700}
   html.robin-native-app .mobile-admin-nav span{max-width:100%;overflow:clip;text-overflow:ellipsis;white-space:nowrap}
   html.robin-native-app .scrim{z-index:45}
   html.robin-native-app .side{z-index:50;width:min(20rem,calc(100% - 48px));padding-bottom:env(safe-area-inset-bottom)}

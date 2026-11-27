@@ -369,6 +369,8 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
     (!crmLoaded && (path === "/" || path === "/bandeja-leads" || path.startsWith("/crm"))) ||
     (portalLoading && (["/", "/alumnos-global", "/analitica-global"].includes(path) || path.startsWith("/informes/inicio"))) ||
     (!crmLoaded && path.startsWith("/informes/inicio"));
+  const mobileNavItems = sideMenus[area].filter(([, , , permission]) => canSee(permission)).slice(0, 3);
+  const isMobileMenuActive = !mobileNavItems.some(([href]) => isSideItemActive(path, href));
 
   return (
     <div className="shell">
@@ -488,14 +490,14 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
       </div>
 
       <nav className="mobile-admin-nav" aria-label="Navegación de administración">
-        {sideMenus[area].filter(([, , , permission]) => canSee(permission)).slice(0, 3).map(([href, label, Icon]) => (
+        {mobileNavItems.map(([href, label, Icon]) => (
           <a href={adminPath(href)} key={href} className={isSideItemActive(path, href) ? "active" : ""}
              aria-current={isSideItemActive(path, href) ? "page" : undefined}>
             <Icon aria-hidden="true" />
             <span>{mobileNavLabels[label] || label}</span>
           </a>
         ))}
-        <button type="button" onClick={() => setOpen(true)} aria-label="Abrir todas las secciones">
+        <button type="button" onClick={() => setOpen(true)} className={isMobileMenuActive ? "active" : ""} aria-label="Abrir todas las secciones">
           <Menu aria-hidden="true" />
           <span>Menú</span>
         </button>
