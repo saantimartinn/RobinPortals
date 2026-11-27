@@ -1,0 +1,94 @@
+/* Hallmark · Robin admin mobile app · Robin brand preserved, mobile workbench introduced
+ * Critique: the desktop CRM had no persistent mobile orientation or home shortcut hierarchy. */
+
+.mobile-admin-nav{display:none}
+.admin-home-mobile{display:none}
+
+@media(max-width:800px){
+  html.robin-native-app,html.robin-native-app body,html.robin-native-app #root{min-height:100%;width:100%;overflow-x:clip}
+  html.robin-native-app .shell{min-height:100dvh}
+
+  html.robin-native-app .top{
+    display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;
+    width:100%;height:auto;min-height:60px;padding:8px 12px;background:var(--robin-paper);
+    border-bottom:var(--robin-line);z-index:32
+  }
+  html.robin-native-app .top .menub{display:grid;grid-column:1;place-items:center;width:44px;height:44px;padding:0;border:0;background:transparent;color:var(--robin-navy)}
+  html.robin-native-app .top .workspace-menu{grid-column:2;grid-row:1;width:100%;height:auto;min-width:0;padding:0}
+  html.robin-native-app .top .workspace-menu-toggle{width:100%;max-width:none;min-height:44px;margin:0;padding:0 12px;border-radius:var(--robin-radius-control);font-size:.875rem}
+  html.robin-native-app .top .workspace-menu-toggle svg{width:16px;height:16px}
+  html.robin-native-app .top-actions{grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:flex-end;min-width:0}
+  html.robin-native-app .top-actions .authenticated-user{display:none!important}
+  html.robin-native-app .top-actions button{display:grid;place-items:center;width:44px;height:44px;padding:0}
+  html.robin-native-app .work{width:100%;min-height:100dvh;margin:0;padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  html.robin-native-app .work main{width:100%;min-width:0}
+  html.robin-native-app .page{width:100%;max-width:none;margin:0;padding:16px 16px 28px;overflow-x:clip}
+  html.robin-native-app .title{align-items:flex-start;flex-direction:column;gap:12px;margin-bottom:16px}
+  html.robin-native-app .title h1{max-width:100%;font-size:clamp(1.65rem,7vw,2rem);line-height:1.08;overflow-wrap:anywhere;text-wrap:balance}
+  html.robin-native-app .title p{font-size:.875rem;line-height:1.45}
+  html.robin-native-app .title>div:last-child{width:100%;flex-wrap:wrap}
+  html.robin-native-app .title>div:last-child button{min-height:44px}
+  html.robin-native-app :is(button,a,select,input,textarea){font-size:max(14px,1em)}
+  html.robin-native-app :is(input,select,textarea){min-height:44px;font-size:16px}
+  html.robin-native-app :is(.panel,.stats article,.grid,.lower,.data-table,.table-wrap){min-width:0;max-width:100%}
+  html.robin-native-app .panel{padding:16px;border-radius:14px}
+  html.robin-native-app .panel-heading{align-items:flex-start;flex-wrap:wrap;gap:12px}
+  html.robin-native-app .data-table,.robin-native-app .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  html.robin-native-app .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  html.robin-native-app .stats article{min-width:0;gap:8px;padding:12px}
+  html.robin-native-app .stats article>i{flex:0 0 34px;width:34px;height:34px}
+  html.robin-native-app .stats article>div{min-width:0}
+  html.robin-native-app .stats article span,html.robin-native-app .stats article small{font-size:.75rem;line-height:1.35}
+  html.robin-native-app .stats strong{font-size:1.35rem;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+  html.robin-native-app .grid,html.robin-native-app .lower{grid-template-columns:minmax(0,1fr);gap:12px}
+  html.robin-native-app .grid>*,html.robin-native-app .lower>*{min-width:0}
+  html.robin-native-app .chart{overflow:clip}
+  html.robin-native-app .chart-legend{flex-wrap:wrap}
+  html.robin-native-app .kanban{grid-auto-flow:column;grid-auto-columns:minmax(0,calc(100vw - 48px));grid-template-columns:none;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:0 0 8px;-webkit-overflow-scrolling:touch}
+  html.robin-native-app .kanban>section{min-height:0;scroll-snap-align:start}
+  html.robin-native-app .modal-backdrop{align-items:end;padding:0}
+  html.robin-native-app .modal-backdrop>.panel{width:100%;max-height:90dvh;padding:16px 16px calc(16px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;overflow-y:auto}
+  html.robin-native-app .permission-checklist{grid-template-columns:minmax(0,1fr);max-height:45dvh}
+  html.robin-native-app .mobile-admin-nav{
+    position:fixed;inset:auto 0 0;z-index:24;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    min-height:64px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+    border-top:var(--robin-line);background:var(--robin-paper)
+  }
+  html.robin-native-app .mobile-admin-nav a,html.robin-native-app .mobile-admin-nav button{
+    display:flex;min-width:0;min-height:48px;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    padding:4px;border:0;border-radius:10px;background:transparent;color:var(--robin-ink-600);
+    font:500 .75rem/1.15 var(--robin-font-text);text-decoration:none
+  }
+  html.robin-native-app .mobile-admin-nav svg{width:19px;height:19px;flex:none}
+  html.robin-native-app .mobile-admin-nav a.active{background:var(--robin-ink-50);color:var(--robin-navy);font-weight:700}
+  html.robin-native-app .mobile-admin-nav span{max-width:100%;overflow:clip;text-overflow:ellipsis;white-space:nowrap}
+  html.robin-native-app .scrim{z-index:45}
+  html.robin-native-app .side{z-index:50;width:min(20rem,calc(100% - 48px));padding-bottom:env(safe-area-inset-bottom)}
+  html.robin-native-app .side nav a{min-height:44px;height:auto}
+  html.robin-native-app .toast{bottom:calc(74px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px)}
+
+  html.robin-native-app .admin-home-mobile{display:block;margin:0 0 16px}
+  html.robin-native-app .admin-home-mobile-brand{display:flex;align-items:center;gap:8px;margin:0 0 24px}
+  html.robin-native-app .admin-home-mobile-brand img{display:block;width:76px;height:38px;object-fit:contain;object-position:left center}
+  html.robin-native-app .admin-home-mobile-brand span{padding-left:12px;border-left:var(--robin-line);color:var(--robin-ink-600);font:400 1rem/1.2 var(--robin-font-subtitle)}
+  html.robin-native-app .admin-home-mobile>h1{margin:0;color:var(--robin-navy);font:500 clamp(2rem,9vw,2.6rem)/1.05 var(--robin-font-display);text-wrap:balance}
+  html.robin-native-app .admin-home-mobile>p{margin:8px 0 16px;color:var(--robin-ink-600);font:400 1rem/1.4 var(--robin-font-subtitle)}
+  html.robin-native-app .admin-home-mobile-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:142px;margin:0 0 24px;padding:20px;border-radius:16px;background:var(--robin-navy);color:var(--robin-on-navy);text-decoration:none}
+  html.robin-native-app .admin-home-mobile-hero>div{display:grid;justify-items:start;gap:8px;min-width:0}
+  html.robin-native-app .admin-home-mobile-hero>div>span{color:var(--robin-on-navy-muted);font-size:.875rem}
+  html.robin-native-app .admin-home-mobile-hero strong{font:400 clamp(1.4rem,6vw,1.8rem)/1.1 var(--robin-font-subtitle)}
+  html.robin-native-app .admin-home-mobile-hero b{display:inline-flex;align-items:center;gap:8px;margin-top:4px;padding:8px 16px;border-radius:9px;background:var(--robin-orange);color:var(--robin-navy);font:650 .9rem var(--robin-font-text)}
+  html.robin-native-app .admin-home-mobile-hero b svg{width:16px;height:16px}
+  html.robin-native-app .admin-home-mobile-hero>i{display:grid;place-items:center;flex:0 0 52px;width:52px;height:52px;border-radius:14px;background:var(--robin-paper);color:var(--robin-navy);font-style:normal}
+  html.robin-native-app .admin-home-mobile-hero>i svg{width:27px;height:27px}
+  html.robin-native-app .admin-home-mobile-links{display:grid;gap:0;margin-bottom:8px}
+  html.robin-native-app .admin-home-mobile-links h2{margin:0;padding:0 0 8px;color:var(--robin-navy);font:400 1.35rem/1.2 var(--robin-font-subtitle);text-wrap:balance}
+  html.robin-native-app .admin-home-mobile-links a{display:grid;grid-template-columns:34px minmax(0,1fr) 20px;align-items:center;gap:12px;min-height:58px;border-bottom:1px solid var(--robin-line);color:var(--robin-navy);font:600 .95rem var(--robin-font-text);text-decoration:none}
+  html.robin-native-app .admin-home-mobile-links a>svg:first-child{width:22px;height:22px}
+  html.robin-native-app .admin-home-mobile-links a>svg:last-child{width:16px;height:16px;color:var(--robin-ink-600)}
+  html.robin-native-app .dashboard-page>.title{align-items:stretch;margin:0 0 16px}
+  html.robin-native-app .dashboard-page>.title>div:first-child{display:none}
+  html.robin-native-app .dashboard-page .dashboard-period{width:100%;min-width:0;height:44px;margin:0}
+  html.robin-native-app :is(a,button,input,select,textarea):focus-visible{outline:2px solid var(--robin-navy);outline-offset:2px}
+  html.robin-native-app :is(a,button):active{opacity:.78}
+}

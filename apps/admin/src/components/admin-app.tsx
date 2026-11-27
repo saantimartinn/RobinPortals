@@ -106,6 +106,22 @@ const sideMenus: Record<string, NavItem[]> = {
   ],
 };
 
+const mobileNavLabels: Record<string, string> = {
+  Resumen: "Inicio",
+  "Bandeja de leads": "Leads",
+  "Vista de alumnos": "Alumnos",
+  "Analíticas generales": "Datos",
+  "Por contactar": "Pendientes",
+  Contactados: "Contactados",
+  Clientes: "Clientes",
+  "Ventas P": "Ventas",
+  Campañas: "Campañas",
+  Web: "Web",
+  Operaciones: "Operaciones",
+  Tests: "Tests",
+  Logs: "Logs",
+};
+
 function getArea(path: string) {
   if (path.startsWith("/desarrolladores")) return "developers";
   if (path.startsWith("/crm")) return "crm";
@@ -157,6 +173,10 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
   const isDeveloperAdmin = isDeveloperAdminEmail(permissionProfile.email);
   const visibleTabs = isProAdmin ? allAdminTabPermissions : (permissionProfile.visible_tabs || allAdminTabPermissions);
   const canSee = (key: string) => key === "developer.database" ? isDeveloperAdmin : key.startsWith("developer.") || visibleTabs.includes(key);
+  const mobileHomeLinks = sideMenus.home
+    .filter(([href, , , permission]) => href !== "/" && canSee(permission))
+    .slice(0, 3)
+    .map(([href, label, Icon]) => ({ href: adminPath(href), label, Icon }));
   const routePermission = path === "/" || path.startsWith("/informes/inicio") ? "home.summary"
     : path === "/bandeja-leads" ? "home.leads"
       : path === "/alumnos-global" || path.startsWith("/alumnos-global/") ? "home.students"
@@ -426,7 +446,7 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
         </header>
 
         <main>
-          {accessDenied ? <div className="page"><div className="empty"><ShieldCheck /><h2>Sección no disponible</h2><p>Tu perfil no tiene acceso a esta sección. Pide a un administrador Pro que ajuste sus pestañas.</p>{firstAllowedHref && <a className="portal-link-button" href={adminPath(firstAllowedHref)}>Ir a una sección disponible</a>}</div></div> : dashboardLoading || ((path === "/" || path.startsWith("/informes/inicio")) && holdedLoading) ? <div className="page"><DashboardLoader /></div> : path === "/" ? <Dashboard snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} currentUser={currentUser} holded={holdedSnapshot} isDeveloperAdmin={isDeveloperAdmin} /> : path.startsWith("/informes/inicio") ? <DashboardReport snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} holded={holdedSnapshot} /> : (
+          {accessDenied ? <div className="page"><div className="empty"><ShieldCheck /><h2>Sección no disponible</h2><p>Tu perfil no tiene acceso a esta sección. Pide a un administrador Pro que ajuste sus pestañas.</p>{firstAllowedHref && <a className="portal-link-button" href={adminPath(firstAllowedHref)}>Ir a una sección disponible</a>}</div></div> : dashboardLoading || ((path === "/" || path.startsWith("/informes/inicio")) && holdedLoading) ? <div className="page"><DashboardLoader /></div> : path === "/" ? <Dashboard snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} currentUser={currentUser} holded={holdedSnapshot} isDeveloperAdmin={isDeveloperAdmin} canOpenCRM={canSee("crm.to_contact")} mobileQuickLinks={mobileHomeLinks} /> : path.startsWith("/informes/inicio") ? <DashboardReport snapshot={portalSnapshot} contacts={crmContacts} leadStages={leadStages} holded={holdedSnapshot} /> : (
             <FeatureModule
               path={path}
               notify={setNotice}
@@ -466,6 +486,20 @@ export function AdminApp({ authUser, onLogout }: { authUser: PortalAdmin; onLogo
         </main>
         <AdminTutorial portal="admin" user={permissionProfile}/>
       </div>
+
+      <nav className="mobile-admin-nav" aria-label="Navegación de administración">
+        {sideMenus[area].filter(([, , , permission]) => canSee(permission)).slice(0, 3).map(([href, label, Icon]) => (
+          <a href={adminPath(href)} key={href} className={isSideItemActive(path, href) ? "active" : ""}
+             aria-current={isSideItemActive(path, href) ? "page" : undefined}>
+            <Icon aria-hidden="true" />
+            <span>{mobileNavLabels[label] || label}</span>
+          </a>
+        ))}
+        <button type="button" onClick={() => setOpen(true)} aria-label="Abrir todas las secciones">
+          <Menu aria-hidden="true" />
+          <span>Menú</span>
+        </button>
+      </nav>
 
       {notice && <div className="toast"><ShieldCheck /><span>{notice}</span><button onClick={() => setNotice("")}><X /></button></div>}
     </div>

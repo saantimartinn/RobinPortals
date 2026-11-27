@@ -1,9 +1,10 @@
 // Admin interface component for dashboard home; composed by the shell or a feature module.
 import { useEffect, useState } from "react";
 import {
-  CalendarDays, ChevronDown, CircleDollarSign, ExternalLink, GraduationCap,
+  ArrowRight, CalendarDays, ChevronDown, CircleDollarSign, ExternalLink, GraduationCap,
   Sparkles, TrendingUp, Users,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import {
   Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer,
   Tooltip, XAxis, YAxis,
@@ -17,8 +18,10 @@ import type { PortalClient, PortalSnapshot } from "@/services/portal";
 import { adminPath } from "@/components/admin-path";
 import { dashboardAcquisitionPeriod } from "@/components/dashboard-utils";
 
+const interactiveState = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--robin-navy)] active:opacity-80 disabled:cursor-not-allowed disabled:opacity-60";
+
 function Head({ title, sub, action }: { title: string; sub: string; action?: string }) {
-  return <header className="phead"><div><h2>{title}</h2><p>{sub}</p></div>{action && <button>{action}</button>}</header>;
+  return <header className="phead"><div><h2>{title}</h2><p>{sub}</p></div>{action && <button className={interactiveState}>{action}</button>}</header>;
 }
 
 function dashboardReportUrl(type: "altas" | "embudo" | "facturacion", period: string) {
@@ -26,7 +29,9 @@ function dashboardReportUrl(type: "altas" | "embudo" | "facturacion", period: st
 }
 
 
-export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded, isDeveloperAdmin }: { snapshot: PortalSnapshot | null; contacts: Contact[]; leadStages: Record<string, CrmStage>; currentUser: string; holded: HoldedSnapshot | null; isDeveloperAdmin: boolean }) {
+type MobileQuickLink = { href: string; label: string; Icon: LucideIcon };
+
+export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded, isDeveloperAdmin, canOpenCRM, mobileQuickLinks }: { snapshot: PortalSnapshot | null; contacts: Contact[]; leadStages: Record<string, CrmStage>; currentUser: string; holded: HoldedSnapshot | null; isDeveloperAdmin: boolean; canOpenCRM: boolean; mobileQuickLinks: MobileQuickLink[] }) {
   const [period, setPeriod] = useState<"7" | "15" | "30" | "all">("all");
   const [acquisition, setAcquisition] = useState<SalesDashboard["acquisition"] | null>(null);
   // The charts and counts wait for the acquisition data instead of drawing a local
@@ -67,24 +72,50 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
   const chartLabels = new Map(chartData.map((point) => [point.key, point]));
   const chartHasValues = chartData.some((point) => point.leads > 0 || point.clients > 0);
   const hotLeads = contacts.filter((lead) => (isDeveloperAdmin || lead.owner === currentUser) && (lead.heat || 0) >= 80 && !["Cliente", "Lost"].includes(leadStages[lead.id] || lead.stage || "Por contactar"));
+  const firstName = currentUser.trim().split(/\s+/)[0] || "equipo";
+  const primaryLink = canOpenCRM ? { href: adminPath("/crm"), label: "CRM", Icon: Users } : mobileQuickLinks[0];
+  const PrimaryIcon = primaryLink?.Icon || Users;
   const funnelStages: Array<[string, CrmStage]> = [["Por contactar", "Por contactar"], ["Contactados", "Contactado"], ["Llamadas", "Llamada programada"], ["Propuestas", "Propuesta enviada"], ["Clientes", "Cliente"]];
   const funnel = funnelStages.map(([label, stage]) => [label, contacts.filter((lead) => (leadStages[lead.id] || lead.stage || "Por contactar") === stage).length] as const);
   const funnelBase = Math.max(1, contacts.length);
   const financeData = holded ? [{ label: "Ventas", value: holded.currentYear.sales, previousValue: holded.previousYear.sales }, { label: "Cobrado", value: holded.currentYear.collected, previousValue: holded.previousYear.collected }, { label: "Pendiente", value: holded.currentYear.pending, previousValue: holded.previousYear.pending }] : [];
   return (
-    <div className="page">
-      <div className="title">
+    <div className="page dashboard-page">
+      <section className="admin-home-mobile" aria-labelledby="admin-home-title">
+        <div className="admin-home-mobile-brand">
+          <img src="/admin/robin-wordmark.png" alt="Robin" />
+          <span>Administración</span>
+        </div>
+        <h1 id="admin-home-title">Hola, {firstName}</h1>
+        <p>Tu equipo y los productos Robin, en un mismo lugar.</p>
+        {primaryLink && <a className={`admin-home-mobile-hero ${interactiveState}`} href={primaryLink.href}>
+          <div>
+            <span>Continuar en</span>
+            <strong>{primaryLink.label}</strong>
+            <b>Abrir <ArrowRight aria-hidden="true" /></b>
+          </div>
+          <i><PrimaryIcon aria-hidden="true" /></i>
+        </a>}
+        {mobileQuickLinks.filter((link) => link.href !== primaryLink?.href).length > 0 && <div className="admin-home-mobile-links">
+          <h2>Accesos rápidos</h2>
+          {mobileQuickLinks.filter((link) => link.href !== primaryLink?.href).map(({ href, label, Icon }) => <a className={interactiveState} href={href} key={href}>
+            <Icon aria-hidden="true" /><span>{label}</span><ArrowRight aria-hidden="true" />
+          </a>)}
+        </div>}
+      </section>
+
+      <div className="title dashboard-page-heading">
         <div><span>Inicio compartido</span><h1>Visión general de Robin</h1><p>Información común para todo el equipo de administración.</p></div>
-        <label className="dashboard-period"><CalendarDays /><select value={period} onChange={(event) => setPeriod(event.target.value as "7" | "15" | "30" | "all")}><option value="7">Últimos 7 días</option><option value="15">Últimos 15 días</option><option value="30">Últimos 30 días</option><option value="all">Todo</option></select><ChevronDown /></label>
+        <label className="dashboard-period"><CalendarDays /><select className={`${interactiveState} disabled:cursor-not-allowed disabled:opacity-60`} value={period} onChange={(event) => setPeriod(event.target.value as "7" | "15" | "30" | "all")}><option value="7">Últimos 7 días</option><option value="15">Últimos 15 días</option><option value="30">Últimos 30 días</option><option value="all">Todo</option></select><ChevronDown /></label>
       </div>
 
       {acquisitionLoading ? <DashboardLoader /> : <>
       <section className="stats">
-        {liveStats.map(([label, value, detail, Icon, tone, report]) => report ? <a className="stat-report-link" href={report} target="_blank" rel="noreferrer" key={label} aria-label={`Abrir informe de ${label}`}><article><i className={tone}><Icon /></i><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div><ExternalLink /></article></a> : <article key={label}><i className={tone}><Icon /></i><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div></article>)}
+        {liveStats.map(([label, value, detail, Icon, tone, report]) => report ? <a className={`stat-report-link ${interactiveState}`} href={report} target="_blank" rel="noreferrer" key={label} aria-label={`Abrir informe de ${label}`}><article><i className={tone}><Icon /></i><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div><ExternalLink /></article></a> : <article key={label}><i className={tone}><Icon /></i><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div></article>)}
       </section>
 
       <div className="grid">
-        <a className="panel chart report-chart" href={dashboardReportUrl("altas", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe de nuevos leads y clientes">
+        <a className={`panel chart report-chart ${interactiveState}`} href={dashboardReportUrl("altas", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe de nuevos leads y clientes">
           <header className="phead"><div><h2>Nuevos leads y clientes</h2><p>Altas diarias · {periodLabel.toLowerCase()}</p></div><span className="report-hint">Ver informe <ExternalLink /></span></header>
           <div className="chart-legend"><span className="leads">Leads</span><span className="clients">Clientes</span></div>
           {chartHasValues ? <ResponsiveContainer width="100%" height={270}>
@@ -94,18 +125,18 @@ export function Dashboard({ snapshot, contacts, leadStages, currentUser, holded,
 
         <section className="panel attention">
           <Head title="Leads calientes" sub={`Heat igual o superior a 80 · ${currentUser}`} />
-          <div>{hotLeads.length ? hotLeads.map((lead) => <button key={lead.id} onClick={() => window.location.assign(adminPath("/crm"))}><i className="red" /><div><strong>{lead.name}</strong><small>{leadStages[lead.id] || lead.stage}</small></div><em className="red">Heat {lead.heat}</em></button>) : <p className="empty-copy">No hay leads calientes asignados.</p>}</div>
+          <div>{hotLeads.length ? hotLeads.map((lead) => <button key={lead.id} className={interactiveState} onClick={() => window.location.assign(adminPath("/crm"))}><i className="red" /><div><strong>{lead.name}</strong><small>{leadStages[lead.id] || lead.stage}</small></div><em className="red">Heat {lead.heat}</em></button>) : <p className="empty-copy">No hay leads calientes asignados.</p>}</div>
         </section>
       </div>
 
       <div className="lower">
-        <a className="panel report-chart" href={dashboardReportUrl("embudo", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe del embudo de captación">
+        <a className={`panel report-chart ${interactiveState}`} href={dashboardReportUrl("embudo", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe del embudo de captación">
           <header className="phead"><div><h2>Embudo de captación</h2><p>Fases reales del CRM</p></div><span className="report-hint">Ver informe <ExternalLink /></span></header>
           <div className="funnel">{funnel.map(([label, value]) => <div key={label}><p><span>{label}</span><strong>{value}</strong></p><div><i style={{ width: `${Math.max(3, value / funnelBase * 100)}%` }} /></div></div>)}</div>
           <div className="conversion"><strong>{contacts.length ? `${(funnel[funnel.length - 1][1] / contacts.length * 100).toFixed(1)}%` : "0%"}</strong><span>Conversión total a cliente</span><b>{funnel[funnel.length - 1][1]} clientes</b></div>
         </a>
 
-        <a className="panel report-chart" href={dashboardReportUrl("facturacion", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe de facturación anual">
+        <a className={`panel report-chart ${interactiveState}`} href={dashboardReportUrl("facturacion", period)} target="_blank" rel="noreferrer" aria-label="Abrir informe de facturación anual">
           <header className="phead"><div><h2>Ventas anuales</h2><p>Base imponible real de Holded</p></div><span className="report-hint">Ver informe <ExternalLink /></span></header>
           <div className="comparison-legend"><span className="current">Este año</span><span className="previous">Año anterior</span></div><ResponsiveContainer width="100%" height={210}><BarChart data={financeData} layout="vertical" margin={{ left: 24, right: 18 }} barGap={-12}><CartesianGrid horizontal={false} stroke="#EDECDB" /><XAxis type="number" axisLine={false} tickLine={false} /><YAxis type="category" dataKey="label" axisLine={false} tickLine={false} width={72} /><Tooltip formatter={(value) => `${Number(value).toLocaleString("es-ES")} €`} /><Bar dataKey="previousValue" name="Año anterior" fill="#EDECDB" radius={[0,5,5,0]} /><Bar dataKey="value" name="Este año" fill="#2D3A64" radius={[0,5,5,0]} /></BarChart></ResponsiveContainer>
         </a>

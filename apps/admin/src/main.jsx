@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/global.css";
 import "./styles/brand-shell.css";
+import "./styles/native-app.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
